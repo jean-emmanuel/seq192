@@ -1,0 +1,102 @@
+
+<0.9.0>
+
+[sequence editor]
+
+[X] Ctrl Z undo seq + perf
+[x] Ctrl + select = adds to selection (roll + event) m_seq->unselect
+[X] Window Raise on Edit 
+[x] Static clipboard share
+[X] Do not use selected for internal stuff
+[X] Midi items are not de-selected after actions are taken (copy too)
+[x] Paste buffer shouldn't clear
+[x] paint notes
+[x] paint events
+
+[x] Port Names and number specd in rc file 
+[x] Controllers Speced in rc file eg. (Wavestation MIDI 1) (SuperNova Filter)
+[ ] Notes Speced in rc file eg. Bass Drum (no black/white)
+
+
+[ ] sorting of events placed into event list
+    0) Program Changes
+    1) CC's
+    2) Notes
+    3) MSB? LSB?
+[ ] If Data Entries are placed on same tick, Make Course First ??
+[ ] If NRPN or RPN are on same tick, Make Course First ??
+    
+[ ] Shuffle Quantize (percent and note from tool options)
+[x] Keyboard start/stop 
+[ ] Midi start/stop
+[ ] More scales!
+[X] Make the sequence editor grow tool stretch over the length.
+[x] Bump default song length way up.
+[X] Stretch Notes ( Rubber Band)
+[ ] Listen to notes as you draw / move?
+[X] Vertical Lines at grid snap ?
+[ ] exclusive groups (only one item in row or column can be active)
+[x] copy and paste between sequences (make clipboard static)
+[ ] Mouse move on piano roll/key roll, change background a bit ( check with scales on)
+[ ] Scroll on dragging ?
+[ ] Event mute ?
+[x] Stretch w/ Ctrl (Federico)
+[ ] Change background sequence color
+
+
+[x] Test Maxim Patches w/ wheel mouse
+    Make sure data entry still does its thing w/ wheel
+
+ 1) when clicking on an event only one (the "topmost") event is selected.
+ useful to decouple two events that are eventually stocked on top one another
+ 2) if there are any events selected, data editor only changes controller.
+ values for these events; if there are no events selected it acts as usual.
+ 3) data editor slope line can be dragged outside of data editor window;
+ controller values are adjusted to fit (0,127).
+ makes it easier setting all controllers to min/max value.
+ 4) mouse wheel scrolls the grid up/down in sequence editor and song editor.
+  MAxim Krikun[+ 
+ 5) Scrolling draw
+
+[ ] Quantize Button
+  
+[tools]
+[ ] Insert data runs. (Using Snap) CC
+[ ] Randomize                      CC
+[ ] Smooth                         CC
+[ ] Sharpen                        CC
+[ ] Thin.                          CC
+[ ] Thick.                         CC
+[ ] Reverse.                NOTES CC
+[ ] Delete doubles (Start) NOTES   CC   
+[x] Quantize Start        NOTES    CC
+[ ] Quantize Length  > Big Menu.   NOTES
+[ ] Set Note Lengthi > Big Menu.  NOTES
+[x] Transpose.            NOTES
+[x] Harmonic transpose.   NOTES
+
+[ ] Multiple Manual Inputs.  Selectable from editor.
+
+[ ] One mouse button operation (buttons now chose mode)
+       Old buttons still work.
+       Add keyboard shortcuts for Select Draw Erase Grow
+
+[ ] options for priority
+[ ] nologo flag ??
+
+[sysex]
+[ ] add data buffers to event.cpp
+[ ] midi files must read/save sysex.
+[ ] .seq24rc defines known sysex patters
+[ ] editor has new menu for known sysex and unknown sysex.
+[ ] known sysex patterns can be changed with data graph
+[ ] unknown sysex patterns can be edited raw
+
+[ ] Implement raw hex editor.  
+[hexeditor]
+    Design for sysex and normal midi data.
+    Edit whole sequence list.  Filters?  Super flexable
+
+<< Other >>
+[ ] Midi file export (render mode)
+[ ] Song Cue Points Based on Keys or Midi Input

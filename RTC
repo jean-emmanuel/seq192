@@ -1,0 +1,82 @@
+** Note **
+this text is quite outdated.  If you check out the linux kernels
+high resolution timer patches for 2.4 (they are built in 2.5+).
+They will allow the scheduler and default timers to run at 1000Hz.
+
+[1] RTC - What is is....
+
+The following was taken from the site of Takashi Iwai:
+(http://www.alsa-project.org/~iwai/alsa.html)
+-------------------------------------------------------------------------
+RTC High Frequency Timer Patch
+
+RTC has a nice high-frequent interrupt capability up to 8192 Hz. Although 
+this can be used (on the recent kernel) even from userspace via fasync 
+signals, it is not allowed to use the interrupt from kernel. This is the 
+very reason of this patch.
+
+This tiny patch adds a hook to the RTC driver in linux kernel. A callback 
+function is called at each interrupt. For changing frequency, starting and 
+stopping interrupts, use rtc_control function.
+
+The older version of this patch had more functionalities than the current 
+version, for example, multiple callbacks with different frequencies are 
+allowed. From this patch, however, I intensionally removed these things, 
+because of simplicity. Only one callback can be used exclusively (even 
+to user-space). That is, if a kernel driver (e.g. ALSA RTC timer) registers 
+the callback, no other threads can use RTC interrupt. /dev/rtc cannot be 
+opened during it.
+--------------------------------------------------------------------------
+
+
+[2] What is does.....
+
+In a nutshell, it allows the sequencer to pump out midi messages at a 
+resolution of 1 millisecond, compared to the standard 2.4.x kernels 10ms.  
+This is needed for midi clock, where 2-3 ms in-between ticks is necessary,
+or your synced gear will be acting quite funny.
+
+-------------------------------------------------------------------------
+
+
+[3] How to get it...
+
+So basically, if you want to use the RTC patch, you have to get it from 
+the alsa-driver files.  
+
+Download the current driver tarball from ( http://www.alsa-project.org/ ).  
+
+Located in [alsa-driver-0.9.0x/utils/patches] are diff files to apply 
+towards your kernel source.
+
+Once you have that patched and installed, you compile your alsa drivers 
+with the rtc-timer module.
+
+Then, modify your modules.conf file accordingly.  
+Here is what mine looks like:
+
+
+> modules.conf excerpt ------------------
+
+# rtc
+options snd-timer snd_timer_limit=2
+alias snd-timer-1 snd-rtctimer
+options snd-seq snd_seq_default_timer_resolution=1000 
+options snd-seq snd_seq_default_timer_device=1
+
+# ALSA portion
+alias char-major-116 snd
+alias snd-card-0 snd-emu10k1
+
+> --------------------------------------
+
+-------------------------------------------------------------------------
+
+
+[4] Problems ?
+
+If your having problems with the RTC module, please ask on one of the 
+ALSA lists.  The author of seq24 does not wish to troubleshoot your 
+kernel/alsa issues.
+
+

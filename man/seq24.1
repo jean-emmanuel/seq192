@@ -1,0 +1,79 @@
+.TH Seq24 1 "February 9 2006" "Version 0.7.0" "Seq24 Manual Page"
+
+.SH NAME
+Seq24 - Real time MIDI sequencer
+
+
+.SH SYNOPSIS
+.B seq24
+[\fIOPTIONS\fP]
+
+
+.SH DESCRIPTION
+.PP
+\fISeq24\fP is a real-time midi sequencer. It was created to
+provide a very simple interface for editing and playing
+midi 'loops'.
+
+
+.SH OPTIONS
+Seq24 accepts the following options:
+.TP 8
+.B  \-\-help
+Display a list of all commandline options
+.TP 8
+.B \-\-file \fI<filename>\fP
+Load MIDI file on startup
+.TP 8
+.B \-\-showmidi
+Dumps incoming midi to screen
+.TP 8
+.B \-\-priority
+Runs higher priority with FIFO scheduler
+.TP 8
+.B \-\-pass_sysex
+Passes any incoming sysex messages to all outputs
+.TP 8
+.B \-\-show_keys
+Prints pressed key value
+.TP 8
+.B \-\-interaction_method <number>
+Select mouse interaction method
+	(0 = seq24) (default)
+	(1 = fruity loops method)
+.TP 8
+.B \-\-jack_transport
+seq24 will sync to JACK transport
+.TP 8
+.B \-\-jack_master
+seq24 will try to be JACK master
+.TP 8
+.B \-\-jack_master_cond
+JACK master will fail if there is already a master
+.TP 8
+.B \-\-jack_start_mode \fI<x>\fP
+When seq24 is synced to JACK, the following play modes are available:
+	(0 = live mode)
+	(1 = song mode) (default)
+
+
+.SH FILES
+\fB$HOME\fP/.seq24rc stores the user settings for seq24.
+
+
+.SH SUGGESTIONS AND BUG REPORTS
+Any bugs found should be reported to the upstream author and/or package 
+maintainer.
+
+
+.SH OTHER INFO
+The project homepage is at http://www.filter24.org/seq24/.
+
+It is released under the GNU GPL license.
+
+
+.SH AUTHOR
+Seq24 was written by Rob C. Buse <seq24@filter24.org>.
+
+This manual page was written by Dana Olson <seq24@ubuntustudio.com>, 
+for the Ubuntu project (but may be used by others).
