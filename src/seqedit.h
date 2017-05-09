@@ -213,11 +213,13 @@ class seqedit : public Gtk::Window
     void set_note_length( int a_note_length );
 
     void set_bpm( int a_beats_per_measure );
-    void bpm_change_callback( void ); // ORL bpm set through text by user
+    bool bpm_change_callback( GdkEventFocus *focus ); // ORL bpm set through text by user
+    void bpm_change_enter_callback( void); // ORL bpm set through text by user
     void set_bw( int a_beat_width );
     void set_rec_vol( int a_rec_vol );
     void set_measures( int a_length_measures  );
-    void measures_change_callback( void ); // ORL length set through text by user
+    bool measures_change_callback( GdkEventFocus *focus ); // ORL length set through text by user
+    void measures_change_enter_callback( void); // ORL length set through text by user
     void apply_length( int a_bpm, int a_bw, int a_measures );
     long get_measures( void );
 

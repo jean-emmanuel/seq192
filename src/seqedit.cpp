@@ -706,8 +706,10 @@ seqedit::fill_top_bar( void )
     m_entry_bpm->set_width_chars(2);
     // ORL bpm can be set by a text type by the user
     m_entry_bpm->set_editable( true );
-    m_entry_bpm->signal_changed().connect(
+    m_entry_bpm->signal_focus_out_event().connect(
             mem_fun(*this, &seqedit::bpm_change_callback));
+    m_entry_bpm->signal_activate().connect(
+            mem_fun(*this, &seqedit::bpm_change_enter_callback));
     // end of the mod
 
     m_hbox->pack_start( *m_button_bpm , false, false );
@@ -740,8 +742,10 @@ seqedit::fill_top_bar( void )
     m_entry_length->set_width_chars(3);
     // ORL number of measures may be set by a text typed by the user
     m_entry_length->set_editable( true );
-    m_entry_length->signal_changed().connect(
+    m_entry_length->signal_focus_out_event().connect(
             mem_fun(*this, &seqedit::measures_change_callback));
+    m_entry_length->signal_activate().connect(
+            mem_fun(*this, &seqedit::measures_change_enter_callback));
     // end of mod
 
     m_hbox->pack_start( *m_button_length , false, false );
@@ -1337,8 +1341,8 @@ seqedit::set_measures( int a_length_measures  )
 }
 
 // ORL Number of measures (length of sequence) can be set by a text typed by user
-void
-seqedit::measures_change_callback(void)
+bool
+seqedit::measures_change_callback(GdkEventFocus *focus)
 {
     char b[4];
 
@@ -1365,9 +1369,19 @@ seqedit::measures_change_callback(void)
         apply_length( m_seq->get_bpm(), m_seq->get_bw(), m_measures );
 
     }
+    return true;
 }
 
-void 
+void
+seqedit::measures_change_enter_callback()
+{
+
+      GdkEventFocus event = GdkEventFocus();
+      this->measures_change_callback(&event);
+
+}
+
+void
 seqedit::set_bpm( int a_beats_per_measure )
 {
     char b[4];
@@ -1384,8 +1398,8 @@ seqedit::set_bpm( int a_beats_per_measure )
 }
 
 // ORL BPM can be set by a text typed by user
-void
-seqedit::bpm_change_callback(void)
+bool
+seqedit::bpm_change_callback(GdkEventFocus *focus)
 {
     char b[4];
 
@@ -1411,11 +1425,23 @@ seqedit::bpm_change_callback(void)
         long length = get_measures();
         m_seq->set_bpm( m_int_bpm );
         apply_length( m_int_bpm, m_seq->get_bw(), length );
-       
+
     }
+
+    return true;
 }
 
-void 
+void
+seqedit::bpm_change_enter_callback()
+{
+
+      GdkEventFocus event = GdkEventFocus();
+      this->bpm_change_callback(&event);
+
+}
+
+
+void
 seqedit::set_bw( int a_beat_width  )
 {
     char b[4];
