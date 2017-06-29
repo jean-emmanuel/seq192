@@ -55,8 +55,10 @@ const int c_bpm          = 120;  /* default */
 const int c_maxBuses = 32;
 
 /* trigger width in milliseconds */
-const int c_thread_trigger_width_ms = 4;
-const int c_thread_trigger_lookahead_ms = 2;
+// PLAGIAT: divide by two
+const int c_thread_trigger_width_ms = 2;
+const int c_thread_trigger_lookahead_ms = 1;
+// PLAGIAT done
 
 /* for the seqarea class */
 const int c_text_x = 6;

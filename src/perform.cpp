@@ -167,17 +167,17 @@ perform::perform()
 }
 
 /* I had to reintroduce those functions here so that it is possible to use a PC or CC or Note On to play with a restart of jack location (useful if you have some sequences longer than other and you want to switch from one to another without knowing how many times you will play the first one. */
-void 
+void
 perform::start_playing( void )
 {
     position_jack( false );
     start( false );
-    usleep(500);
+    usleep(1000);
     start_jack();
 }
 
 
-void 
+void
 perform::stop_playing( void )
 {
     stop_jack();
