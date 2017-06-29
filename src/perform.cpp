@@ -172,7 +172,7 @@ perform::start_playing( void )
 {
     position_jack( false );
     start( false );
-    usleep(1000);
+    usleep(500);
     start_jack();
 }
 
