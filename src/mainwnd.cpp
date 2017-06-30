@@ -292,9 +292,7 @@ mainwnd::options_dialog( void )
 void 
 mainwnd::start_playing( void )
 {
-    m_mainperf->position_jack( false );  
-    m_mainperf->start( false );
-    m_mainperf->start_jack( );
+    m_mainperf->start_playing();
     is_pattern_playing = true;
 }
 
@@ -302,8 +300,7 @@ mainwnd::start_playing( void )
 void 
 mainwnd::stop_playing( void )
 {
-    m_mainperf->stop_jack();
-    m_mainperf->stop();
+    m_mainperf->stop_playing();
     m_main_wid->update_sequences_on_window();
     is_pattern_playing = false;
 }
