@@ -172,6 +172,12 @@ perform::start_playing( void )
 {
     position_jack( false );
     start_jack();
+
+    if (!m_jack_running && m_running) {
+        inner_stop();
+        usleep(c_thread_trigger_width_ms * 1000);
+    }
+
     start( false );
 }
 
