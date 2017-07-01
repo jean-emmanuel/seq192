@@ -657,9 +657,7 @@ void perform::set_bpm(int a_bpm)
     if ( a_bpm < 20 )  a_bpm = 20;
     if ( a_bpm > 500 ) a_bpm = 500;
 
-    if ( ! (m_jack_running && m_running )){
-        m_master_bus.set_bpm( a_bpm );
-    }
+    m_master_bus.set_bpm( a_bpm );
 }
 
 
