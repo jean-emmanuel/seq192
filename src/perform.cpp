@@ -1182,6 +1182,9 @@ int jack_sync_callback(jack_transport_state_t state,
 
     p->m_jack_frame_current = jack_get_current_transport_frame(p->m_jack_client);
 
+    p->m_jack_pos = *pos;
+    p->set_bpm(p->m_jack_pos.beats_per_minute);
+
     p->m_jack_tick =
         p->m_jack_frame_current *
         p->m_jack_pos.ticks_per_beat *
@@ -1391,8 +1394,16 @@ void perform::output_func(void)
 
                 init_clock = false;
 
-                m_jack_transport_state = jack_transport_query( m_jack_client, &m_jack_pos );
+                jack_position_t pos;
+                m_jack_transport_state = jack_transport_query( m_jack_client, &pos );
                 m_jack_frame_current =  jack_get_current_transport_frame( m_jack_client );
+
+                if (m_jack_pos.beats_per_minute != pos.beats_per_minute)
+                    set_bpm(m_jack_pos.beats_per_minute);
+
+                m_jack_pos.ticks_per_beat = pos.ticks_per_beat;
+                m_jack_pos.beats_per_minute = pos.beats_per_minute;
+                m_jack_pos.frame_rate = pos.frame_rate;
 
                 if ( m_jack_transport_state_last  ==  JackTransportStarting &&
                         m_jack_transport_state       == JackTransportRolling ){
