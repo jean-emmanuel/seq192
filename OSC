@@ -1,9 +1,9 @@
 ## OSC commands
 
 ### /play
-Start playback or trig if already playing
+Start playback or restart if already playing
 
-###  /stop
+### /stop
 Stop playback
 
 ### /screenset <int: screen>
