@@ -21,9 +21,9 @@
 #include "maintime.h"
 
 
-maintime::maintime( ): DrawingArea() 
-{     
-    // in the construor you can only allocate colors, 
+maintime::maintime( ): DrawingArea()
+{
+    // in the construor you can only allocate colors,
     // get_window() returns 0 because we have not be realized
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
 
@@ -36,15 +36,15 @@ maintime::maintime( ): DrawingArea()
     colormap->alloc_color( m_grey );
 
     m_tick = 0;
-} 
+}
 
-void 
+void
 maintime::on_realize()
 {
     // we need to do the default realize
     Gtk::DrawingArea::on_realize();
 
-    
+
     // Now we can allocate any additional resources we need
     m_window = get_window();
     m_gc = Gdk::GC::create( m_window );
@@ -52,11 +52,11 @@ maintime::on_realize()
 
     /* set default size */
     set_size_request( c_maintime_x , c_maintime_y );
- 
+
 }
 
 
-int 
+int
 maintime::idle_progress( long a_ticks )
 {
   m_tick = a_ticks;
@@ -66,8 +66,8 @@ maintime::idle_progress( long a_ticks )
   m_gc->set_foreground(m_black);
   m_window->draw_rectangle(m_gc,false,
 			  0,
-			  0, 
-			  c_maintime_x - 1, 
+			  0,
+			  c_maintime_x - 1,
 			  c_maintime_y - 1  );
 
   int width = c_maintime_x - 1 - c_pill_width;
@@ -81,24 +81,24 @@ maintime::idle_progress( long a_ticks )
     m_gc->set_foreground(m_grey);
     m_window->draw_rectangle(m_gc,true,
 			    2, //tick_x + 2,
-			    2, 
-			    c_maintime_x - 4, 
+			    2,
+			    c_maintime_x - 4,
 			    c_maintime_y - 4  );
   }
 
-  
+
 
   m_gc->set_foreground(m_black);
   m_window->draw_rectangle(m_gc,true,
 			  beat_x + 2,
-			  2, 
-			  c_pill_width, 
+			  2,
+			  c_pill_width,
 			  c_maintime_y - 4  );
-  
+
   m_window->draw_rectangle(m_gc,true,
 			  bar_x + 2,
-			  2, 
-			  c_pill_width, 
+			  2,
+			  c_pill_width,
 			  c_maintime_y - 4  );
 
   return true;

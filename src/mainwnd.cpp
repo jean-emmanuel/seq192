@@ -67,8 +67,8 @@ mainwnd::mainwnd(perform *a_p)
     m_menu_file = manage(new Menu());
     m_menubar->items().push_front(MenuElem("_File", *m_menu_file));
 
-    m_menu_view = manage( new Menu());
-    m_menubar->items().push_back(MenuElem("_View", *m_menu_view));
+    // m_menu_view = manage( new Menu());
+    // m_menubar->items().push_back(MenuElem("_View", *m_menu_view));
 
     m_menu_help = manage( new Menu());
     m_menubar->items().push_back(MenuElem("_Help", *m_menu_help));
@@ -96,9 +96,9 @@ mainwnd::mainwnd(perform *a_p)
                 mem_fun(*this, &mainwnd::file_exit)));
 
     /* view menu items */
-    m_menu_view->items().push_back(MenuElem("_Song Editor...",
-                Gtk::AccelKey("<control>E"),
-                mem_fun(*this, &mainwnd::open_performance_edit)));
+    // m_menu_view->items().push_back(MenuElem("_Song Editor...",
+    //             Gtk::AccelKey("<control>E"),
+    //             mem_fun(*this, &mainwnd::open_performance_edit)));
 
     /* help menu items */
     m_menu_help->items().push_back(MenuElem("_About...",
@@ -127,13 +127,13 @@ mainwnd::mainwnd(perform *a_p)
     hbox->pack_start(*m_button_play, false, false);
 
     /* song edit button */
-    m_button_perfedit = manage( new Button( ));
-    m_button_perfedit->add( *manage( new Image(
-                    Gdk::Pixbuf::create_from_xpm_data( perfedit_xpm  ))));
-    m_button_perfedit->signal_clicked().connect(
-            mem_fun( *this, &mainwnd::open_performance_edit ));
-    add_tooltip( m_button_perfedit, "Show or hide song editor window" );
-    hbox->pack_end(*m_button_perfedit, false, false, 4);
+    // m_button_perfedit = manage( new Button( ));
+    // m_button_perfedit->add( *manage( new Image(
+    //                 Gdk::Pixbuf::create_from_xpm_data( perfedit_xpm  ))));
+    // m_button_perfedit->signal_clicked().connect(
+    //         mem_fun( *this, &mainwnd::open_performance_edit ));
+    // add_tooltip( m_button_perfedit, "Show or hide song editor window" );
+    // hbox->pack_end(*m_button_perfedit, false, false, 4);
 
     /* bpm spin button */
     m_adjust_bpm = manage(new Adjustment(m_mainperf->get_bpm(), 20, 500, 1));
