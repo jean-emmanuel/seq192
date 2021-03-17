@@ -1,3 +1,5 @@
+## OSC commands
+
 ### /play
 Start playback or trig if already playing
 
@@ -9,14 +11,36 @@ Change active screen set
 
 ### /sequence <string: mode> <int: column> <int: row>
 Set sequence(s) state
-    mode: "solo", "on", "off" or toggle
+    mode: "solo", "on", "off" or "toggle"
     column: column number on screen set (zero indexed)
     row: row number; if omitted, all rows are affected; multiple rows can be specified
 
+### /sequence <string: mode> <string: name>
+Set sequence(s) state
+    name: sequence name or osc pattern (can match multiple sequence names); multiple names can be specified
 
 ### /sequence_and_play <string: mode> <int: column> <int: row>
-Same as /sseq and (re)start playback
+Same as /sequence and (re)start playback
 
 ### /status <string: address>
 Send sequencer's status in a json string
     address: osc.udp://ip:port ; if omitted the response will be sent to the sender
+
+
+## OSC status
+
+{
+    "screenset": <int>,
+    "sequences": [
+        {
+            "col": <int>,
+            "row": <int>,
+            "name": "<string>",
+            "time": "<string>",
+            "bars": <int>,
+            "queued": <int>,
+            "on": <int>
+        }
+    ],
+    "playing": <int>
+}

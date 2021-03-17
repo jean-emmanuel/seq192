@@ -234,50 +234,103 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
             break;
         case SEQ_SSEQ:
         case SEQ_SSEQ_AND_PLAY:
+        case SEQ_SSEQ_QUEUED:
         {
-            if (argc < 2) return 0;
+            if (argc < 2 || types[0] != 's') return 0;
 
+            // arg 0: mode
             int mode = self->osc_seq_modes[(std::string) &argv[0]->s];
-            int col = argv[1]->i;
+            if (!mode) return 1;
 
-            if (!mode || col < 0 || col > c_mainwnd_cols) return 1;
-
-            int rows[c_mainwnd_rows];
-
-            for (int i = 2; i < argc; i++) {
-                int row = argv[i]->i;
-                if (row < c_mainwnd_rows) {
-                    rows[row] = 1;
-                }
+            for (int i = 0; i < c_mainwnd_rows * c_mainwnd_cols; i++) {
+                self->osc_selected_seqs[i] = 0;
             }
-            if (argc == 2) {
-                for (int i = 0; i < c_mainwnd_rows; i++) {
-                    rows[i] = 1;
+            // int selected_seqs[c_mainwnd_rows * c_mainwnd_cols];
+
+            if (types[1] == 'i') {
+                // arg 1: column number
+
+                int col = argv[1]->i;
+                if (col < 0 || col > c_mainwnd_cols) return 0;
+
+                if (argc == 2) {
+                    // select all rows in column
+                    for (int i = 0; i < c_mainwnd_rows; i++) {
+                        self->osc_selected_seqs[i + col * c_mainwnd_rows] = 1;
+                    }
+                } else {
+                    // select some rows in column
+                    for (int i = 2; i < argc; i++) {
+                        if (types[i] == 'i') {
+                            int row = argv[i]->i;
+                            if (row < c_mainwnd_rows) {
+                                self->osc_selected_seqs[row + col * c_mainwnd_rows] = 1;
+                            }
+                        }
+                    }
                 }
+
+            } else if (types[1] == 's') {
+                // arg 1...n: sequences names / osc pattern
+
+                for (int i = 0; i < c_mainwnd_cols * c_mainwnd_rows; i++) {
+                    if (self->m_seqs[i] != NULL) {
+                        for (int j = 1; j < argc; j++) {
+                            if (types[j] == 's' && lo_pattern_match(self->m_seqs[i]->get_name(), &argv[j]->s)) {
+                                self->osc_selected_seqs[i] = 1;
+                            }
+                        }
+                    }
+                }
+
             }
 
             if (mode == SEQ_MODE_SOLO) {
                 for (int i = 0; i < c_max_sequence; i++) {
                     if (self->m_seqs[i] != NULL && self->m_seqs[i]->get_playing()) {
-                        self->m_seqs[i]->set_playing(false);
+                        if (command == SEQ_SSEQ_QUEUED) {
+                            if (!self->m_seqs[i]->get_queued()) {
+                                self->m_seqs[i]->toggle_queued();
+                            }
+                        } else {
+                            self->m_seqs[i]->set_playing(false);
+                        }
                     }
                 }
             }
 
-            for (int i = 0; i < c_mainwnd_rows; i++) {
-                if (rows[i] == 1) {
-                    int nseq = i + col * c_mainwnd_rows + self->m_screen_set * c_mainwnd_cols * c_mainwnd_rows;
+            for (int i = 0; i < c_mainwnd_rows * c_mainwnd_cols; i++) {
+                if (self->osc_selected_seqs[i] == 1) {
+                    int nseq = i + self->m_screen_set * c_mainwnd_cols * c_mainwnd_rows;
                     if (nseq < c_max_sequence && self->m_seqs[nseq] != NULL) {
                         switch (mode) {
                             case SEQ_MODE_SOLO:
                             case SEQ_MODE_ON:
-                                self->m_seqs[nseq]->set_playing(true);
+                                if (command == SEQ_SSEQ_QUEUED) {
+                                    if (!self->m_seqs[nseq]->get_playing() && !self->m_seqs[nseq]->get_queued()) {
+                                        self->m_seqs[nseq]->toggle_queued();
+                                    }
+                                } else {
+                                    self->m_seqs[nseq]->set_playing(true);
+                                }
                                 break;
                             case SEQ_MODE_OFF:
-                                self->m_seqs[nseq]->set_playing(false);
+                                if (command == SEQ_SSEQ_QUEUED) {
+                                    if (self->m_seqs[nseq]->get_playing() && !self->m_seqs[nseq]->get_queued()) {
+                                        self->m_seqs[nseq]->toggle_queued();
+                                    }
+                                } else {
+                                    self->m_seqs[nseq]->set_playing(false);
+                                }
                                 break;
                             case SEQ_MODE_TOGGLE:
-                                self->m_seqs[nseq]->toggle_playing();
+                                if (command == SEQ_SSEQ_QUEUED) {
+                                    if (!self->m_seqs[nseq]->get_queued()) {
+                                        self->m_seqs[nseq]->toggle_queued();
+                                    }
+                                } else {
+                                    self->m_seqs[nseq]->toggle_playing();
+                                }
                                 break;
                         }
                     }
@@ -326,6 +379,7 @@ void perform::osc_status( char* address )
                 json += "\"name\":\"" + (std::string)m_seqs[nseq]->get_name() + "\",";
                 json += "\"time\":\"" + std::to_string(m_seqs[nseq]->get_bpm()) + "/" + std::to_string(m_seqs[nseq]->get_bw()) + "\",";
                 json += "\"bars\":" + std::to_string((int)((double)m_seqs[nseq]->get_length() / c_ppqn / m_seqs[nseq]->get_bpm() * (m_seqs[nseq]->get_bw() / 4))) + ",";
+                json += "\"queued\":" + std::to_string(m_seqs[nseq]->get_queued()) + ",";
                 json += "\"on\":" + std::to_string(m_seqs[nseq]->get_playing());
                 json += "},";
             }
