@@ -365,6 +365,7 @@ void perform::osc_status( char* address )
 
     std::string json = "{";
 
+    json += "\"playing\":" + std::to_string(m_running) + ",";
     json += "\"screenset\":" + std::to_string(m_screen_set) + ",";
     json += "\"sequences\":[";
     bool empty = true;
@@ -388,11 +389,7 @@ void perform::osc_status( char* address )
 
     if (!empty) json = json.substr(0, json.size() - 1);
 
-    json += "],";
-
-    json += "\"playing\":" + std::to_string(m_running);
-
-    json += "}";
+    json += "]}";
 
     oscserver->send_json(address, json.c_str());
 
