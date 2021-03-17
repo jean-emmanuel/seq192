@@ -55,7 +55,7 @@ class mainwnd : public Gtk::Window, public performcallback
  private:
 
     bool      m_modified;
-    
+
 #if GTK_MINOR_VERSION < 12
     Tooltips *m_tooltips;
 #endif
@@ -63,6 +63,15 @@ class mainwnd : public Gtk::Window, public performcallback
     Menu     *m_menu_file;
     Menu     *m_menu_view;
     Menu     *m_menu_help;
+
+    // SCROLL MOD
+    Adjustment * m_hadjust;
+    Adjustment * m_vadjust;
+    HScrollbar * m_hscroll;
+    VScrollbar * m_vscroll;
+    void on_scrollbar_resize ();
+    bool on_scroll_event (GdkEventScroll * ev);
+    // SCROLL MOD
 
     perform  *m_mainperf;
 
@@ -73,7 +82,7 @@ class mainwnd : public Gtk::Window, public performcallback
     options *m_options;
 
     Gdk::Cursor   m_main_cursor;
-    
+
     Button      *m_button_learn;
 
     Button      *m_button_stop;
