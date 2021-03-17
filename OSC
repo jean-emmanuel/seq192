@@ -11,8 +11,12 @@ Change active screen set
 Set sequence(s) state
     mode: "solo", "on", "off" or toggle
     column: column number on screen set (zero indexed)
-    row: row number; if ommitted, all rows are affected; multiple rows can be specified
+    row: row number; if omitted, all rows are affected; multiple rows can be specified
 
 
 ### /sequence_and_play <string: mode> <int: column> <int: row>
 Same as /sseq and (re)start playback
+
+### /status <string: address>
+Send sequencer's status in a json string
+    address: osc.udp://ip:port ; if omitted the response will be sent to the sender
