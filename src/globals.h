@@ -88,11 +88,12 @@ const int c_dataarea_y = 128;
 const int c_data_x = 2;
 
 /* keyboard */
-const int c_key_x = 16;
-const int c_key_y = 8;
+const float c_key_size_factor = 1.5;
+const int c_key_x = 16 * c_key_size_factor;
+const int c_key_y = 8 * c_key_size_factor;
 const int c_num_keys = 128;
 const int c_keyarea_y = c_key_y * c_num_keys + 1;
-const int c_keyarea_x = 36;
+const int c_keyarea_x = 36 * c_key_size_factor;
 const int c_keyoffset_x = c_keyarea_x - c_key_x;
 
 
@@ -130,7 +131,7 @@ const unsigned long c_mutegroups = 0x24240009; // not sure why we went to 10 abo
 
 const char c_font_6_12[] = "-*-fixed-medium-r-*--12-*-*-*-*-*-*";
 const char c_font_8_13[] = "-*-fixed-medium-r-*--13-*-*-*-*-*-*";
-const char c_font_5_7[]  = "-*-fixed-medium-r-*--7-*-*-*-*-*-*";
+const char c_font_5_7[]  = "-*-fixed-medium-r-*--8-*-*-*-*-*-*";
 
 
 /* used in menu to tell setState what to do */

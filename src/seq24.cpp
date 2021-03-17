@@ -58,6 +58,7 @@ option long_options[] = {
     {"pass_sysex", 0, 0, 'P'},
     {"show_keys", 0,0,'k'},
     {"osc_port", 1,0,'o'},
+    {"key_size", 1,0,'o'},
     {0, 0, 0, 0}
 
 };

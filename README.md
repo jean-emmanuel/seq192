@@ -1,12 +1,23 @@
+# seq24-plagiat
+
+Main changes
+- song editor disabled
+- keyboard shortcuts disabled
+- scrollable main windowx
+- osc controllable (see OSC.md)
+- starting playback when already playing restarts playback
+- bigger keys in pianoroll; slightly bigger font for small texts
+
+```
 seq24 README
 ------------
 
-How to install? 
+How to install?
 
     read INSTALL.
 
 How to use seq24?
-    
+
     Documentation on using seq24 is in the SEQ24 file.
 
 Information on modifying, copying?
@@ -26,3 +37,4 @@ What to do with a fresh repository checkout?
 
     Apply "autoreconf" to get a configure script, then read INSTALL.
 
+```
