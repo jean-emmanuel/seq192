@@ -220,16 +220,14 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
     // fflush(stdout);
 
     int command = self->osc_commands[(std::string) path];
-    if (!command) return 1;
+    if (!command) return 0;
 
     switch (command) {
         case SEQ_PLAY:
             self->start_playing();
-            printf("play\n");
             break;
         case SEQ_STOP:
             self->stop_playing();
-            printf("stop\n");
             break;
         case SEQ_SSET:
             self->set_screenset((int) argv[0]->i);
@@ -237,7 +235,7 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
         case SEQ_SSEQ:
         case SEQ_SSEQ_AND_PLAY:
         {
-            if (argc < 2) return 1;
+            if (argc < 2) return 0;
 
             int mode = self->osc_seq_modes[(std::string) &argv[0]->s];
             int col = argv[1]->i;
@@ -260,7 +258,7 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
 
             if (mode == SEQ_MODE_SOLO) {
                 for (int i = 0; i < c_max_sequence; i++) {
-                    if (self->is_active(i)) {
+                    if (self->m_seqs[i] != NULL && self->m_seqs[i]->get_playing()) {
                         self->m_seqs[i]->set_playing(false);
                     }
                 }
@@ -305,7 +303,7 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
     }
 
 
-    return 1;
+    return 0;
 }
 
 
@@ -325,7 +323,10 @@ void perform::osc_status( char* address )
                 json += "{";
                 json += "\"col\":" + std::to_string(col) + ",";
                 json += "\"row\":" + std::to_string(row) + ",";
-                json += "\"on\":" + std::to_string(is_active(nseq));
+                json += "\"name\":\"" + (std::string)m_seqs[nseq]->get_name() + "\",";
+                json += "\"time\":\"" + std::to_string(m_seqs[nseq]->get_bpm()) + "/" + std::to_string(m_seqs[nseq]->get_bw()) + "\",";
+                json += "\"bars\":" + std::to_string((int)((double)m_seqs[nseq]->get_length() / c_ppqn / m_seqs[nseq]->get_bpm() * (m_seqs[nseq]->get_bw() / 4))) + ",";
+                json += "\"on\":" + std::to_string(m_seqs[nseq]->get_playing());
                 json += "},";
             }
         }
