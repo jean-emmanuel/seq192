@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(seq24, [0.9.1], [seq24-devel@lists.sourceforge.net])
+AC_INIT(seq24, [0.10.0], [seq24-devel@lists.sourceforge.net])
 
 AC_CONFIG_SRCDIR([src/event.cpp])
 AC_CONFIG_HEADER([src/config.h])
@@ -35,7 +35,7 @@ if test x"${as_needed}" = x"unknown"; then
                 [],
                 [as_needed="1"],
                 [as_needed=""])
-    LDFLAGS="${ac_old_ldflags}" 
+    LDFLAGS="${ac_old_ldflags}"
 fi
 if test -n "$as_needed"; then
     AC_MSG_RESULT(yes)
@@ -45,7 +45,7 @@ else
 fi
 
 dnl Checks for libraries.
-AC_CHECK_LIB(rt, main, ,    
+AC_CHECK_LIB(rt, main, ,
 	AC_MSG_ERROR([POSIX.1b RealTime Library Missing -lrt]))
 AC_CHECK_LIB(gtkmm-2.4, _init,,
              AC_MSG_ERROR(Essential library libgtkmm-2.4 not found))
@@ -76,11 +76,11 @@ dnl
 dnl     JACK SUPPORT
 dnl
 jack_support=yes
-                                                                                                                 
+
 AC_ARG_ENABLE(jack-support, [AS_HELP_STRING(--disable-jack-support, [Compile without JACK support])], [jack_support=$enableval])
 
 JACK_SUPPORT=0
-                                                                                                                 
+
 if test "$jack_support" != "no"; then
         PKG_CHECK_MODULES(JACK, jack >= 0.90.0, jack_found="yes", jack_found="no")
         if test "$jack_found" = "yes"; then
@@ -121,4 +121,3 @@ fi
 
 
 AC_OUTPUT(Makefile man/Makefile src/Makefile)
-

@@ -1,7 +1,7 @@
 # Makefile.am for seq24
 
 AM_CXXFLAGS = $(GTKMM_CFLAGS) $(JACK_CFLAGS) $(LASH_CFLAGS) -Wall
-seq24_LDADD = $(GTKMM_LIBS) $(ALSA_LIBS) $(JACK_LIBS) $(LASH_LIBS)
+seq24_LDADD = $(GTKMM_LIBS) $(ALSA_LIBS) $(JACK_LIBS) $(LASH_LIBS) -llo
 
 bin_PROGRAMS = seq24
 
@@ -21,6 +21,7 @@ seq24_SOURCES = \
 	mutex.cpp mutex.h \
 	options.cpp options.h \
 	optionsfile.cpp optionsfile.h \
+	oscserver.cpp oscserver.h \
 	perfedit.cpp perfedit.h \
 	perfnames.cpp perfnames.h \
 	perform.cpp perform.h \
@@ -37,7 +38,6 @@ seq24_SOURCES = \
 	sequence.cpp sequence.h \
 	userfile.cpp userfile.h
 
-EXTRA_DIST = configwin32.h *.xpm 
+EXTRA_DIST = configwin32.h *.xpm
 
 MOSTLYCLEANFILES = *~
-

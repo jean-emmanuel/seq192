@@ -39,7 +39,7 @@
 #include "userfile.h"
 
 /* struct for command parsing */
-static struct 
+static struct
 option long_options[] = {
 
     {"file",     required_argument, 0, 'f'},
@@ -57,6 +57,7 @@ option long_options[] = {
     {"manual_alsa_ports", 0, 0, 'm' },
     {"pass_sysex", 0, 0, 'P'},
     {"show_keys", 0,0,'k'},
+    {"osc_port", 1,0,'o'},
     {0, 0, 0, 0}
 
 };
@@ -80,6 +81,8 @@ bool global_with_jack_master = false;
 bool global_with_jack_master_cond = false;
 bool global_jack_start_mode = true;
 
+int global_oscport = 0;
+
 user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];
 user_instrument_definition global_user_instrument_definitions[c_max_instruments];
 
@@ -98,7 +101,7 @@ lash *lash_driver = NULL;
 #endif
 
 
-int 
+int
 main (int argc, char *argv[])
 {
     for ( int i=0; i<c_maxBuses; i++ )
@@ -112,14 +115,14 @@ main (int argc, char *argv[])
         for ( int j=0; j<128; j++ )
             global_user_instrument_definitions[i].controllers_active[j] = false;
     }
-    
+
 	/* init the lash driver (strips lash specific cmdline arguments */
 #ifdef LASH_SUPPORT
 	lash_driver = new lash(&argc, &argv);
 #endif
 
     /* the main performance object */
-    perform p; 
+    perform p;
 
     /* all GTK applications must have a gtk_main(). Control ends here
        and waits for an event to occur (like a key press or mouse event). */
@@ -129,7 +132,7 @@ main (int argc, char *argv[])
 
 
     if ( getenv( HOME ) != NULL ){
-        
+
         Glib::ustring home( getenv( HOME ));
         last_used_dir = home;
         Glib::ustring total_file = home + SLASH + config_filename;
@@ -138,7 +141,7 @@ main (int argc, char *argv[])
         optionsfile options( total_file );
 
         if ( !options.parse( &p ) ){
-            printf( "Error Reading [%s]\n", total_file.c_str());  
+            printf( "Error Reading [%s]\n", total_file.c_str());
         }
 
         total_file = home + SLASH + user_filename;
@@ -147,36 +150,36 @@ main (int argc, char *argv[])
         userfile user( total_file );
 
         if ( !user.parse( &p ) ){
-            printf( "Error Reading [%s]\n", total_file.c_str());  
+            printf( "Error Reading [%s]\n", total_file.c_str());
         }
-    
+
     } else {
-        
-        printf( "Error calling getenv( \"%s\" )\n", HOME );  
+
+        printf( "Error calling getenv( \"%s\" )\n", HOME );
     }
 
-    
+
 
     /* parse parameters */
     int c;
 
 
     while (1){
-	
+
         /* getopt_long stores the option index here. */
         int option_index = 0;
-        
+
         c = getopt_long (argc, argv, "p:f:v", long_options, &option_index);
-        
+
         /* Detect the end of the options. */
         if (c == -1)
             break;
-        
+
         switch (c){
-            
+
             case '?':
             case 'h':
-                
+
                 printf( "usage: seq24 [options]\n\n" );
                 printf( "options:\n" );
                 printf( "    --help : show this message\n" );
@@ -193,39 +196,40 @@ main (int argc, char *argv[])
                 printf( "    --jack_start_mode <x> : when seq24 is synced to jack, the following play\n" );
                 printf( "                          modes are available (0 = live mode)\n");
                 printf( "                                              (1 = song mode) (default)\n" );
+                printf( "    --osc_port : osc input port\n" );
                 printf( "\n\n\n" );
-                
+
                 return 0;
                 break;
-                
+
             case 'S':
                 global_stats = true;
                 break;
-                
+
             case 's':
                 global_showmidi = true;
                 break;
-                
+
             case 'p':
                 global_priority = true;
                 break;
-                
+
             case 'P':
                 global_pass_sysex = true;
                 break;
-                
+
             case 'k':
                 global_print_keys = true;
                 break;
-                
+
             case 'j':
                 global_with_jack_transport = true;
                 break;
-                
+
             case 'J':
                 global_with_jack_master = true;
                 break;
-                
+
             case 'C':
                 global_with_jack_master_cond = true;
                 break;
@@ -246,31 +250,34 @@ main (int argc, char *argv[])
             case 'f':
                 global_filename = Glib::ustring(optarg);
                break;
-                
+
             case 'i':
                 /* ignore alsa device */
                 global_device_ignore = true;
                 global_device_ignore_num = atoi( optarg );
                 break;
-                
+
             case 'x':
                 global_interactionmethod = (interaction_method_e)atoi( optarg );
                 break;
 
-                
+            case 'o':
+                global_oscport = atoi( optarg );
+                break;
+
             default:
                 break;
         }
-        
+
     } /* end while */
 
 
     p.init();
-    
+
     p.launch_input_thread();
     p.launch_output_thread();
     p.init_jack();
-    
+
     if (global_filename != "") {
         /* import that midi file */
         midifile *f = new midifile(global_filename);
@@ -284,11 +291,15 @@ main (int argc, char *argv[])
 	lash_driver->start( &p );
 #endif
     kit.run(seq24_window);
-    
+
     p.deinit_jack();
-    
+
+    if (global_oscport != 0) {
+        p.oscserver->stop();
+    }
+
     if ( getenv( HOME ) != NULL ){
-        
+
         string home( getenv( HOME ));
         Glib::ustring total_file = home + SLASH + config_filename;
         printf( "Writing [%s]\n", total_file.c_str());
@@ -296,12 +307,12 @@ main (int argc, char *argv[])
         optionsfile options( total_file );
 
         if ( !options.write( &p ) ){
-            printf( "Error writing [%s]\n", total_file.c_str());  
+            printf( "Error writing [%s]\n", total_file.c_str());
         }
-            
+
     } else {
-        
-        printf( "Error calling getenv( \"%s\" )\n", HOME );  
+
+        printf( "Error calling getenv( \"%s\" )\n", HOME );
     }
 
 #ifdef LASH_SUPPORT
@@ -310,5 +321,3 @@ main (int argc, char *argv[])
 
     return 0;
 }
-
-

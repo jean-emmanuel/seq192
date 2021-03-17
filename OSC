@@ -1,0 +1,18 @@
+### /play
+Start playback or trig if already playing
+
+###  /stop
+Stop playback
+
+### /screenset <int: screen>
+Change active screen set
+
+### /sequence <string: mode> <int: column> <int: row>
+Set sequence(s) state
+    mode: "solo", "on", "off" or toggle
+    column: column number on screen set (zero indexed)
+    row: row number; if ommitted, all rows are affected; multiple rows can be specified
+
+
+### /sequence_and_play <string: mode> <int: column> <int: row>
+Same as /sseq and (re)start playback

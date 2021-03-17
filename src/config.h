@@ -1,11 +1,14 @@
 /* src/config.h.  Generated from config.h.in by configure.  */
-/* src/config.h.in.  Generated from configure.in by autoheader.  */
+/* src/config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the `asound' library (-lasound). */
 #define HAVE_LIBASOUND 1
+
+/* Define to 1 if you have the `atopology' library (-latopology). */
+/* #undef HAVE_LIBATOPOLOGY */
 
 /* Define to 1 if you have the `gtkmm-2.4' library (-lgtkmm-2.4). */
 #define HAVE_LIBGTKMM_2_4 1
@@ -59,7 +62,7 @@
 #define PACKAGE_NAME "seq24"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "seq24 0.9.1"
+#define PACKAGE_STRING "seq24 0.10.0"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "seq24"
@@ -68,13 +71,13 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.9.1"
+#define PACKAGE_VERSION "0.10.0"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "0.9.1"
+#define VERSION "0.10.0"
 
 /* gnu source */
 #define _GNU_SOURCE 1
