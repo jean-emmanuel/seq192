@@ -64,7 +64,7 @@ public:
             case groups: set( m_perf->lookup_keygroup_key( m_slot ) ); break;
         }
     }
-    
+
     void set( unsigned int val )
     {
         char buf[256] = "";
@@ -103,7 +103,7 @@ options::options (Gtk::Window & parent, perform * a_p):
 {
     m_perf = a_p;
     VBox *vbox = NULL;
-    
+
     HBox *hbox = manage (new HBox ());
     get_vbox ()->pack_start (*hbox, false, false);
 
@@ -129,21 +129,21 @@ options::options (Gtk::Window & parent, perform * a_p):
 
     CheckButton *check;
     Label *label;
-    
+
     Gtk::Tooltips * tooltips = manage (new Tooltips ());
 
     for (int i = 0; i < buses; i++)
-    {  
+    {
         HBox *hbox2 = manage (new HBox ());
         label = manage( new Label(m_perf->get_master_midi_bus ()->
                                             get_midi_out_bus_name (i), 0));
 
         hbox2->pack_start (*label, false, false);
-        
-        
+
+
         Gtk::RadioButton * rb_off = manage (new RadioButton ("Off"));
         add_tooltip( rb_off, "Midi Clock will be disabled.");
-        
+
         Gtk::RadioButton * rb_on = manage (new RadioButton ("On (Pos)"));
         add_tooltip( rb_on,
                 "Midi Clock will be sent. Midi Song Position and Midi Continue will be sent if starting greater than tick 0 in song mode, otherwise Midi Start is sent.");
@@ -158,20 +158,20 @@ options::options (Gtk::Window & parent, perform * a_p):
         rb_off->signal_toggled().connect (sigc::bind(mem_fun (*this, &options::clock_callback_off), i, rb_off ));
         rb_on->signal_toggled ().connect (sigc::bind(mem_fun (*this, &options::clock_callback_on),  i, rb_on  ));
         rb_mod->signal_toggled().connect (sigc::bind(mem_fun (*this, &options::clock_callback_mod), i, rb_mod ));
-        
-        hbox2->pack_end (*rb_mod, false, false ); 
+
+        hbox2->pack_end (*rb_mod, false, false );
         hbox2->pack_end (*rb_on, false, false);
         hbox2->pack_end (*rb_off, false, false);
 
         vbox->pack_start( *hbox2, false, false );
-       
+
         switch ( m_perf->get_master_midi_bus ()->get_clock (i))
         {
             case e_clock_off: rb_off->set_active(1); break;
             case e_clock_pos: rb_on->set_active(1); break;
             case e_clock_mod: rb_mod->set_active(1); break;
         }
-                              
+
         // SET DEFAULT STATES check->set_active (m_perf->get_master_midi_bus ()->get_clock (i));
     }
 
@@ -179,13 +179,13 @@ options::options (Gtk::Window & parent, perform * a_p):
     SpinButton *clock_mod_spin = new SpinButton( *clock_mod_adj );
 
     HBox *hbox2 = manage (new HBox ());
-    
+
     //m_spinbutton_bpm->set_editable( false );
     hbox2->pack_start(*(manage( new Label( "Clock Start Modulo (1/16 Notes)"))), false, false, 4);
     hbox2->pack_start(*clock_mod_spin, false, false );
 
     vbox->pack_start( *hbox2, false, false );
-    
+
     clock_mod_adj->signal_value_changed().connect( sigc::bind(mem_fun(*this,&options::clock_mod_callback),clock_mod_adj));
 
     // add controls for input method
@@ -234,6 +234,7 @@ options::options (Gtk::Window & parent, perform * a_p):
         vbox->pack_start (*check, false, false);
     }
 
+#ifndef DISABLE_SONG_EDITOR 
     // KeyBoard keybinding setup (editor for .seq24rc keybindings.
     vbox = manage (new VBox ());
     m_notebook->pages ().push_back (Notebook_Helpers::TabElem (*vbox, "Keyboard"));
@@ -351,6 +352,8 @@ options::options (Gtk::Window & parent, perform * a_p):
         #undef AddKeyL
         #undef AddKey
     }
+#endif
+
 
     // Jack
 #ifdef JACK_SUPPORT
@@ -438,31 +441,31 @@ options::options (Gtk::Window & parent, perform * a_p):
 
 void
 options::clock_callback_off (int a_bus, RadioButton *a_button)
-{  
+{
     if (a_button->get_active ())
         m_perf->get_master_midi_bus ()->set_clock(a_bus, e_clock_off );
 }
 
 void
 options::clock_callback_on (int a_bus, RadioButton *a_button)
-{  
+{
     if (a_button->get_active ())
         m_perf->get_master_midi_bus ()->set_clock(a_bus, e_clock_pos );
 }
 
 void
 options::clock_callback_mod (int a_bus, RadioButton *a_button)
-{  
+{
     if (a_button->get_active ())
         m_perf->get_master_midi_bus ()->set_clock(a_bus, e_clock_mod );
 }
 
-void 
+void
 options::clock_mod_callback( Adjustment *adj )
 {
     midibus::set_clock_mod((int)adj->get_value());
 }
- 
+
 void
 options::interaction_method_callback( Adjustment *adj )
 {
@@ -471,7 +474,7 @@ options::interaction_method_callback( Adjustment *adj )
     text += c_interaction_method_names[(int)adj->get_value()];
     text += "): ";
     interaction_method_label->set_text( text.c_str() );
-    
+
     text = "     (";
     text += c_interaction_method_descs[(int)adj->get_value()];
     text += ")";

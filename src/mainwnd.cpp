@@ -67,8 +67,10 @@ mainwnd::mainwnd(perform *a_p)
     m_menu_file = manage(new Menu());
     m_menubar->items().push_front(MenuElem("_File", *m_menu_file));
 
-    // m_menu_view = manage( new Menu());
-    // m_menubar->items().push_back(MenuElem("_View", *m_menu_view));
+#ifndef DISABLE_SONG_EDITOR
+    m_menu_view = manage( new Menu());
+    m_menubar->items().push_back(MenuElem("_View", *m_menu_view));
+#endif
 
     m_menu_help = manage( new Menu());
     m_menubar->items().push_back(MenuElem("_Help", *m_menu_help));
@@ -95,10 +97,12 @@ mainwnd::mainwnd(perform *a_p)
                 Gtk::AccelKey("<control>Q"),
                 mem_fun(*this, &mainwnd::file_exit)));
 
+#ifndef DISABLE_SONG_EDITOR
     /* view menu items */
-    // m_menu_view->items().push_back(MenuElem("_Song Editor...",
-    //             Gtk::AccelKey("<control>E"),
-    //             mem_fun(*this, &mainwnd::open_performance_edit)));
+    m_menu_view->items().push_back(MenuElem("_Song Editor...",
+                Gtk::AccelKey("<control>E"),
+                mem_fun(*this, &mainwnd::open_performance_edit)));
+#endif
 
     /* help menu items */
     m_menu_help->items().push_back(MenuElem("_About...",
@@ -126,14 +130,16 @@ mainwnd::mainwnd(perform *a_p)
     add_tooltip( m_button_play, "Play MIDI sequence" );
     hbox->pack_start(*m_button_play, false, false);
 
+#ifndef DISABLE_SONG_EDITOR
     /* song edit button */
-    // m_button_perfedit = manage( new Button( ));
-    // m_button_perfedit->add( *manage( new Image(
-    //                 Gdk::Pixbuf::create_from_xpm_data( perfedit_xpm  ))));
-    // m_button_perfedit->signal_clicked().connect(
-    //         mem_fun( *this, &mainwnd::open_performance_edit ));
-    // add_tooltip( m_button_perfedit, "Show or hide song editor window" );
-    // hbox->pack_end(*m_button_perfedit, false, false, 4);
+    m_button_perfedit = manage( new Button( ));
+    m_button_perfedit->add( *manage( new Image(
+                    Gdk::Pixbuf::create_from_xpm_data( perfedit_xpm  ))));
+    m_button_perfedit->signal_clicked().connect(
+            mem_fun( *this, &mainwnd::open_performance_edit ));
+    add_tooltip( m_button_perfedit, "Show or hide song editor window" );
+    hbox->pack_end(*m_button_perfedit, false, false, 4);
+#endif
 
     /* bpm spin button */
     m_adjust_bpm = manage(new Adjustment(m_mainperf->get_bpm(), 20, 500, 1));
@@ -183,22 +189,22 @@ mainwnd::mainwnd(perform *a_p)
     hbox3->pack_start( *m_main_time, false, false );
 
     /* group learn button */
-    m_button_learn = manage( new Button( ));
-    m_button_learn->set_focus_on_click( false );
-    m_button_learn->set_flags( m_button_learn->get_flags() & ~Gtk::CAN_FOCUS );
-    m_button_learn->set_image(*manage(new Image(
-                    Gdk::Pixbuf::create_from_xpm_data( learn_xpm ))));
-    m_button_learn->signal_clicked().connect(
-            mem_fun(*this, &mainwnd::learn_toggle));
-    add_tooltip( m_button_learn, "Mute Group Learn\n\n"
-            "Click 'L' then press a mutegroup key to store the mute state of "
-            "the sequences in that key.\n\n"
-            "(see File/Options/Keyboard for available mutegroup keys "
-            "and the corresponding hotkey for the 'L' button)" );
-    hbox3->pack_end( *m_button_learn, false, false );
-
-    Button w;
-    hbox3->set_focus_child( w ); // clear the focus, don't want to trigger L via keys
+    // m_button_learn = manage( new Button( ));
+    // m_button_learn->set_focus_on_click( false );
+    // m_button_learn->set_flags( m_button_learn->get_flags() & ~Gtk::CAN_FOCUS );
+    // m_button_learn->set_image(*manage(new Image(
+    //                 Gdk::Pixbuf::create_from_xpm_data( learn_xpm ))));
+    // m_button_learn->signal_clicked().connect(
+    //         mem_fun(*this, &mainwnd::learn_toggle));
+    // add_tooltip( m_button_learn, "Mute Group Learn\n\n"
+    //         "Click 'L' then press a mutegroup key to store the mute state of "
+    //         "the sequences in that key.\n\n"
+    //         "(see File/Options/Keyboard for available mutegroup keys "
+    //         "and the corresponding hotkey for the 'L' button)" );
+    // hbox3->pack_end( *m_button_learn, false, false );
+    //
+    // Button w;
+    // hbox3->set_focus_child( w ); // clear the focus, don't want to trigger L via keys
 
     // SCROLL MOD
     m_hadjust = (manage(new Gtk::Adjustment(0,0,1,10,100,0)));
@@ -871,6 +877,8 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
     else {
         if ( a_ev->type == GDK_KEY_PRESS ){
 
+#ifndef DISABLE_KEYBOARD
+
             if ( global_print_keys ){
                 printf( "key_press[%d]\n", a_ev->keyval );
                 fflush( stdout );
@@ -982,7 +990,7 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
                     m_mainperf->unset_mode_group_learn();
                 }
             }
-
+#endif
             // the start/end key may be the same key (i.e. SPACE)
             // allow toggling when the same key is mapped to both
             // triggers (i.e. SPACEBAR)
@@ -1000,11 +1008,13 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
                 stop_playing();
             }
 
+#ifndef DISABLE_KEYBOARD
             /* toggle sequence mute/unmute using keyboard keys... */
             if (m_mainperf->get_key_events()->count( a_ev->keyval) != 0)
             {
                 sequence_key(m_mainperf->lookup_keyevent_seq( a_ev->keyval));
             }
+#endif
         }
     }
 

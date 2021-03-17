@@ -84,3 +84,7 @@
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
+
+
+#define DISABLE_SONG_EDITOR 1
+#define DISABLE_KEYBOARD 1
