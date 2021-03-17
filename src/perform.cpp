@@ -274,10 +274,12 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                 // arg 1...n: sequences names / osc pattern
 
                 for (int i = 0; i < c_mainwnd_cols * c_mainwnd_rows; i++) {
-                    if (self->m_seqs[i] != NULL) {
+                    int nseq = i + self->m_screen_set * c_mainwnd_cols * c_mainwnd_rows;
+                    if (self->m_seqs[nseq] != NULL) {
                         for (int j = 1; j < argc; j++) {
-                            if (types[j] == 's' && lo_pattern_match(self->m_seqs[i]->get_name(), &argv[j]->s)) {
+                            if (types[j] == 's' && lo_pattern_match(self->m_seqs[nseq]->get_name(), &argv[j]->s)) {
                                 self->osc_selected_seqs[i] = 1;
+                                break;
                             }
                         }
                     }
