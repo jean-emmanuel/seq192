@@ -61,8 +61,6 @@ sequence::sequence( )
     m_dirty_perf = true;
     m_dirty_names = true;
 
-    m_song_mute = false;
-
     m_trigger_offset = 0;
 }
 
@@ -152,18 +150,6 @@ sequence::set_master_midi_bus( mastermidibus *a_mmb )
     unlock();
 }
 
-
-void
-sequence::set_song_mute( bool a_mute )
-{
-    m_song_mute = a_mute;
-}
-
-bool
-sequence::get_song_mute( void )
-{
-    return m_song_mute;
-}
 
 void
 sequence::set_bpm( long a_beats_per_measure )
@@ -275,12 +261,10 @@ sequence::get_queued_tick( void )
 
 /* tick comes in as global tick */
     void
-sequence::play( long a_tick, bool a_playback_mode )
+sequence::play( long a_tick )
 {
 
     lock();
-
-    //printf( "a_tick[%ld] a_playback[%d]\n", a_tick, a_playback_mode );
 
     /* turns sequence off after we play in this frame */
     bool trigger_turning_off = false;
@@ -291,79 +275,6 @@ sequence::play( long a_tick, bool a_playback_mode )
     long start_tick = m_last_tick;
     long end_tick = a_tick;
     long trigger_offset = 0;
-
-    if (  m_song_mute )
-    {
-        set_playing(false);
-    }
-    else
-    {
-
-        /* if we are using our in sequence on/off triggers */
-        if ( a_playback_mode ){
-
-            bool trigger_state = false;
-            long trigger_tick = 0;
-
-
-            list<trigger>::iterator i = m_list_trigger.begin();
-
-            while ( i != m_list_trigger.end()){
-
-                if ( (*i).m_tick_start <= end_tick ){
-                    trigger_state = true;
-                    trigger_tick = (*i).m_tick_start;
-                    trigger_offset = (*i).m_offset;
-                }
-
-                if ( (*i).m_tick_end <= end_tick ){
-                    trigger_state = false;
-                    trigger_tick = (*i).m_tick_end;
-                    trigger_offset = (*i).m_offset;
-                }
-
-                if ( (*i).m_tick_start >  end_tick ||
-                        (*i).m_tick_end   >  end_tick )
-                {
-                    break;
-                }
-
-                i++;
-            }
-
-            /* we had triggers in our slice and its not equal to current state */
-            if ( trigger_state != m_playing ){
-
-                //printf( "trigger %d\n", trigger_state );
-
-                /* we are turning on */
-                if ( trigger_state ){
-
-                    if ( trigger_tick < m_last_tick )
-                        start_tick = m_last_tick;
-                    else
-                        start_tick = trigger_tick;
-
-                    set_playing( true );
-
-                } else {
-
-                    /* we are on and turning off */
-                    end_tick = trigger_tick;
-                    trigger_turning_off = true;
-                }
-
-            }
-
-            if( m_list_trigger.size() == 0 &&
-                    m_playing ){
-
-                set_playing(false);
-
-            }
-
-        }
-    }
 
     set_trigger_offset(trigger_offset);
 

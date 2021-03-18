@@ -177,7 +177,7 @@ perform::start_playing( void )
     position_jack( false );
     start_jack();
 
-    start( false );
+    start();
 }
 
 
@@ -613,17 +613,6 @@ void perform::select_and_mute_group (int a_g_group)
 }
 
 
-void perform::mute_all_tracks( void )
-{
-    for (int i=0; i< c_max_sequence; i++ )
-    {
-        if ( is_active(i) )
-            m_seqs[i]->set_song_mute( true );
-
-    }
-}
-
-
 perform::~perform()
 {
     m_inputing = false;
@@ -1012,11 +1001,11 @@ void perform::play( long a_tick )
             if ( m_seqs[i]->get_queued() &&
                     m_seqs[i]->get_queued_tick() <= a_tick ){
 
-                m_seqs[i]->play( m_seqs[i]->get_queued_tick() - 1, m_playback_mode );
+                m_seqs[i]->play( m_seqs[i]->get_queued_tick() - 1 );
                 m_seqs[i]->toggle_playing();
             }
 
-            m_seqs[i]->play( a_tick, m_playback_mode );
+            m_seqs[i]->play( a_tick );
         }
     }
 
@@ -1189,13 +1178,13 @@ void perform::position_jack( bool a_state )
 }
 
 
-void perform::start(bool a_state)
+void perform::start()
 {
     if (m_jack_running) {
         return;
     }
 
-    inner_start(a_state);
+    inner_start();
 }
 
 
@@ -1209,16 +1198,11 @@ void perform::stop()
 }
 
 
-void perform::inner_start(bool a_state)
+void perform::inner_start()
 {
     m_condition_var.lock();
 
     if (!is_running()) {
-
-        set_playback_mode( a_state );
-
-        if (a_state)
-            off_sequences();
 
         set_running(true);
         m_condition_var.signal();
@@ -1275,9 +1259,7 @@ void perform::reset_sequences(void)
             m_seqs[i]->off_playing_notes();
             m_seqs[i]->set_playing(false);
             m_seqs[i]->zero_markers();
-
-            if (!m_playback_mode)
-                m_seqs[i]->set_playing(state);
+            m_seqs[i]->set_playing(state);
         }
     }
     /* flush the bus */
@@ -1295,12 +1277,6 @@ void perform::launch_output_thread(void)
     }
     else
         m_out_thread_launched= true;
-}
-
-
-void perform::set_playback_mode( bool a_playback_mode )
-{
-    m_playback_mode = a_playback_mode;
 }
 
 
@@ -1413,7 +1389,7 @@ int jack_sync_callback(jack_transport_state_t state,
 
         case JackTransportStarting:
             //printf( "[JackTransportStarting]\n" );
-            p->inner_start( global_jack_start_mode );
+            p->inner_start();
             break;
 
         case JackTransportLooping:
@@ -1448,8 +1424,6 @@ void perform::output_func(void)
         }
 
         m_condition_var.unlock();
-
-        //printf( "signaled [%d]\n", m_playback_mode );
 
 #ifndef __WIN32__
         /* begning time */
@@ -1508,16 +1482,6 @@ void perform::output_func(void)
             stats_all[i] = 0;
             stats_clock[i] = 0;
         }
-
-        /* if we are in the performance view, we care
-           about starting from the offset */
-        if ( m_playback_mode && !m_jack_running){
-
-            current_tick = m_starting_tick;
-            clock_tick = m_starting_tick;
-            set_orig_ticks( m_starting_tick );
-        }
-
 
         int ppqn = m_master_bus.get_ppqn();
 #ifndef __WIN32__
@@ -1633,23 +1597,6 @@ void perform::output_func(void)
                     current_tick = clock_tick = total_tick = jack_ticks_converted_last = jack_ticks_converted;
                     init_clock = true;
 
-                    if ( m_looping && m_playback_mode ){
-
-                        //printf( "left[%lf] right[%lf]\n", (double) get_left_tick(), (double) get_right_tick() );
-
-                        if ( current_tick >= get_right_tick() ){
-
-                            while ( current_tick >= get_right_tick() ){
-
-                                double size = get_right_tick() - get_left_tick();
-                                current_tick = current_tick - size;
-
-                                //printf( "> current_tick[%lf]\n", current_tick );
-                            }
-                            reset_sequences();
-                            set_orig_ticks( (long)current_tick );
-                        }
-                    }
                 }
 
                 if ( m_jack_transport_state_last  ==  JackTransportRolling &&
@@ -1762,19 +1709,6 @@ void perform::output_func(void)
             }
 
             if (dumping) {
-                if ( m_looping && m_playback_mode )
-                {
-                    if ( current_tick >= get_right_tick() )
-                    {
-                        double leftover_tick = current_tick - (get_right_tick());
-
-                        play( get_right_tick() - 1 );
-                        reset_sequences();
-
-                        set_orig_ticks( get_left_tick() );
-                        current_tick = (double) get_left_tick() + leftover_tick;
-                    }
-                }
 
                 /* play */
                 play( (long) current_tick );
@@ -2117,7 +2051,7 @@ void perform::input_func(void)
                         if (m_midiclockrunning)
                             m_midiclocktick += 8;
                         else if (m_usemidiclock) {
-                            start(false);
+                            start();
                             m_midiclockrunning = true;
                         }
                     }

@@ -263,11 +263,6 @@ userfile::parse( perform *a_perf )
     sscanf( m_line, "%ld", &flag );
     global_with_jack_master_cond = (bool) flag;
 
-    next_data_line( &file );
-    sscanf( m_line, "%ld", &flag );
-    global_jack_start_mode = (bool) flag;
-
-
     line_after( &file, "[midi-input]" );
     buses = 0;
     sscanf( m_line, "%ld", &buses );

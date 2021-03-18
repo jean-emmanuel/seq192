@@ -117,13 +117,6 @@ seqmenu::set_bus_and_midi_channel( int a_bus, int a_ch )
     }
 }
 
-void
-seqmenu::mute_all_tracks( void )
-{
-    m_mainperf->mute_all_tracks();
-}
-
-
 // Menu callback, Lanches Editor Window
 void
 seqmenu::seq_edit(){

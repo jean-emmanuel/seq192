@@ -158,7 +158,6 @@ extern bool global_pass_sysex;
 extern bool global_with_jack_transport;
 extern bool global_with_jack_master;
 extern bool global_with_jack_master_cond;
-extern bool global_jack_start_mode;
 extern bool global_manual_alsa_ports;
 extern int global_oscport;
 

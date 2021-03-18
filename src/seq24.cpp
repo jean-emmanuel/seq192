@@ -53,7 +53,6 @@ option long_options[] = {
     {"jack_transport",0, 0, 'j'},
     {"jack_master",0, 0, 'J'},
     {"jack_master_cond",0,0,'C'},
-    {"jack_start_mode", required_argument, 0, 'M' },
     {"manual_alsa_ports", 0, 0, 'm' },
     {"pass_sysex", 0, 0, 'P'},
     {"show_keys", 0,0,'k'},
@@ -80,7 +79,6 @@ interaction_method_e global_interactionmethod = e_seq24_interaction;
 bool global_with_jack_transport = false;
 bool global_with_jack_master = false;
 bool global_with_jack_master_cond = false;
-bool global_jack_start_mode = true;
 
 int global_oscport = 0;
 
@@ -194,9 +192,6 @@ main (int argc, char *argv[])
                 printf( "    --jack_transport : seq24 will sync to jack transport\n" );
                 printf( "    --jack_master : seq24 will try to be jack master\n" );
                 printf( "    --jack_master_cond : jack master will fail if there is already a master\n" );
-                printf( "    --jack_start_mode <x> : when seq24 is synced to jack, the following play\n" );
-                printf( "                          modes are available (0 = live mode)\n");
-                printf( "                                              (1 = song mode) (default)\n" );
                 printf( "    --osc_port : osc input port\n" );
                 printf( "\n\n\n" );
 
@@ -233,15 +228,6 @@ main (int argc, char *argv[])
 
             case 'C':
                 global_with_jack_master_cond = true;
-                break;
-
-            case 'M':
-                if (atoi( optarg ) > 0) {
-                    global_jack_start_mode = true;
-                }
-                else {
-                    global_jack_start_mode = false;
-                }
                 break;
 
             case 'm':

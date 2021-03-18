@@ -97,10 +97,6 @@ class sequence
     char m_midi_channel;
     char m_bus;
 
-
-    /* song playback mode mute */
-    bool m_song_mute;
-
     /* outputs to sequence to this Bus on midichannel */
     mastermidibus *m_masterbus;
 
@@ -209,9 +205,6 @@ class sequence
     long get_bw (void);
     void set_rec_vol (long a_rec_vol);
 
-    void set_song_mute (bool a_mute);
-    bool get_song_mute (void);
-
     /* returns string of name */
     const char *get_name (void);
 
@@ -283,7 +276,7 @@ class sequence
 
     /* dumps notes from tick and prebuffers to
        ahead.  Called by sequencer thread - performance */
-    void play (long a_tick, bool a_playback_mode);
+    void play (long a_tick);
     void set_orig_tick (long a_tick);
 
     //

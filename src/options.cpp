@@ -234,7 +234,7 @@ options::options (Gtk::Window & parent, perform * a_p):
         vbox->pack_start (*check, false, false);
     }
 
-#ifndef DISABLE_SONG_EDITOR
+#ifndef DISABLE_KEYBOARD
     // KeyBoard keybinding setup (editor for .seq24rc keybindings.
     vbox = manage (new VBox ());
     m_notebook->pages ().push_back (Notebook_Helpers::TabElem (*vbox, "Keyboard"));
@@ -393,33 +393,6 @@ options::options (Gtk::Window & parent, perform * a_p):
     vbox2->pack_start (*check, false, false);
 
 
-    Gtk::RadioButton * rb_live = manage (new RadioButton ("Live Mode"));
-    add_tooltip( rb_live,
-            "Playback will be in live mode.  Use this to allow muting and unmuting of loops.");
-
-    Gtk::RadioButton * rb_perform = manage (new RadioButton ("Song Mode"));
-    add_tooltip( rb_perform, "Playback will use the song editors data.");
-
-    Gtk::RadioButton::Group group = rb_live->get_group ();
-    rb_perform->set_group (group);
-
-    if (global_jack_start_mode)
-    {
-        rb_perform->set_active (true);
-    }
-    else
-    {
-        rb_live->set_active (true);
-    }
-
-    rb_perform->signal_toggled ().
-        connect (bind
-                (mem_fun (*this, &options::transport_callback),
-                 e_jack_start_mode_song, rb_perform));
-
-    vbox2->pack_start (*rb_live, false, false);
-    vbox2->pack_start (*rb_perform, false, false);
-
     Gtk::Button * button = manage (new Button ("Connect"));
     add_tooltip( button, "Connect to Jack.");
     button->signal_clicked().connect(bind(mem_fun(*this,
@@ -522,13 +495,6 @@ options::transport_callback (button a_type, Button * a_check)
         case e_jack_master_cond:
             {
                 global_with_jack_master_cond = check->get_active ();
-            }
-            break;
-
-        case e_jack_start_mode_song:
-            {
-                //printf( "toggle %d\n" ,  check->get_active() );
-                global_jack_start_mode = check->get_active ();
             }
             break;
 

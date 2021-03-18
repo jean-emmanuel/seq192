@@ -181,7 +181,7 @@ class perform
     bool m_jack_running;
     bool m_jack_master;
 
-    void inner_start( bool a_state );
+    void inner_start();
     void inner_stop();
 
  public:
@@ -280,7 +280,7 @@ class perform
     bool is_group_learning( void ) { return m_mode_group_learn; }
     void select_mute_group ( int a_group );
     void unset_mode_group_mute ();
-    void start( bool a_state );
+    void start();
     void stop();
 
     void start_jack();

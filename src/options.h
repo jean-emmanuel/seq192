@@ -74,8 +74,6 @@ class options : public Gtk::Dialog
         e_jack_transport,
         e_jack_master,
         e_jack_master_cond,
-        e_jack_start_mode_live,
-        e_jack_start_mode_song,
 
         e_jack_connect,
         e_jack_disconnect

@@ -69,7 +69,6 @@ class seqmenu : public virtual Glib::ObjectBase
     void seq_clear_perf();
 
     void set_bus_and_midi_channel( int a_bus, int a_ch );
-    void mute_all_tracks();
 
     virtual void redraw( int a_sequence ) = 0;
 
