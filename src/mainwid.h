@@ -42,7 +42,7 @@ class seqedit;
 #include <gtkmm/table.h>
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/widget.h>
-#include <gtkmm/style.h> 
+#include <gtkmm/style.h>
 
 
 
@@ -56,7 +56,7 @@ const int c_seqarea_seq_y = c_text_y * 2;
 class mainwid : public Gtk::DrawingArea, public seqmenu
 {
 
- private: 
+ private:
 
     Glib::RefPtr<Gdk::GC> m_gc;
     Glib::RefPtr<Gdk::Window> m_window;
@@ -64,10 +64,10 @@ class mainwid : public Gtk::DrawingArea, public seqmenu
     Gdk::Color   m_background, m_foreground;
 
     Glib::RefPtr<Gdk::Pixmap>   m_pixmap;
-   
+
     GdkRectangle m_old;
     GdkRectangle m_selected;
-    
+
     int          m_screenset;
 
     perform      *m_mainperf;
@@ -75,16 +75,16 @@ class mainwid : public Gtk::DrawingArea, public seqmenu
     sequence     m_clipboard;
     sequence     m_moving_seq;
 
-    int          m_window_x, 
+    int          m_window_x,
                  m_window_y;
 
     bool         m_button_down;
     bool         m_moving;
 
     /* when highlighting a bunch of events */
- 
+
     /* where the dragging started */
-    int m_drop_x; 
+    int m_drop_x;
     int m_drop_y;
     int m_current_x;
     int m_current_y;
@@ -98,7 +98,7 @@ class mainwid : public Gtk::DrawingArea, public seqmenu
     void on_realize();
 
     bool on_expose_event(GdkEventExpose* a_ev);
-    bool on_button_press_event(GdkEventButton* a_ev); 
+    bool on_button_press_event(GdkEventButton* a_ev);
     bool on_button_release_event(GdkEventButton* a_ev);
     bool on_motion_notify_event(GdkEventMotion* a_p0);
     bool on_focus_in_event(GdkEventFocus*);
@@ -115,7 +115,7 @@ class mainwid : public Gtk::DrawingArea, public seqmenu
 
     int timeout( void );
 
-    void redraw( int a_seq ); 
+    void redraw( int a_seq );
 
  public:
 
@@ -123,13 +123,13 @@ class mainwid : public Gtk::DrawingArea, public seqmenu
     ~mainwid( );
 
     void reset();
- 
-    //int get_screenset( ); 
+
+    //int get_screenset( );
     void set_screenset( int a_ss );
 
     void update_sequence_on_window( int a_seq  );
     void update_sequences_on_window( );
-   
+
     void update_markers( int a_ticks );
     void draw_marker_on_sequence( int a_seq, int a_tick );
 

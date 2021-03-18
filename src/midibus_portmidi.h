@@ -48,7 +48,7 @@ enum clock_e
 
 class midibus
 {
-    
+
  private:
 
     char m_id;
@@ -71,9 +71,9 @@ class midibus
     /* mutex */
     void lock();
     void unlock();
-    
+
     PortMidiStream* m_pms;
-   
+
 
  public:
     midibus( char a_id,
@@ -85,7 +85,7 @@ class midibus
 
     bool init_out(  );
     bool init_in(  );
- 
+
     void print();
 
     string get_name();
@@ -96,12 +96,12 @@ class midibus
     void sysex( event *a_e24 );
 
     int poll_for_midi( );
-    
+
     /* clock */
     void start();
     void stop();
     void clock(  long a_tick );
-    void continue_from( long a_tick ); 
+    void continue_from( long a_tick );
     void init_clock( long a_tick );
     void set_clock( clock_e a_clocking );
     clock_e get_clock( );
@@ -116,14 +116,14 @@ class midibus
     friend class mastermidibus;
 
 	/* address of client */
-#if HAVE_LIBASOUND	     
+#if HAVE_LIBASOUND
     int get_client( void ) {  return m_dest_addr_client; };
     int get_port( void ) { return m_dest_addr_port; };
 #endif
 
     static void set_clock_mod( int a_clock_mod );
     static int get_clock_mod( void );
- 
+
 };
 
 class mastermidibus
@@ -131,7 +131,7 @@ class mastermidibus
  private:
 
     /* sequencer client handle */
-#if HAVE_LIBASOUND	     
+#if HAVE_LIBASOUND
     snd_seq_t *m_alsa_seq;
 #endif
 
@@ -141,10 +141,10 @@ class mastermidibus
     midibus *m_buses_out[c_maxBuses];
     midibus *m_buses_in[c_maxBuses];
     midibus *m_bus_announce;
-    
+
     bool m_buses_out_active[c_maxBuses];
     bool m_buses_in_active[c_maxBuses];
-    
+
     bool m_buses_out_init[c_maxBuses];
     bool m_buses_in_init[c_maxBuses];
 
@@ -156,7 +156,7 @@ class mastermidibus
 
     int m_ppqn;
     int m_bpm;
-    
+
     int  m_num_poll_descriptors;
     struct pollfd *m_poll_descriptors;
 
@@ -172,7 +172,7 @@ class mastermidibus
     void unlock();
 
  public:
-  
+
     mastermidibus();
     ~mastermidibus();
     //midibus *get_default_bus();
@@ -188,36 +188,36 @@ class mastermidibus
     void set_ppqn(int a_ppqn);
     int get_bpm(){ return m_bpm;}
     int get_ppqn(){ return m_ppqn;}
-    
+
     string get_midi_out_bus_name( int a_bus );
     string get_midi_in_bus_name( int a_bus );
-    
+
     void print();
-    void flush(); 
-    
+    void flush();
+
     void start();
     void stop();
-    
+
     void clock(  long a_tick );
-    void continue_from( long a_tick ); 
+    void continue_from( long a_tick );
     void init_clock( long a_tick );
-    
+
     int poll_for_midi( );
     bool is_more_input( );
     bool get_midi_event( event *a_in );
     void set_sequence_input( bool a_state, sequence *a_seq );
-    
+
     bool is_dumping( ) { return m_dumping_input; }
     sequence* get_sequence( ) { return m_seq; }
     void sysex( event *a_event );
-    
-    
+
+
     void play( unsigned char a_bus, event *a_e24, unsigned char a_channel );
-    
+
     void set_clock( unsigned char a_bus, clock_e a_clock_type );
     clock_e get_clock( unsigned char a_bus );
 
-   
+
     void set_input( unsigned char a_bus, bool a_inputing );
     bool get_input( unsigned char a_bus );
 

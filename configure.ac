@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(seq24, [0.10.0], [seq24-devel@lists.sourceforge.net])
+AC_INIT(seq24, [0.11.0], [seq24-devel@lists.sourceforge.net])
 
 AC_CONFIG_SRCDIR([src/event.cpp])
 AC_CONFIG_HEADER([src/config.h])
@@ -7,6 +7,9 @@ AC_CONFIG_HEADER([src/config.h])
 AM_INIT_AUTOMAKE([dist-bzip2])
 
 AC_DEFINE(_GNU_SOURCE, 1, [gnu source])
+
+AC_DEFINE(DISABLE_KEYBOARD, 1, [disable keyboard shortcuts])
+AC_DEFINE(DISABLE_SONG_EDITOR, 1, [disable song editor])
 
 dnl Checks for programs.
 AC_PROG_AWK

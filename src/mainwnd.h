@@ -25,7 +25,6 @@
 #include "event.h"
 #include "options.h"
 #include "maintime.h"
-#include "perfedit.h"
 #include "options.h"
 
 
@@ -78,7 +77,6 @@ class mainwnd : public Gtk::Window, public performcallback
     mainwid  *m_main_wid;
     maintime *m_main_time;
 
-    perfedit *m_perf_edit;
     options *m_options;
 
     Gdk::Cursor   m_main_cursor;
@@ -87,7 +85,6 @@ class mainwnd : public Gtk::Window, public performcallback
 
     Button      *m_button_stop;
     Button      *m_button_play;
-    Button      *m_button_perfedit;
 
     SpinButton  *m_spinbutton_bpm;
     Adjustment  *m_adjust_bpm;
@@ -114,7 +111,6 @@ class mainwnd : public Gtk::Window, public performcallback
     void start_playing();
     void stop_playing();
     void learn_toggle();
-    void open_performance_edit( );
     void sequence_key( int a_seq );
     void update_window_title();
     void toLower(basic_string<char>&);

@@ -24,15 +24,13 @@
 #include "mainwnd.h"
 #include "perform.h"
 #include "midifile.h"
-#include "perfedit.h"
 
-#include "play2.xpm"
-#include "stop.xpm"
-#include "learn.xpm"
-#include "learn2.xpm"
-#include "perfedit.xpm"
-#include "seq24.xpm"
-#include "seq24_32.xpm"
+#include "xpm/play2.xpm"
+#include "xpm/stop.xpm"
+#include "xpm/learn.xpm"
+#include "xpm/learn2.xpm"
+#include "xpm/seq24.xpm"
+#include "xpm/seq24_32.xpm"
 
 bool is_pattern_playing = false;
 
@@ -67,11 +65,6 @@ mainwnd::mainwnd(perform *a_p)
     m_menu_file = manage(new Menu());
     m_menubar->items().push_front(MenuElem("_File", *m_menu_file));
 
-#ifndef DISABLE_SONG_EDITOR
-    m_menu_view = manage( new Menu());
-    m_menubar->items().push_back(MenuElem("_View", *m_menu_view));
-#endif
-
     m_menu_help = manage( new Menu());
     m_menubar->items().push_back(MenuElem("_Help", *m_menu_help));
 
@@ -96,13 +89,6 @@ mainwnd::mainwnd(perform *a_p)
     m_menu_file->items().push_back(MenuElem("E_xit",
                 Gtk::AccelKey("<control>Q"),
                 mem_fun(*this, &mainwnd::file_exit)));
-
-#ifndef DISABLE_SONG_EDITOR
-    /* view menu items */
-    m_menu_view->items().push_back(MenuElem("_Song Editor...",
-                Gtk::AccelKey("<control>E"),
-                mem_fun(*this, &mainwnd::open_performance_edit)));
-#endif
 
     /* help menu items */
     m_menu_help->items().push_back(MenuElem("_About...",
@@ -129,17 +115,6 @@ mainwnd::mainwnd(perform *a_p)
             mem_fun( *this, &mainwnd::start_playing));
     add_tooltip( m_button_play, "Play MIDI sequence" );
     hbox->pack_start(*m_button_play, false, false);
-
-#ifndef DISABLE_SONG_EDITOR
-    /* song edit button */
-    m_button_perfedit = manage( new Button( ));
-    m_button_perfedit->add( *manage( new Image(
-                    Gdk::Pixbuf::create_from_xpm_data( perfedit_xpm  ))));
-    m_button_perfedit->signal_clicked().connect(
-            mem_fun( *this, &mainwnd::open_performance_edit ));
-    add_tooltip( m_button_perfedit, "Show or hide song editor window" );
-    hbox->pack_end(*m_button_perfedit, false, false, 4);
-#endif
 
     /* bpm spin button */
     m_adjust_bpm = manage(new Adjustment(m_mainperf->get_bpm(), 20, 500, 1));
@@ -284,7 +259,6 @@ mainwnd::mainwnd(perform *a_p)
 
     m_modified = false;
 
-    m_perf_edit = new perfedit( m_mainperf );
     m_options = NULL;
 
 }
@@ -292,8 +266,6 @@ mainwnd::mainwnd(perform *a_p)
 
 mainwnd::~mainwnd()
 {
-    if ( m_perf_edit != NULL )
-        delete m_perf_edit;
     if ( m_options != NULL )
         delete m_options;
 }
@@ -365,19 +337,6 @@ mainwnd::timer_callback(  )
     }
 
     return true;
-}
-
-
-void
-mainwnd::open_performance_edit( void )
-{
-    if (m_perf_edit->is_visible())
-        m_perf_edit->hide();
-    else {
-        m_perf_edit->init_before_show();
-        m_perf_edit->show_all();
-        m_modified = true;
-    }
 }
 
 

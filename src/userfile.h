@@ -34,11 +34,11 @@ class userfile  : public configfile
 
     userfile( string a_name );
     ~userfile( );
-    
+
     bool parse( perform *a_perf );
     bool write( perform *a_perf );
 
 };
 
 
-#endif 
+#endif

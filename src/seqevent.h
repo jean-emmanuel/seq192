@@ -76,7 +76,7 @@ struct Seq24SeqEventInput
 class seqevent : public Gtk::DrawingArea
 {
 
- private: 
+ private:
     friend struct FruitySeqEventInput;
     FruitySeqEventInput m_fruity_interaction;
 
@@ -88,7 +88,7 @@ class seqevent : public Gtk::DrawingArea
     Gdk::Color m_black, m_white, m_grey, m_dk_grey, m_red;
 
     Glib::RefPtr<Gdk::Pixmap> m_pixmap;
- 
+
     GdkRectangle m_old;
     GdkRectangle m_selected;
 
@@ -97,8 +97,8 @@ class seqevent : public Gtk::DrawingArea
     int m_scroll_offset_ticks;
     int m_scroll_offset_x;
 
-   
-    
+
+
     sequence     *m_seq;
     seqdata      *m_seqdata_wid;
 
@@ -117,7 +117,7 @@ class seqevent : public Gtk::DrawingArea
     bool m_paste;
 
     /* where the dragging started */
-    int m_drop_x; 
+    int m_drop_x;
     int m_drop_y;
     int m_current_x;
     int m_current_y;
@@ -131,7 +131,7 @@ class seqevent : public Gtk::DrawingArea
     void on_realize();
     bool on_expose_event(GdkEventExpose* a_ev);
 
-    bool on_button_press_event(GdkEventButton* a_ev); 
+    bool on_button_press_event(GdkEventButton* a_ev);
     bool on_button_release_event(GdkEventButton* a_ev);
     bool on_motion_notify_event(GdkEventMotion* a_ev);
     bool on_key_press_event(GdkEventKey* a_p0);
@@ -152,7 +152,7 @@ class seqevent : public Gtk::DrawingArea
 
     void start_paste( void );
 
-    void on_size_allocate(Gtk::Allocation& );    
+    void on_size_allocate(Gtk::Allocation& );
     void change_horz( void );
 
     void force_draw( void );
@@ -171,19 +171,19 @@ class seqevent : public Gtk::DrawingArea
     void set_snap( int a_snap );
 
     void set_data_type( unsigned char a_status, unsigned char a_control  );
-   
+
     void update_sizes();
     void draw_background();
     void draw_events_on_pixmap();
     void draw_pixmap_on_window();
     void draw_selection_on_window();
     void update_pixmap();
-    
+
     int idle_redraw();
 
 
 
-  
+
 };
 
 #endif

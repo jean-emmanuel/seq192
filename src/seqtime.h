@@ -45,7 +45,7 @@
 class seqtime: public Gtk::DrawingArea
 {
 
- private: 
+ private:
 
     Glib::RefPtr<Gdk::GC>     m_gc;
     Glib::RefPtr<Gdk::Window>   m_window;
@@ -57,7 +57,7 @@ class seqtime: public Gtk::DrawingArea
 
     int m_scroll_offset_ticks;
     int m_scroll_offset_x;
- 
+
     sequence     *m_seq;
 
     /* one pixel == m_zoom ticks */
@@ -67,7 +67,7 @@ class seqtime: public Gtk::DrawingArea
 
     void on_realize();
     bool on_expose_event(GdkEventExpose* a_ev);
-    bool on_button_press_event(GdkEventButton* a_ev); 
+    bool on_button_press_event(GdkEventButton* a_ev);
     bool on_button_release_event(GdkEventButton* a_ev);
     void draw_pixmap_on_window();
     void draw_progress_on_window();

@@ -45,26 +45,26 @@ enum draw_type
 class trigger
 {
 public:
-    
+
     long m_tick_start;
     long m_tick_end;
-    
+
     bool m_selected;
-    
+
     long m_offset;
-    
+
     trigger (){
         m_tick_start = 0;
         m_tick_end = 0;
         m_offset = 0;
         m_selected = false;
     };
-    
+
     bool operator< (trigger rhs){
-        
+
         if (m_tick_start < rhs.m_tick_start)
             return true;
-        
+
         return false;
     };
 };
@@ -104,7 +104,7 @@ class sequence
     /* outputs to sequence to this Bus on midichannel */
     mastermidibus *m_masterbus;
 
-    /* map for noteon, used when muting, to shut off current 
+    /* map for noteon, used when muting, to shut off current
        messages */
     int m_playing_notes[c_midi_notes];
 
@@ -128,7 +128,7 @@ class sequence
     /* anything editing currently ? */
     bool m_editing;
     bool m_raise;
-    
+
     /* named sequence */
     string m_name;
 
@@ -138,7 +138,7 @@ class sequence
 
     long m_trigger_offset;
 
-    /* length of sequence in pulses 
+    /* length of sequence in pulses
        should be powers of two in bars */
     long m_length;
     long m_snap_tick;
@@ -237,7 +237,7 @@ class sequence
     void set_length (long a_len, bool a_adjust_triggers = true);
     long get_length ();
 
-    /* returns last tick played..  used by 
+    /* returns last tick played..  used by
        editors idle function */
     long get_last_tick ();
 
@@ -268,7 +268,7 @@ class sequence
     bool is_dirty_edit ();
     bool is_dirty_perf ();
     bool is_dirty_names ();
-    
+
 
     void set_dirty_mp();
     void set_dirty();
@@ -310,7 +310,7 @@ class sequence
     void cut_selected_trigger( void );
     void copy_selected_trigger( void );
     void paste_trigger( void );
-    
+
     void move_selected_triggers_to(long a_tick, bool a_adjust_offset, int a_which=2);
     long get_selected_trigger_start_tick( void );
     long get_selected_trigger_end_tick( void );
@@ -340,7 +340,7 @@ class sequence
         e_toggle_selection, // sel/deselect under cursor
         e_remove_one // remove one note under cursor
     };
-    
+
     /* select note events in range, returns number
        selected */
     int select_note_events (long a_tick_s, int a_note_h,
@@ -393,12 +393,12 @@ class sequence
     /* moves note off event */
     void grow_selected (long a_delta_tick);
     void stretch_selected(long a_delta_tick);
-    
+
     /* deletes events */
     void remove_marked();
     void mark_selected();
     void unpaint_all();
-    
+
     /* unselects every event */
     void unselect ();
 
@@ -411,7 +411,7 @@ class sequence
        sequencer stops */
     void zero_markers (void);
 
-    /* flushes a note to the midibus to preview its 
+    /* flushes a note to the midibus to preview its
        sound, used by the virtual paino */
     void play_note_on (int a_note);
     void play_note_off (int a_note);
@@ -428,8 +428,8 @@ class sequence
     void reset_draw_marker (void);
     void reset_draw_trigger_marker (void);
 
-    /* each call seqdata( sequence *a_seq, int a_scale );fills the passed refrences with a 
-       events elements, and returns true.  When it 
+    /* each call seqdata( sequence *a_seq, int a_scale );fills the passed refrences with a
+       events elements, and returns true.  When it
        has no more events, returns a false */
     draw_type get_next_note_event (long *a_tick_s,
 				   long *a_tick_f,

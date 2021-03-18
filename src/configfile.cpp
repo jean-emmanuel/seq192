@@ -56,8 +56,7 @@ configfile::line_after( ifstream *a_file, string a_tag)
     while ( strncmp( m_line, a_tag.c_str(), a_tag.length()) != 0  &&
             !a_file->eof() )
     {
-        a_file->getline( m_line, sizeof(m_line) );    
+        a_file->getline( m_line, sizeof(m_line) );
     }
     next_data_line( a_file );
 }
-

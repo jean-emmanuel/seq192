@@ -45,7 +45,7 @@ userfile::parse( perform *a_perf )
 
     if( ! file.is_open() )
         return false;
-    
+
     file_size = file.tellg();
 
     /* run to start */
@@ -55,7 +55,7 @@ userfile::parse( perform *a_perf )
     int buses = 0;
     sscanf( m_line, "%d", &buses );
     char bus_num[4];
-    
+
     for ( int i=0; i<buses; i++ )
     {
         snprintf(bus_num, sizeof(bus_num), "%d", i);
@@ -92,7 +92,7 @@ userfile::parse( perform *a_perf )
         int cc=0;
 
         char cc_name[1024];
-        
+
         sscanf( m_line, "%d", &ccs );
         for ( int j=0; j<ccs; j++ )
         {
@@ -104,7 +104,7 @@ userfile::parse( perform *a_perf )
             // printf( "[%d] %s\n", cc, cc_name );
         }
     }
-    
+
 
 #if 0
     line_after( &file, "[midi-control]" );
@@ -116,32 +116,32 @@ userfile::parse( perform *a_perf )
     for ( unsigned int i=0; i<sequences; ++i ){
 
         int sequence = 0;
-        
+
         sscanf( m_line, "%d [ %d %d %ld %ld %ld %ld ] [ %d %d %ld %ld %ld %ld ] [ %d %d %ld %ld %ld %ld ]",
-                
+
                 &sequence,
-                
+
                 &a_perf->get_midi_control_toggle(i)->m_active,
                 &a_perf->get_midi_control_toggle(i)->m_inverse_active,
                 &a_perf->get_midi_control_toggle(i)->m_status,
                 &a_perf->get_midi_control_toggle(i)->m_data,
                 &a_perf->get_midi_control_toggle(i)->m_min_value,
                 &a_perf->get_midi_control_toggle(i)->m_max_value,
-                
+
                 &a_perf->get_midi_control_on(i)->m_active,
                 &a_perf->get_midi_control_on(i)->m_inverse_active,
                 &a_perf->get_midi_control_on(i)->m_status,
                 &a_perf->get_midi_control_on(i)->m_data,
                 &a_perf->get_midi_control_on(i)->m_min_value,
                 &a_perf->get_midi_control_on(i)->m_max_value,
-                
+
                 &a_perf->get_midi_control_off(i)->m_active,
                 &a_perf->get_midi_control_off(i)->m_inverse_active,
                 &a_perf->get_midi_control_off(i)->m_status,
                 &a_perf->get_midi_control_off(i)->m_data,
                 &a_perf->get_midi_control_off(i)->m_min_value,
                 &a_perf->get_midi_control_off(i)->m_max_value );
-         
+
         next_data_line( &file );
     }
     /* group midi control */
@@ -150,7 +150,7 @@ userfile::parse( perform *a_perf )
     int gtrack = 0;
     sscanf( m_line, "%d", &gtrack );
     next_data_line( &file );
-   
+
     int mtx[c_seqs_in_set], j=0;
     for (int i=0; i< c_seqs_in_set; i++) {
         a_perf->select_group_mute(j);
@@ -158,13 +158,13 @@ userfile::parse( perform *a_perf )
             &j,
             &mtx[0], &mtx[1], &mtx[2], &mtx[3],
             &mtx[4], &mtx[5], &mtx[6], &mtx[7],
-           
+
             &mtx[8], &mtx[9], &mtx[10], &mtx[11],
             &mtx[12], &mtx[13], &mtx[14], &mtx[15],
-             
+
             &mtx[16], &mtx[17], &mtx[18], &mtx[19],
             &mtx[20], &mtx[21], &mtx[22], &mtx[23],
-             
+
             &mtx[24], &mtx[25], &mtx[26], &mtx[27],
             &mtx[28], &mtx[29], &mtx[30], &mtx[31]);
         for (int k=0; k< c_seqs_in_set; k++) {
@@ -194,10 +194,10 @@ userfile::parse( perform *a_perf )
     next_data_line( &file );
 
     a_perf->key_events.clear();
-    
-    
+
+
     for ( int i=0; i<keys; ++i ){
-        
+
         long key = 0, seq = 0;
         sscanf( m_line, "%ld %ld", &key, &seq );
         a_perf->set_key_event( key, seq );
@@ -209,10 +209,10 @@ userfile::parse( perform *a_perf )
     next_data_line( &file );
 
     a_perf->key_groups.clear();
-   
-   
+
+
     for ( int i=0; i<groups; ++i ){
-       
+
         long key = 0, group = 0;
         sscanf( m_line, "%ld %ld", &key, &group );
         a_perf->set_key_group( key, group );
@@ -232,7 +232,7 @@ userfile::parse( perform *a_perf )
     sscanf( m_line, "%u %u %u", &a_perf->m_key_group_on,
                               &a_perf->m_key_group_off,
                              &a_perf->m_key_group_learn);
-   
+
     next_data_line( &file );
 
     sscanf( m_line, "%u %u %u %u %u",
@@ -251,18 +251,18 @@ userfile::parse( perform *a_perf )
 
     line_after( &file, "[jack-transport]" );
     long flag = 0;
-    
+
     sscanf( m_line, "%ld", &flag );
     global_with_jack_transport = (bool) flag;
-    
+
     next_data_line( &file );
     sscanf( m_line, "%ld", &flag );
     global_with_jack_master = (bool) flag;
-    
+
     next_data_line( &file );
     sscanf( m_line, "%ld", &flag );
     global_with_jack_master_cond = (bool) flag;
-    
+
     next_data_line( &file );
     sscanf( m_line, "%ld", &flag );
     global_jack_start_mode = (bool) flag;
@@ -280,7 +280,7 @@ userfile::parse( perform *a_perf )
         a_perf->get_master_midi_bus( )->set_input( bus, (bool) bus_on );
         next_data_line( &file );
     }
-    
+
     /* midi clock mod  */
     long ticks = 64;
     line_after( &file, "[midi-clock-mod-ticks]" );
@@ -312,7 +312,7 @@ userfile::parse( perform *a_perf )
 }
 
 
-bool 
+bool
 userfile::write( perform *a_perf  )
 {
     return false;

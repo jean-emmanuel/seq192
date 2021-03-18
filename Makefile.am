@@ -1,6 +1,4 @@
 # Makefile.am for seq24
 
-SUBDIRS = man src
+SUBDIRS = src
 MOSTLYCLEANFILES = *~
-
-EXTRA_DIST = README COPYING RTC AUTHORS INSTALL SEQ24 NEWS ChangeLog seq24usr.example

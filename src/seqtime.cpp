@@ -23,17 +23,17 @@
 
 
 seqtime::seqtime(sequence *a_seq, int a_zoom,
-                 Gtk::Adjustment   *a_hadjust): DrawingArea() 
-{     
+                 Gtk::Adjustment   *a_hadjust): DrawingArea()
+{
     m_seq = a_seq;
     m_zoom = a_zoom;
 
     m_hadjust = a_hadjust;
 
-    add_events( Gdk::BUTTON_PRESS_MASK | 
+    add_events( Gdk::BUTTON_PRESS_MASK |
 		Gdk::BUTTON_RELEASE_MASK );
 
-    // in the construor you can only allocate colors, 
+    // in the construor you can only allocate colors,
     // get_window() returns 0 because we have not be realized
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
 
@@ -52,19 +52,19 @@ seqtime::seqtime(sequence *a_seq, int a_zoom,
     m_scroll_offset_x = 0;
 
     set_double_buffered( false );
-    
+
 
 }
 
 
 
-void 
+void
 seqtime::update_sizes()
 {
- 
+
     /* set these for later */
     if( is_realized() ) {
-        
+
         m_pixmap = Gdk::Pixmap::create( m_window,
                                         m_window_x,
                                         m_window_y, -1 );
@@ -74,7 +74,7 @@ seqtime::update_sizes()
     }
 }
 
-void 
+void
 seqtime::on_realize()
 {
     // we need to do the default realize
@@ -83,9 +83,9 @@ seqtime::on_realize()
     //Gtk::Main::idle.connect(mem_fun(this,&seqtime::idleProgress));
     Glib::signal_timeout().connect(mem_fun(*this,&seqtime::idle_progress), 50);
 
-  
 
-    
+
+
     // Now we can allocate any additional resources we need
     m_window = get_window();
     m_gc = Gdk::GC::create( m_window );
@@ -104,7 +104,7 @@ seqtime::change_horz( )
     m_scroll_offset_x = m_scroll_offset_ticks / m_zoom;
 
     update_pixmap();
-    force_draw();    
+    force_draw();
 }
 
 
@@ -113,12 +113,12 @@ void
 seqtime::on_size_allocate(Gtk::Allocation & a_r )
 {
     Gtk::DrawingArea::on_size_allocate( a_r );
-    
+
     m_window_x = a_r.get_width();
     m_window_y = a_r.get_height();
-    
-    update_sizes(); 
- 
+
+    update_sizes();
+
 }
 
 
@@ -131,16 +131,16 @@ seqtime::idle_progress( )
 
 
 
-void 
+void
 seqtime::set_zoom( int a_zoom )
 {
     m_zoom = a_zoom;
 
     reset();
- 
+
 }
 
-void 
+void
 seqtime::reset()
 {
     m_scroll_offset_ticks = (int) m_hadjust->get_value();
@@ -152,33 +152,33 @@ seqtime::reset()
 }
 
 
-void 
+void
 seqtime::redraw()
 {
-    
+
     m_scroll_offset_ticks = (int) m_hadjust->get_value();
     m_scroll_offset_x = m_scroll_offset_ticks / m_zoom;
-    
+
     update_pixmap();
     draw_pixmap_on_window();
-    
+
 }
 
-void 
+void
 seqtime::update_pixmap()
 {
 
-  
-    
+
+
     /* clear background */
     m_gc->set_foreground(m_white);
     m_pixmap->draw_rectangle(m_gc,true,
                              0,
-                             0, 
-                             m_window_x, 
+                             0,
+                             m_window_x,
                              m_window_y );
 
-   
+
 
 
     m_gc->set_foreground(m_black);
@@ -194,9 +194,9 @@ seqtime::update_pixmap()
 
     zoom   32         16         8        4        1
 
-    
+
     ml
-    c_ppqn  
+    c_ppqn
     *
     1      128
     2      64
@@ -204,17 +204,17 @@ seqtime::update_pixmap()
     8      16m       8          4          2       1
     16     8m        4          2          1       1
     32     4m        2          1          1       1
-    64     2m        1          1          1       1 
+    64     2m        1          1          1       1
     128    1m        1          1          1       1
-    
-    
-*/      
+
+
+*/
 
     int measure_length_32nds =  m_seq->get_bpm() * 32 /
         m_seq->get_bw();
 
     //printf ( "measure_length_32nds[%d]\n", measure_length_32nds );
-    
+
     int measures_per_line = (128 / measure_length_32nds) / (32 / m_zoom);
     if ( measures_per_line <= 0 )
         measures_per_line = 1;
@@ -234,25 +234,25 @@ seqtime::update_pixmap()
     for ( int i=start_tick; i<end_tick; i += ticks_per_step )
     {
         int base_line = i / m_zoom;
-        
+
         /* beat */
         m_pixmap->draw_line(m_gc,
                             base_line -  m_scroll_offset_x ,
                             0,
                             base_line -  m_scroll_offset_x ,
                             m_window_y );
-        
-            
+
+
         char bar[5];
-        snprintf(bar, sizeof(bar), "%d", (i/ ticks_per_measure ) + 1); 
-        
+        snprintf(bar, sizeof(bar), "%d", (i/ ticks_per_measure ) + 1);
+
         m_gc->set_foreground(m_black);
-        
+
         p_font_renderer->render_string_on_drawable(m_gc,
-                                                   base_line + 2 -  m_scroll_offset_x , 
+                                                   base_line + 2 -  m_scroll_offset_x ,
                                                    0,
-                                                   m_pixmap, bar, font::BLACK );           
-    
+                                                   m_pixmap, bar, font::BLACK );
+
     }
 
     long end_x = m_seq->get_length() / m_zoom - m_scroll_offset_x;
@@ -260,23 +260,23 @@ seqtime::update_pixmap()
     m_gc->set_foreground(m_black);
     m_pixmap->draw_rectangle(m_gc,true,
                              end_x,
-                             9, 
-                             19, 
+                             9,
+                             19,
                              8 );
-       
+
     p_font_renderer->render_string_on_drawable(m_gc,
-                                               end_x + 1, 
+                                               end_x + 1,
                                                9,
                                                m_pixmap, "END", font::WHITE );
 }
 
 
 
-void 
+void
 seqtime::draw_pixmap_on_window()
 {
-    m_window->draw_drawable(m_gc, 
-                            m_pixmap, 
+    m_window->draw_drawable(m_gc,
+                            m_pixmap,
                             0,0,
                             0,0,
                             m_window_x,
@@ -286,8 +286,8 @@ seqtime::draw_pixmap_on_window()
 bool
 seqtime::on_expose_event(GdkEventExpose* a_e)
 {
-    m_window->draw_drawable(m_gc,  
-                            m_pixmap, 
+    m_window->draw_drawable(m_gc,
+                            m_pixmap,
                             a_e->area.x,
                             a_e->area.y,
                             a_e->area.x,
@@ -300,8 +300,8 @@ seqtime::on_expose_event(GdkEventExpose* a_e)
 void
 seqtime::force_draw( void )
 {
-    m_window->draw_drawable(m_gc, 
-                            m_pixmap, 
+    m_window->draw_drawable(m_gc,
+                            m_pixmap,
                             0,0,
                             0,0,
                             m_window_x,

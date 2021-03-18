@@ -26,17 +26,17 @@
 #include <string>
 #include <list>
 
-class midifile 
+class midifile
 {
 
  private:
-    
+
     int m_pos;
     Glib::ustring m_name;
 
     /* holds our data */
     unsigned char *m_d;
-    
+
     list<unsigned char> m_l;
 
     unsigned long read_long();
@@ -49,7 +49,7 @@ class midifile
  public:
 
     midifile(const Glib::ustring&);
- 
+
     ~midifile();
 
     bool parse( perform *a_perf, int a_screen_set );
@@ -58,4 +58,4 @@ class midifile
 };
 
 
-#endif 
+#endif

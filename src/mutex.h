@@ -25,18 +25,18 @@
 #include <pthread.h>
 
 class smutex {
-    
+
 private:
 
     static const pthread_mutex_t recmutex;
-    
+
 protected:
-    
+
     /* mutex lock */
     pthread_mutex_t  m_mutex_lock;
-    
+
 public:
-    
+
     smutex();
 
     void lock();
@@ -55,10 +55,10 @@ private:
 public:
 
     condition_var();
-    
+
     void wait();
     void signal();
-    
+
 };
 
 #endif

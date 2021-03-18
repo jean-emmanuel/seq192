@@ -1,0 +1,16 @@
+src/seq24
+src/.deps
+src/*.o
+src/stamp-h1
+src/config.h*
+**Makefile.in
+Makefile
+config.log
+autom4te.cache
+aclocal.m4
+compile
+depcomp
+install-sh
+missing
+configure
+config.status

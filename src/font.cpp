@@ -22,14 +22,14 @@
 #include "string.h"
 
 
-#include "font_w.xpm"
-#include "font_b.xpm"
+#include "xpm/font_w.xpm"
+#include "xpm/font_b.xpm"
 
 #include <string>
 
 font::font( )
 {
-  
+
 }
 
 void
@@ -46,14 +46,14 @@ font::render_string_on_drawable(
         Glib::RefPtr<Gdk::GC> a_gc,
         int x, int y,
         Glib::RefPtr<Gdk::Drawable> a_draw,
-        const char *str, 
+        const char *str,
         font::Color col )
 {
     int length = 0;
 
     if ( str != NULL )
         length = strlen(str);
-    
+
     int font_w = 6;
     int font_h = 10;
 
@@ -62,8 +62,8 @@ font::render_string_on_drawable(
         unsigned char c = (unsigned char) str[i];
 
         // solid
-        //int pixbuf_index_x = 2; 
-        //int pixbuf_index_y = 0; 
+        //int pixbuf_index_x = 2;
+        //int pixbuf_index_y = 0;
 
         int pixbuf_index_x = c % 16;
         int pixbuf_index_y = c / 16;
@@ -73,14 +73,14 @@ font::render_string_on_drawable(
 
         pixbuf_index_x += 2;
         pixbuf_index_y += 2;
-        
+
         if ( col == font::BLACK )
             m_pixmap = m_black_pixmap;
         if ( col == font::WHITE )
             m_pixmap = m_white_pixmap;
 
-        a_draw->draw_drawable(a_gc, 
-                              m_pixmap, 
+        a_draw->draw_drawable(a_gc,
+                              m_pixmap,
                               pixbuf_index_x,
                               pixbuf_index_y,
                               x + (i*font_w),

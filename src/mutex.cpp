@@ -27,16 +27,16 @@ smutex::smutex( )
     m_mutex_lock = recmutex;
 }
 
-void 
+void
 smutex::lock( )
 {
     pthread_mutex_lock( &m_mutex_lock );
 }
 
 
-void 
+void
 smutex::unlock( )
-{      
+{
     pthread_mutex_unlock( &m_mutex_lock );
 }
 
@@ -57,5 +57,3 @@ condition_var::wait( )
 {
     pthread_cond_wait( &m_cond, &m_mutex_lock );
 }
-
-

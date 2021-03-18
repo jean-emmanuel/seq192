@@ -234,7 +234,7 @@ options::options (Gtk::Window & parent, perform * a_p):
         vbox->pack_start (*check, false, false);
     }
 
-#ifndef DISABLE_SONG_EDITOR 
+#ifndef DISABLE_SONG_EDITOR
     // KeyBoard keybinding setup (editor for .seq24rc keybindings.
     vbox = manage (new VBox ());
     m_notebook->pages ().push_back (Notebook_Helpers::TabElem (*vbox, "Keyboard"));

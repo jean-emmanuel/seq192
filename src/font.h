@@ -32,9 +32,9 @@ using namespace Gtk;
 
 class font
 {
-    
+
 private:
-    
+
     Glib::RefPtr<Gdk::Pixmap>   m_pixmap;
     Glib::RefPtr<Gdk::Pixmap>   m_black_pixmap;
     Glib::RefPtr<Gdk::Pixmap>   m_white_pixmap;
@@ -46,7 +46,7 @@ public:
         BLACK = 0,
         WHITE = 1
     };
-    
+
     font( );
 
     void init( Glib::RefPtr<Gdk::Window> a_window );
@@ -56,9 +56,9 @@ public:
         int x,
         int y,
         Glib::RefPtr<Gdk::Drawable> a_draw,
-        const char *str, 
+        const char *str,
         font::Color col );
-    
+
 };
 
 extern font *p_font_renderer;

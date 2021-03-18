@@ -45,7 +45,7 @@
 class seqdata : public Gtk::DrawingArea
 {
 
- private: 
+ private:
 
     Glib::RefPtr<Gdk::GC>     m_gc;
     Glib::RefPtr<Gdk::Window> m_window;
@@ -53,8 +53,8 @@ class seqdata : public Gtk::DrawingArea
 
     Glib::RefPtr<Gdk::Pixmap>   m_pixmap;
     Glib::RefPtr<Gdk::Pixmap>   m_numbers[c_dataarea_y];
- 
-    
+
+
     sequence     *m_seq;
 
     /* one pixel == m_zoom ticks */
@@ -85,12 +85,12 @@ class seqdata : public Gtk::DrawingArea
     void on_realize();
     bool on_expose_event(GdkEventExpose* a_ev);
 
-    bool on_button_press_event(GdkEventButton* a_ev); 
+    bool on_button_press_event(GdkEventButton* a_ev);
     bool on_button_release_event(GdkEventButton* a_ev);
     bool on_motion_notify_event(GdkEventMotion* a_p0);
     bool on_leave_notify_event(GdkEventCrossing* p0);
     bool on_scroll_event( GdkEventScroll* a_ev ) ;
-    
+
     void update_sizes();
     void draw_events_on_pixmap();
     void draw_pixmap_on_window();
@@ -103,16 +103,16 @@ class seqdata : public Gtk::DrawingArea
 		     int a_x2,  int a_y2,
 		     int *a_x,  int *a_y,
 		     int *a_w,  int *a_h );
-    
+
     void draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw );
 
-    void on_size_allocate(Gtk::Allocation& );    
+    void on_size_allocate(Gtk::Allocation& );
     void change_horz( void );
 
     void force_draw( void );
 
  public:
-    
+
     seqdata( sequence *a_seq, int a_zoom,  Gtk::Adjustment   *a_hadjust );
 
     void reset();

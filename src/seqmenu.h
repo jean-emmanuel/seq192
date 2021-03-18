@@ -41,7 +41,7 @@ class seqedit;
 #include <gtkmm/table.h>
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/widget.h>
-#include <gtkmm/style.h> 
+#include <gtkmm/style.h>
 
 
 
@@ -51,7 +51,7 @@ using namespace Gtk;
 class seqmenu : public virtual Glib::ObjectBase
 {
 
- private: 
+ private:
 
     Menu         *m_menu;
     perform      *m_mainperf;
@@ -62,19 +62,19 @@ class seqmenu : public virtual Glib::ObjectBase
     void seq_edit();
     void seq_new();
 
-    void seq_copy();   
+    void seq_copy();
     void seq_cut();
-    void seq_paste(); 
+    void seq_paste();
 
     void seq_clear_perf();
 
     void set_bus_and_midi_channel( int a_bus, int a_ch );
     void mute_all_tracks();
-    
+
     virtual void redraw( int a_sequence ) = 0;
 
  protected:
-   
+
     int m_current_seq;
     void popup_menu();
 

@@ -47,10 +47,10 @@
 #include <gtkmm/combo.h>
 #include <gtkmm/label.h>
 #include <gtkmm/toolbar.h>
-#include <gtkmm/optionmenu.h> 
+#include <gtkmm/optionmenu.h>
 #include <gtkmm/togglebutton.h>
 #include <gtkmm/invisible.h>
-#include <gtkmm/separator.h> 
+#include <gtkmm/separator.h>
 #include <gtkmm/image.h>
 #include <gtkmm/tooltips.h>
 #include <gtkmm/invisible.h>
@@ -72,10 +72,10 @@ class seqedit : public Gtk::Window
 {
 
  private:
- 
+
     static const int c_min_zoom = 1;
     static const int c_max_zoom = 32;
- 	
+
     MenuBar    *m_menubar;
 
     Menu       *m_menu_tools;
@@ -122,37 +122,37 @@ class seqedit : public Gtk::Window
 
     VScrollbar *m_vscroll_new;
     HScrollbar *m_hscroll_new;
-    
+
     Button      *m_button_undo;
     Button      *m_button_redo;
     Button      *m_button_quanize;
-    
+
     Button      *m_button_tools;
 
     Button      *m_button_sequence;
     Entry       *m_entry_sequence;
-    
+
     Button      *m_button_bus;
     Entry       *m_entry_bus;
-    
+
     Button      *m_button_channel;
     Entry       *m_entry_channel;
-    
+
     Button      *m_button_snap;
     Entry       *m_entry_snap;
-    
+
     Button      *m_button_note_length;
     Entry       *m_entry_note_length;
-    
+
     Button      *m_button_zoom;
     Entry       *m_entry_zoom;
-    
+
     Button      *m_button_length;
     Entry       *m_entry_length;
-    
+
     Button      *m_button_key;
     Entry       *m_entry_key;
-    
+
     Button      *m_button_scale;
     Entry       *m_entry_scale;
 
@@ -166,7 +166,7 @@ class seqedit : public Gtk::Window
 
     Button      *m_button_bw;
     Entry       *m_entry_bw;
-    
+
     Button	*m_button_rec_vol;
 
     ToggleButton *m_toggle_play;
@@ -177,10 +177,10 @@ class seqedit : public Gtk::Window
     RadioButton *m_radio_select;
     RadioButton *m_radio_grow;
     RadioButton *m_radio_draw;
-    
+
     Entry       *m_entry_name;
 
-    /* the zoom 0  1  2  3  4  
+    /* the zoom 0  1  2  3  4
                  1, 2, 4, 8, 16 */
     int         m_zoom;
     static int  m_initial_zoom;
@@ -230,7 +230,7 @@ class seqedit : public Gtk::Window
     void set_key( int a_note );
 
     void set_background_sequence( int a_seq );
-    
+
     void name_change_callback( void );
     void play_change_callback( void );
     void record_change_callback( void );
@@ -239,7 +239,7 @@ class seqedit : public Gtk::Window
     void undo_callback( void );
     void redo_callback( void );
 
-    void set_data_type( unsigned char a_status, 
+    void set_data_type( unsigned char a_status,
 			unsigned char a_control = 0 );
 
     void update_all_windows( );
@@ -248,16 +248,16 @@ class seqedit : public Gtk::Window
     void create_menus( void );
 
     void menu_action_quantise( void );
-    
+
     void popup_menu( Menu *a_menu );
-    void popup_event_menu( void );                                                                                                                                                                                                                                                                                                
+    void popup_event_menu( void );
     void popup_midibus_menu( void );
     void popup_sequence_menu( void );
     void popup_tool_menu( void );
     void popup_midich_menu(void);
 
     Gtk::Image* create_menu_image( bool a_state = false );
-    
+
     void on_realize();
 
     bool timeout( void );
@@ -268,14 +268,14 @@ class seqedit : public Gtk::Window
 
  public:
 
-    seqedit(sequence *a_seq, 
-	    perform *a_perf, 
-	    // mainwid *a_mainwid, 
+    seqedit(sequence *a_seq,
+	    perform *a_perf,
+	    // mainwid *a_mainwid,
 	    int a_pos);
 
     ~seqedit();
 
- 
+
     bool on_delete_event(GdkEventAny *a_event);
     bool on_scroll_event(GdkEventScroll* a_ev);
     bool on_key_press_event(GdkEventKey* a_ev);

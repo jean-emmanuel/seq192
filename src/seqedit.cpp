@@ -18,7 +18,7 @@
 //
 //-----------------------------------------------------------------------------
 
-#include "seqedit.h" 
+#include "seqedit.h"
 #include "sequence.h"
 #include "midibus.h"
 #include "controllers.h"
@@ -26,27 +26,27 @@
 #include "options.h"
 
 
-#include "play.xpm"
-#include "q_rec.xpm"
-#include "rec.xpm"
-#include "thru.xpm"
-#include "bus.xpm"
-#include "midi.xpm"
-#include "snap.xpm"
-#include "zoom.xpm"
-#include "length.xpm"
-#include "scale.xpm"
-#include "key.xpm"   
-#include "down.xpm"
-#include "note_length.xpm"
-#include "undo.xpm"
-#include "redo.xpm"
-#include "quanize.xpm"
-#include "menu_empty.xpm"
-#include "menu_full.xpm"
-#include "sequences.xpm"
-#include "tools.xpm"
-#include "seq-editor.xpm"
+#include "xpm/play.xpm"
+#include "xpm/q_rec.xpm"
+#include "xpm/rec.xpm"
+#include "xpm/thru.xpm"
+#include "xpm/bus.xpm"
+#include "xpm/midi.xpm"
+#include "xpm/snap.xpm"
+#include "xpm/zoom.xpm"
+#include "xpm/length.xpm"
+#include "xpm/scale.xpm"
+#include "xpm/key.xpm"
+#include "xpm/down.xpm"
+#include "xpm/note_length.xpm"
+#include "xpm/undo.xpm"
+#include "xpm/redo.xpm"
+#include "xpm/quanize.xpm"
+#include "xpm/menu_empty.xpm"
+#include "xpm/menu_full.xpm"
+#include "xpm/sequences.xpm"
+#include "xpm/tools.xpm"
+#include "xpm/seq-editor.xpm"
 
 // tooltip helper, for old vs new gtk...
 #if GTK_MINOR_VERSION >= 12
@@ -78,18 +78,18 @@ const int tighten_notes    =  9;
 const int transpose     = 10;
 const int transpose_h   = 12;
 
-/* connects to a menu item, tells the performance 
+/* connects to a menu item, tells the performance
    to launch the timer thread */
-void 
+void
 seqedit::menu_action_quantise( void )
 {
 }
 
 
 
-seqedit::seqedit( sequence *a_seq, 
-		  perform *a_perf,  
-		  // mainwid *a_mainwid, 
+seqedit::seqedit( sequence *a_seq,
+		  perform *a_perf,
+		  // mainwid *a_mainwid,
 		  int a_pos  )
 {
     set_icon(Gdk::Pixbuf::create_from_xpm_data(seq_editor_xpm));
@@ -118,7 +118,7 @@ seqedit::seqedit( sequence *a_seq,
 
     /* scroll bars */
     m_vadjust = manage( new Adjustment(55,0, c_num_keys,           1,1,1 ));
-    m_hadjust = manage( new Adjustment(0, 0, 1,  1,1,1 ));    
+    m_hadjust = manage( new Adjustment(0, 0, 1,  1,1,1 ));
     m_vscroll_new   =  manage(new VScrollbar( *m_vadjust ));
     m_hscroll_new   =  manage(new HScrollbar( *m_hadjust ));
 
@@ -129,17 +129,17 @@ seqedit::seqedit( sequence *a_seq,
     m_seqtime_wid  = manage( new seqtime(  m_seq,
                                            m_zoom,
                                            m_hadjust ));
-    
+
     m_seqdata_wid  = manage( new seqdata(  m_seq,
                                            m_zoom,
                                            m_hadjust));
-    
+
     m_seqevent_wid = manage( new seqevent( m_seq,
                                            m_zoom,
                                            m_snap,
                                            m_seqdata_wid,
                                            m_hadjust));
-    
+
     m_seqroll_wid  = manage( new seqroll(  m_mainperf,
                                            m_seq,
                                            m_zoom,
@@ -150,9 +150,9 @@ seqedit::seqedit( sequence *a_seq,
                                            m_pos,
                                            m_hadjust,
                                            m_vadjust ));
-    
 
-    
+
+
     /* menus */
     m_menubar   =  manage( new MenuBar());
     m_menu_tools = manage( new Menu() );
@@ -172,12 +172,12 @@ seqedit::seqedit( sequence *a_seq,
     m_menu_scale = manage( new Menu());
     m_menu_data = NULL;
 
-    create_menus(); 
+    create_menus();
 
     /* tooltips */
     m_tooltips = manage( new Tooltips( ) );
 
- 
+
     /* init table, viewports and scroll bars */
     m_table     = manage( new Table( 7, 4, false));
     m_vbox      = manage( new VBox( false, 2 ));
@@ -193,7 +193,7 @@ seqedit::seqedit( sequence *a_seq,
 
     m_table->attach( *m_seqtime_wid, 1, 2, 0, 1, Gtk::FILL, Gtk::SHRINK );
     m_table->attach( *m_seqroll_wid , 1, 2, 1, 2,
-    	      Gtk::FILL |  Gtk::SHRINK,  
+    	      Gtk::FILL |  Gtk::SHRINK,
     	      Gtk::FILL |  Gtk::SHRINK );
 
     m_table->attach( *m_seqevent_wid, 1, 2, 2, 3, Gtk::FILL, Gtk::SHRINK );
@@ -233,7 +233,7 @@ seqedit::seqedit( sequence *a_seq,
     m_toggle_play->signal_clicked().connect(
             mem_fun( *this, &seqedit::play_change_callback));
     add_tooltip( m_toggle_play, "Sequence dumps data to midi bus." );
-    
+
     m_toggle_record = manage( new ToggleButton(  ));
     m_toggle_record->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( rec_xpm ))));
     m_toggle_record->signal_clicked().connect(
@@ -262,7 +262,7 @@ seqedit::seqedit( sequence *a_seq,
     m_toggle_play->set_active( m_seq->get_playing());
     m_toggle_record->set_active( m_seq->get_recording());
     m_toggle_thru->set_active( m_seq->get_thru());
- 
+
     dhbox->pack_end( *m_button_rec_vol, false, false, 4);
     dhbox->pack_end( *m_toggle_q_rec, false, false, 4);
     dhbox->pack_end( *m_toggle_record, false, false, 4);
@@ -305,13 +305,13 @@ seqedit::seqedit( sequence *a_seq,
 }
 
 
-void 
+void
 seqedit::create_menus( void )
 {
     using namespace Menu_Helpers;
 
     char b[20];
-    
+
     /* zoom */
     for (int i = c_min_zoom; i <= c_max_zoom; i*=2)
     {
@@ -319,7 +319,7 @@ seqedit::create_menus( void )
         m_menu_zoom->items().push_back(MenuElem(b,
                     sigc::bind(mem_fun(*this, &seqedit::set_zoom), i )));
     }
-      
+
     /* note snap */
     m_menu_snap->items().push_back(MenuElem("1",
                 sigc::bind(mem_fun(*this, &seqedit::set_snap),
@@ -347,7 +347,7 @@ seqedit::create_menus( void )
                     c_ppqn / 32 )));
 
     m_menu_snap->items().push_back(SeparatorElem());
-    
+
     m_menu_snap->items().push_back(MenuElem("1/3",
                 sigc::bind(mem_fun(*this, &seqedit::set_snap),
                     c_ppqn * 4  / 3 )));
@@ -369,7 +369,7 @@ seqedit::create_menus( void )
     m_menu_snap->items().push_back(MenuElem("1/192",
                 sigc::bind(mem_fun(*this, &seqedit::set_snap),
                     c_ppqn / 16 / 3 )));
-    
+
     /* note note_length */
     m_menu_note_length->items().push_back(MenuElem("1",
                 sigc::bind(mem_fun(*this, &seqedit::set_note_length),
@@ -417,7 +417,7 @@ seqedit::create_menus( void )
     m_menu_note_length->items().push_back(MenuElem("1/192",
                 sigc::bind(mem_fun(*this, &seqedit::set_note_length),
                     c_ppqn / 16 / 3 )));
-    
+
     /* Key */
     m_menu_key->items().push_back(MenuElem( c_key_text[0],
                 sigc::bind(mem_fun(*this, &seqedit::set_key), 0 )));
@@ -443,7 +443,7 @@ seqedit::create_menus( void )
                 sigc::bind(mem_fun(*this, &seqedit::set_key), 10 )));
     m_menu_key->items().push_back(MenuElem( c_key_text[11],
                 sigc::bind(mem_fun(*this, &seqedit::set_key), 11 )));
-    
+
     /* bw */
     m_menu_bw->items().push_back(MenuElem("1",
                 sigc::bind(mem_fun(*this, &seqedit::set_bw), 1  )));
@@ -461,7 +461,7 @@ seqedit::create_menus( void )
                 sigc::bind(mem_fun(*this, &seqedit::set_bw), 64 )));
     m_menu_bw->items().push_back(MenuElem("128",
                 sigc::bind(mem_fun(*this, &seqedit::set_bw), 128 )));
-  
+
     /* record volume */
     m_menu_rec_vol->items().push_back(MenuElem("Free",
                 sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 0)));
@@ -481,7 +481,7 @@ seqedit::create_menus( void )
                 sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 31)));
     m_menu_rec_vol->items().push_back(MenuElem("Fixed 1",
                 sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 15)));
-    
+
     /* music scale */
     m_menu_scale->items().push_back(MenuElem(c_scales_text[0],
                 sigc::bind(mem_fun(*this, &seqedit::set_scale),
@@ -492,17 +492,17 @@ seqedit::create_menus( void )
     m_menu_scale->items().push_back(MenuElem(c_scales_text[2],
                 sigc::bind(mem_fun(*this, &seqedit::set_scale),
                     c_scale_minor )));
-    
+
     /* midi channel menu */
     for( int i=0; i<16; i++ ){
-        
+
         snprintf(b, sizeof(b), "%d", i + 1);
-        
+
         /* length */
         m_menu_length->items().push_back(MenuElem(b,
                     sigc::bind(mem_fun(*this, &seqedit::set_measures), i+1 )));
         /* length */
-        m_menu_bpm->items().push_back(MenuElem(b, 
+        m_menu_bpm->items().push_back(MenuElem(b,
                     sigc::bind(mem_fun(*this, &seqedit::set_bpm), i+1 )));
     }
 
@@ -511,7 +511,7 @@ seqedit::create_menus( void )
     m_menu_length->items().push_back(MenuElem("64",
                 sigc::bind(mem_fun(*this, &seqedit::set_measures), 64 )));
 
-  //m_menu_tools->items().push_back( SeparatorElem( )); 
+  //m_menu_tools->items().push_back( SeparatorElem( ));
 }
 
 
@@ -526,7 +526,7 @@ seqedit::popup_tool_menu( void )
     /* tools */
     Menu *holder;
     Menu *holder2;
-    
+
     holder = manage( new Menu());
     holder->items().push_back( MenuElem( "All Notes",
                 sigc::bind(mem_fun(*this, &seqedit::do_action),
@@ -535,11 +535,11 @@ seqedit::popup_tool_menu( void )
     holder->items().push_back( MenuElem( "Inverse Notes",
                 sigc::bind(mem_fun(*this, &seqedit::do_action),
                     select_inverse_notes, 0)));
-   
+
     if ( m_editing_status !=  EVENT_NOTE_ON &&
          m_editing_status !=  EVENT_NOTE_OFF ){
 
-        holder->items().push_back( SeparatorElem( )); 
+        holder->items().push_back( SeparatorElem( ));
         holder->items().push_back( MenuElem( "All Events",
                     sigc::bind(mem_fun(*this, &seqedit::do_action),
                         select_all_events, 0)));
@@ -548,9 +548,9 @@ seqedit::popup_tool_menu( void )
                     sigc::bind(mem_fun(*this, &seqedit::do_action),
                         select_inverse_events, 0)));
     }
-    
+
     m_menu_tools->items().push_back( MenuElem( "Select", *holder ));
-    
+
     holder = manage( new Menu());
     holder->items().push_back( MenuElem( "Quantize Selected Notes",
                 sigc::bind(mem_fun(*this, &seqedit::do_action),
@@ -562,8 +562,8 @@ seqedit::popup_tool_menu( void )
 
     if ( m_editing_status !=  EVENT_NOTE_ON &&
          m_editing_status !=  EVENT_NOTE_OFF ){
-        
-        holder->items().push_back( SeparatorElem( )); 
+
+        holder->items().push_back( SeparatorElem( ));
         holder->items().push_back( MenuElem( "Quantize Selected Events",
                     sigc::bind(mem_fun(*this, &seqedit::do_action),
                         quantize_events,0 )));
@@ -571,7 +571,7 @@ seqedit::popup_tool_menu( void )
         holder->items().push_back( MenuElem( "Tighten Selected Events",
                     sigc::bind(mem_fun(*this, &seqedit::do_action),
                         tighten_events,0 )));
-        
+
     }
     m_menu_tools->items().push_back( MenuElem( "Modify Time", *holder ));
 
@@ -660,12 +660,12 @@ seqedit::do_action( int a_action, int a_var )
 
         case transpose:
             m_seq->push_undo();
-            m_seq->transpose_notes(a_var, 0); 
-            break; 
+            m_seq->transpose_notes(a_var, 0);
+            break;
 
         case transpose_h:
             m_seq->push_undo();
-            m_seq->transpose_notes(a_var, m_scale); 
+            m_seq->transpose_notes(a_var, m_scale);
             break;
 
         default:
@@ -674,12 +674,12 @@ seqedit::do_action( int a_action, int a_var )
 
     m_seqroll_wid->redraw();
     m_seqtime_wid->redraw();
-    m_seqdata_wid->redraw();  
+    m_seqdata_wid->redraw();
     m_seqevent_wid->redraw();
 }
 
 
-void  
+void
 seqedit::fill_top_bar( void )
 {
      /* name */
@@ -695,7 +695,7 @@ seqedit::fill_top_bar( void )
     m_hbox->pack_start( *m_entry_name, true, true );
     m_hbox->pack_start( *(manage(new VSeparator( ))), false, false, 4);
 
-    /* beats per measure */ 
+    /* beats per measure */
     m_button_bpm = manage( new Button());
     m_button_bpm->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( down_xpm  ))));
     m_button_bpm->signal_clicked().connect(
@@ -714,7 +714,7 @@ seqedit::fill_top_bar( void )
 
     m_hbox->pack_start( *m_button_bpm , false, false );
     m_hbox->pack_start( *m_entry_bpm , false, false );
- 
+
     m_hbox->pack_start( *(manage(new Label( "/" ))), false, false, 4);
 
     /* beat width */
@@ -753,7 +753,7 @@ seqedit::fill_top_bar( void )
 
 
     m_hbox->pack_start( *(manage(new VSeparator( ))), false, false, 4);
-    
+
     /* midi bus */
     m_button_bus = manage( new Button());
     m_button_bus->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( bus_xpm  ))));
@@ -789,25 +789,25 @@ seqedit::fill_top_bar( void )
     m_button_undo->signal_clicked().connect(
             mem_fun( *this, &seqedit::undo_callback));
     add_tooltip( m_button_undo, "Undo." );
- 
+
     m_hbox2->pack_start( *m_button_undo , false, false );
-    
+
     /* redo */
     m_button_redo = manage( new Button());
     m_button_redo->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( redo_xpm  ))));
     m_button_redo->signal_clicked().connect(
             mem_fun( *this, &seqedit::redo_callback));
     add_tooltip( m_button_redo, "Redo." );
- 
+
     m_hbox2->pack_start( *m_button_redo , false, false );
-    
+
     /* quantize shortcut */
     m_button_quanize = manage( new Button());
     m_button_quanize->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( quanize_xpm  ))));
     m_button_quanize->signal_clicked().connect(
             sigc::bind(mem_fun(*this, &seqedit::do_action), quantize_notes, 0));
     add_tooltip( m_button_quanize, "Quantize Selection." );
- 
+
     m_hbox2->pack_start( *m_button_quanize , false, false );
 
     m_hbox2->pack_start( *(manage(new VSeparator( ))), false, false, 4);
@@ -821,7 +821,7 @@ seqedit::fill_top_bar( void )
 
     m_hbox2->pack_start( *m_button_tools , false, false );
     m_hbox2->pack_start( *(manage(new VSeparator( ))), false, false, 4);
-    
+
     /* snap */
     m_button_snap = manage( new Button());
     m_button_snap->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( snap_xpm  ))));
@@ -832,7 +832,7 @@ seqedit::fill_top_bar( void )
     m_entry_snap = manage( new Entry());
     m_entry_snap->set_width_chars(5);
     m_entry_snap->set_editable( false );
-    
+
     m_hbox2->pack_start( *m_button_snap , false, false );
     m_hbox2->pack_start( *m_entry_snap , false, false );
 
@@ -846,7 +846,7 @@ seqedit::fill_top_bar( void )
     m_entry_note_length = manage( new Entry());
     m_entry_note_length->set_width_chars(5);
     m_entry_note_length->set_editable( false );
-    
+
     m_hbox2->pack_start( *m_button_note_length , false, false );
     m_hbox2->pack_start( *m_entry_note_length , false, false );
 
@@ -865,7 +865,7 @@ seqedit::fill_top_bar( void )
     m_hbox2->pack_start( *m_button_zoom , false, false );
     m_hbox2->pack_start( *m_entry_zoom , false, false );
 
-  
+
     m_hbox2->pack_start( *(manage(new VSeparator( ))), false, false, 4);
 
     /* key */
@@ -878,7 +878,7 @@ seqedit::fill_top_bar( void )
     m_entry_key = manage( new Entry());
     m_entry_key->set_width_chars(5);
     m_entry_key->set_editable( false );
-    
+
     m_hbox2->pack_start( *m_button_key , false, false );
     m_hbox2->pack_start( *m_entry_key , false, false );
 
@@ -918,32 +918,32 @@ seqedit::fill_top_bar( void )
     m_radio_select = manage( new RadioButton( "Sel", true ));
     m_radio_select->signal_clicked().connect( sigc::bind(mem_fun( *this, &seqedit::mouse_action ), e_action_select ));
     m_hbox3->pack_start( *m_radio_select, false, false );
-    
+
     /* Draw */
     m_radio_draw = manage( new RadioButton( "Draw" ));
     m_radio_draw->signal_clicked().connect( sigc::bind(mem_fun( *this, &seqedit::mouse_action ), e_action_draw ));
     m_hbox3->pack_start( *m_radio_draw, false, false );
-     
+
     /* Grow */
     m_radio_grow = manage( new RadioButton( "Grow" ));
     m_radio_grow->signal_clicked().connect( sigc::bind(mem_fun( *this, &seqedit::mouse_action ), e_action_grow ));
     m_hbox3->pack_start( *m_radio_grow, false, false );
-     
+
     /* Stretch */
 
     Gtk::RadioButton::Group g = m_radio_select->get_group();
     m_radio_draw->set_group(g);
     m_radio_grow->set_group(g);
-#endif 
+#endif
 }
 
 #if 0
-void 
+void
 seqedit::mouse_action( mouse_action_e a_action )
 {
     if ( a_action == e_action_select && m_radio_select->get_active())
         printf( "mouse_action() select [%d]\n", a_action );
-    
+
     if ( a_action == e_action_draw && m_radio_draw->get_active())
         printf( "mouse_action() draw [%d]\n", a_action );
 
@@ -988,21 +988,21 @@ seqedit::popup_midich_menu( void )
     int midi_bus = m_seq->get_midi_bus();
 
     char b[16];
-    
+
     /* midi channel menu */
     for( int i=0; i<16; i++ ){
-        
+
         snprintf( b, sizeof(b), "%d", i+1 );
         std::string name = string(b);
-        int instrument = global_user_midi_bus_definitions[midi_bus].instrument[i]; 
+        int instrument = global_user_midi_bus_definitions[midi_bus].instrument[i];
         if ( instrument >= 0 && instrument < c_maxBuses )
         {
-            name = name + (string(" (") + 
-                           global_user_instrument_definitions[instrument].instrument + 
+            name = name + (string(" (") +
+                           global_user_instrument_definitions[instrument].instrument +
                            string(")") );
         }
-        m_menu_midich->items().push_back(MenuElem(name, 
-                    sigc::bind(mem_fun(*this,&seqedit::set_midi_channel), 
+        m_menu_midich->items().push_back(MenuElem(name,
+                    sigc::bind(mem_fun(*this,&seqedit::set_midi_channel),
                                                        i )));
     }
 
@@ -1024,15 +1024,15 @@ seqedit::popup_sequence_menu( void )
 
     for ( int ss=0; ss<c_max_sets; ++ss ){
 
-        Menu *menu_ss = NULL;  
+        Menu *menu_ss = NULL;
         bool inserted = false;
-        
+
         for ( int seq=0; seq<  c_seqs_in_set; seq++ ){
 
             int i = ss * c_seqs_in_set + seq;
 
             char name[30];
-            
+
             if ( m_mainperf->is_active( i )){
 
                 if ( !inserted ){
@@ -1041,17 +1041,17 @@ seqedit::popup_sequence_menu( void )
                     menu_ss = manage( new Menu());
                     m_menu_sequences->items().push_back(MenuElem(name,*menu_ss));
                 }
-                
-                sequence *seq = m_mainperf->get_sequence( i );                
+
+                sequence *seq = m_mainperf->get_sequence( i );
                 snprintf(name, sizeof(name),"[%d] %.13s", i, seq->get_name());
 
                 menu_ss->items().push_back(MenuElem(name,
                             sigc::bind(mem_fun(*this, &seqedit::set_background_sequence), i)));
-                
+
             }
         }
     }
-    
+
     m_menu_sequences->popup(0,0);
 }
 
@@ -1067,10 +1067,10 @@ seqedit::set_background_sequence( int a_seq )
         m_entry_sequence->set_text("Off");
          m_seqroll_wid->set_background_sequence( false, 0 );
     }
-    
+
     if ( m_mainperf->is_active( a_seq )){
 
-        sequence *seq = m_mainperf->get_sequence( a_seq );                
+        sequence *seq = m_mainperf->get_sequence( a_seq );
         snprintf(name, sizeof(name),"[%d] %.13s", a_seq, seq->get_name());
         m_entry_sequence->set_text(name);
 
@@ -1117,7 +1117,7 @@ seqedit::popup_event_menu( void )
         switch( status ){
             case EVENT_NOTE_OFF:
                 note_off = true;
-                break;	  
+                break;
             case EVENT_NOTE_ON:
                 note_on = true;
                 break;
@@ -1147,7 +1147,7 @@ seqedit::popup_event_menu( void )
                 sigc::bind(mem_fun(*this, &seqedit::set_data_type),
                     (unsigned char) EVENT_NOTE_ON, 0 )));
 
-    m_menu_data->items().push_back( SeparatorElem( )); 
+    m_menu_data->items().push_back( SeparatorElem( ));
 
     m_menu_data->items().push_back( ImageMenuElem( "Note Off Velocity",
                 *create_menu_image( note_off ),
@@ -1174,17 +1174,17 @@ seqedit::popup_event_menu( void )
                 sigc::bind(mem_fun(*this, &seqedit::set_data_type),
                     (unsigned char) EVENT_PITCH_WHEEL , 0 )));
 
-    m_menu_data->items().push_back( SeparatorElem( )); 
+    m_menu_data->items().push_back( SeparatorElem( ));
 
     /* create control change */
     for ( int i=0; i<8; i++ ){
 
         snprintf(b, sizeof(b), "Controls %d-%d", (i*16), (i*16) + 15);
-        Menu *menu_cc = manage( new Menu() ); 
+        Menu *menu_cc = manage( new Menu() );
 
         for( int j=0; j<16; j++ ){
             string controller_name( c_controller_names[i*16+j] );
-            int instrument = global_user_midi_bus_definitions[midi_bus].instrument[midi_ch];  
+            int instrument = global_user_midi_bus_definitions[midi_bus].instrument[midi_ch];
             if ( instrument > -1 && instrument < c_max_instruments )
             {
                 if ( global_user_instrument_definitions[instrument].controllers_active[i*16+j] )
@@ -1193,7 +1193,7 @@ seqedit::popup_event_menu( void )
 
             menu_cc->items().push_back( ImageMenuElem( controller_name,
                         *create_menu_image( ccs[i*16+j]),
-                        sigc::bind(mem_fun(*this, &seqedit::set_data_type), 
+                        sigc::bind(mem_fun(*this, &seqedit::set_data_type),
                             (unsigned char) EVENT_CONTROL_CHANGE, i*16+j)));
         }
         m_menu_data->items().push_back( MenuElem( string(b), *menu_cc ));
@@ -1206,7 +1206,7 @@ seqedit::popup_event_menu( void )
     //m_option_midich->set_history( m_seq->getMidiChannel() );
     //m_option_midibus->set_history( m_seq->getMidiBus()->getID() );
 
-void 
+void
 seqedit::set_midi_channel( int a_midichannel  )
 {
     char b[10];
@@ -1218,7 +1218,7 @@ seqedit::set_midi_channel( int a_midichannel  )
 }
 
 
-void 
+void
 seqedit::set_midi_bus( int a_midibus )
 {
     m_seq->set_midi_bus( a_midibus );
@@ -1228,7 +1228,7 @@ seqedit::set_midi_bus( int a_midibus )
 }
 
 
-void 
+void
 seqedit::set_zoom( int a_zoom  )
 {
     char b[10];
@@ -1240,19 +1240,19 @@ seqedit::set_zoom( int a_zoom  )
     m_initial_zoom = a_zoom;
     m_seqroll_wid->set_zoom( m_zoom );
     m_seqtime_wid->set_zoom( m_zoom );
-    m_seqdata_wid->set_zoom( m_zoom ); 
+    m_seqdata_wid->set_zoom( m_zoom );
     m_seqevent_wid->set_zoom( m_zoom );
 }
 
 
-void 
+void
 seqedit::set_snap( int a_snap  )
 {
     char b[10];
 
     snprintf(b, sizeof(b), "1/%d",   c_ppqn * 4 / a_snap);
     m_entry_snap->set_text(b);
-    
+
     m_snap = a_snap;
     m_initial_snap = a_snap;
     m_seqroll_wid->set_snap( m_snap );
@@ -1261,21 +1261,21 @@ seqedit::set_snap( int a_snap  )
 }
 
 
-void 
+void
 seqedit::set_note_length( int a_note_length  )
 {
     char b[10];
 
     snprintf(b, sizeof(b), "1/%d",   c_ppqn * 4 / a_note_length);
     m_entry_note_length->set_text(b);
-    
+
     m_note_length = a_note_length;
     m_initial_note_length = a_note_length;
     m_seqroll_wid->set_note_length( m_note_length );
 }
 
 
-void 
+void
 seqedit::set_scale( int a_scale )
 {
   m_entry_scale->set_text( c_scales_text[a_scale] );
@@ -1288,13 +1288,13 @@ seqedit::set_scale( int a_scale )
 
 }
 
-void 
+void
 seqedit::set_key( int a_note )
-{ 
+{
   m_entry_key->set_text( c_key_text[a_note] );
 
   m_key = m_initial_key = a_note;
-  
+
   m_seqroll_wid->set_key( m_key );
   m_seqkeys_wid->set_key( m_key );
 
@@ -1308,9 +1308,9 @@ seqedit::apply_length( int a_bpm, int a_bw, int a_measures )
 
   m_seqroll_wid->reset();
   m_seqtime_wid->reset();
-  m_seqdata_wid->reset();  
+  m_seqdata_wid->reset();
   m_seqevent_wid->reset();
-    
+
 }
 
 
@@ -1328,7 +1328,7 @@ seqedit::get_measures( void )
 }
 
 
-void 
+void
 seqedit::set_measures( int a_length_measures  )
 {
     char b[10];
@@ -1465,7 +1465,7 @@ seqedit::set_rec_vol( int a_rec_vol  )
 }
 
 
-void 
+void
 seqedit::name_change_callback( void )
 {
     m_seq->set_name( m_entry_name->get_text());
@@ -1473,7 +1473,7 @@ seqedit::name_change_callback( void )
 }
 
 
-void 
+void
 seqedit::play_change_callback( void )
 {
     m_seq->set_playing( m_toggle_play->get_active() );
@@ -1481,7 +1481,7 @@ seqedit::play_change_callback( void )
 }
 
 
-void 
+void
 seqedit::record_change_callback( void )
 {
     m_mainperf->get_master_midi_bus()->set_sequence_input( true, m_seq );
@@ -1489,38 +1489,38 @@ seqedit::record_change_callback( void )
 }
 
 
-void 
+void
 seqedit::q_rec_change_callback( void )
 {
     m_seq->set_quanized_rec( m_toggle_q_rec->get_active() );
 }
 
 
-void 
+void
 seqedit::undo_callback( void )
 {
 	m_seq->pop_undo( );
- 	
+
 	m_seqroll_wid->redraw();
 	m_seqtime_wid->redraw();
-	m_seqdata_wid->redraw();  
+	m_seqdata_wid->redraw();
 	m_seqevent_wid->redraw();
 }
 
 
-void 
+void
 seqedit::redo_callback( void )
 {
 	m_seq->pop_redo( );
- 	
+
 	m_seqroll_wid->redraw();
 	m_seqtime_wid->redraw();
-	m_seqdata_wid->redraw();  
+	m_seqdata_wid->redraw();
 	m_seqevent_wid->redraw();
 }
 
 
-void 
+void
 seqedit::thru_change_callback( void )
 {
     m_mainperf->get_master_midi_bus()->set_sequence_input( true, m_seq );
@@ -1528,7 +1528,7 @@ seqedit::thru_change_callback( void )
 }
 
 
-void 
+void
 seqedit::set_data_type( unsigned char a_status, unsigned char a_control  )
 {
     m_editing_status = a_status;
@@ -1542,38 +1542,38 @@ seqedit::set_data_type( unsigned char a_status, unsigned char a_control  )
     char hex[20];
     char type[80];
 
-    snprintf(hex, sizeof(hex), "[0x%02X]", a_status);  
+    snprintf(hex, sizeof(hex), "[0x%02X]", a_status);
 
-    if ( a_status == EVENT_NOTE_OFF )         
+    if ( a_status == EVENT_NOTE_OFF )
         snprintf(type, sizeof(type),"Note Off" );
-    else if ( a_status == EVENT_NOTE_ON )          
-        snprintf(type, sizeof(type),"Note On" );  
-    else if ( a_status == EVENT_AFTERTOUCH )       
-        snprintf(type, sizeof(type), "Aftertouch" );       
+    else if ( a_status == EVENT_NOTE_ON )
+        snprintf(type, sizeof(type),"Note On" );
+    else if ( a_status == EVENT_AFTERTOUCH )
+        snprintf(type, sizeof(type), "Aftertouch" );
     else if ( a_status == EVENT_CONTROL_CHANGE )
     {
         int midi_bus = m_seq->get_midi_bus();
         int midi_ch = m_seq->get_midi_channel();
 
         string controller_name( c_controller_names[a_control] );
-        int instrument = global_user_midi_bus_definitions[midi_bus].instrument[midi_ch];  
+        int instrument = global_user_midi_bus_definitions[midi_bus].instrument[midi_ch];
         if ( instrument > -1 && instrument < c_max_instruments )
         {
             if ( global_user_instrument_definitions[instrument].controllers_active[a_control] )
                 controller_name = global_user_instrument_definitions[instrument].controllers[a_control];
         }
         snprintf(type, sizeof(type), "Control Change - %s",
-                controller_name.c_str() );  
+                controller_name.c_str() );
     }
 
-    else if ( a_status == EVENT_PROGRAM_CHANGE )   
-        snprintf(type, sizeof(type), "Program Change");       
-    else if ( a_status == EVENT_CHANNEL_PRESSURE ) 
-        snprintf(type, sizeof(type), "Channel Pressure");     
-    else if ( a_status == EVENT_PITCH_WHEEL )      
-        snprintf(type, sizeof(type), "Pitch Wheel");          
+    else if ( a_status == EVENT_PROGRAM_CHANGE )
+        snprintf(type, sizeof(type), "Program Change");
+    else if ( a_status == EVENT_CHANNEL_PRESSURE )
+        snprintf(type, sizeof(type), "Channel Pressure");
+    else if ( a_status == EVENT_PITCH_WHEEL )
+        snprintf(type, sizeof(type), "Pitch Wheel");
     else
-        snprintf(type, sizeof(type), "Unknown MIDI Event");          
+        snprintf(type, sizeof(type), "Unknown MIDI Event");
 
     snprintf(text, sizeof(text), "%s %s", hex, type );
 
@@ -1581,7 +1581,7 @@ seqedit::set_data_type( unsigned char a_status, unsigned char a_control  )
 }
 
 
-void 
+void
 seqedit::on_realize()
 {
     // we need to do the default realize
@@ -1600,7 +1600,7 @@ seqedit::timeout( void )
         m_seq->set_raise(false);
         raise();
     }
-    
+
     if (m_seq->is_dirty_edit() ){
 
 	    m_seqroll_wid->redraw_events();
@@ -1609,7 +1609,7 @@ seqedit::timeout( void )
     }
 
     m_seqroll_wid->draw_progress_on_window();
-    
+
     return true;
 }
 
@@ -1629,7 +1629,7 @@ seqedit::on_delete_event(GdkEventAny *a_event)
     m_seq->set_editing( false );
 
     delete this;
-    
+
     return false;
 }
 
@@ -1690,4 +1690,3 @@ seqedit::on_key_press_event( GdkEventKey* a_ev )
     else
         return Gtk::Window::on_key_press_event(a_ev);
 }
-

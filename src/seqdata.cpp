@@ -22,18 +22,18 @@
 #include "font.h"
 
 
-seqdata::seqdata(sequence *a_seq, int a_zoom,  Gtk::Adjustment   *a_hadjust): DrawingArea() 
-{     
+seqdata::seqdata(sequence *a_seq, int a_zoom,  Gtk::Adjustment   *a_hadjust): DrawingArea()
+{
     m_seq = a_seq;
     m_zoom = a_zoom;
 
-    add_events( Gdk::BUTTON_PRESS_MASK | 
+    add_events( Gdk::BUTTON_PRESS_MASK |
 		Gdk::BUTTON_RELEASE_MASK |
 		Gdk::POINTER_MOTION_MASK |
 		Gdk::LEAVE_NOTIFY_MASK |
                 Gdk::SCROLL_MASK );
 
-    // in the construor you can only allocate colors, 
+    // in the construor you can only allocate colors,
     // get_window() returns 0 because we have not be realized
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
 
@@ -55,17 +55,17 @@ seqdata::seqdata(sequence *a_seq, int a_zoom,  Gtk::Adjustment   *a_hadjust): Dr
     set_size_request( 10,  c_dataarea_y );
 
     m_hadjust = a_hadjust;
-    
+
     m_scroll_offset_ticks = 0;
     m_scroll_offset_x = 0;
-} 
+}
 
-void 
+void
 seqdata::update_sizes()
-{   
+{
     if( is_realized() ) {
         /* create pixmaps with window dimentions */
-        
+
         m_pixmap = Gdk::Pixmap::create( m_window,
                                         m_window_x,
                                         m_window_y, -1  );
@@ -75,7 +75,7 @@ seqdata::update_sizes()
 
 }
 
-void 
+void
 seqdata::reset()
 {
     update_sizes();
@@ -84,7 +84,7 @@ seqdata::reset()
 }
 
 
-void 
+void
 seqdata::redraw()
 {
     update_pixmap();
@@ -92,7 +92,7 @@ seqdata::redraw()
 }
 
 
-void 
+void
 seqdata::on_realize()
 {
     // we need to do the default realize
@@ -106,7 +106,7 @@ seqdata::on_realize()
     m_hadjust->signal_value_changed().connect( mem_fun( *this, &seqdata::change_horz ));
 
     for( int i=0; i<c_dataarea_y; ++i ){
-        
+
         m_numbers[i] = Gdk::Pixmap::create( m_window,
                                             6,
                                             30, -1  );
@@ -114,8 +114,8 @@ seqdata::on_realize()
         m_gc->set_foreground( m_white );
         m_numbers[i]->draw_rectangle(m_gc,true,
                                      0,
-                                     0, 
-                                     6, 
+                                     0,
+                                     6,
                                      30 );
 
         char val[5];
@@ -125,7 +125,7 @@ seqdata::on_realize()
         num[0] = val[0];
         num[2] = val[1];
         num[4] = val[2];
-        
+
         p_font_renderer->render_string_on_drawable(m_gc,
                                                    0,
                                                    0,
@@ -138,16 +138,16 @@ seqdata::on_realize()
                                                    0,
                                                    16,
                                                    m_numbers[i], &num[4], font::BLACK );
- 
 
-        
+
+
     }
-    
+
     update_sizes();
-    
+
 }
 
-void 
+void
 seqdata::set_zoom( int a_zoom )
 {
     if ( m_zoom != a_zoom ){
@@ -158,7 +158,7 @@ seqdata::set_zoom( int a_zoom )
 
 
 
-void 
+void
 seqdata::set_data_type( unsigned char a_status, unsigned char a_control = 0  )
 {
     m_status = a_status;
@@ -166,17 +166,17 @@ seqdata::set_data_type( unsigned char a_status, unsigned char a_control = 0  )
 
     this->redraw();
 }
-   
 
-void 
+
+void
 seqdata::update_pixmap()
 {
     draw_events_on_pixmap();
 }
 
-void 
+void
 seqdata::draw_events_on(  Glib::RefPtr<Gdk::Drawable> a_draw  )
-{   
+{
     long tick;
 
     unsigned char d0,d1;
@@ -189,54 +189,54 @@ seqdata::draw_events_on(  Glib::RefPtr<Gdk::Drawable> a_draw  )
 
     int start_tick = m_scroll_offset_ticks ;
     int end_tick = (m_window_x * m_zoom) + m_scroll_offset_ticks;
-    
+
     //printf( "draw_events_on\n" );
 
     m_gc->set_foreground( m_white );
     a_draw->draw_rectangle(m_gc,true,
                            0,
-                           0, 
-                           m_window_x, 
+                           0,
+                           m_window_x,
                            m_window_y );
 
-    
+
     m_gc->set_foreground( m_black );
 
     m_seq->reset_draw_marker();
     while ( m_seq->get_next_event( m_status,
 				   m_cc,
-				   &tick, &d0, &d1, 
+				   &tick, &d0, &d1,
 				   &selected ) == true )
     {
 
         if ( tick >= start_tick && tick <= end_tick ){
-            
+
             /* turn into screen corrids */
-            
+
             event_x = tick / m_zoom;
             event_width  = c_data_x;
-            
+
             /* generate the value */
             event_height = d1;
-            
+
             if ( m_status == EVENT_PROGRAM_CHANGE ||
                  m_status == EVENT_CHANNEL_PRESSURE  ){
-                
+
                 event_height = d0;
             }
-            
+
             m_gc->set_line_attributes( 2,
                                        Gdk::LINE_SOLID,
                                        Gdk::CAP_NOT_LAST,
                                        Gdk::JOIN_MITER );
-            
+
             /* draw vert lines */
             a_draw->draw_line(m_gc,
                               event_x -  m_scroll_offset_x +1,
-                              c_dataarea_y - event_height, 
-                              event_x -  m_scroll_offset_x + 1, 
+                              c_dataarea_y - event_height,
+                              event_x -  m_scroll_offset_x + 1,
                               c_dataarea_y );
-            
+
             a_draw->draw_drawable(m_gc,
                                   m_numbers[event_height],
                                   0,0,
@@ -244,27 +244,27 @@ seqdata::draw_events_on(  Glib::RefPtr<Gdk::Drawable> a_draw  )
                                   c_dataarea_y - 25,
                                   6,30);
         }
-    }        
-    
+    }
+
 }
 
 
 
 
-void 
+void
 seqdata::draw_events_on_pixmap()
 {
     draw_events_on( m_pixmap );
 }
 
-void 
+void
 seqdata::draw_pixmap_on_window()
 {
     queue_draw();
 }
 
 
-int 
+int
 seqdata::idle_redraw()
 {
     /* no flicker, redraw */
@@ -278,8 +278,8 @@ seqdata::idle_redraw()
 bool
 seqdata::on_expose_event(GdkEventExpose* a_e)
 {
-    m_window->draw_drawable(m_gc, 
-                            m_pixmap, 
+    m_window->draw_drawable(m_gc,
+                            m_pixmap,
                             a_e->area.x,
                             a_e->area.y,
                             a_e->area.x,
@@ -290,10 +290,10 @@ seqdata::on_expose_event(GdkEventExpose* a_e)
 }
 
 /* takes screen corrdinates, give us notes and ticks */
-void 
+void
 seqdata::convert_x( int a_x, long *a_tick )
 {
-    *a_tick = a_x * m_zoom; 
+    *a_tick = a_x * m_zoom;
 }
 
 bool
@@ -315,7 +315,7 @@ seqdata::on_scroll_event( GdkEventScroll* a_ev )
     }
 
     update_pixmap();
-    queue_draw();	 
+    queue_draw();
 
     return true;
 }
@@ -326,17 +326,17 @@ seqdata::on_button_press_event(GdkEventButton* a_p0)
     if ( a_p0->type == GDK_BUTTON_PRESS ){
 
         m_seq->push_undo();
-        
+
         /* set values for line */
         m_drop_x = (int) a_p0->x + m_scroll_offset_x;
         m_drop_y = (int) a_p0->y;
-        
+
         /* reset box that holds dirty redraw spot */
         m_old.x = 0;
         m_old.y = 0;
         m_old.width = 0;
         m_old.height = 0;
-        
+
         m_dragging = true;
     }
 
@@ -364,7 +364,7 @@ seqdata::on_button_release_event(GdkEventButton* a_p0)
   	m_seq->change_event_data_range( tick_s, tick_f,
 					m_status,
 					m_cc,
-					c_dataarea_y - m_drop_y -1, 
+					c_dataarea_y - m_drop_y -1,
 					c_dataarea_y - m_current_y-1 );
 
 	/* convert x,y to ticks, then set events in range */
@@ -372,13 +372,13 @@ seqdata::on_button_release_event(GdkEventButton* a_p0)
     }
 
     update_pixmap();
-    queue_draw();	    
+    queue_draw();
     return true;
 }
 
 
-// Takes two points, returns a Xwin rectangle 
-void 
+// Takes two points, returns a Xwin rectangle
+void
 seqdata::xy_to_rect(  int a_x1,  int a_y1,
 		      int a_x2,  int a_y2,
 		      int *a_x,  int *a_y,
@@ -388,23 +388,23 @@ seqdata::xy_to_rect(  int a_x1,  int a_y1,
        and width and height */
 
     if ( a_x1 < a_x2 ){
-	*a_x = a_x1; 
+	*a_x = a_x1;
 	*a_w = a_x2 - a_x1;
     } else {
-	*a_x = a_x2; 
+	*a_x = a_x2;
 	*a_w = a_x1 - a_x2;
     }
 
     if ( a_y1 < a_y2 ){
-	*a_y = a_y1; 
+	*a_y = a_y1;
 	*a_h = a_y2 - a_y1;
     } else {
-	*a_y = a_y2; 
+	*a_y = a_y2;
 	*a_h = a_y1 - a_y2;
     }
 }
 
-bool 
+bool
 seqdata::on_motion_notify_event(GdkEventMotion* a_p0)
 {
     if ( m_dragging ){
@@ -438,12 +438,12 @@ seqdata::on_motion_notify_event(GdkEventMotion* a_p0)
 	m_seq->change_event_data_range( tick_s, tick_f,
 					m_status,
 					m_cc,
-					c_dataarea_y - adj_y_min -1, 
+					c_dataarea_y - adj_y_min -1,
 					c_dataarea_y - adj_y_max -1 );
-	
+
 	/* convert x,y to ticks, then set events in range */
 	update_pixmap();
-	  
+
 
 	draw_events_on( m_window );
 
@@ -459,14 +459,14 @@ seqdata::on_leave_notify_event(GdkEventCrossing* p0)
 {
     // m_dragging = false;
     update_pixmap();
-    queue_draw();	    
+    queue_draw();
     return true;
 }
 
 
 
 
-void 
+void
 seqdata::draw_line_on_window( void )
 {
     int x,y,w,h;
@@ -477,8 +477,8 @@ seqdata::draw_line_on_window( void )
                                Gdk::JOIN_MITER );
 
    /* replace old */
-    m_window->draw_drawable(m_gc, 
-                            m_pixmap, 
+    m_window->draw_drawable(m_gc,
+                            m_pixmap,
                             m_old.x,
                             m_old.y,
                             m_old.x,
@@ -494,7 +494,7 @@ seqdata::draw_line_on_window( void )
 		 &w, &h );
 
     x -= m_scroll_offset_x;
-    
+
     m_old.x = x;
     m_old.y = y;
     m_old.width = w;
@@ -518,7 +518,7 @@ seqdata::change_horz( )
     m_scroll_offset_x = m_scroll_offset_ticks / m_zoom;
 
     update_pixmap();
-    force_draw();    
+    force_draw();
 }
 
 
@@ -526,20 +526,20 @@ void
 seqdata::on_size_allocate(Gtk::Allocation& a_r )
 {
     Gtk::DrawingArea::on_size_allocate( a_r );
-    
+
     m_window_x = a_r.get_width();
     m_window_y = a_r.get_height();
-    
-    update_sizes(); 
- 
+
+    update_sizes();
+
 }
 
 
 void
 seqdata::force_draw(void )
 {
-    m_window->draw_drawable(m_gc, 
-                            m_pixmap, 
+    m_window->draw_drawable(m_gc,
+                            m_pixmap,
                             0,
                             0,
                             0,

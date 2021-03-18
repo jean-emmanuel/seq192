@@ -357,8 +357,8 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                     /* Trk Done */
                                 case 0x2f:
 
-                                    // If delta is 0, then another event happened at the same time 
-                                    // as the track end.  the sequence class will discard the last 
+                                    // If delta is 0, then another event happened at the same time
+                                    // as the track end.  the sequence class will discard the last
                                     // note.  This is a fix for that.   Native Seq24 file will always
                                     // have a Delta >= 1
                                     if ( Delta == 0 ){
@@ -397,7 +397,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                     for (i = 0; i < len; i++)
                                     {
                                         c = m_d[m_pos++];
-                                        //printf( "%02X ", c  );  
+                                        //printf( "%02X ", c  );
                                     }
                                     //printf("\n");
                                     break;
@@ -432,14 +432,14 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
             }			/* while ( !done loading Trk chunk */
 
             /* the sequence has been filled, add it  */
-            //printf ( "add_sequence( %d )\n", perf + (a_screen_set * c_seqs_in_set)); 
+            //printf ( "add_sequence( %d )\n", perf + (a_screen_set * c_seqs_in_set));
             a_perf->add_sequence (seq, perf + (a_screen_set * c_seqs_in_set));
         }
 
         /* dont know what kind of chunk */
         else
         {
-            /* its not a MTrk, we dont know how to deal with it, 
+            /* its not a MTrk, we dont know how to deal with it,
                so we just eat it */
             fprintf(stderr, "Unsupported MIDI header detected: %8lX\n", ID);
             m_pos += TrackLength;
@@ -685,7 +685,7 @@ bool midifile::write (perform * a_perf)
             write_long( a_perf->get_group_mute_state(i) );
         }
     }
-    
+
     int data_size = m_l.size ();
     m_d = (unsigned char *) new char[data_size];
 

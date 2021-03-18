@@ -68,20 +68,6 @@ seqmenu::popup_menu( void )
         m_menu->items().push_back(MenuElem("Paste", mem_fun(*this,&seqmenu::seq_paste)));
     }
 
-#ifndef DISABLE_SONG_EDITOR
-    m_menu->items().push_back(SeparatorElem());
-
-    Menu *menu_song = manage( new Menu() );
-    m_menu->items().push_back( MenuElem( "Song", *menu_song) );
-
-    if ( m_mainperf->is_active( m_current_seq ))
-    {
-        menu_song->items().push_back(MenuElem("Clear Song Data", mem_fun(*this,&seqmenu::seq_clear_perf)));
-    }
-
-    menu_song->items().push_back(MenuElem("Mute All Tracks", mem_fun(*this,&seqmenu::mute_all_tracks)));
-#endif
-
     if ( m_mainperf->is_active( m_current_seq )) {
         m_menu->items().push_back(SeparatorElem());
         Menu *menu_buses = manage( new Menu() );

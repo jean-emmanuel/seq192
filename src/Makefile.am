@@ -22,11 +22,7 @@ seq24_SOURCES = \
 	options.cpp options.h \
 	optionsfile.cpp optionsfile.h \
 	oscserver.cpp oscserver.h \
-	perfedit.cpp perfedit.h \
-	perfnames.cpp perfnames.h \
 	perform.cpp perform.h \
-	perfroll.cpp perfroll.h \
-	perftime.cpp perftime.h \
 	seq24.cpp \
 	seqdata.cpp seqdata.h \
 	seqedit.cpp seqedit.h \
@@ -38,6 +34,6 @@ seq24_SOURCES = \
 	sequence.cpp sequence.h \
 	userfile.cpp userfile.h
 
-EXTRA_DIST = configwin32.h *.xpm
+EXTRA_DIST = xpm/*.xpm
 
 MOSTLYCLEANFILES = *~
