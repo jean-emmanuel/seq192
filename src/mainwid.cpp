@@ -223,7 +223,7 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
 
 	    sprintf( str,
 		     "%d-%d %ld/%ld",
-		     seq->get_midi_bus(),
+		     seq->get_midi_bus()+1,
 		     seq->get_midi_channel()+1,
 		     seq->get_bpm(), seq->get_bw() );
 
