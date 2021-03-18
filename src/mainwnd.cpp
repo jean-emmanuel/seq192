@@ -242,6 +242,7 @@ mainwnd::mainwnd(perform *a_p)
         c_mainwid_x + 20,
         hbox2->get_allocation().get_height() +
         hbox->get_allocation().get_height() +
+        hbox3->get_allocation().get_height() +
         m_menubar->get_allocation().get_height() +
         c_mainwid_y + 40
     );
@@ -251,6 +252,16 @@ mainwnd::mainwnd(perform *a_p)
 
     /* show everything */
     show_all();
+
+    // resize again for exact size
+    resize(
+        c_mainwid_x + 20,
+        hbox2->get_allocation().get_height() +
+        hbox->get_allocation().get_height() +
+        hbox3->get_allocation().get_height() +
+        m_menubar->get_allocation().get_height() +
+        c_mainwid_y + 40
+    );
 
     add_events( Gdk::KEY_PRESS_MASK | Gdk::KEY_RELEASE_MASK | Gdk::SCROLL_MASK);
 
