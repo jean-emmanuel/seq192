@@ -2,12 +2,13 @@
 
 ## 0.11.0
 
-- removed song editor
-- keyboard shortcuts disabled
-- scrollable main windowx
-- osc controls (see OSC.md)
-- bigger keys in pianoroll
-- slightly bigger font for small texts
+- main: removed song editor
+- main:keyboard shortcuts disabled
+- main:scrollable main window
+- engine: osc controls (see OSC.md)
+- sequence: bigger keys in pianoroll
+- main: slightly bigger font for small texts
+- sequence: prevent name entry from grabbing focus 
 
 ## 0.10.0
 

@@ -88,9 +88,9 @@ seqedit::menu_action_quantise( void )
 
 
 seqedit::seqedit( sequence *a_seq,
-		  perform *a_perf,
-		  // mainwid *a_mainwid,
-		  int a_pos  )
+          perform *a_perf,
+          // mainwid *a_mainwid,
+          int a_pos  )
 {
     set_icon(Gdk::Pixbuf::create_from_xpm_data(seq_editor_xpm));
 
@@ -193,8 +193,8 @@ seqedit::seqedit( sequence *a_seq,
 
     m_table->attach( *m_seqtime_wid, 1, 2, 0, 1, Gtk::FILL, Gtk::SHRINK );
     m_table->attach( *m_seqroll_wid , 1, 2, 1, 2,
-    	      Gtk::FILL |  Gtk::SHRINK,
-    	      Gtk::FILL |  Gtk::SHRINK );
+              Gtk::FILL |  Gtk::SHRINK,
+              Gtk::FILL |  Gtk::SHRINK );
 
     m_table->attach( *m_seqevent_wid, 1, 2, 2, 3, Gtk::FILL, Gtk::SHRINK );
     m_table->attach( *m_seqdata_wid, 1, 2, 3, 4, Gtk::FILL, Gtk::SHRINK );
@@ -270,6 +270,11 @@ seqedit::seqedit( sequence *a_seq,
     dhbox->pack_end( *m_toggle_play, false, false, 4);
     dhbox->pack_end( *(manage(new VSeparator( ))), false, false, 4);
 
+    /* dummy (avoid focus on name entry) */
+    m_entry_dummy = new Entry();
+    m_hbox->pack_start( *m_entry_dummy, false, false, 0);
+
+
     fill_top_bar();
 
 
@@ -277,6 +282,9 @@ seqedit::seqedit( sequence *a_seq,
     this->add( *m_vbox );
     /* show everything */
     show_all();
+
+    m_entry_dummy->hide();
+
 
     /* sets scroll bar to the middle */
     //gfloat middle = m_vscroll->get_adjustment()->get_upper() / 3;
@@ -682,7 +690,8 @@ seqedit::do_action( int a_action, int a_var )
 void
 seqedit::fill_top_bar( void )
 {
-     /* name */
+
+    /* name */
     m_entry_name = manage( new Entry(  ));
     m_entry_name->set_max_length(26);
     m_entry_name->set_width_chars(26);
@@ -1222,7 +1231,7 @@ void
 seqedit::set_midi_bus( int a_midibus )
 {
     m_seq->set_midi_bus( a_midibus );
-	mastermidibus *mmb =  m_mainperf->get_master_midi_bus();
+    mastermidibus *mmb =  m_mainperf->get_master_midi_bus();
     m_entry_bus->set_text( mmb->get_midi_out_bus_name( a_midibus ));
     // m_mainwid->update_sequence_on_window( m_pos );
 }
@@ -1499,24 +1508,24 @@ seqedit::q_rec_change_callback( void )
 void
 seqedit::undo_callback( void )
 {
-	m_seq->pop_undo( );
+    m_seq->pop_undo( );
 
-	m_seqroll_wid->redraw();
-	m_seqtime_wid->redraw();
-	m_seqdata_wid->redraw();
-	m_seqevent_wid->redraw();
+    m_seqroll_wid->redraw();
+    m_seqtime_wid->redraw();
+    m_seqdata_wid->redraw();
+    m_seqevent_wid->redraw();
 }
 
 
 void
 seqedit::redo_callback( void )
 {
-	m_seq->pop_redo( );
+    m_seq->pop_redo( );
 
-	m_seqroll_wid->redraw();
-	m_seqtime_wid->redraw();
-	m_seqdata_wid->redraw();
-	m_seqevent_wid->redraw();
+    m_seqroll_wid->redraw();
+    m_seqtime_wid->redraw();
+    m_seqdata_wid->redraw();
+    m_seqevent_wid->redraw();
 }
 
 
@@ -1603,9 +1612,9 @@ seqedit::timeout( void )
 
     if (m_seq->is_dirty_edit() ){
 
-	    m_seqroll_wid->redraw_events();
-	    m_seqevent_wid->redraw();
-	    m_seqdata_wid->redraw();
+        m_seqroll_wid->redraw_events();
+        m_seqevent_wid->redraw();
+        m_seqdata_wid->redraw();
     }
 
     m_seqroll_wid->draw_progress_on_window();

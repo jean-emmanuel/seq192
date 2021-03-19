@@ -179,6 +179,8 @@ class seqedit : public Gtk::Window
     RadioButton *m_radio_draw;
 
     Entry       *m_entry_name;
+    
+    Entry       *m_entry_dummy;
 
     /* the zoom 0  1  2  3  4
                  1, 2, 4, 8, 16 */
