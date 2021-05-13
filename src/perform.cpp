@@ -275,7 +275,7 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
 
                 for (int i = 0; i < c_mainwnd_cols * c_mainwnd_rows; i++) {
                     int nseq = i + self->m_screen_set * c_mainwnd_cols * c_mainwnd_rows;
-                    if (self->m_seqs[nseq] != NULL) {
+                    if (self->is_active(nseq)) {
                         for (int j = 1; j < argc; j++) {
                             if (types[j] == 's' && lo_pattern_match(self->m_seqs[nseq]->get_name(), &argv[j]->s)) {
                                 self->osc_selected_seqs[i] = 1;
@@ -289,7 +289,7 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
 
             if (mode == SEQ_MODE_SOLO) {
                 for (int i = 0; i < c_max_sequence; i++) {
-                    if (self->m_seqs[i] != NULL && self->m_seqs[i]->get_playing()) {
+                    if (self->is_active(i) && self->m_seqs[i]->get_playing()) {
                         if (command == SEQ_SSEQ_QUEUED) {
                             if (!self->m_seqs[i]->get_queued()) {
                                 self->m_seqs[i]->toggle_queued();
@@ -304,7 +304,7 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
             for (int i = 0; i < c_mainwnd_rows * c_mainwnd_cols; i++) {
                 if (self->osc_selected_seqs[i] == 1) {
                     int nseq = i + self->m_screen_set * c_mainwnd_cols * c_mainwnd_rows;
-                    if (nseq < c_max_sequence && self->m_seqs[nseq] != NULL) {
+                    if (nseq < c_max_sequence && self->is_active(nseq)) {
                         switch (mode) {
                             case SEQ_MODE_SOLO:
                             case SEQ_MODE_ON:
@@ -374,7 +374,7 @@ void perform::osc_status( char* address )
     for (int col = 0; col < c_mainwnd_cols; col++) {
         for (int row = 0; row < c_mainwnd_rows; row++) {
             int nseq = row + col * c_mainwnd_rows + m_screen_set * c_mainwnd_cols * c_mainwnd_rows;
-            if (m_seqs[nseq] != NULL) {
+            if (is_active(nseq)) {
                 empty = false;
                 json += "{";
                 json += "\"col\":" + std::to_string(col) + ",";
