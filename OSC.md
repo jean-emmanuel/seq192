@@ -33,6 +33,7 @@ Send sequencer's status as json
 ```
 {
     "screenset": <int>,
+    "screensetName": "<string>",
     "playing": <int>,
     "sequences": [
         {

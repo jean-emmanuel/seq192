@@ -369,6 +369,7 @@ void perform::osc_status( char* address )
 
     json += "\"playing\":" + std::to_string(m_running) + ",";
     json += "\"screenset\":" + std::to_string(m_screen_set) + ",";
+    json += "\"screensetName\":\"" + (std::string)get_screen_set_notepad(m_screen_set)->c_str() + "\",";
     json += "\"sequences\":[";
     bool empty = true;
     for (int col = 0; col < c_mainwnd_cols; col++) {
