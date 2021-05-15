@@ -46,6 +46,7 @@ Send sequencer's status as json, including sequences informations
     "screenset": <int>,
     "screensetName": "<string>",
     "playing": <int>,
+    "bpm": <int>,
     "tick": <int>,
     "sequences": [
         {
