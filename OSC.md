@@ -9,6 +9,9 @@ Stop playback
 #### /screenset <int: screen>
 Change active screen set
 
+#### /panic
+Disable all sequences and cancel queued sequences
+
 #### /sequence <string: mode> <int: column> <int: row>
 Set sequence(s) state
 - mode: "solo", "on", "off" or "toggle"
