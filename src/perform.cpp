@@ -355,13 +355,14 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
             break;
         }
         case SEQ_STATUS:
+        case SEQ_STATUS_EXT:
             char *address;
             if (argc == 1) {
                 address = &argv[0]->s;
             } else {
                 address = lo_address_get_url(lo_message_get_source(data));
             }
-            self->osc_status(address);
+            self->osc_status(address, path);
             break;
 
     }
@@ -371,39 +372,51 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
 }
 
 
-void perform::osc_status( char* address )
+void perform::osc_status( char* address, const char* path)
 {
+
+    int command = osc_commands[(std::string) path];
 
     std::string json = "{";
 
     json += "\"playing\":" + std::to_string(m_running) + ",";
     json += "\"screenset\":" + std::to_string(m_screen_set) + ",";
     json += "\"screensetName\":\"" + (std::string)get_screen_set_notepad(m_screen_set)->c_str() + "\",";
-    json += "\"sequences\":[";
-    bool empty = true;
-    for (int col = 0; col < c_mainwnd_cols; col++) {
-        for (int row = 0; row < c_mainwnd_rows; row++) {
-            int nseq = row + col * c_mainwnd_rows + m_screen_set * c_mainwnd_cols * c_mainwnd_rows;
-            if (is_active(nseq)) {
-                empty = false;
-                json += "{";
-                json += "\"col\":" + std::to_string(col) + ",";
-                json += "\"row\":" + std::to_string(row) + ",";
-                json += "\"name\":\"" + (std::string)m_seqs[nseq]->get_name() + "\",";
-                json += "\"time\":\"" + std::to_string(m_seqs[nseq]->get_bpm()) + "/" + std::to_string(m_seqs[nseq]->get_bw()) + "\",";
-                json += "\"bars\":" + std::to_string((int)((double)m_seqs[nseq]->get_length() / c_ppqn / m_seqs[nseq]->get_bpm() * (m_seqs[nseq]->get_bw() / 4))) + ",";
-                json += "\"queued\":" + std::to_string(m_seqs[nseq]->get_queued()) + ",";
-                json += "\"on\":" + std::to_string(m_seqs[nseq]->get_playing());
-                json += "},";
+    json += "\"tick\":\"" + std::to_string(get_tick()) + "\",";
+    json += "\"bpm\":\"" + std::to_string(get_bpm()) + "\"";
+
+    if (command == SEQ_STATUS_EXT) {
+
+        json += ",\"sequences\":[";
+        bool empty = true;
+        for (int col = 0; col < c_mainwnd_cols; col++) {
+            for (int row = 0; row < c_mainwnd_rows; row++) {
+                int nseq = row + col * c_mainwnd_rows + m_screen_set * c_mainwnd_cols * c_mainwnd_rows;
+                if (is_active(nseq)) {
+                    empty = false;
+                    json += "{";
+                    json += "\"col\":" + std::to_string(col) + ",";
+                    json += "\"row\":" + std::to_string(row) + ",";
+                    json += "\"name\":\"" + (std::string)m_seqs[nseq]->get_name() + "\",";
+                    json += "\"time\":\"" + std::to_string(m_seqs[nseq]->get_bpm()) + "/" + std::to_string(m_seqs[nseq]->get_bw()) + "\",";
+                    json += "\"bars\":" + std::to_string((int)((double)m_seqs[nseq]->get_length() / c_ppqn / m_seqs[nseq]->get_bpm() * (m_seqs[nseq]->get_bw() / 4))) + ",";
+                    json += "\"ticks\":" + std::to_string(m_seqs[nseq]->get_length()) + ",";
+                    json += "\"queued\":" + std::to_string(m_seqs[nseq]->get_queued()) + ",";
+                    json += "\"on\":" + std::to_string(m_seqs[nseq]->get_playing());
+                    json += "},";
+                }
             }
         }
+
+        if (!empty) json = json.substr(0, json.size() - 1);
+
+        json += "]";
+
     }
 
-    if (!empty) json = json.substr(0, json.size() - 1);
+    json += "}";
 
-    json += "]}";
-
-    oscserver->send_json(address, json.c_str());
+    oscserver->send_json(address, path, json.c_str());
 
 }
 

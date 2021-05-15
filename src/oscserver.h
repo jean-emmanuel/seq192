@@ -20,7 +20,7 @@ public:
     void stop();
 
     void add_method (const char* path, const char* types, lo_method_handler h, void* user_data = NULL);
-    void send_json(const char* address, const char* json);
+    void send_json(const char* address, const char *path, const char* json);
 
     lo_server_thread serverThread;
     lo_server server;

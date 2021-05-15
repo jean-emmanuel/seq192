@@ -31,12 +31,12 @@ void OSCServer::add_method( const char* path, const char* types, lo_method_handl
     lo_server_thread_add_method( serverThread, path, types, h, user_data );
 }
 
-void OSCServer::send_json( const char* address, const char* json)
+void OSCServer::send_json( const char* address, const char* path, const char* json)
 {
 
     lo_address lo_add = lo_address_new_from_url(address);
     if (lo_add != NULL) {
-        lo_send_from(lo_add, server, LO_TT_IMMEDIATE, "/status", "s", json);
+        lo_send_from(lo_add, server, LO_TT_IMMEDIATE, path, "s", json);
         lo_address_free(lo_add);
     }
 

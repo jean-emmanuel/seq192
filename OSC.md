@@ -30,7 +30,11 @@ Same as /sequence and (re)start playback
 
 
 #### /status <string: address>
-Send sequencer's status as json
+Send sequencer's status as json, without sequences informations
+- address: osc.udp://ip:port ; if omitted the response will be sent to the sender
+
+#### /status/extended <string: address>
+Send sequencer's status as json, including sequences informations
 - address: osc.udp://ip:port ; if omitted the response will be sent to the sender
 
 
@@ -42,6 +46,7 @@ Send sequencer's status as json
     "screenset": <int>,
     "screensetName": "<string>",
     "playing": <int>,
+    "tick": <int>,
     "sequences": [
         {
             "col": <int>,
@@ -49,6 +54,7 @@ Send sequencer's status as json
             "name": "<string>",
             "time": "<string>",
             "bars": <int>,
+            "ticks": <int>,
             "queued": <int>,
             "on": <int>
         },
@@ -57,17 +63,21 @@ Send sequencer's status as json
 }
 ```
 
-Sequencer status
+*Sequencer status*
 
 - screenset: current screenset
+- screensetName: current screenset's name
 - playing: playback state
+- bpm: current bpm
+- tick: playback tick (192 ticks = 1 quarter note)
 
-Sequences statuses
+*Sequences statuses* (1 per active sequence in current screenset)
 
 - col: column position
 - row: row position
 - name: sequence name
 - time: sequence time signature (eg "4/4")
 - bars: number of bars in sequence
+- ticks: sequence length
 - queued: sequence's queued state
 - on: sequence's playing state

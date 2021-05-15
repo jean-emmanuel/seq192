@@ -355,7 +355,7 @@ class perform
                     int argc, void *data, void *user_data);
 
     int osc_selected_seqs[c_mainwnd_rows * c_mainwnd_cols];
-    void osc_status( char* address );
+    void osc_status( char* address, const char* path );
     enum OSC_COMMANDS {
         OSC_ZERO = 0,
         SEQ_PLAY,
@@ -366,6 +366,7 @@ class perform
         SEQ_SSEQ_AND_PLAY,
         SEQ_SSEQ_QUEUED,
         SEQ_STATUS,
+        SEQ_STATUS_EXT,
 
         SEQ_MODE_SOLO,
         SEQ_MODE_ON,
@@ -381,7 +382,8 @@ class perform
         {"/sequence",           SEQ_SSEQ},
         {"/sequence_and_play",  SEQ_SSEQ_AND_PLAY},
         {"/sequence_queued",    SEQ_SSEQ_QUEUED},
-        {"/status",             SEQ_STATUS}
+        {"/status",             SEQ_STATUS},
+        {"/status/extended",    SEQ_STATUS_EXT}
     };
 
     std::map<std::string, int> osc_seq_modes = {
