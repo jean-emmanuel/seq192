@@ -318,7 +318,8 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                                 break;
                             case SEQ_MODE_OFF:
                                 if (command == SEQ_SSEQ_QUEUED) {
-                                    if (self->m_seqs[nseq]->get_playing() && !self->m_seqs[nseq]->get_queued()) {
+                                    if (self->m_seqs[nseq]->get_playing() != self->m_seqs[nseq]->get_queued()) {
+                                        // if playing and not queued or queued and not playing
                                         self->m_seqs[nseq]->toggle_queued();
                                     }
                                 } else {
@@ -327,9 +328,7 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                                 break;
                             case SEQ_MODE_TOGGLE:
                                 if (command == SEQ_SSEQ_QUEUED) {
-                                    if (!self->m_seqs[nseq]->get_queued()) {
-                                        self->m_seqs[nseq]->toggle_queued();
-                                    }
+                                    self->m_seqs[nseq]->toggle_queued();
                                 } else {
                                     self->m_seqs[nseq]->toggle_playing();
                                 }

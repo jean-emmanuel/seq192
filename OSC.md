@@ -19,8 +19,12 @@ Set sequence(s) state
 Set sequence(s) state
 - name: sequence name or osc pattern (can match multiple sequence names); multiple names can be specified
 
+#### /sequence_queued <string: mode> <int: column> <int: row>
+Same as /sequence but sequences will change state only on next cycle
+
 #### /sequence_and_play <string: mode> <int: column> <int: row>
 Same as /sequence and (re)start playback
+
 
 #### /status <string: address>
 Send sequencer's status as json
