@@ -234,6 +234,7 @@ seqedit::seqedit( sequence *a_seq,
     m_entry_data = manage( new Entry( ));
     m_entry_data->set_size_request(40,-1);
     m_entry_data->set_editable( false );
+    m_entry_data->set_can_focus( false );
 
     dhbox->pack_start( *m_button_data, false, false );
     dhbox->pack_start( *m_entry_data, true, true );
@@ -282,8 +283,9 @@ seqedit::seqedit( sequence *a_seq,
     dhbox->pack_end( *(manage(new VSeparator( ))), false, false, 4);
 
     /* dummy (avoid focus on name entry) */
-    m_entry_dummy = new Entry();
-    m_hbox->pack_start( *m_entry_dummy, false, false, 0);
+    m_entry_hidden = new Entry();
+    m_entry_hidden->set_editable( false );
+    m_hbox->pack_start( *m_entry_hidden, false, false, 0);
 
 
     fill_top_bar();
@@ -294,8 +296,9 @@ seqedit::seqedit( sequence *a_seq,
     /* show everything */
     show_all();
 
-    m_entry_dummy->hide();
+    m_entry_hidden->hide();
 
+    m_seqroll_wid->grab_focus();
 
     /* sets scroll bar to the middle */
     //gfloat middle = m_vscroll->get_adjustment()->get_upper() / 3;
@@ -822,6 +825,8 @@ seqedit::fill_top_bar( void )
     m_entry_bw = manage( new Entry());
     m_entry_bw->set_width_chars(2);
     m_entry_bw->set_editable( false );
+    m_entry_bw->set_can_focus( false );
+
 
     m_hbox->pack_start( *m_button_bw , false, false );
     m_hbox->pack_start( *m_entry_bw , false, false );
@@ -860,6 +865,7 @@ seqedit::fill_top_bar( void )
     m_entry_bus->set_max_length(60);
     m_entry_bus->set_width_chars(60);
     m_entry_bus->set_editable( false );
+    m_entry_bus->set_can_focus( false );
 
     m_hbox->pack_start( *m_button_bus , false, false );
     m_hbox->pack_start( *m_entry_bus , true, true );
@@ -873,6 +879,7 @@ seqedit::fill_top_bar( void )
     m_entry_channel = manage( new Entry());
     m_entry_channel->set_width_chars(2);
     m_entry_channel->set_editable( false );
+    m_entry_channel->set_can_focus( false );
 
     m_hbox->pack_start( *m_button_channel , false, false );
     m_hbox->pack_start( *m_entry_channel , false, false );
@@ -929,6 +936,7 @@ seqedit::fill_top_bar( void )
     m_entry_snap = manage( new Entry());
     m_entry_snap->set_width_chars(5);
     m_entry_snap->set_editable( false );
+    m_entry_snap->set_can_focus( false );
 
     m_hbox2->pack_start( *m_button_snap , false, false );
     m_hbox2->pack_start( *m_entry_snap , false, false );
@@ -943,6 +951,7 @@ seqedit::fill_top_bar( void )
     m_entry_note_length = manage( new Entry());
     m_entry_note_length->set_width_chars(5);
     m_entry_note_length->set_editable( false );
+    m_entry_note_length->set_can_focus( false );
 
     m_hbox2->pack_start( *m_button_note_length , false, false );
     m_hbox2->pack_start( *m_entry_note_length , false, false );
@@ -958,6 +967,7 @@ seqedit::fill_top_bar( void )
     m_entry_zoom = manage( new Entry());
     m_entry_zoom->set_width_chars(4);
     m_entry_zoom->set_editable( false );
+    m_entry_zoom->set_can_focus( false );
 
     m_hbox2->pack_start( *m_button_zoom , false, false );
     m_hbox2->pack_start( *m_entry_zoom , false, false );
@@ -975,6 +985,7 @@ seqedit::fill_top_bar( void )
     m_entry_key = manage( new Entry());
     m_entry_key->set_width_chars(5);
     m_entry_key->set_editable( false );
+    m_entry_key->set_can_focus( false );
 
     m_hbox2->pack_start( *m_button_key , false, false );
     m_hbox2->pack_start( *m_entry_key , false, false );
@@ -989,6 +1000,7 @@ seqedit::fill_top_bar( void )
     m_entry_scale = manage( new Entry());
     m_entry_scale->set_width_chars(5);
     m_entry_scale->set_editable( false );
+    m_entry_scale->set_can_focus( false );
 
     m_hbox2->pack_start( *m_button_scale , false, false );
     m_hbox2->pack_start( *m_entry_scale , false, false );
@@ -1004,6 +1016,7 @@ seqedit::fill_top_bar( void )
     m_entry_sequence = manage( new Entry());
     m_entry_sequence->set_width_chars(14);
     m_entry_sequence->set_editable( false );
+    m_entry_sequence->set_can_focus( false );
 
     m_hbox2->pack_start( *m_button_sequence , false, false );
     m_hbox2->pack_start( *m_entry_sequence , true, true );
@@ -1479,10 +1492,9 @@ seqedit::measures_change_callback(GdkEventFocus *focus)
 void
 seqedit::measures_change_enter_callback()
 {
-
-      GdkEventFocus event = GdkEventFocus();
-      this->measures_change_callback(&event);
-
+    GdkEventFocus event = GdkEventFocus();
+    this->measures_change_callback(&event);
+    m_seqroll_wid->grab_focus();
 }
 
 void
@@ -1540,10 +1552,9 @@ seqedit::bpm_change_callback(GdkEventFocus *focus)
 void
 seqedit::bpm_change_enter_callback()
 {
-
-      GdkEventFocus event = GdkEventFocus();
-      this->bpm_change_callback(&event);
-
+    GdkEventFocus event = GdkEventFocus();
+    this->bpm_change_callback(&event);
+    m_seqroll_wid->grab_focus();
 }
 
 
