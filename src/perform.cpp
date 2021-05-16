@@ -888,6 +888,7 @@ void perform::delete_sequence( int a_num )
 
         m_seqs[a_num]->set_playing( false );
         delete m_seqs[a_num];
+        global_is_modified = true;
     }
 }
 
@@ -905,7 +906,7 @@ void perform::new_sequence( int a_sequence )
     m_seqs[ a_sequence ] = new sequence();
     m_seqs[ a_sequence ]->set_master_midi_bus( &m_master_bus );
     set_active(a_sequence, true);
-
+    global_is_modified = true;
 }
 
 

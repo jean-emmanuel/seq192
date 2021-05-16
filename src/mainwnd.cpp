@@ -33,6 +33,7 @@
 #include "xpm/seq24_32.xpm"
 
 bool is_pattern_playing = false;
+bool global_is_modified = false;
 
 // tooltip helper, for old vs new gtk...
 #if GTK_MINOR_VERSION >= 12
@@ -268,7 +269,7 @@ mainwnd::mainwnd(perform *a_p)
     m_timeout_connect = Glib::signal_timeout().connect(
             mem_fun(*this, &mainwnd::timer_callback), 25);
 
-    m_modified = false;
+    global_is_modified = false;
 
     m_options = NULL;
 
@@ -418,7 +419,7 @@ void mainwnd::new_file()
 
     global_filename = "";
     update_window_title();
-    m_modified = false;
+    global_is_modified = false;
 }
 
 
@@ -503,7 +504,7 @@ void mainwnd::open_file(const Glib::ustring& fn)
 
     midifile f(fn);
     result = f.parse(m_mainperf, 0);
-    m_modified = !result;
+    global_is_modified = !result;
 
     if (!result) {
         Gtk::MessageDialog errdialog(*this,
@@ -584,7 +585,7 @@ bool mainwnd::save_file()
                 Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
         errdialog.run();
     }
-    m_modified = !result;
+    global_is_modified = !result;
     return result;
 }
 
@@ -615,19 +616,21 @@ bool mainwnd::is_save()
 {
     bool result = false;
 
-    if (is_modified()) {
+    if (global_is_modified)
+    {
         int choice = query_save_changes();
-        switch (choice) {
-            case Gtk::RESPONSE_YES:
-                if (save_file())
-                    result = true;
-                break;
-            case Gtk::RESPONSE_NO:
+        switch (choice)
+        {
+        case Gtk::RESPONSE_YES:
+            if (save_file())
                 result = true;
-                break;
-            case Gtk::RESPONSE_CANCEL:
-            default:
-                break;
+            break;
+        case Gtk::RESPONSE_NO:
+            result = true;
+            break;
+        case Gtk::RESPONSE_CANCEL:
+        default:
+            break;
         }
     }
     else
@@ -635,7 +638,6 @@ bool mainwnd::is_save()
 
     return result;
 }
-
 
 /* convert string to lower case letters */
 void
@@ -705,7 +707,7 @@ mainwnd::file_import_dialog( void )
 
            global_filename = std::string(dialog.get_filename());
            update_window_title();
-           m_modified = true;
+           global_is_modified = true;
 
            m_main_wid->reset();
            m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
@@ -790,7 +792,7 @@ mainwnd::adj_callback_ss( )
     m_main_wid->set_screenset( m_mainperf->get_screenset());
     m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                 m_mainperf->get_screenset()));
-    m_modified = true;
+    global_is_modified = true;
 }
 
 
@@ -798,7 +800,7 @@ void
 mainwnd::adj_callback_bpm( )
 {
     m_mainperf->set_bpm( (int) m_adjust_bpm->get_value());
-    m_modified = true;
+    global_is_modified = true;
 }
 
 
@@ -828,7 +830,7 @@ mainwnd::edit_callback_notepad( )
     string text = m_entry_notes->get_text();
     m_mainperf->set_screen_set_notepad( m_mainperf->get_screenset(),
 				        &text );
-    m_modified = true;
+    global_is_modified = true;
 }
 
 
@@ -1018,10 +1020,4 @@ mainwnd::update_window_title()
             + string( "]" );
 
     set_title ( title.c_str());
-}
-
-
-bool mainwnd::is_modified()
-{
-    return m_modified;
 }

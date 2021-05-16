@@ -45,6 +45,7 @@ seqroll::seqroll(perform *a_perf,
 
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
 
+    m_blue = Gdk::Color( "dark blue" );
     m_black = Gdk::Color( "black" );
     m_white = Gdk::Color( "white" );
     m_grey  = Gdk::Color( "gray" );
@@ -56,6 +57,7 @@ seqroll::seqroll(perform *a_perf,
     colormap->alloc_color( m_grey );
     colormap->alloc_color( m_dk_grey );
     colormap->alloc_color( m_red );
+    colormap->alloc_color( m_blue );
 
     m_perform = a_perf;
     m_seq =   a_seq;
@@ -540,14 +542,15 @@ seqroll::draw_progress_on_window()
 }
 
 
-void seqroll::draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw ) {
-
+void seqroll::draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw )
+{
     long tick_s;
     long tick_f;
     int note;
 
     int note_x;
     int note_width;
+    int note_off_width = 0; // needed for wrapped note OFF
     int note_y;
     int note_height;
 
@@ -557,27 +560,30 @@ void seqroll::draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw ) {
 
     draw_type dt;
 
-
-
     int start_tick = m_scroll_offset_ticks ;
     int end_tick = (m_window_x * m_zoom) + m_scroll_offset_ticks;
 
     sequence *seq = NULL;
-    for( int method=0; method<2; ++method )	{
-
-        if ( method == 0 && m_drawing_background_seq  ){
-
-            if ( m_perform->is_active( m_background_sequence )){
+    for( int method=0; method<2; ++method )
+    {
+        if ( method == 0 && m_drawing_background_seq  )
+        {
+            if ( m_perform->is_active( m_background_sequence ))
+            {
                 seq =m_perform->get_sequence( m_background_sequence );
-            } else {
+            }
+            else
+            {
                 method++;
             }
-        } else if ( method == 0 ){
+        }
+        else if ( method == 0 )
+        {
             method++;
         }
 
-
-        if ( method==1){
+        if ( method==1)
+        {
             seq = m_seq;
         }
 
@@ -585,12 +591,11 @@ void seqroll::draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw ) {
         m_gc->set_foreground( m_black );
         seq->reset_draw_marker();
 
-        while ( (dt = seq->get_next_note_event( &tick_s, &tick_f, &note, &selected, &velocity )) != DRAW_FIN ) {
-
+        while ( (dt = seq->get_next_note_event( &tick_s, &tick_f, &note, &selected, &velocity )) != DRAW_FIN )
+        {
             if ((tick_s >= start_tick && tick_s <= end_tick) ||
-                    ( (dt == DRAW_NORMAL_LINKED) && (tick_f >= start_tick && tick_f <= end_tick))
-               ) {
-
+                    ( (dt == DRAW_NORMAL_LINKED) && (tick_f >= start_tick && tick_f <= end_tick)))
+            {
                 /* turn into screen corrids */
                 note_x = tick_s / m_zoom;
                 note_y = c_rollarea_y -(note * c_key_y) - c_key_y - 1 + 2;
@@ -603,25 +608,32 @@ void seqroll::draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw ) {
                 int in_shift = 0;
                 int length_add = 0;
 
-                if ( dt == DRAW_NORMAL_LINKED ){
-
-                    if (tick_f >= tick_s) {
+                if ( dt == DRAW_NORMAL_LINKED )
+                {
+                    if (tick_f >= tick_s)
+                    {
                         note_width = (tick_f - tick_s) / m_zoom;
                         if ( note_width < 1 ) note_width = 1;
-                    } else {
-                        note_width = (m_seq->get_length() - tick_s) / m_zoom;
                     }
-
-                } else {
+                    else    // this is wrap around note
+                    {
+                        note_width = (m_seq->get_length() - tick_s) / m_zoom; // this is note ON width
+                        note_off_width = tick_f / m_zoom;                     // needed for wrapped note OFF
+                    }
+                }
+                else
+                {
                     note_width = 16 / m_zoom;
                 }
 
-                if ( dt == DRAW_NOTE_ON ){
+                if ( dt == DRAW_NOTE_ON )
+                {
                     in_shift = 0;
                     length_add = 2;
                 }
 
-                if ( dt == DRAW_NOTE_OFF ){
+                if ( dt == DRAW_NOTE_OFF )
+                {
                     in_shift = -1;
                     length_add = 1;
                 }
@@ -629,51 +641,78 @@ void seqroll::draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw ) {
                 note_x -= m_scroll_offset_x;
                 note_y -= m_scroll_offset_y;
 
-                m_gc->set_foreground(m_black);
+                m_gc->set_foreground(m_blue);  // Note box frame
+
                 /* draw boxes from sequence */
+                /* method 0 is background sequence */
 
                 if ( method == 0 )
                     m_gc->set_foreground( m_dk_grey );
 
                 a_draw->draw_rectangle(	m_gc,true,
-                        note_x,
-                        note_y,
-                        note_width,
-                        note_height);
-                if (tick_f < tick_s) {
+                                        note_x,
+                                        note_y,
+                                        note_width,
+                                        note_height);
+
+                /* if note wraps around to the beginning */
+                if (tick_f < tick_s)
+                {
                     a_draw->draw_rectangle(	m_gc,true,
-                            0,
-                            note_y,
-                            tick_f/m_zoom,
-                            note_height);
+                                            0,
+                                            note_y,
+                                            tick_f/m_zoom,
+                                            note_height);
                 }
 
-                /* draw inside box if there is room */
-                if ( note_width > 3 ){
+                /*
+                    Draw inside box if there is room.
+                    The check for note_width is based on the note ON width. If the note ON
+                    is less than 3 and there is a wrapped note OFF of width > 3 then the note
+                    OFF portion would not draw the inside rectangle. Thus the need for the additional
+                    note_off_width check.
+                */
 
+                if ( note_width > 3  || note_off_width > 3)
+                {
                     if ( selected )
                         m_gc->set_foreground(m_red);
                     else
                         m_gc->set_foreground(m_white);
 
-                    if ( method == 1 ) {
-                        if (tick_f >= tick_s) {
+                    if ( method == 1 )
+                    {
+                        if (tick_f >= tick_s)   // note is not wrapped
+                        {
                             a_draw->draw_rectangle(	m_gc,true,
-                                    note_x + 1 + in_shift,
-                                    note_y + 1,
-                                    note_width - 3 + length_add,
-                                    note_height - 3);
-                        } else {
+                                                    note_x + 1 + in_shift,
+                                                    note_y + 1,
+                                                    note_width - 3 + length_add,
+                                                    note_height - 3);
+                        }
+                        else    // note is wrapped
+                        {
+                            /* note ON */
                             a_draw->draw_rectangle(	m_gc,true,
-                                    note_x + 1 + in_shift,
-                                    note_y + 1,
-                                    note_width ,
-                                    note_height - 3);
-                            a_draw->draw_rectangle(	m_gc,true,
-                                    0,
-                                    note_y + 1,
-                                    (tick_f/m_zoom) - 3 + length_add,
-                                    note_height - 3);
+                                                    note_x + 1 + in_shift,
+                                                    note_y + 1,
+                                                    note_width,
+                                                    note_height - 3);
+
+                            /*
+                                note OFF - wrapped. If the off_note_width is < 0 then the draw would
+                                span the entire sequence (presumably because the negative is converted to
+                                a positive??). This would occur occasionally when there was
+                                a very small wrapped note OFF - due to rounding.
+                             */
+                            long off_note_width = (tick_f/m_zoom) - 3 + length_add;
+
+                            if(off_note_width >= 0 )
+                                a_draw->draw_rectangle(	m_gc,true,
+                                                    0,
+                                                    note_y + 1,
+                                                    off_note_width,
+                                                    note_height - 3);
                         }
                     }
                 }
@@ -1074,50 +1113,122 @@ seqroll::on_key_press_event(GdkEventKey* a_p0)
     if ( a_p0->type == GDK_KEY_PRESS ){
 
         if ( a_p0->keyval ==  GDK_Delete || a_p0->keyval == GDK_BackSpace ){
+            if(m_seq->mark_selected())
+            {
+                m_seq->push_undo();
+                m_seq->remove_marked();
+                ret = true;
+            }
+        }
 
-            m_seq->push_undo();
-            m_seq->mark_selected();
-            m_seq->remove_marked();
+        if ( a_p0->keyval ==  GDK_Up )
+        {
+            if ( a_p0->state & GDK_SHIFT_MASK )
+            {
+                m_seq->transpose_notes(12, 0);
+            }
+            else
+            {
+                m_seq->transpose_notes(1, 0);
+            }
             ret = true;
         }
 
-        if ( a_p0->state & GDK_CONTROL_MASK ){
+        if ( a_p0->keyval ==  GDK_Down )
+        {
+            if ( a_p0->state & GDK_SHIFT_MASK )
+            {
+                m_seq->transpose_notes(-12, 0);
+            }
+            else
+            {
+                m_seq->transpose_notes(-1, 0);
+            }
+            ret = true;
+        }
 
+        if ( a_p0->keyval ==  GDK_Right )
+        {
+            if ( a_p0->state & GDK_SHIFT_MASK )
+            {
+                m_seq->shift_notes(1);
+            }
+            else if(!(a_p0->state & GDK_CONTROL_MASK))
+            {
+                m_seq->shift_notes(m_snap);
+            }
+            ret = true;
+        }
+
+        if ( a_p0->keyval ==  GDK_Left )
+        {
+            if ( a_p0->state & GDK_SHIFT_MASK )
+            {
+                m_seq->shift_notes(-1);
+            }
+            else if(!(a_p0->state & GDK_CONTROL_MASK))
+            {
+                m_seq->shift_notes(-m_snap);
+            }
+            ret = true;
+        }
+
+        if ( a_p0->state & GDK_CONTROL_MASK )
+        {
             /* cut */
-            if ( a_p0->keyval == GDK_x || a_p0->keyval == GDK_X ){
-
-                m_seq->push_undo();
-                m_seq->copy_selected();
-                m_seq->mark_selected();
-                m_seq->remove_marked();
-
-                ret = true;
+            if ( a_p0->keyval == GDK_x || a_p0->keyval == GDK_X )
+            {
+                if(m_seq->mark_selected())
+                {
+                    m_seq->push_undo();
+                    m_seq->copy_selected();
+                    m_seq->remove_marked();
+                    ret = true;
+                }
             }
             /* copy */
-            if ( a_p0->keyval == GDK_c || a_p0->keyval == GDK_C ){
-
+            if ( a_p0->keyval == GDK_c || a_p0->keyval == GDK_C )
+            {
                 m_seq->copy_selected();
                 ret = true;
             }
 
             /* paste */
-            if ( a_p0->keyval == GDK_v || a_p0->keyval == GDK_V ){
-
-                start_paste();
-                ret = true;
+            if ( a_p0->keyval == GDK_v || a_p0->keyval == GDK_V )
+            {
+                if(this->has_focus())
+                {
+                    start_paste();
+                    ret = true;
+                }
             }
 
             /* Undo */
-            if ( a_p0->keyval == GDK_z || a_p0->keyval == GDK_Z ){
+            if (a_p0->keyval == GDK_z || a_p0->keyval == GDK_Z)
+            {
+                if (a_p0->state & GDK_SHIFT_MASK) {
+                    m_seq->pop_redo();
+                } else {
+                    m_seq->pop_undo();
+                }
+                ret = true;
+            }
 
-                m_seq->pop_undo();
+            /* Redo */
+            if ( a_p0->keyval == GDK_y || a_p0->keyval == GDK_Y )
+            {
+                m_seq->pop_redo();
                 ret = true;
             }
 
             /* select all events */
-            if ( a_p0->keyval == GDK_a || a_p0->keyval == GDK_A ){
-
-                m_seq->select_all();
+            if ( a_p0->keyval == GDK_a || a_p0->keyval == GDK_A )
+            {
+                if (a_p0->state & GDK_SHIFT_MASK) {
+                    m_seq->unselect();
+                } else {
+                    m_seq->select_all();
+                }
                 ret = true;
             }
         }

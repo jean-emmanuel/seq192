@@ -49,7 +49,7 @@ class seqdata : public Gtk::DrawingArea
 
     Glib::RefPtr<Gdk::GC>     m_gc;
     Glib::RefPtr<Gdk::Window> m_window;
-    Gdk::Color    m_black, m_white, m_grey;
+    Gdk::Color    m_black, m_white, m_grey, m_blue, m_red;
 
     Glib::RefPtr<Gdk::Pixmap>   m_pixmap;
     Glib::RefPtr<Gdk::Pixmap>   m_numbers[c_dataarea_y];
@@ -81,6 +81,7 @@ class seqdata : public Gtk::DrawingArea
     GdkRectangle m_old;
 
     bool m_dragging;
+    bool m_drag_handle;
 
     void on_realize();
     bool on_expose_event(GdkEventExpose* a_ev);

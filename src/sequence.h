@@ -78,6 +78,8 @@ class sequence
     list < event > m_list_event;
     static list < event > m_list_clipboard;
 
+    list < event > m_list_undo_hold; // seqdata
+
     list < trigger > m_list_trigger;
     trigger m_trigger_clipboard;
 
@@ -176,20 +178,30 @@ class sequence
 
   public:
 
-      sequence ();
-     ~sequence ();
+    sequence ();
+    ~sequence ();
 
+    /* seqdata hold for undo */
+    void set_hold_undo (bool a_hold);
+    int get_hold_undo ();
 
-    void push_undo (void);
-    void pop_undo (void);
-    void pop_redo (void);
+    bool m_have_undo;
+    bool m_have_redo;
 
-    void push_trigger_undo (void);
-    void pop_trigger_undo (void);
+    void push_undo (bool a_hold = false);
+    void pop_undo ();
+    void pop_redo ();
+
+    void push_trigger_undo ();
+    void pop_trigger_undo ();
+    void pop_trigger_redo ();
 
     //
     //  Gets and Sets
     //
+
+    void set_have_undo();
+    void set_have_redo();
 
     /* name */
     void set_name (string a_name);
@@ -344,6 +356,10 @@ class sequence
     int select_events (long a_tick_s, long a_tick_f,
 		       unsigned char a_status, unsigned char a_cc, select_action_e a_action);
 
+    int select_event_handle( long a_tick_s, long a_tick_f,
+                        unsigned char a_status,
+                        unsigned char a_cc, int a_data_s);
+
     int get_num_selected_notes ();
     int get_num_selected_events (unsigned char a_status, unsigned char a_cc);
 
@@ -383,13 +399,15 @@ class sequence
     void increment_selected (unsigned char a_status, unsigned char a_control);
     void decrement_selected (unsigned char a_status, unsigned char a_control);
 
+    void adjust_data_handle( unsigned char a_status, int a_data );
+
     /* moves note off event */
     void grow_selected (long a_delta_tick);
     void stretch_selected(long a_delta_tick);
 
     /* deletes events */
     void remove_marked();
-    void mark_selected();
+    bool mark_selected();
     void unpaint_all();
 
     /* unselects every event */
@@ -433,10 +451,10 @@ class sequence
     int get_highest_note_event ();
 
     bool get_next_event (unsigned char a_status,
-			 unsigned char a_cc,
-			 long *a_tick,
-			 unsigned char *a_D0,
-			 unsigned char *a_D1, bool * a_selected);
+                         unsigned char a_cc,
+                         long *a_tick,
+                         unsigned char *a_D0,
+                         unsigned char *a_D1, bool * a_selected, int type = ALL_EVENTS);
 
     bool get_next_event (unsigned char *a_status, unsigned char *a_cc);
 
@@ -454,6 +472,8 @@ class sequence
 			 long a_snap_tick, int a_divide, bool a_linked =
 			 false);
     void transpose_notes (int a_steps, int a_scale);
+    void shift_notes (int a_ticks);  // move selected notes later/earlier in time
+    
 };
 
 #endif

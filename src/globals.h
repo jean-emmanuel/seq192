@@ -54,6 +54,8 @@ const int c_ppqn         = 192;  /* default - dosnt change */
 const int c_bpm          = 120;  /* default */
 const int c_maxBuses = 32;
 
+const int c_note_off_margin = 2;  // # ticks to shave off end of painted notes
+
 /* trigger width in milliseconds */
 // PLAGIAT: divide by two
 const int c_thread_trigger_width_ms = 2;
@@ -86,6 +88,9 @@ const int c_mainwid_y = ((c_seqarea_y  + c_mainwid_spacing )
 const int c_dataarea_y = 128;
 /* width of 'bar' */
 const int c_data_x = 2;
+/* size of handle */
+const int c_data_handle_x = 8;
+const int c_data_handle_y = 4;
 
 /* keyboard */
 const float c_key_size_factor = 1.5;
@@ -160,6 +165,8 @@ extern bool global_with_jack_master;
 extern bool global_with_jack_master_cond;
 extern bool global_manual_alsa_ports;
 extern int global_oscport;
+
+extern bool global_is_modified;
 
 extern Glib::ustring global_filename;
 extern Glib::ustring last_used_dir;

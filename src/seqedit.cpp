@@ -794,6 +794,7 @@ seqedit::fill_top_bar( void )
 
     /* undo */
     m_button_undo = manage( new Button());
+    m_button_undo->set_can_focus(false);
     m_button_undo->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( undo_xpm  ))));
     m_button_undo->signal_clicked().connect(
             mem_fun( *this, &seqedit::undo_callback));
@@ -803,6 +804,7 @@ seqedit::fill_top_bar( void )
 
     /* redo */
     m_button_redo = manage( new Button());
+    m_button_redo->set_can_focus(false);
     m_button_redo->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( redo_xpm  ))));
     m_button_redo->signal_clicked().connect(
             mem_fun( *this, &seqedit::redo_callback));
@@ -1230,10 +1232,12 @@ seqedit::set_midi_channel( int a_midichannel  )
 void
 seqedit::set_midi_bus( int a_midibus )
 {
-    m_seq->set_midi_bus( a_midibus );
-    mastermidibus *mmb =  m_mainperf->get_master_midi_bus();
-    m_entry_bus->set_text( mmb->get_midi_out_bus_name( a_midibus ));
-    // m_mainwid->update_sequence_on_window( m_pos );
+    if (m_seq->get_midi_bus() != a_midibus) {
+        m_seq->set_midi_bus( a_midibus );
+        mastermidibus *mmb =  m_mainperf->get_master_midi_bus();
+        m_entry_bus->set_text( mmb->get_midi_out_bus_name( a_midibus ));
+        global_is_modified = true;
+    }
 }
 
 
@@ -1340,13 +1344,18 @@ seqedit::get_measures( void )
 void
 seqedit::set_measures( int a_length_measures  )
 {
-    char b[10];
 
-    snprintf(b, sizeof(b), "%d", a_length_measures);
-    m_entry_length->set_text(b);
+    if (a_length_measures != m_measures) {
+        char b[10];
 
-    m_measures = a_length_measures;
-    apply_length( m_seq->get_bpm(), m_seq->get_bw(), a_length_measures );
+        snprintf(b, sizeof(b), "%d", a_length_measures);
+        m_entry_length->set_text(b);
+
+        m_measures = a_length_measures;
+        apply_length( m_seq->get_bpm(), m_seq->get_bw(), a_length_measures );
+
+        global_is_modified = true;
+    }
 }
 
 // ORL Number of measures (length of sequence) can be set by a text typed by user
@@ -1398,11 +1407,12 @@ seqedit::set_bpm( int a_beats_per_measure )
     snprintf(b, sizeof(b), "%d", a_beats_per_measure);
     m_entry_bpm->set_text(b);
 
-    if ( a_beats_per_measure != m_seq->get_bpm() ){
-
+    if ( a_beats_per_measure != m_seq->get_bpm() )
+    {
         long length = get_measures();
         m_seq->set_bpm( a_beats_per_measure );
         apply_length( a_beats_per_measure, m_seq->get_bw(), length );
+        global_is_modified = true;
     }
 }
 
@@ -1434,6 +1444,7 @@ seqedit::bpm_change_callback(GdkEventFocus *focus)
         long length = get_measures();
         m_seq->set_bpm( m_int_bpm );
         apply_length( m_int_bpm, m_seq->get_bw(), length );
+        global_is_modified = true;
 
     }
 
@@ -1458,11 +1469,12 @@ seqedit::set_bw( int a_beat_width  )
     snprintf(b, sizeof(b), "%d", a_beat_width);
     m_entry_bw->set_text(b);
 
-    if ( a_beat_width != m_seq->get_bw()){
-
+    if ( a_beat_width != m_seq->get_bw())
+    {
         long length = get_measures();
         m_seq->set_bw( a_beat_width );
         apply_length( m_seq->get_bpm(), a_beat_width, length );
+        global_is_modified = true;
     }
 }
 
@@ -1478,6 +1490,7 @@ void
 seqedit::name_change_callback( void )
 {
     m_seq->set_name( m_entry_name->get_text());
+    global_is_modified = true;
     // m_mainwid->update_sequence_on_window( m_pos );
 }
 
@@ -1514,6 +1527,7 @@ seqedit::undo_callback( void )
     m_seqtime_wid->redraw();
     m_seqdata_wid->redraw();
     m_seqevent_wid->redraw();
+    m_seq->set_dirty();
 }
 
 
@@ -1526,6 +1540,7 @@ seqedit::redo_callback( void )
     m_seqtime_wid->redraw();
     m_seqdata_wid->redraw();
     m_seqevent_wid->redraw();
+    m_seq->set_dirty();
 }
 
 
@@ -1648,7 +1663,7 @@ seqedit::on_scroll_event( GdkEventScroll* a_ev )
 {
     //printf("seqedit::on_scroll_event(x=%f,y=%f,state=%d)\n", a_ev->x, a_ev->y, a_ev->state);
 
-    guint modifiers;    // Used to filter out caps/num lock etc.
+    guint modifiers;    // Uset_midi_bussed to filter out caps/num lock etc.
     modifiers = gtk_accelerator_get_default_mod_mask ();
 
     if ((a_ev->state & modifiers) == GDK_CONTROL_MASK)

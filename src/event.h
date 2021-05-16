@@ -43,6 +43,9 @@ const unsigned char  EVENT_MIDI_STOP        = 0xFC;
 const unsigned char  EVENT_SYSEX            = 0xF0;
 const unsigned char  EVENT_SYSEX_END        = 0xF7;
 
+const int ALL_EVENTS                        = -1;
+const int UNSELECTED_EVENTS                 = 0;
+
 class event
 {
 

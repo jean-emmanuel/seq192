@@ -42,12 +42,17 @@ seqdata::seqdata(sequence *a_seq, int a_zoom,  Gtk::Adjustment   *a_hadjust): Dr
     m_black = Gdk::Color( "black" );
     m_white = Gdk::Color( "white" );
     m_grey  = Gdk::Color( "grey" );
+    m_blue  = Gdk::Color( "dark blue" );
+    m_red   = Gdk::Color( "orange" );
 
     colormap->alloc_color( m_black );
     colormap->alloc_color( m_white );
     colormap->alloc_color( m_grey );
+    colormap->alloc_color( m_blue );
+    colormap->alloc_color( m_red );
 
     m_dragging = false;
+    m_drag_handle = false;
 
     set_flags(Gtk::CAN_FOCUS );
     set_double_buffered( false );
@@ -181,11 +186,31 @@ seqdata::draw_events_on(  Glib::RefPtr<Gdk::Drawable> a_draw  )
 
     unsigned char d0,d1;
 
+    bool selected;
+
     int event_x;
-    int event_width;
     int event_height;
 
-    bool selected;
+    /*  For note ON there can be multiple events on the same vertical in which
+        the selected item can be covered.  For note ON's the selected item needs
+        to be drawn last so it can be seen.  So, for other events the below var
+        num_selected_events will be -1 for ALL_EVENTS. For note ON's only, the
+        var will be the number of selected events. If 0 then only one pass is
+        needed. If > 0 then two passes are needed, one for unselected (first), and one for
+        selected (last).
+    */
+    int num_selected_events = ALL_EVENTS;
+    int selection_type = num_selected_events;
+
+    if ( m_status == EVENT_NOTE_ON)
+    {
+        num_selected_events = m_seq->get_num_selected_events(m_status, m_cc);
+
+        /* For first pass - if any selected,  selection_type = UNSELECTED_EVENTS.
+           For second pass will be set to num_selected_events*/
+        if(num_selected_events > 0)
+            selection_type = UNSELECTED_EVENTS;
+    }
 
     int start_tick = m_scroll_offset_ticks ;
     int end_tick = (m_window_x * m_zoom) + m_scroll_offset_ticks;
@@ -199,28 +224,31 @@ seqdata::draw_events_on(  Glib::RefPtr<Gdk::Drawable> a_draw  )
                            m_window_x,
                            m_window_y );
 
-
-    m_gc->set_foreground( m_black );
+    SECOND_PASS_NOTE_ON: // yes this is a goto... yikes!!!!
 
     m_seq->reset_draw_marker();
-    while ( m_seq->get_next_event( m_status,
-				   m_cc,
-				   &tick, &d0, &d1,
-				   &selected ) == true )
-    {
 
-        if ( tick >= start_tick && tick <= end_tick ){
+    while ( m_seq->get_next_event( m_status,
+                                   m_cc,
+                                   &tick, &d0, &d1,
+                                   &selected, selection_type ) == true )
+    {
+        if ( tick >= start_tick && tick <= end_tick )
+        {
+            if(selected)
+                m_gc->set_foreground( m_red );
+            else
+                m_gc->set_foreground( m_blue );
 
             /* turn into screen corrids */
-
             event_x = tick / m_zoom;
-            event_width  = c_data_x;
 
             /* generate the value */
             event_height = d1;
 
             if ( m_status == EVENT_PROGRAM_CHANGE ||
-                 m_status == EVENT_CHANNEL_PRESSURE  ){
+                    m_status == EVENT_CHANNEL_PRESSURE  )
+            {
 
                 event_height = d0;
             }
@@ -232,11 +260,20 @@ seqdata::draw_events_on(  Glib::RefPtr<Gdk::Drawable> a_draw  )
 
             /* draw vert lines */
             a_draw->draw_line(m_gc,
-                              event_x -  m_scroll_offset_x +1,
+                              event_x -  m_scroll_offset_x + 1,
                               c_dataarea_y - event_height,
                               event_x -  m_scroll_offset_x + 1,
                               c_dataarea_y );
 
+            /* draw handle */
+            a_draw->draw_rectangle(m_gc,
+                              true,
+                              event_x -  m_scroll_offset_x - 3,
+                              c_dataarea_y - event_height ,
+                              c_data_handle_x,
+                              c_data_handle_y);
+
+            /* draw numbers */
             a_draw->draw_drawable(m_gc,
                                   m_numbers[event_height],
                                   0,0,
@@ -246,6 +283,11 @@ seqdata::draw_events_on(  Glib::RefPtr<Gdk::Drawable> a_draw  )
         }
     }
 
+    if(selection_type == UNSELECTED_EVENTS)
+    {
+        selection_type = num_selected_events;
+        goto SECOND_PASS_NOTE_ON; // this is NOT spaghetti code... it's very clear what is going on!!!
+    }
 }
 
 
@@ -323,13 +365,25 @@ seqdata::on_scroll_event( GdkEventScroll* a_ev )
 bool
 seqdata::on_button_press_event(GdkEventButton* a_p0)
 {
-    if ( a_p0->type == GDK_BUTTON_PRESS ){
-
-        m_seq->push_undo();
-
+    if ( a_p0->type == GDK_BUTTON_PRESS )
+    {
         /* set values for line */
         m_drop_x = (int) a_p0->x + m_scroll_offset_x;
         m_drop_y = (int) a_p0->y;
+
+        /* if they select the handle */
+        long tick_s, tick_f;
+
+        convert_x( m_drop_x - 3, &tick_s );
+        convert_x( m_drop_x + 3, &tick_f );
+
+        m_drag_handle = m_seq->select_event_handle(tick_s, tick_f,
+                                              m_status, m_cc,
+                                              c_dataarea_y - m_drop_y +3);
+
+        if(m_drag_handle)
+            if(!m_seq->get_hold_undo()) // if they used line draw but did not leave...
+                m_seq->push_undo();
 
         /* reset box that holds dirty redraw spot */
         m_old.x = 0;
@@ -337,7 +391,7 @@ seqdata::on_button_press_event(GdkEventButton* a_p0)
         m_old.width = 0;
         m_old.height = 0;
 
-        m_dragging = true;
+        m_dragging = !m_drag_handle;
     }
 
     return true;
@@ -349,32 +403,41 @@ seqdata::on_button_release_event(GdkEventButton* a_p0)
     m_current_x = (int) a_p0->x + m_scroll_offset_x;
     m_current_y = (int) a_p0->y;
 
-    if ( m_dragging ){
+    if ( m_dragging )
+    {
+        long tick_s, tick_f;
 
-	long tick_s, tick_f;
+        if ( m_current_x < m_drop_x )
+        {
+            swap( m_current_x, m_drop_x );
+            swap( m_current_y, m_drop_y );
+        }
 
-	if ( m_current_x < m_drop_x ){
-	    swap( m_current_x, m_drop_x );
-	    swap( m_current_y, m_drop_y );
-	}
+        convert_x( m_drop_x, &tick_s );
+        convert_x( m_current_x, &tick_f );
 
-	convert_x( m_drop_x, &tick_s );
-	convert_x( m_current_x, &tick_f );
+        m_seq->change_event_data_range( tick_s, tick_f,
+                                        m_status,
+                                        m_cc,
+                                        c_dataarea_y - m_drop_y -1,
+                                        c_dataarea_y - m_current_y-1 );
 
-  	m_seq->change_event_data_range( tick_s, tick_f,
-					m_status,
-					m_cc,
-					c_dataarea_y - m_drop_y -1,
-					c_dataarea_y - m_current_y-1 );
+        /* convert x,y to ticks, then set events in range */
+        m_dragging = false;
+    }
 
-	/* convert x,y to ticks, then set events in range */
-	m_dragging = false;
+    if(m_drag_handle)
+    {
+        m_drag_handle = false;
+        m_seq->unselect();
+        m_seq->set_dirty();
     }
 
     update_pixmap();
     queue_draw();
     return true;
 }
+
 
 
 // Takes two points, returns a Xwin rectangle
@@ -407,45 +470,62 @@ seqdata::xy_to_rect(  int a_x1,  int a_y1,
 bool
 seqdata::on_motion_notify_event(GdkEventMotion* a_p0)
 {
-    if ( m_dragging ){
+    if(m_drag_handle)
+    {
+        m_current_y = (int) a_p0->y - 3;
 
-	m_current_x = (int) a_p0->x + m_scroll_offset_x;
-	m_current_y = (int) a_p0->y;
+        m_current_y = c_dataarea_y - m_current_y;
 
-	long tick_s, tick_f;
+        if(m_current_y < 0 )
+            m_current_y = 0;
 
-	int adj_x_min, adj_x_max,
-	    adj_y_min, adj_y_max;
+        if(m_current_y > 127 )
+            m_current_y = 127;
 
-	if ( m_current_x < m_drop_x ){
+        m_seq->adjust_data_handle(m_status, m_current_y );
 
-	    adj_x_min = m_current_x;
-	    adj_y_min = m_current_y;
-	    adj_x_max = m_drop_x;
-	    adj_y_max = m_drop_y;
+        update_pixmap();
+        draw_events_on( m_window );
+    }
 
-	} else {
+    if ( m_dragging )
+    {
+        m_current_x = (int) a_p0->x + m_scroll_offset_x;
+        m_current_y = (int) a_p0->y;
 
-	    adj_x_max = m_current_x;
-	    adj_y_max = m_current_y;
-	    adj_x_min = m_drop_x;
-	    adj_y_min = m_drop_y;
-	}
+        long tick_s, tick_f;
 
-	convert_x( adj_x_min, &tick_s );
-	convert_x( adj_x_max, &tick_f );
+        int adj_x_min, adj_x_max,
+            adj_y_min, adj_y_max;
 
-	m_seq->change_event_data_range( tick_s, tick_f,
-					m_status,
-					m_cc,
-					c_dataarea_y - adj_y_min -1,
-					c_dataarea_y - adj_y_max -1 );
+        if ( m_current_x < m_drop_x )
+        {
+            adj_x_min = m_current_x;
+            adj_y_min = m_current_y;
+            adj_x_max = m_drop_x;
+            adj_y_max = m_drop_y;
+        }
+        else
+        {
+            adj_x_max = m_current_x;
+            adj_y_max = m_current_y;
+            adj_x_min = m_drop_x;
+            adj_y_min = m_drop_y;
+        }
 
-	/* convert x,y to ticks, then set events in range */
-	update_pixmap();
+        convert_x( adj_x_min, &tick_s );
+        convert_x( adj_x_max, &tick_f );
 
+        m_seq->change_event_data_range( tick_s, tick_f,
+                                        m_status,
+                                        m_cc,
+                                        c_dataarea_y - adj_y_min -1,
+                                        c_dataarea_y - adj_y_max -1 );
 
-	draw_events_on( m_window );
+        /* convert x,y to ticks, then set events in range */
+        update_pixmap();
+
+        draw_events_on( m_window );
 
         draw_line_on_window();
     }
