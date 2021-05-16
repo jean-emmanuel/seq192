@@ -8,7 +8,8 @@
 - sequence: (seq32) pitch/time menu actions
 - sequence: redo on ctrl+y and ctrl+shift+z
 - sequence: unselect on ctrl+shift+a
-- main: (seq32) global is_modified flag
+- sequence: fix start/stop keyboard shortcuts
+- main: (seq32) global is_modified flag (warning when quitting with unsaved changes)
 
 ## 0.11.0
 
