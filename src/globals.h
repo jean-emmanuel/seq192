@@ -51,6 +51,10 @@ const int c_max_sequence =  c_mainwnd_rows *  c_mainwnd_cols * c_max_sets;
 
 
 const int c_ppqn         = 192;  /* default - dosnt change */
+const int c_ppwn         = c_ppqn * 4;  // whole note
+const int c_ppen         = c_ppqn / 2;  // eighth note
+const int c_ppsn         = c_ppqn / 4;  // 16th note
+
 const int c_bpm          = 120;  /* default */
 const int c_maxBuses = 32;
 

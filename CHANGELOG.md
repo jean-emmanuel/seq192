@@ -5,6 +5,7 @@
 - sequence: (seq32) trigger undo/redo
 - sequence: (seq32) trigger value handle undo/redo
 - sequence: (seq32) nudge notes with keyboard arrows
+- sequence: (seq32) pitch/time menu actions
 - sequence: redo on ctrl+y and ctrl+shift+z
 - sequence: unselect on ctrl+shift+a
 - main: (seq32) global is_modified flag

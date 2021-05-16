@@ -827,6 +827,44 @@ sequence::get_num_selected_events( unsigned char a_status,
     return ret;
 }
 
+int
+sequence::select_even_or_odd_notes(int note_len, bool even)
+{
+    int ret = 0;
+    list<event>::iterator i;
+    long tick = 0;
+    int is_even = 0;
+    event *note_off;
+    unselect();
+    lock();
+
+    for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
+    {
+        if ( (*i).is_note_on() )
+        {
+            tick = (*i).get_timestamp();
+            if(tick % note_len == 0)
+            {
+                // Note that from the user POV of even and odd,
+                // we start counting from 1, not 0.
+                is_even = (tick / note_len) % 2;
+                if ( (even && is_even) || (!even && !is_even) )
+                {
+                    (*i).select( );
+                    ret++;
+                    if ( (*i).is_linked() )
+                    {
+                        note_off = (*i).get_linked();
+                        note_off->select();
+                        ret++;
+                    }
+                }
+            }
+        }
+    }
+    unlock();
+    return ret;
+}
 
 /* selects events in range..  tick start, note high, tick end
    note low */
@@ -1490,6 +1528,63 @@ sequence::decrement_selected(unsigned char a_status, unsigned char a_control )
 
                 (*i).decrement_data1();
             }
+        }
+    }
+
+    unlock();
+}
+
+void
+sequence::randomize_selected( unsigned char a_status, unsigned char a_control, int a_plus_minus )
+{
+    int random;
+    unsigned char data[2];
+    int data_item;
+    int data_idx = 0;
+
+    lock();
+
+    list<event>::iterator i;
+
+    for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
+    {
+        if ( (*i).is_selected() && (*i).get_status() == a_status )
+        {
+            (*i).get_data( data, data+1 );
+
+            if ( a_status == EVENT_NOTE_ON ||
+                    a_status == EVENT_NOTE_OFF ||
+                    a_status == EVENT_AFTERTOUCH ||
+                    a_status == EVENT_CONTROL_CHANGE ||
+                    a_status == EVENT_PITCH_WHEEL )
+            {
+                data_idx = 1;
+            }
+
+            if ( a_status == EVENT_PROGRAM_CHANGE || a_status == EVENT_CHANNEL_PRESSURE )
+            {
+                data_idx = 0;
+            }
+
+            data_item = data[data_idx];
+
+            // See http://c-faq.com/lib/randrange.html
+            random = (rand() / (RAND_MAX / ((2 * a_plus_minus) + 1) + 1)) - a_plus_minus;
+
+            data_item += random;
+
+            if(data_item > 127)
+            {
+                data_item = 127;
+            }
+            else if(data_item < 0)
+            {
+                data_item = 0;
+            }
+
+            data[data_idx] = data_item;
+
+            (*i).set_data(data[0], data[1]);
         }
     }
 
@@ -3713,6 +3808,137 @@ sequence::quanize_events( unsigned char a_status, unsigned char a_cc,
 
 
 
+void
+sequence::multiply_pattern( float a_multiplier )
+{
+    long orig_length = get_length();
+    long new_length = orig_length * a_multiplier;
+
+    if(new_length > orig_length)
+    {
+        set_length(new_length);
+    }
+
+    lock();
+
+    list<event>::iterator i;
+
+    for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
+    {
+        long timestamp = (*i).get_timestamp();
+        if ( (*i).get_status() ==  EVENT_NOTE_OFF)
+        {
+            timestamp += c_note_off_margin;
+        }
+
+        timestamp *= a_multiplier;
+
+        if ( (*i).get_status() ==  EVENT_NOTE_OFF)
+        {
+            timestamp -= c_note_off_margin;
+        }
+
+        timestamp %= m_length;
+        //printf("in multiply_event_time; a_multiplier=%f  timestamp=%06ld  new_timestamp=%06ld (mlength=%ld)\n", a_multiplier, e.get_timestamp(), timestamp, m_length);
+        (*i).set_timestamp(timestamp);
+    }
+
+    verify_and_link();
+    unlock();
+
+    if(new_length < orig_length)
+    {
+        set_length(new_length);
+    }
+
+    set_dirty();    /* to update perfedit */
+}
+
+void
+sequence::reverse_pattern()
+{
+    lock();
+    event e1,e2;
+
+    list<event>::iterator i;
+    list<event> reversed_events;
+
+    for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
+    {
+        /* only do for note ONs and OFFs */
+        if((*i).get_status() !=  EVENT_NOTE_ON && (*i).get_status() !=  EVENT_NOTE_OFF)
+            continue;
+
+        if((*i).is_marked())                                // we mark then as we go so don't duplicate
+            continue;
+
+        /* copy event */
+        e1 = (*i);
+
+        (*i).mark();                                        // for later deletion
+
+        calulate_reverse(e1);
+
+        /* get the linked event and switch it also */
+
+        if ( (*i).is_linked() )                             // should all be linked!
+        {
+            e2 = *(*i).get_linked();
+
+            (*i).get_linked()->mark();                      // so we don't duplicate and for later remove
+
+            calulate_reverse(e2);
+        }
+        else
+            continue;                                       // ignore any unlinked
+
+        /* reverse the velocities also */
+        unsigned char a_vel = e1.get_note_velocity();
+
+        e1.set_note_velocity(e2.get_note_velocity());
+        e2.set_note_velocity(a_vel);
+
+        reversed_events.push_front(e1);
+        reversed_events.push_front(e2);
+    }
+
+    remove_marked();
+    reversed_events.sort();
+    m_list_event.merge(reversed_events);
+    verify_and_link();
+    unlock();
+
+    set_dirty();    /* to update perfedit */
+}
+
+void
+sequence::calulate_reverse(event &a_e)
+{
+    long seq_length = get_length();
+    long timestamp = a_e.get_timestamp();
+
+    /* note OFFs become note ONs & note ONs become note OFFs */
+    if ( a_e.get_status() ==  EVENT_NOTE_OFF)
+    {
+        timestamp += c_note_off_margin;     // add back the trim ending if it was a note OFF
+        a_e.set_status( EVENT_NOTE_ON);     // change it to a note ON
+    }
+    else
+        a_e.set_status( EVENT_NOTE_OFF);    // change note ONs to OFFs
+
+    /* calculate the reverse location */
+    double note_ratio = 1.0;
+    note_ratio -= (double)timestamp / seq_length;
+
+    timestamp = seq_length * note_ratio;    // the new location
+
+    if ( a_e.get_status() ==  EVENT_NOTE_OFF)
+    {
+        timestamp -= c_note_off_margin;     // trim the new note OFF
+    }
+
+    a_e.set_timestamp(timestamp);
+}
 
 
 void
