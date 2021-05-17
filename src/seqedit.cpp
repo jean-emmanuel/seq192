@@ -1319,7 +1319,7 @@ seqedit::popup_event_menu( void )
 void
 seqedit::set_midi_channel( int a_midichannel  )
 {
-    char b[10];
+    char b[12];
 
     snprintf( b, sizeof(b), "%d", a_midichannel + 1);
     m_entry_channel->set_text(b);

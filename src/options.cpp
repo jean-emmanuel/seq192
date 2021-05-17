@@ -21,13 +21,6 @@
 #include "options.h"
 #include <sstream>
 
-// tooltip helper, for old vs new gtk...
-#if GTK_MINOR_VERSION >= 12
-#   define add_tooltip( obj, text ) obj->set_tooltip_text( text);
-#else
-#   define add_tooltip( obj, text ) tooltips->set_tip( *obj, text );
-#endif
-
 const int c_status = 0;
 const int c_status_inv = 1;
 const int c_d1 = 2;
@@ -130,8 +123,6 @@ options::options (Gtk::Window & parent, perform * a_p):
     CheckButton *check;
     Label *label;
 
-    Gtk::Tooltips * tooltips = manage (new Tooltips ());
-
     for (int i = 0; i < buses; i++)
     {
         HBox *hbox2 = manage (new HBox ());
@@ -142,14 +133,13 @@ options::options (Gtk::Window & parent, perform * a_p):
 
 
         Gtk::RadioButton * rb_off = manage (new RadioButton ("Off"));
-        add_tooltip( rb_off, "Midi Clock will be disabled.");
+        rb_off->set_tooltip_text("Midi Clock will be disabled.");
 
         Gtk::RadioButton * rb_on = manage (new RadioButton ("On (Pos)"));
-        add_tooltip( rb_on,
-                "Midi Clock will be sent. Midi Song Position and Midi Continue will be sent if starting greater than tick 0 in song mode, otherwise Midi Start is sent.");
+        rb_on->set_tooltip_text("Midi Clock will be sent. Midi Song Position and Midi Continue will be sent if starting greater than tick 0 in song mode, otherwise Midi Start is sent.");
 
         Gtk::RadioButton * rb_mod = manage (new RadioButton ("On (Mod)"));
-        add_tooltip( rb_mod, "Midi Clock will be sent.  Midi Start will be sent and clocking will begin once the song position has reached the modulo of the specified Size. (Used for gear that doesn't respond to Song Position)");
+        rb_mod->set_tooltip_text("Midi Clock will be sent.  Midi Start will be sent and clocking will begin once the song position has reached the modulo of the specified Size. (Used for gear that doesn't respond to Song Position)");
 
         Gtk::RadioButton::Group group = rb_off->get_group ();
         rb_on->set_group (group);
@@ -364,7 +354,7 @@ options::options (Gtk::Window & parent, perform * a_p):
 
     check = manage (new CheckButton ("Jack Transport"));
     check->set_active (global_with_jack_transport);
-    add_tooltip( check, "Enable sync with JACK Transport.");
+    check->set_tooltip_text("Enable sync with JACK Transport.");
     check->signal_toggled ().
         connect (bind
                 (mem_fun (*this, &options::transport_callback), e_jack_transport,
@@ -373,7 +363,7 @@ options::options (Gtk::Window & parent, perform * a_p):
 
     check = manage (new CheckButton ("Transport Master"));
     check->set_active (global_with_jack_master);
-    add_tooltip( check, "Seq24 will attempt to serve as JACK Master.");
+    check->set_tooltip_text("Seq24 will attempt to serve as JACK Master.");
     check->signal_toggled ().
         connect (bind
                 (mem_fun (*this, &options::transport_callback), e_jack_master,
@@ -383,8 +373,7 @@ options::options (Gtk::Window & parent, perform * a_p):
 
     check = manage (new CheckButton ("Master Conditional"));
     check->set_active (global_with_jack_master_cond);
-    add_tooltip( check,
-            "Seq24 will fail to be master if there is already a master set.");
+    check->set_tooltip_text("Seq24 will fail to be master if there is already a master set.");
     check->signal_toggled ().
         connect (bind
                 (mem_fun (*this, &options::transport_callback), e_jack_master_cond,
@@ -394,13 +383,13 @@ options::options (Gtk::Window & parent, perform * a_p):
 
 
     Gtk::Button * button = manage (new Button ("Connect"));
-    add_tooltip( button, "Connect to Jack.");
+    button->set_tooltip_text("Connect to Jack.");
     button->signal_clicked().connect(bind(mem_fun(*this,
                     &options::transport_callback), e_jack_connect, button));
     vbox2->pack_start (*button, false, false);
 
     button = manage (new Button ("Disconnect"));
-    add_tooltip( button, "Disconnect Jack.");
+    button->set_tooltip_text("Disconnect Jack.");
     button->signal_clicked().connect(bind(mem_fun(*this,
                     &options::transport_callback), e_jack_disconnect, button));
     vbox2->pack_start (*button, false, false);

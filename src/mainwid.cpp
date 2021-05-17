@@ -629,10 +629,13 @@ mainwid::set_screenset( int a_ss )
     m_screenset = a_ss;
 
     if ( m_screenset < 0 )
-	m_screenset = c_max_sets - 1;
-
-    if ( m_screenset >= c_max_sets )
-	m_screenset = 0;
+    {
+        m_screenset = c_max_sets - 1;
+    }
+    else if ( m_screenset >= c_max_sets )
+    {
+        m_screenset = 0;
+    }
 
 	m_mainperf->set_offset(m_screenset);
 

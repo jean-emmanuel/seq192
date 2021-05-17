@@ -39,16 +39,11 @@ bool
 optionsfile::parse( perform *a_perf )
 {
 
-    /* file size */
-    int file_size = 0;
-
     /* open binary file */
     ifstream file ( m_name.c_str(), ios::in | ios::ate );
 
     if( ! file.is_open() )
         return false;
-
-    file_size = file.tellg();
 
     /* run to start */
     file.seekg( 0, ios::beg );
@@ -62,33 +57,38 @@ optionsfile::parse( perform *a_perf )
     for (unsigned int i = 0; i < sequences; ++i) {
 
         int sequence = 0;
-
-        sscanf(m_line, "%d [ %d %d %ld %ld %ld %ld ]"
-                " [ %d %d %ld %ld %ld %ld ]"
-                " [ %d %d %ld %ld %ld %ld ]",
+        int tog[6], on[6], off[6];
+        sscanf(m_line,
+               "%d [ %d %d %d %d %d %d ]"
+                 " [ %d %d %d %d %d %d ]"
+                 " [ %d %d %d %d %d %d ]",
 
                 &sequence,
+                &tog[0], &tog[1], &tog[2], &tog[3], &tog[4], &tog[5],
+                &on[0], &on[1], &on[2], &on[3], &on[4], &on[5],
+                &off[0], &off[1], &off[2], &off[3], &off[4], &off[5]
+            );
 
-                &a_perf->get_midi_control_toggle(i)->m_active,
-                &a_perf->get_midi_control_toggle(i)->m_inverse_active,
-                &a_perf->get_midi_control_toggle(i)->m_status,
-                &a_perf->get_midi_control_toggle(i)->m_data,
-                &a_perf->get_midi_control_toggle(i)->m_min_value,
-                &a_perf->get_midi_control_toggle(i)->m_max_value,
+        a_perf->get_midi_control_toggle(i)->m_active            =  tog[0];
+        a_perf->get_midi_control_toggle(i)->m_inverse_active    =  tog[1];
+        a_perf->get_midi_control_toggle(i)->m_status            =  tog[2];
+        a_perf->get_midi_control_toggle(i)->m_data              =  tog[3];
+        a_perf->get_midi_control_toggle(i)->m_min_value         =  tog[4];
+        a_perf->get_midi_control_toggle(i)->m_max_value         =  tog[5];
 
-                &a_perf->get_midi_control_on(i)->m_active,
-                &a_perf->get_midi_control_on(i)->m_inverse_active,
-                &a_perf->get_midi_control_on(i)->m_status,
-                &a_perf->get_midi_control_on(i)->m_data,
-                &a_perf->get_midi_control_on(i)->m_min_value,
-                &a_perf->get_midi_control_on(i)->m_max_value,
+        a_perf->get_midi_control_on(i)->m_active                =  on[0];
+        a_perf->get_midi_control_on(i)->m_inverse_active        =  on[1];
+        a_perf->get_midi_control_on(i)->m_status                =  on[2];
+        a_perf->get_midi_control_on(i)->m_data                  =  on[3];
+        a_perf->get_midi_control_on(i)->m_min_value             =  on[4];
+        a_perf->get_midi_control_on(i)->m_max_value             =  on[5];
 
-                &a_perf->get_midi_control_off(i)->m_active,
-                &a_perf->get_midi_control_off(i)->m_inverse_active,
-                &a_perf->get_midi_control_off(i)->m_status,
-                &a_perf->get_midi_control_off(i)->m_data,
-                &a_perf->get_midi_control_off(i)->m_min_value,
-                &a_perf->get_midi_control_off(i)->m_max_value);
+        a_perf->get_midi_control_off(i)->m_active               =  off[0];
+        a_perf->get_midi_control_off(i)->m_inverse_active       =  off[1];
+        a_perf->get_midi_control_off(i)->m_status               =  off[2];
+        a_perf->get_midi_control_off(i)->m_data                 =  off[3];
+        a_perf->get_midi_control_off(i)->m_min_value            =  off[4];
+        a_perf->get_midi_control_off(i)->m_max_value            =  off[5];
 
         next_data_line(&file);
     }

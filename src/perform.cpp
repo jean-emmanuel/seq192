@@ -1419,6 +1419,9 @@ int jack_sync_callback(jack_transport_state_t state,
         case JackTransportLooping:
             //printf( "[JackTransportLooping]" );
             break;
+        case JackTransportNetStarting:
+            //printf( "[JackTransportNetStarting]" );
+            break;
     }
 
     //printf( "starting frame[%d] tick[%8.2f]\n", p->m_jack_frame_current, p->m_jack_tick );
@@ -1684,15 +1687,15 @@ void perform::output_func(void)
                     /* printf( "current_tick[%lf] delta[%lf]\n", current_tick, jack_ticks_delta ); */
 
 
-                    long ptick, pbeat, pbar;
-
-                    pbar  = (long) ((long) m_jack_tick / (m_jack_pos.ticks_per_beat *  m_jack_pos.beats_per_bar ));
-
-                    pbeat = (long) ((long) m_jack_tick % (long) (m_jack_pos.ticks_per_beat *  m_jack_pos.beats_per_bar ));
-                    pbeat = pbeat / (long) m_jack_pos.ticks_per_beat;
-
-                    ptick = (long) m_jack_tick % (long) m_jack_pos.ticks_per_beat;
-
+                    // long ptick, pbeat, pbar;
+                    //
+                    // pbar  = (long) ((long) m_jack_tick / (m_jack_pos.ticks_per_beat *  m_jack_pos.beats_per_bar ));
+                    //
+                    // pbeat = (long) ((long) m_jack_tick % (long) (m_jack_pos.ticks_per_beat *  m_jack_pos.beats_per_bar ));
+                    // pbeat = pbeat / (long) m_jack_pos.ticks_per_beat;
+                    //
+                    // ptick = (long) m_jack_tick % (long) m_jack_pos.ticks_per_beat;
+                    
 
                     //printf( " bbb [%2d:%2d:%4d]", pbar+1, pbeat+1, ptick );
                     //printf( " bbb [%2d:%2d:%4d]", m_jack_pos.bar, m_jack_pos.beat, m_jack_pos.tick );

@@ -62,8 +62,8 @@ midibus::midibus( int a_localclient,
     }
 
     /* copy names */
-    char tmp[60];
-    snprintf( tmp, 59, "[%d] %d:%d %s",
+    char tmp[80];
+    snprintf( tmp, 79, "[%d] %d:%d %s",
 	      m_id,
 	      m_dest_addr_client,
 	      m_dest_addr_port,

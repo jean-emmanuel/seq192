@@ -457,8 +457,6 @@ void mainwnd::file_save_as()
     switch (result) {
         case Gtk::RESPONSE_OK:
         {
-            bool result = false;
-
             std::string fname = dialog.get_filename();
             Gtk::FileFilter* current_filter = dialog.get_filter();
 

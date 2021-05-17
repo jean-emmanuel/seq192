@@ -1617,7 +1617,6 @@ bool FruitySeqRollInput::on_button_release_event(GdkEventButton* a_ev, seqroll& 
     int note_h;
     int note_l;
     int x,y,w,h;
-    int numsel;
 
     bool needs_update = false;
 
@@ -1690,7 +1689,7 @@ bool FruitySeqRollInput::on_button_release_event(GdkEventButton* a_ev, seqroll& 
                 (a_ev->state & GDK_CONTROL_MASK))
             {
                 // deselect the note
-                numsel = ths.m_seq->select_note_events( current_tick, current_note,
+                ths.m_seq->select_note_events( current_tick, current_note,
                                                     current_tick, current_note,
                                                     sequence::e_deselect );
                 needs_update = true;
@@ -1730,7 +1729,7 @@ bool FruitySeqRollInput::on_button_release_event(GdkEventButton* a_ev, seqroll& 
             ths.convert_xy( x,     y, &tick_s, &note_h );
             ths.convert_xy( x+w, y+h, &tick_f, &note_l );
 
-            numsel = ths.m_seq->select_note_events( tick_s, note_h, tick_f, note_l, sequence::e_toggle_selection );
+            ths.m_seq->select_note_events( tick_s, note_h, tick_f, note_l, sequence::e_toggle_selection );
 
             needs_update = true;
         }
@@ -2053,7 +2052,6 @@ bool Seq24SeqRollInput::on_button_release_event(GdkEventButton* a_ev, seqroll& t
     int note_h;
     int note_l;
     int x,y,w,h;
-    int numsel;
 
     bool needs_update = false;
 
@@ -2085,7 +2083,7 @@ bool Seq24SeqRollInput::on_button_release_event(GdkEventButton* a_ev, seqroll& t
             ths.convert_xy( x,     y, &tick_s, &note_h );
             ths.convert_xy( x+w, y+h, &tick_f, &note_l );
 
-            numsel = ths.m_seq->select_note_events( tick_s, note_h, tick_f, note_l, sequence::e_select );
+            ths.m_seq->select_note_events( tick_s, note_h, tick_f, note_l, sequence::e_select );
 
             needs_update = true;
         }

@@ -243,7 +243,7 @@ seqtime::update_pixmap()
                             m_window_y );
 
 
-        char bar[5];
+        char bar[12];
         snprintf(bar, sizeof(bar), "%d", (i/ ticks_per_measure ) + 1);
 
         m_gc->set_foreground(m_black);
