@@ -113,7 +113,7 @@ class mainwid : public Gtk::DrawingArea, public seqmenu
 
     int seq_from_xy( int a_x, int a_y );
 
-    int timeout( void );
+    int timeout();
 
     void redraw( int a_seq );
 

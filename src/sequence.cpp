@@ -232,7 +232,7 @@ sequence::set_bpm( long a_beats_per_measure )
 }
 
 long
-sequence::get_bpm( void )
+sequence::get_bpm()
 {
     return m_time_beats_per_measure;
 }
@@ -255,7 +255,7 @@ sequence::set_rec_vol( long a_rec_vol )
 }
 
 long
-sequence::get_bw( void )
+sequence::get_bw()
 {
     return m_time_beat_width;
 }
@@ -292,7 +292,7 @@ sequence::set_orig_tick( long a_tick )
 
 
 void
-sequence::toggle_queued( void )
+sequence::toggle_queued()
 {
     lock();
 
@@ -305,7 +305,7 @@ sequence::toggle_queued( void )
 }
 
 void
-sequence::off_queued( void )
+sequence::off_queued()
 {
 
     lock();
@@ -318,13 +318,13 @@ sequence::off_queued( void )
 }
 
 bool
-sequence::get_queued( void )
+sequence::get_queued()
 {
     return m_queued;
 }
 
 long
-sequence::get_queued_tick( void )
+sequence::get_queued_tick()
 {
     return m_queued_tick;
 }
@@ -404,7 +404,7 @@ sequence::play( long a_tick )
 
 
 void
-sequence::zero_markers( void )
+sequence::zero_markers()
 {
     lock();
 
@@ -1223,7 +1223,7 @@ sequence::select_events( long a_tick_s, long a_tick_f,
 
 
 void
-sequence::select_all( void )
+sequence::select_all()
 {
     lock();
 
@@ -1238,7 +1238,7 @@ sequence::select_all( void )
 
 /* unselects every event */
 void
-sequence::unselect( void )
+sequence::unselect()
 {
     lock();
 
@@ -1637,7 +1637,7 @@ sequence::adjust_data_handle( unsigned char a_status, int a_data )
 
 
 void
-sequence::copy_selected( void )
+sequence::copy_selected()
 {
     list<event>::iterator i;
 
@@ -2078,7 +2078,7 @@ sequence::play_note_off( int a_note )
 
 
 void
-sequence::clear_triggers( void )
+sequence::clear_triggers()
 {
     lock();
     m_list_trigger.clear();
@@ -2316,7 +2316,7 @@ sequence::set_trigger_offset( long a_trigger_offset )
 
 
 long
-sequence::get_trigger_offset( void )
+sequence::get_trigger_offset()
 {
     return m_trigger_offset;
 }
@@ -2628,7 +2628,7 @@ sequence::move_triggers( long a_start_tick,
 }
 
 long
-sequence::get_selected_trigger_start_tick( void )
+sequence::get_selected_trigger_start_tick()
 {
     long ret = -1;
     lock();
@@ -2650,7 +2650,7 @@ sequence::get_selected_trigger_start_tick( void )
 }
 
 long
-sequence::get_selected_trigger_end_tick( void )
+sequence::get_selected_trigger_end_tick()
 {
     long ret = -1;
     lock();
@@ -2787,7 +2787,7 @@ sequence::move_selected_triggers_to( long a_tick, bool a_adjust_offset, int a_wh
 
 
 long
-sequence::get_max_trigger( void )
+sequence::get_max_trigger()
 {
     lock();
 
@@ -2863,7 +2863,7 @@ sequence::select_trigger( long a_tick )
 
 
 bool
-sequence::unselect_triggers( void )
+sequence::unselect_triggers()
 {
     lock();
 
@@ -2882,7 +2882,7 @@ sequence::unselect_triggers( void )
 
 
 void
-sequence::del_selected_trigger( void )
+sequence::del_selected_trigger()
 {
     lock();
 
@@ -2901,7 +2901,7 @@ sequence::del_selected_trigger( void )
 
 
 void
-sequence::cut_selected_trigger( void )
+sequence::cut_selected_trigger()
 {
     copy_selected_trigger();
     del_selected_trigger();
@@ -2909,7 +2909,7 @@ sequence::cut_selected_trigger( void )
 
 
 void
-sequence::copy_selected_trigger( void )
+sequence::copy_selected_trigger()
 {
     lock();
 
@@ -2929,7 +2929,7 @@ sequence::copy_selected_trigger( void )
 
 
 void
-sequence::paste_trigger( void )
+sequence::paste_trigger()
 {
     if ( m_trigger_copied ){
         long length =  m_trigger_clipboard.m_tick_end -
@@ -2950,7 +2950,7 @@ sequence::paste_trigger( void )
 
 /* this refreshes the play marker to the LastTick */
 void
-sequence::reset_draw_marker( void )
+sequence::reset_draw_marker()
 {
     lock();
 
@@ -2960,7 +2960,7 @@ sequence::reset_draw_marker( void )
 }
 
 void
-sequence::reset_draw_trigger_marker( void )
+sequence::reset_draw_trigger_marker()
 {
     lock();
 
@@ -2971,7 +2971,7 @@ sequence::reset_draw_trigger_marker( void )
 
 
 int
-sequence::get_lowest_note_event( void )
+sequence::get_lowest_note_event()
 {
     lock();
 
@@ -2993,7 +2993,7 @@ sequence::get_lowest_note_event( void )
 
 
 int
-sequence::get_highest_note_event( void )
+sequence::get_highest_note_event()
 {
     lock();
 
@@ -3151,7 +3151,7 @@ sequence::get_next_trigger( long *a_tick_on, long *a_tick_off, bool *a_selected,
 
 
 void
-sequence::remove_all( void )
+sequence::remove_all()
 {
     lock();
 

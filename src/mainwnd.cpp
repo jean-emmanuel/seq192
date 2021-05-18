@@ -342,7 +342,7 @@ mainwnd::timer_callback(  )
 
 
 void
-mainwnd::options_dialog( void )
+mainwnd::options_dialog()
 {
     if ( m_options != NULL )
         delete m_options;
@@ -352,7 +352,7 @@ mainwnd::options_dialog( void )
 
 
 void
-mainwnd::start_playing( void )
+mainwnd::start_playing()
 {
     m_mainperf->start_playing();
     is_pattern_playing = true;
@@ -360,7 +360,7 @@ mainwnd::start_playing( void )
 
 
 void
-mainwnd::stop_playing( void )
+mainwnd::stop_playing()
 {
     m_mainperf->stop_playing();
     m_main_wid->update_sequences_on_window();
@@ -637,7 +637,7 @@ mainwnd::toLower(basic_string<char>& s) {
 
 
 void
-mainwnd::file_import_dialog( void )
+mainwnd::file_import_dialog()
 {
     Gtk::FileChooserDialog dialog("Import MIDI file",
             Gtk::FILE_CHOOSER_ACTION_OPEN);
@@ -736,7 +736,7 @@ mainwnd::on_delete_event(GdkEventAny *a_e)
 
 
 void
-mainwnd::about_dialog( void )
+mainwnd::about_dialog()
 {
     Gtk::AboutDialog dialog;
     dialog.set_transient_for(*this);

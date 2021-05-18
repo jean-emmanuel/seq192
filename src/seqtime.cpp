@@ -298,7 +298,7 @@ seqtime::on_expose_event(GdkEventExpose* a_e)
 }
 
 void
-seqtime::force_draw( void )
+seqtime::force_draw()
 {
     m_window->draw_drawable(m_gc,
                             m_pixmap,

@@ -1102,7 +1102,7 @@ midibus::set_clock_mod( int a_clock_mod )
 }
 
 int
-midibus::get_clock_mod( void )
+midibus::get_clock_mod()
 {
     return m_clock_mod;
 }

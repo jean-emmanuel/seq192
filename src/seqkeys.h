@@ -86,10 +86,10 @@ class seqkeys : public Gtk::DrawingArea
     void draw_key( int a_key, bool a_state );
     void on_size_allocate(Gtk::Allocation&);
 
-    void change_vert( void );
-    void force_draw( void );
+    void change_vert();
+    void force_draw();
 
-    void update_sizes( void );
+    void update_sizes();
 
     void reset();
 

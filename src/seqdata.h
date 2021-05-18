@@ -108,9 +108,9 @@ class seqdata : public Gtk::DrawingArea
     void draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw );
 
     void on_size_allocate(Gtk::Allocation& );
-    void change_horz( void );
+    void change_horz();
 
-    void force_draw( void );
+    void force_draw();
 
  public:
 

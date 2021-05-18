@@ -222,7 +222,7 @@ seqkeys::on_expose_event(GdkEventExpose* a_e)
 
 
 void
-seqkeys::force_draw( void )
+seqkeys::force_draw()
 {
     m_window->draw_drawable(m_gc,
                             m_pixmap,

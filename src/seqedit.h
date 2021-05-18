@@ -216,14 +216,14 @@ class seqedit : public Gtk::Window
 
     void set_bpm( int a_beats_per_measure );
     bool bpm_change_callback( GdkEventFocus *focus ); // ORL bpm set through text by user
-    void bpm_change_enter_callback( void); // ORL bpm set through text by user
+    void bpm_change_enter_callback(); // ORL bpm set through text by user
     void set_bw( int a_beat_width );
     void set_rec_vol( int a_rec_vol );
     void set_measures( int a_length_measures  );
     bool measures_change_callback( GdkEventFocus *focus ); // ORL length set through text by user
-    void measures_change_enter_callback( void); // ORL length set through text by user
+    void measures_change_enter_callback(); // ORL length set through text by user
     void apply_length( int a_bpm, int a_bw, int a_measures );
-    long get_measures( void );
+    long get_measures();
 
     void set_midi_channel( int a_midichannel );
     void set_midi_bus( int a_midibus );
@@ -234,36 +234,36 @@ class seqedit : public Gtk::Window
     void set_background_sequence( int a_seq );
 
     bool name_change_callback( GdkEventFocus *focus );
-    void name_change_enter_callback( void );
-    void play_change_callback( void );
-    void record_change_callback( void );
-    void q_rec_change_callback( void );
-    void thru_change_callback( void );
-    void undo_callback( void );
-    void redo_callback( void );
+    void name_change_enter_callback();
+    void play_change_callback();
+    void record_change_callback();
+    void q_rec_change_callback();
+    void thru_change_callback();
+    void undo_callback();
+    void redo_callback();
 
     void set_data_type( unsigned char a_status,
 			unsigned char a_control = 0 );
 
     void update_all_windows( );
 
-    void fill_top_bar( void );
-    void create_menus( void );
+    void fill_top_bar();
+    void create_menus();
 
-    void menu_action_quantise( void );
+    void menu_action_quantise();
 
     void popup_menu( Menu *a_menu );
-    void popup_event_menu( void );
-    void popup_midibus_menu( void );
-    void popup_sequence_menu( void );
-    void popup_tool_menu( void );
-    void popup_midich_menu(void);
+    void popup_event_menu();
+    void popup_midibus_menu();
+    void popup_sequence_menu();
+    void popup_tool_menu();
+    void popup_midich_menu();
 
     Gtk::Image* create_menu_image( bool a_state = false );
 
     void on_realize();
 
-    bool timeout( void );
+    bool timeout();
 
     void do_action( int a_action, int a_var );
 

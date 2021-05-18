@@ -39,7 +39,7 @@ seqmenu::seqmenu( perform *a_p  )
 
 
     void
-seqmenu::popup_menu( void )
+seqmenu::popup_menu()
 {
 
     using namespace Menu_Helpers;

@@ -150,12 +150,12 @@ class seqevent : public Gtk::DrawingArea
     void drop_event( long a_tick );
     void draw_events_on ( Glib::RefPtr<Gdk::Drawable> a_draw );
 
-    void start_paste( void );
+    void start_paste();
 
     void on_size_allocate(Gtk::Allocation& );
-    void change_horz( void );
+    void change_horz();
 
-    void force_draw( void );
+    void force_draw();
 
  public:
 

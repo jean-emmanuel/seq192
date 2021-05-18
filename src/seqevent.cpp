@@ -483,7 +483,7 @@ seqevent::on_expose_event(GdkEventExpose* e)
 }
 
 void
-seqevent::force_draw(void )
+seqevent::force_draw()
 {
     m_window->draw_drawable(m_gc,
                             m_pixmap,

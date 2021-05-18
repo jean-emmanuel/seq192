@@ -198,10 +198,10 @@ class seqroll : public Gtk::DrawingArea
 
     void on_size_allocate(Gtk::Allocation& );
 
-    void change_horz( void );
-    void change_vert( void );
+    void change_horz();
+    void change_vert();
 
-    void force_draw( void );
+    void force_draw();
 
 
  public:

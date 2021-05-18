@@ -77,11 +77,11 @@ class seqtime: public Gtk::DrawingArea
 
     void on_size_allocate(Gtk::Allocation& );
 
-    void change_horz( void );
+    void change_horz();
 
-    void update_sizes( void );
+    void update_sizes();
 
-    void force_draw( void );
+    void force_draw();
 
 
  public:
@@ -90,7 +90,7 @@ class seqtime: public Gtk::DrawingArea
              Gtk::Adjustment   *a_hadjust );
 
     void reset();
-    void redraw( void );
+    void redraw();
     void set_zoom( int a_zoom );
 
 };
