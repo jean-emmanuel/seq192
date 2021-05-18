@@ -164,7 +164,6 @@ perform::perform()
     m_in_thread_launched = false;
 }
 
-/* I had to reintroduce those functions here so that it is possible to use a PC or CC or Note On to play with a restart of jack location (useful if you have some sequences longer than other and you want to switch from one to another without knowing how many times you will play the first one. */
 void
 perform::start_playing()
 {
@@ -184,7 +183,6 @@ perform::stop_playing()
     stop_jack();
     stop();
 }
-/* End of my mod */
 
 
 void perform::init()
