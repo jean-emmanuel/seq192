@@ -18,7 +18,6 @@ seq24_SOURCES = \
 	midibus.cpp midibus.h \
 	midifile.cpp midifile.h \
 	mutex.cpp mutex.h \
-	options.cpp options.h \
 	optionsfile.cpp optionsfile.h \
 	oscserver.cpp oscserver.h \
 	perform.cpp perform.h \

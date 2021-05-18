@@ -23,7 +23,6 @@
 #include "midibus.h"
 #include "controllers.h"
 #include "event.h"
-#include "options.h"
 
 
 #include "xpm/play.xpm"
@@ -1303,9 +1302,6 @@ seqedit::popup_event_menu()
     m_menu_data->popup(0,0);
 }
 
-
-    //m_option_midich->set_history( m_seq->getMidiChannel() );
-    //m_option_midibus->set_history( m_seq->getMidiBus()->getID() );
 
 void
 seqedit::set_midi_channel( int a_midichannel  )

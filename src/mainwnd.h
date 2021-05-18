@@ -23,9 +23,7 @@
 #include "perform.h"
 #include "sequence.h"
 #include "event.h"
-#include "options.h"
 #include "maintime.h"
-#include "options.h"
 
 
 
@@ -73,8 +71,6 @@ class mainwnd : public Gtk::Window, public performcallback
 
     mainwid  *m_main_wid;
     maintime *m_main_time;
-
-    options *m_options;
 
     Gdk::Cursor   m_main_cursor;
 

@@ -73,8 +73,6 @@ mainwnd::mainwnd(perform *a_p)
     m_menu_file->items().push_back(SeparatorElem());
     m_menu_file->items().push_back(MenuElem("_Import...",
                 mem_fun(*this, &mainwnd::file_import_dialog)));
-    m_menu_file->items().push_back(MenuElem("O_ptions...",
-                mem_fun(*this,&mainwnd::options_dialog)));
     m_menu_file->items().push_back(SeparatorElem());
     m_menu_file->items().push_back(MenuElem("E_xit",
                 Gtk::AccelKey("<control>Q"),
@@ -260,15 +258,12 @@ mainwnd::mainwnd(perform *a_p)
 
     global_is_modified = false;
 
-    m_options = NULL;
-
 }
 
 
 mainwnd::~mainwnd()
 {
-    if ( m_options != NULL )
-        delete m_options;
+
 }
 
 // SCROLL MOD
@@ -338,16 +333,6 @@ mainwnd::timer_callback(  )
     }
 
     return true;
-}
-
-
-void
-mainwnd::options_dialog()
-{
-    if ( m_options != NULL )
-        delete m_options;
-    m_options = new options( *this,  m_mainperf );
-    m_options->show_all();
 }
 
 
