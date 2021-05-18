@@ -233,7 +233,8 @@ class seqedit : public Gtk::Window
 
     void set_background_sequence( int a_seq );
 
-    void name_change_callback( void );
+    bool name_change_callback( GdkEventFocus *focus );
+    void name_change_enter_callback( void );
     void play_change_callback( void );
     void record_change_callback( void );
     void q_rec_change_callback( void );

@@ -787,8 +787,10 @@ seqedit::fill_top_bar( void )
     m_entry_name->set_text( m_seq->get_name());
     m_entry_name->select_region(0,0);
     m_entry_name->set_position(0);
-    m_entry_name->signal_changed().connect(
-            mem_fun( *this, &seqedit::name_change_callback));
+    m_entry_name->signal_focus_out_event().connect(
+            mem_fun(*this, &seqedit::name_change_callback));
+    m_entry_name->signal_activate().connect(
+            mem_fun(*this, &seqedit::name_change_enter_callback));
 
     m_hbox->pack_start( *m_entry_name, true, true );
     m_hbox->pack_start( *(manage(new VSeparator( ))), false, false, 4);
@@ -802,13 +804,11 @@ seqedit::fill_top_bar( void )
     add_tooltip( m_button_bpm, "Time Signature. Beats per Measure" );
     m_entry_bpm = manage( new Entry());
     m_entry_bpm->set_width_chars(2);
-    // ORL bpm can be set by a text type by the user
     m_entry_bpm->set_editable( true );
     m_entry_bpm->signal_focus_out_event().connect(
             mem_fun(*this, &seqedit::bpm_change_callback));
     m_entry_bpm->signal_activate().connect(
             mem_fun(*this, &seqedit::bpm_change_enter_callback));
-    // end of the mod
 
     m_hbox->pack_start( *m_button_bpm , false, false );
     m_hbox->pack_start( *m_entry_bpm , false, false );
@@ -840,13 +840,11 @@ seqedit::fill_top_bar( void )
     add_tooltip( m_button_length, "Sequence length in Bars." );
     m_entry_length = manage( new Entry());
     m_entry_length->set_width_chars(3);
-    // ORL number of measures may be set by a text typed by the user
     m_entry_length->set_editable( true );
     m_entry_length->signal_focus_out_event().connect(
             mem_fun(*this, &seqedit::measures_change_callback));
     m_entry_length->signal_activate().connect(
             mem_fun(*this, &seqedit::measures_change_enter_callback));
-    // end of mod
 
     m_hbox->pack_start( *m_button_length , false, false );
     m_hbox->pack_start( *m_entry_length , false, false );
@@ -1457,35 +1455,23 @@ seqedit::set_measures( int a_length_measures  )
     }
 }
 
-// ORL Number of measures (length of sequence) can be set by a text typed by user
 bool
 seqedit::measures_change_callback(GdkEventFocus *focus)
 {
-    char b[4];
+    int a_length_measures = atoi( m_entry_length->get_text().c_str() );
 
-    int m_int_length = atoi( m_entry_length->get_text().c_str() );
+    if ( a_length_measures < 1 ){
 
-    if( m_int_length < 0 ){
+        a_length_measures = 1;
 
-        fprintf( stderr, "Number of measures must be > 1\n" );
-        snprintf(b, sizeof(b), "%ld", get_measures() );
-        m_entry_length->set_text(b);
+    } else if ( a_length_measures > 1024) {
 
-    } else if( m_int_length > 1024) {
-
-        fprintf( stderr, "Number of measures must be < 1024\n" );
-        snprintf(b, sizeof(b), "%ld", get_measures() );
-        m_entry_length->set_text(b);
-        // This max value may be changed. Actually, I'm not even sure that's it's really important to set a max value.
-
-    } else if (m_int_length == 0) {
-        // This else statement just allows to remove everything in the Entry before typing something new
-    } else {
-
-        m_measures = m_int_length;
-        apply_length( m_seq->get_bpm(), m_seq->get_bw(), m_measures );
+        a_length_measures = 1024;
 
     }
+
+    set_measures(a_length_measures);
+
     return true;
 }
 
@@ -1514,37 +1500,23 @@ seqedit::set_bpm( int a_beats_per_measure )
     }
 }
 
-// ORL BPM can be set by a text typed by user
 bool
 seqedit::bpm_change_callback(GdkEventFocus *focus)
 {
-    char b[4];
+    int a_beats_per_measure = atoi( m_entry_bpm->get_text().c_str() );
 
-    int m_int_bpm = atoi( m_entry_bpm->get_text().c_str() );
+    if ( a_beats_per_measure < 1 ) {
 
-    if( m_int_bpm < 0 ){
+        a_beats_per_measure = 1;
 
-        fprintf( stderr, "Number of beats in bar must be > 1\n" );
-        snprintf(b, sizeof(b), "%ld", m_seq->get_bpm() );
-        m_entry_bpm->set_text(b);
+    } else if( a_beats_per_measure > 128) {
 
-    } else if( m_int_bpm > 128) {
-
-        fprintf( stderr, "Number of beats in bar must be < 128\n" );
-        snprintf(b, sizeof(b), "%ld", m_seq->get_bpm() );
-        m_entry_bpm->set_text(b);
-        // This max value may be changed. Actually, going over 32 is probably senseless, but -due to the minimal division (128), this value will allow every composed bars within these decomposition
-
-    } else if (m_int_bpm == 0) {
-        // This else statement just allows to remove everything in the Entry before typing something new
-    } else {
-
-        long length = get_measures();
-        m_seq->set_bpm( m_int_bpm );
-        apply_length( m_int_bpm, m_seq->get_bw(), length );
-        global_is_modified = true;
+        a_beats_per_measure = 128;
 
     }
+
+    set_bpm( a_beats_per_measure );
+
 
     return true;
 }
@@ -1583,12 +1555,21 @@ seqedit::set_rec_vol( int a_rec_vol  )
 }
 
 
-void
-seqedit::name_change_callback( void )
+bool
+seqedit::name_change_callback( GdkEventFocus *focus  )
 {
     m_seq->set_name( m_entry_name->get_text());
     global_is_modified = true;
     // m_mainwid->update_sequence_on_window( m_pos );
+    return true;
+}
+
+void
+seqedit::name_change_enter_callback( )
+{
+    GdkEventFocus event = GdkEventFocus();
+    this->measures_change_callback(&event);
+    m_seqroll_wid->grab_focus();
 }
 
 
