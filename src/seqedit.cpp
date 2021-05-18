@@ -1678,6 +1678,16 @@ seqedit::timeout()
 
     m_seqroll_wid->draw_progress_on_window();
 
+    if(m_seq->m_have_undo && !m_button_undo->get_sensitive())
+        m_button_undo->set_sensitive(true);
+    else if(!m_seq->m_have_undo && m_button_undo->get_sensitive())
+        m_button_undo->set_sensitive(false);
+
+    if(m_seq->m_have_redo && !m_button_redo->get_sensitive())
+        m_button_redo->set_sensitive(true);
+    else if(!m_seq->m_have_redo && m_button_redo->get_sensitive())
+        m_button_redo->set_sensitive(false);
+
     return true;
 }
 

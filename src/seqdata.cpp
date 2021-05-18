@@ -433,6 +433,12 @@ seqdata::on_button_release_event(GdkEventButton* a_p0)
         m_seq->set_dirty();
     }
 
+    if(m_seq->get_hold_undo())
+    {
+        m_seq->push_undo(true);
+        m_seq->set_hold_undo(false);
+    }
+
     update_pixmap();
     queue_draw();
     return true;
@@ -537,7 +543,6 @@ seqdata::on_motion_notify_event(GdkEventMotion* a_p0)
 bool
 seqdata::on_leave_notify_event(GdkEventCrossing* p0)
 {
-    // m_dragging = false;
     update_pixmap();
     queue_draw();
     return true;

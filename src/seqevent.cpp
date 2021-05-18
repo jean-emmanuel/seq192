@@ -700,6 +700,7 @@ seqevent::on_key_press_event(GdkEventKey* a_p0)
             /* cut */
             if ( a_p0->keyval == GDK_x || a_p0->keyval == GDK_X ){
 
+                m_seq->push_undo();
                 m_seq->copy_selected();
                 m_seq->mark_selected();
                 m_seq->remove_marked();
