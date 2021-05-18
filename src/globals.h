@@ -21,11 +21,7 @@
 #ifndef SEQ24_GLOBALS
 #define SEQ24_GLOBALS
 
-#ifdef __WIN32__
-#    include "configwin32.h"
-#else
-#    include "config.h"
-#endif
+#include "config.h"
 
 #include <string>
 #include <gtkmm/main.h>
@@ -149,11 +145,7 @@ const int c_normal = 1;
 const int c_paste  = 2;
 
 /* redraw when recording ms */
-#ifdef __WIN32__
-const int c_redraw_ms = 20;
-#else
 const int c_redraw_ms = 40;
-#endif
 
 /* consts for perform editor */
 const int c_names_x = 6 * 24;

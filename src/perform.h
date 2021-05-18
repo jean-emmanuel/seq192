@@ -29,9 +29,7 @@ class perform;
 #include "midifile.h"
 #include "sequence.h"
 #include "oscserver.h"
-#ifndef __WIN32__
-#   include <unistd.h>
-#endif
+#include <unistd.h>
 #include <pthread.h>
 
 

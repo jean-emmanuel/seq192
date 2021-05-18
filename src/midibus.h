@@ -25,10 +25,6 @@
 class mastermidibus;
 class midibus;
 
-#ifdef __WIN32__
-#   include "configwin32.h"
-#   include "midibus_portmidi.h"
-#else
 #include "config.h"
 
 #if HAVE_LIBASOUND
@@ -273,5 +269,4 @@ class mastermidibus
 
 };
 
-#endif
 #endif

@@ -10,6 +10,8 @@
 - sequence: unselect on ctrl+shift+a
 - sequence: fix start/stop keyboard shortcuts
 - main: (seq32) global is_modified flag (warning when quitting with unsaved changes)
+- build: drop windows support
+- build: drop old gtkmm version
 
 ## 0.11.0
 

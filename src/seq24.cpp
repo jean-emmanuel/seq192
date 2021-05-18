@@ -22,11 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef __WIN32__
-#    include "configwin32.h"
-#else
-#    include "config.h"
-#endif
+#include "config.h"
 
 #include "font.h"
 #ifdef LASH_SUPPORT
@@ -91,14 +87,8 @@ font *p_font_renderer;
 lash *lash_driver = NULL;
 #endif
 
-#ifdef __WIN32__
-#   define HOME "HOMEPATH"
-#   define SLASH "\\"
-#else
-#   define HOME "HOME"
-#   define SLASH "/"
-#endif
-
+#define HOME "HOME"
+#define SLASH "/"
 
 int
 main (int argc, char *argv[])
