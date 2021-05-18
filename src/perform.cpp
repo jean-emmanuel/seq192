@@ -183,7 +183,7 @@ perform::stop_playing()
 
 void perform::init()
 {
-    m_master_bus.init( );
+    m_master_bus.init();
 
     if (global_oscport != 0) {
         oscserver = new OSCServer(global_oscport);

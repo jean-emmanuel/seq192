@@ -19,17 +19,13 @@
 //-----------------------------------------------------------------------------
 
 #include "midibus.h"
-
-#ifdef HAVE_LIBASOUND
-#    include <sys/poll.h>
-#endif
+#include <sys/poll.h>
 
 #ifdef LASH_SUPPORT
 #    include "lash.h"
 #endif
 
 
-#ifdef HAVE_LIBASOUND
 midibus::midibus( int a_localclient,
 		  int a_destclient,
 		  int a_destport,
@@ -83,15 +79,27 @@ midibus::midibus( int a_localclient,
     m_id = a_id;
     m_inputing = false;
 
+
+	char name[60];
+    if ( global_user_midi_bus_definitions[m_id - 1].alias.length() > 0 )
+    {
+        snprintf(name, 59, "%s",
+                global_user_midi_bus_definitions[m_id - 1].alias.c_str());
+    }
+    else
+    {
+        snprintf(name,59,"seq24 %d", m_id);
+    }
+
+
     /* copy names */
-    char tmp[60];
-    snprintf( tmp, 59, "[%d] seq24 %d",
+    char tmp[80];
+    snprintf( tmp, 79, "[%d] %s",
 	      m_id,
-	      m_id );
+	      name );
 
     m_name = tmp;
 }
-#endif
 
 void
 midibus::lock( )
@@ -109,7 +117,6 @@ midibus::unlock( )
 
 bool midibus::init_out( )
 {
-#ifdef HAVE_LIBASOUND
     /* temp return */
     int ret;
 
@@ -137,14 +144,12 @@ bool midibus::init_out( )
                 m_dest_addr_client, m_dest_addr_port);
         return false;
     }
-#endif
     return true;
 }
 
 
 bool midibus::init_out_sub( )
 {
-#ifdef HAVE_LIBASOUND
     /* temp return */
     int ret;
 
@@ -161,7 +166,6 @@ bool midibus::init_out_sub( )
         printf( "snd_seq_create_simple_port(write) error\n");
         return false;
     }
-#endif
     return true;
 }
 
@@ -169,7 +173,6 @@ bool midibus::init_out_sub( )
 
 bool midibus::init_in( )
 {
-#ifdef HAVE_LIBASOUND
     /* temp return */
     int ret;
 
@@ -213,14 +216,12 @@ bool midibus::init_in( )
                 m_dest_addr_client, m_dest_addr_port);
         return false;
     }
-#endif
     return true;
 }
 
 
 bool midibus::init_in_sub( )
 {
-#ifdef HAVE_LIBASOUND
     /* temp return */
     int ret;
 
@@ -236,14 +237,12 @@ bool midibus::init_in_sub( )
         printf( "snd_seq_create_simple_port(write) error\n");
         return false;
     }
-#endif
     return true;
 }
 
 
 bool midibus::deinit_in( )
 {
-#ifdef HAVE_LIBASOUND
     /* temp return */
     int ret;
 
@@ -273,7 +272,6 @@ bool midibus::deinit_in( )
                 m_dest_addr_client, m_dest_addr_port);
         return false;
     }
-#endif
     return true;
 }
 
@@ -310,40 +308,38 @@ midibus::play( event *a_e24, unsigned char a_channel )
 {
     lock();
 
-#ifdef HAVE_LIBASOUND
+	snd_seq_event_t ev;
 
-		snd_seq_event_t ev;
+	/* alsa midi parser */
+	snd_midi_event_t *midi_ev;
 
-		/* alsa midi parser */
-		snd_midi_event_t *midi_ev;
+	/* temp for midi data */
+	unsigned char buffer[3];
 
-		/* temp for midi data */
-		unsigned char buffer[3];
+	/* fill buffer and set midi channel */
+	buffer[0] = a_e24->get_status();
+	buffer[0] += (a_channel & 0x0F);
+	a_e24->get_data( &buffer[1], &buffer[2] );
+	snd_midi_event_new( 10, &midi_ev );
 
-		/* fill buffer and set midi channel */
-		buffer[0] = a_e24->get_status();
-		buffer[0] += (a_channel & 0x0F);
-		a_e24->get_data( &buffer[1], &buffer[2] );
-		snd_midi_event_new( 10, &midi_ev );
+	/* clear event */
+	snd_seq_ev_clear( &ev );
+	snd_midi_event_encode( midi_ev, buffer, 3, &ev );
+	snd_midi_event_free( midi_ev );
 
-		/* clear event */
-		snd_seq_ev_clear( &ev );
-		snd_midi_event_encode( midi_ev, buffer, 3, &ev );
-		snd_midi_event_free( midi_ev );
+	/* set source */
+	snd_seq_ev_set_source(&ev, m_local_addr_port );
+	snd_seq_ev_set_subs(&ev);
 
-		/* set source */
-		snd_seq_ev_set_source(&ev, m_local_addr_port );
-		snd_seq_ev_set_subs(&ev);
+	/* set tag unique to each sequence for removal purposes */
+	//ev.tag = a_tag;
 
-		/* set tag unique to each sequence for removal purposes */
-		//ev.tag = a_tag;
+	// its immediate
+	snd_seq_ev_set_direct( &ev );
 
-		// its immediate
-		snd_seq_ev_set_direct( &ev );
+	/* pump it into the queue */
+	snd_seq_event_output(m_seq, &ev);
 
-		/* pump it into the queue */
-		snd_seq_event_output(m_seq, &ev);
-#endif
     unlock();
 }
 
@@ -362,7 +358,7 @@ void
 midibus::sysex( event *a_e24 )
 {
     lock();
-#ifdef HAVE_LIBASOUND
+
     snd_seq_event_t ev;
 
     /* clear event */
@@ -393,7 +389,6 @@ midibus::sysex( event *a_e24 )
         usleep(80000);
         flush();
     }
-#endif
     unlock();
 }
 
@@ -403,9 +398,7 @@ void
 midibus::flush()
 {
     lock();
-#ifdef HAVE_LIBASOUND
     snd_seq_drain_output( m_seq );
-#endif
     unlock();
 }
 
@@ -451,7 +444,7 @@ void
 mastermidibus::set_ppqn( int a_ppqn )
 {
     lock();
-#ifdef HAVE_LIBASOUND
+
     m_ppqn = a_ppqn;
 
     /* allocate tempo struct */
@@ -466,7 +459,7 @@ mastermidibus::set_ppqn( int a_ppqn )
 
     /* give tempo struct to the queue */
     snd_seq_set_queue_tempo( m_alsa_seq, m_queue, tempo );
-#endif
+
     unlock();
 }
 
@@ -475,7 +468,7 @@ void
 mastermidibus::set_bpm( int a_bpm )
 {
     lock();
-#ifdef HAVE_LIBASOUND
+
     m_bpm = a_bpm;
 
     /* allocate tempo struct */
@@ -489,7 +482,7 @@ mastermidibus::set_bpm( int a_bpm )
 
     /* give tempo struct to the queue */
     snd_seq_set_queue_tempo(m_alsa_seq, m_queue, tempo );
-#endif
+
     unlock();
 }
 
@@ -498,9 +491,9 @@ void
 mastermidibus::flush()
 {
     lock();
-#ifdef HAVE_LIBASOUND
+
     snd_seq_drain_output( m_alsa_seq );
-#endif
+
     unlock();
 }
 
@@ -524,7 +517,6 @@ mastermidibus::mastermidibus()
         m_init_input[i] = false;
     }
 
-#ifdef HAVE_LIBASOUND
     /* open the sequencer client */
     ret = snd_seq_open(&m_alsa_seq, "default",  SND_SEQ_OPEN_DUPLEX, 0);
 
@@ -538,7 +530,6 @@ mastermidibus::mastermidibus()
 
     /* set up our clients queue */
     m_queue = snd_seq_alloc_queue( m_alsa_seq );
-#endif
 #ifdef LASH_SUPPORT
 	/* notify lash of our client ID so it can restore connections */
 	lash_driver->set_alsa_client_id(snd_seq_client_id(m_alsa_seq));
@@ -549,121 +540,38 @@ mastermidibus::mastermidibus()
 void
 mastermidibus::init( )
 {
-#ifdef HAVE_LIBASOUND
     /* client info */
     snd_seq_client_info_t *cinfo;
-    /* port info */
-    snd_seq_port_info_t *pinfo;
-
-    int client;
 
     snd_seq_client_info_alloca(&cinfo);
     snd_seq_client_info_set_client(cinfo, -1);
 
-    //printf( "global_ports %d\n", global_manual_alsa_ports );
+    int num_buses = 16;
 
-    if ( global_manual_alsa_ports )
+    for( int i=0; i<num_buses; ++i )
     {
 
-        int num_buses = 16;
+        m_buses_out[i] =
+            new midibus( snd_seq_client_id( m_alsa_seq ), m_alsa_seq, i + 1, m_queue );
 
-        for( int i=0; i<num_buses; ++i )
-        {
-
-            m_buses_out[i] =
-                new midibus( snd_seq_client_id( m_alsa_seq ), m_alsa_seq, i+1, m_queue );
-
-            m_buses_out[i]->init_out_sub();
-            m_buses_out_active[i] = true;
-            m_buses_out_init[i] = true;
-        }
-
-        m_num_out_buses = num_buses;
-
-        /* only one in */
-        m_buses_in[0] =
-            new midibus( snd_seq_client_id( m_alsa_seq ),
-                    m_alsa_seq,
-                    m_num_in_buses, m_queue);
-
-        m_buses_in[0]->init_in_sub();
-        m_buses_in_active[0] = true;
-        m_buses_in_init[0] = true;
-        m_num_in_buses = 1;
-
-
+        m_buses_out[i]->init_out_sub();
+        m_buses_out_active[i] = true;
+        m_buses_out_init[i] = true;
     }
-    else
-    {
-        /* while the next client one the sequencer is avaiable */
-        while (snd_seq_query_next_client(m_alsa_seq, cinfo) >= 0){
 
-            /* get client from cinfo */
-            client = snd_seq_client_info_get_client(cinfo);
+    m_num_out_buses = num_buses;
 
-            /* fill pinfo */
-            snd_seq_port_info_alloca(&pinfo);
-            snd_seq_port_info_set_client(pinfo, client);
-            snd_seq_port_info_set_port(pinfo, -1);
+    /* only one in */
+    m_buses_in[0] =
+        new midibus( snd_seq_client_id( m_alsa_seq ),
+                m_alsa_seq,
+                m_num_in_buses, m_queue);
 
-            /* while the next port is avail */
-            while (snd_seq_query_next_port(m_alsa_seq, pinfo) >= 0 ){
+    m_buses_in[0]->init_in_sub();
+    m_buses_in_active[0] = true;
+    m_buses_in_init[0] = true;
+    m_num_in_buses = 1;
 
-                /* get its capability */
-                int cap =  snd_seq_port_info_get_capability(pinfo);
-
-                if ( snd_seq_client_id( m_alsa_seq ) != snd_seq_port_info_get_client(pinfo) &&
-                        snd_seq_port_info_get_client(pinfo) != SND_SEQ_CLIENT_SYSTEM){
-
-                    /* the outs */
-                    if ( (cap & SND_SEQ_PORT_CAP_SUBS_WRITE) != 0 &&
-                            snd_seq_client_id( m_alsa_seq ) != snd_seq_port_info_get_client(pinfo)){
-
-                        m_buses_out[m_num_out_buses] =
-                            new midibus( snd_seq_client_id( m_alsa_seq ),
-                                    snd_seq_port_info_get_client(pinfo),
-                                    snd_seq_port_info_get_port(pinfo),
-                                    m_alsa_seq,
-                                    snd_seq_client_info_get_name(cinfo),
-                                    snd_seq_port_info_get_name(pinfo),
-                                    m_num_out_buses, m_queue );
-
-                        if ( m_buses_out[m_num_out_buses]->init_out() ){
-                            m_buses_out_active[m_num_out_buses] = true;
-                            m_buses_out_init[m_num_out_buses] = true;
-                        } else {
-                            m_buses_out_init[m_num_out_buses] = true;
-                        }
-
-                        m_num_out_buses++;
-                    }
-
-                    /* the ins */
-                    if ( (cap & SND_SEQ_PORT_CAP_SUBS_READ) != 0 &&
-                            snd_seq_client_id( m_alsa_seq ) != snd_seq_port_info_get_client(pinfo)){
-
-                        m_buses_in[m_num_in_buses] =
-                            new midibus( snd_seq_client_id( m_alsa_seq ),
-                                    snd_seq_port_info_get_client(pinfo),
-                                    snd_seq_port_info_get_port(pinfo),
-                                    m_alsa_seq,
-                                    snd_seq_client_info_get_name(cinfo),
-                                    snd_seq_port_info_get_name(pinfo),
-                                    m_num_in_buses, m_queue);
-
-                        //if ( m_buses_in[m_num_in_buses]->init_in() ){
-                        m_buses_in_active[m_num_in_buses] = true;
-                        m_buses_in_init[m_num_in_buses] = true;
-                        //} else {
-                        //m_buses_in_init[m_num_in_buses] = true;
-                        //}
-                        m_num_in_buses++;
-                    }
-                }
-            }
-
-        } /* end loop for clients */
-    }
 
     set_bpm( c_bpm );
     set_ppqn( c_ppqn );
@@ -700,14 +608,13 @@ mastermidibus::init( )
 
     m_bus_announce->set_input(true);
 
-#endif
 }
 
 mastermidibus::~mastermidibus()
 {
     for ( int i=0; i<m_num_out_buses; i++ )
 	delete m_buses_out[i];
-#ifdef HAVE_LIBASOUND
+
     snd_seq_event_t ev;
 
     /* kill timer */
@@ -718,7 +625,6 @@ mastermidibus::~mastermidibus()
 
     /* close client */
     snd_seq_close( m_alsa_seq );
-#endif
 }
 
 
@@ -850,11 +756,11 @@ int
 mastermidibus::poll_for_midi( )
 {
     int ret = 0;
-#ifdef HAVE_LIBASOUND
+
     ret = poll( m_poll_descriptors,
 		 m_num_poll_descriptors,
 		 1000);
-#endif
+
     return ret;
 }
 
@@ -865,165 +771,11 @@ mastermidibus::is_more_input( ){
 
     int size=0;
 
-#ifdef HAVE_LIBASOUND
     size = snd_seq_event_input_pending(m_alsa_seq, 0);
-#endif
+
     unlock();
 
     return ( size > 0 );
-}
-
-
-void
-mastermidibus::port_start( int a_client, int a_port )
-{
-    lock();
-
-#ifdef HAVE_LIBASOUND
-
-    /* client info */
-    snd_seq_client_info_t *cinfo;
-    snd_seq_client_info_alloca(&cinfo);
-    snd_seq_get_any_client_info( m_alsa_seq, a_client, cinfo );
-
-    /* port info */
-    snd_seq_port_info_t *pinfo;
-
-    /* fill pinfo */
-    snd_seq_port_info_alloca(&pinfo);
-    snd_seq_get_any_port_info( m_alsa_seq, a_client, a_port, pinfo );
-
-
-    /* get its capability */
-    int cap =  snd_seq_port_info_get_capability(pinfo);
-
-    if ( snd_seq_client_id( m_alsa_seq ) != snd_seq_port_info_get_client(pinfo)){
-
-        /* the outs */
-        if ( (cap & (SND_SEQ_PORT_CAP_SUBS_WRITE | SND_SEQ_PORT_CAP_WRITE ))
-             == (SND_SEQ_PORT_CAP_SUBS_WRITE | SND_SEQ_PORT_CAP_WRITE )
-             && snd_seq_client_id( m_alsa_seq ) != snd_seq_port_info_get_client(pinfo)){
-
-
-            bool replacement = false;
-            int bus_slot = m_num_out_buses;
-
-            for( int i=0; i< m_num_out_buses; i++ ){
-
-                if( m_buses_out[i]->get_client() == a_client  &&
-                    m_buses_out[i]->get_port() == a_port &&
-                    m_buses_out_active[i] == false ){
-
-                    replacement = true;
-                    bus_slot = i;
-                }
-            }
-
-            m_buses_out[bus_slot] =
-                new midibus( snd_seq_client_id( m_alsa_seq ),
-                             snd_seq_port_info_get_client(pinfo),
-                             snd_seq_port_info_get_port(pinfo),
-                             m_alsa_seq,
-                             snd_seq_client_info_get_name(cinfo),
-                             snd_seq_port_info_get_name(pinfo),
-                             m_num_out_buses, m_queue );
-
-            m_buses_out[bus_slot]->init_out();
-            m_buses_out_active[bus_slot] = true;
-            m_buses_out_init[bus_slot] = true;
-
-            if ( !replacement ){
-                m_num_out_buses++;
-            }
-        }
-
-        /* the ins */
-        if ( (cap & (SND_SEQ_PORT_CAP_SUBS_READ | SND_SEQ_PORT_CAP_READ ))
-             == (SND_SEQ_PORT_CAP_SUBS_READ | SND_SEQ_PORT_CAP_READ )
-             && snd_seq_client_id( m_alsa_seq ) != snd_seq_port_info_get_client(pinfo)){
-
-            bool replacement = false;
-            int bus_slot = m_num_in_buses;
-
-
-
-            for( int i=0; i< m_num_in_buses; i++ ){
-
-                if( m_buses_in[i]->get_client() == a_client  &&
-                    m_buses_in[i]->get_port() == a_port &&
-                    m_buses_in_active[i] == false ){
-
-                    replacement = true;
-                    bus_slot = i;
-                }
-            }
-
-            //printf( "in [%d] [%d]\n", replacement, bus_slot );
-
-            m_buses_in[bus_slot] =
-                new midibus( snd_seq_client_id( m_alsa_seq ),
-                             snd_seq_port_info_get_client(pinfo),
-                             snd_seq_port_info_get_port(pinfo),
-                             m_alsa_seq,
-                             snd_seq_client_info_get_name(cinfo),
-                             snd_seq_port_info_get_name(pinfo),
-                             m_num_in_buses, m_queue);
-
-            //m_buses_in[bus_slot]->init_in();
-            m_buses_in_active[bus_slot] = true;
-            m_buses_in_init[bus_slot] = true;
-
-            if ( !replacement ){
-                m_num_in_buses++;
-            }
-        }
-    }
-
-    /* end loop for clients */
-
-
-    /* midi input */
-    /* poll descriptors */
-
-    /* get number of file descriptors */
-    m_num_poll_descriptors = snd_seq_poll_descriptors_count(m_alsa_seq, POLLIN);
-
-    /* allocate into */
-    m_poll_descriptors = new pollfd[m_num_poll_descriptors];
-
-    /* get descriptors */
-    snd_seq_poll_descriptors(m_alsa_seq,
-			     m_poll_descriptors,
-			     m_num_poll_descriptors,
-			     POLLIN);
-#endif
-    unlock();
-}
-
-void
-mastermidibus::port_exit( int a_client, int a_port )
-{
-	lock();
-#ifdef HAVE_LIBASOUND
-	for( int i=0; i< m_num_out_buses; i++ ){
-
-		if( m_buses_out[i]->get_client() == a_client  &&
-			m_buses_out[i]->get_port() == a_port ){
-
-			m_buses_out_active[i] = false;
-		}
-	}
-
-        for( int i=0; i< m_num_in_buses; i++ ){
-
-		if( m_buses_in[i]->get_client() == a_client  &&
-			m_buses_in[i]->get_port() == a_port ){
-
-			m_buses_in_active[i] = false;
-		}
-	}
-#endif
-	unlock();
 }
 
 
@@ -1031,58 +783,15 @@ bool
 mastermidibus::get_midi_event( event *a_in )
 {
     lock();
-#ifdef HAVE_LIBASOUND
+
     snd_seq_event_t *ev;
 
     bool sysex = false;
-    bool ret = false;
 
     /* temp for midi data */
     unsigned char buffer[0x1000];
 
     snd_seq_event_input(m_alsa_seq, &ev);
-
-    if (! global_manual_alsa_ports )
-    {
-        switch(ev->type) {
-
-            case SND_SEQ_EVENT_PORT_START:
-                {
-                    //printf("SND_SEQ_EVENT_PORT_START:    addr[%d:%d]\n",
-                    //	   ev->data.addr.client, ev->data.addr.port );
-                    port_start( ev->data.addr.client, ev->data.addr.port );
-                    ret = true;
-                    break;
-                }
-
-            case SND_SEQ_EVENT_PORT_EXIT:
-                {
-                    //printf("SND_SEQ_EVENT_PORT_EXIT:     addr[%d:%d]\n",
-                    //	   ev->data.addr.client, ev->data.addr.port );
-                    port_exit( ev->data.addr.client, ev->data.addr.port );
-                    ret = true;
-                    break;
-                }
-
-            case SND_SEQ_EVENT_PORT_CHANGE:
-                {
-                    //printf("SND_SEQ_EVENT_PORT_CHANGE:   addr[%d:%d]\n",
-                    //	   ev->data.addr.client,
-                    //	   ev->data.addr.port );
-                    ret = true;
-                    break;
-                }
-
-            default:
-                break;
-
-        }
-    }
-
-    if (ret) {
-        unlock();
-        return false;
-    }
 
     /* alsa midi parser */
     snd_midi_event_t *midi_ev;
@@ -1135,8 +844,6 @@ mastermidibus::get_midi_event( event *a_in )
     }
 
     snd_midi_event_free( midi_ev );
-
-#endif
 
     unlock();
     return true;

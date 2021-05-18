@@ -210,11 +210,6 @@ optionsfile::parse( perform *a_perf )
         next_data_line( &file );
     }
 
-    /* manual alsa ports */
-    line_after( &file, "[manual-alsa-ports]" );
-    sscanf( m_line, "%ld", &flag );
-    global_manual_alsa_ports = (bool) flag;
-
     /* last used dir */
     line_after( &file, "[last-used-dir]" );
     //FIXME: check for a valid path is missing
@@ -365,12 +360,6 @@ optionsfile::write( perform *a_perf  )
         file << outs << "\n";
     }
 
-
-    /* manual alsa ports */
-    file << "\n\n\n[manual-alsa-ports]\n";
-    file << "# set to 1 if you want seq24 to create its own alsa ports and\n";
-    file << "# not connect to other clients\n";
-    file << global_manual_alsa_ports << "\n";
 
     /* interaction-method */
     int x = 0;

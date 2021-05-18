@@ -46,7 +46,6 @@ option long_options[] = {
     {"ignore",required_argument, 0, 'i'},
     {"interaction_method",required_argument, 0, 'x'},
     {"jack_transport",0, 0, 'j'},
-    {"manual_alsa_ports", 0, 0, 'm' },
     {"show_keys", 0,0,'k'},
     {"osc_port", 1,0,'o'},
     {"key_size", 1,0,'o'},
@@ -54,7 +53,6 @@ option long_options[] = {
 
 };
 
-bool global_manual_alsa_ports = false;
 bool global_showmidi = false;
 bool global_device_ignore = false;
 int global_device_ignore_num = 0;
@@ -165,7 +163,6 @@ main (int argc, char *argv[])
                 printf( "options:\n" );
                 printf( "    --help : show this message\n" );
                 printf( "    --file <filename> : load midi file on startup\n" );
-                printf( "    --manual_alsa_ports : seq24 won't attach alsa ports\n" );
                 printf( "    --showmidi : dumps incoming midi to screen\n" );
                 printf( "    --show_keys : prints pressed key value\n" );
                 printf( "    --interaction_method <number>: see .seq24rc for methods to use\n" );
@@ -190,10 +187,6 @@ main (int argc, char *argv[])
 
             case 'j':
                 global_with_jack_transport = true;
-                break;
-
-            case 'm':
-                global_manual_alsa_ports = true;
                 break;
 
             case 'f':

@@ -12,9 +12,12 @@
 - main: (seq32) global is_modified flag (warning when quitting with unsaved changes)
 - main: remove option panel
 - midi: remove midi controls, midi clock and sysex passing
+- midi: always use alsa ports
 - build: drop windows support
 - build: drop old gtkmm version
 - misc: remove --priority
+- userfile: apply user bus/channel/control definitions
+- sequence: display user channel definition 
 
 ## 0.11.0
 

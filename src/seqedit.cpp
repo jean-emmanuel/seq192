@@ -867,7 +867,8 @@ seqedit::fill_top_bar()
             mem_fun( *this, &seqedit::popup_midich_menu ));
     m_button_channel->set_tooltip_text( "Select Midi channel." );
     m_entry_channel = manage( new Entry());
-    m_entry_channel->set_width_chars(2);
+    m_entry_channel->set_max_length(30);
+    m_entry_channel->set_width_chars(30);
     m_entry_channel->set_editable( false );
     m_entry_channel->set_can_focus( false );
 
@@ -1092,14 +1093,12 @@ seqedit::popup_midich_menu()
     /* midi channel menu */
     for( int i=0; i<16; i++ ){
 
-        snprintf( b, sizeof(b), "%d", i+1 );
+        snprintf( b, sizeof(b), "[%d] ", i+1 );
         std::string name = string(b);
         int instrument = global_user_midi_bus_definitions[midi_bus].instrument[i];
         if ( instrument >= 0 && instrument < c_maxBuses )
         {
-            name = name + (string(" (") +
-                           global_user_instrument_definitions[instrument].instrument +
-                           string(")") );
+            name = name + global_user_instrument_definitions[instrument].instrument;
         }
         m_menu_midich->items().push_back(MenuElem(name,
                     sigc::bind(mem_fun(*this,&seqedit::set_midi_channel),
@@ -1306,10 +1305,16 @@ seqedit::popup_event_menu()
 void
 seqedit::set_midi_channel( int a_midichannel  )
 {
-    char b[12];
-
-    snprintf( b, sizeof(b), "%d", a_midichannel + 1);
-    m_entry_channel->set_text(b);
+    char b[16];
+    snprintf( b, sizeof(b), "[%d] ", a_midichannel + 1 );
+    std::string name = string(b);
+    int midi_bus = m_seq->get_midi_bus();
+    int instrument = global_user_midi_bus_definitions[midi_bus].instrument[a_midichannel];
+    if ( instrument >= 0 && instrument < c_maxBuses )
+    {
+        name = name + global_user_instrument_definitions[instrument].instrument;
+    }
+    m_entry_channel->set_text(name);
     m_seq->set_midi_channel( a_midichannel );
     // m_mainwid->update_sequence_on_window( m_pos );
 }
@@ -1320,10 +1325,11 @@ seqedit::set_midi_bus( int a_midibus )
 {
     if (m_seq->get_midi_bus() != a_midibus) {
         m_seq->set_midi_bus( a_midibus );
-        mastermidibus *mmb =  m_mainperf->get_master_midi_bus();
-        m_entry_bus->set_text( mmb->get_midi_out_bus_name( a_midibus ));
+        set_midi_channel(m_seq->get_midi_channel());
         global_is_modified = true;
     }
+    mastermidibus *mmb =  m_mainperf->get_master_midi_bus();
+    m_entry_bus->set_text( mmb->get_midi_out_bus_name( a_midibus ));
 }
 
 
