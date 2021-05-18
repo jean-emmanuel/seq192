@@ -16,7 +16,6 @@ seq24_SOURCES = \
 	mainwid.cpp mainwid.h \
 	mainwnd.cpp mainwnd.h \
 	midibus.cpp midibus.h \
-	midibus_portmidi.cpp midibus_portmidi.h \
 	midifile.cpp midifile.h \
 	mutex.cpp mutex.h \
 	options.cpp options.h \
