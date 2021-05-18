@@ -19,7 +19,6 @@
 //-----------------------------------------------------------------------------
 
 #include <cctype>
-#include <gtk/gtkversion.h>
 
 #include "mainwnd.h"
 #include "perform.h"
@@ -35,13 +34,6 @@
 bool is_pattern_playing = false;
 bool global_is_modified = false;
 
-// tooltip helper, for old vs new gtk...
-#if GTK_MINOR_VERSION >= 12
-#   define add_tooltip( obj, text ) obj->set_tooltip_text( text);
-#else
-#   define add_tooltip( obj, text ) m_tooltips->set_tip( *obj, text );
-#endif
-
 mainwnd::mainwnd(perform *a_p)
 {
     set_icon(Gdk::Pixbuf::create_from_xpm_data(seq24_32_xpm));
@@ -55,9 +47,6 @@ mainwnd::mainwnd(perform *a_p)
     /* main window */
     update_window_title();
 
-#if GTK_MINOR_VERSION < 12
-    m_tooltips = manage( new Tooltips() );
-#endif
     m_main_wid = manage( new mainwid( m_mainperf ));
     m_main_time = manage( new maintime( ));
 
@@ -105,7 +94,7 @@ mainwnd::mainwnd(perform *a_p)
                     Gdk::Pixbuf::create_from_xpm_data( stop_xpm ))));
     m_button_stop->signal_clicked().connect(
             mem_fun(*this, &mainwnd::stop_playing));
-    add_tooltip( m_button_stop, "Stop playing MIDI sequence" );
+    m_button_stop->set_tooltip_text( "Stop playing MIDI sequence" );
     hbox->pack_start(*m_button_stop, false, false);
 
     /* play button */
@@ -114,7 +103,7 @@ mainwnd::mainwnd(perform *a_p)
                     Gdk::Pixbuf::create_from_xpm_data( play2_xpm ))));
     m_button_play->signal_clicked().connect(
             mem_fun( *this, &mainwnd::start_playing));
-    add_tooltip( m_button_play, "Play MIDI sequence" );
+    m_button_play->set_tooltip_text( "Play MIDI sequence" );
     hbox->pack_start(*m_button_play, false, false);
 
     /* bpm spin button */
@@ -123,7 +112,7 @@ mainwnd::mainwnd(perform *a_p)
     m_spinbutton_bpm->set_editable( false );
     m_adjust_bpm->signal_value_changed().connect(
             mem_fun(*this, &mainwnd::adj_callback_bpm ));
-    add_tooltip( m_spinbutton_bpm, "Adjust beats per minute (BPM) value" );
+    m_spinbutton_bpm->set_tooltip_text( "Adjust beats per minute (BPM) value" );
     hbox->pack_start(*(manage( new Label( "  bpm " ))), false, false, 4);
     hbox->pack_start(*m_spinbutton_bpm, false, false );
 
@@ -134,7 +123,7 @@ mainwnd::mainwnd(perform *a_p)
     m_spinbutton_ss->set_wrap( true );
     m_adjust_ss->signal_value_changed().connect(
             mem_fun(*this, &mainwnd::adj_callback_ss ));
-    add_tooltip( m_spinbutton_ss, "Select sreen set" );
+    m_spinbutton_ss->set_tooltip_text( "Select sreen set" );
     hbox->pack_end(*m_spinbutton_ss, false, false );
     hbox->pack_end(*(manage( new Label( "  set " ))), false, false, 4);
 
@@ -144,7 +133,7 @@ mainwnd::mainwnd(perform *a_p)
             mem_fun(*this, &mainwnd::edit_callback_notepad));
     m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                 m_mainperf->get_screenset()));
-    add_tooltip( m_entry_notes, "Enter screen set name" );
+    m_entry_notes->set_tooltip_text( "Enter screen set name" );
     hbox->pack_start( *m_entry_notes, true, true );
 
 
@@ -172,7 +161,7 @@ mainwnd::mainwnd(perform *a_p)
     //                 Gdk::Pixbuf::create_from_xpm_data( learn_xpm ))));
     // m_button_learn->signal_clicked().connect(
     //         mem_fun(*this, &mainwnd::learn_toggle));
-    // add_tooltip( m_button_learn, "Mute Group Learn\n\n"
+    // m_button_learn->set_tooltip_text( "Mute Group Learn\n\n"
     //         "Click 'L' then press a mutegroup key to store the mute state of "
     //         "the sequences in that key.\n\n"
     //         "(see File/Options/Keyboard for available mutegroup keys "
