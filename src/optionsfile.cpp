@@ -125,20 +125,6 @@ optionsfile::parse( perform *a_perf )
         next_data_line( &file );
     }
 
-    line_after( &file, "[midi-clock]" );
-    long buses = 0;
-    sscanf( m_line, "%ld", &buses );
-    next_data_line( &file );
-
-    for ( int i=0; i<buses; ++i ){
-
-        long bus_on, bus;
-        sscanf( m_line, "%ld %ld", &bus, &bus_on );
-        a_perf->get_master_midi_bus( )->set_clock( bus, (clock_e) bus_on );
-        next_data_line( &file );
-    }
-
-
     line_after( &file, "[keyboard-control]" );
     long keys = 0;
     sscanf( m_line, "%ld", &keys );
@@ -212,7 +198,7 @@ optionsfile::parse( perform *a_perf )
     global_with_jack_transport = (bool) flag;
 
     line_after( &file, "[midi-input]" );
-    buses = 0;
+    long buses = 0;
     sscanf( m_line, "%ld", &buses );
     next_data_line( &file );
 
@@ -223,13 +209,6 @@ optionsfile::parse( perform *a_perf )
         a_perf->get_master_midi_bus( )->set_input( bus, (bool) bus_on );
         next_data_line( &file );
     }
-
-    /* midi clock mod */
-    long ticks = 64;
-    line_after( &file, "[midi-clock-mod-ticks]" );
-    sscanf( m_line, "%ld", &ticks );
-    midibus::set_clock_mod(ticks);
-
 
     /* manual alsa ports */
     line_after( &file, "[manual-alsa-ports]" );
@@ -371,32 +350,8 @@ optionsfile::write( perform *a_perf  )
         file << string(outs) << "\n";
     }
 
-
-
-    /* bus mute/unmute data */
-    int buses = a_perf->get_master_midi_bus( )->get_num_out_buses();
-
-    file << "\n\n\n[midi-clock]\n";
-    file << buses << "\n";
-
-    for (int i=0; i< buses; i++ ){
-
-
-        file << "# " << a_perf->get_master_midi_bus( )->get_midi_out_bus_name(i) << "\n";
-        snprintf(outs, sizeof(outs), "%d %d", i,
-                (char) a_perf->get_master_midi_bus( )->get_clock(i));
-        file << outs << "\n";
-    }
-
-    /* midi clock mod  */
-    file << "\n\n[midi-clock-mod-ticks]\n";
-    file << midibus::get_clock_mod() << "\n";
-
-
-
-
     /* bus input data */
-    buses = a_perf->get_master_midi_bus( )->get_num_in_buses();
+    int buses = a_perf->get_master_midi_bus( )->get_num_in_buses();
 
     file << "\n\n\n[midi-input]\n";
     file << buses << "\n";

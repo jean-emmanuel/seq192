@@ -46,7 +46,6 @@ midibus::midibus( int a_localclient,
     m_queue          = a_queue;
 
     m_id = a_id;
-    m_clock_type = e_clock_off;
     m_inputing = false;
 
 
@@ -82,7 +81,6 @@ midibus::midibus( int a_localclient,
     m_queue          = a_queue;
 
     m_id = a_id;
-    m_clock_type = e_clock_off;
     m_inputing = false;
 
     /* copy names */
@@ -94,8 +92,6 @@ midibus::midibus( int a_localclient,
     m_name = tmp;
 }
 #endif
-
-int midibus::m_clock_mod = 16 * 4;
 
 void
 midibus::lock( )
@@ -413,135 +409,6 @@ midibus::flush()
     unlock();
 }
 
-
-void
-midibus::init_clock( long a_tick )
-{
-#ifdef HAVE_LIBASOUND
-    if ( m_clock_type == e_clock_pos && a_tick != 0)
-    {
-        continue_from( a_tick );
-    }
-    else
-    if ( m_clock_type == e_clock_mod || a_tick == 0)
-    {
-        start();
-
-        long clock_mod_ticks = (c_ppqn / 4) * m_clock_mod;
-        long leftover = ( a_tick % clock_mod_ticks );
-        long starting_tick = a_tick - leftover;
-
-        /* was there anything left?, then wait for next beat (16th note) to start clocking */
-        if ( leftover > 0)
-        {
-            starting_tick += clock_mod_ticks;
-        }
-        //printf ( "continue_from leftover[%ld] starting_tick[%ld]\n", leftover, starting_tick );
-
-        m_lasttick = starting_tick - 1;
-
-
-    }
-#endif
-}
-
-void
-midibus::continue_from( long a_tick )
-{
-#ifdef HAVE_LIBASOUND
-    /* tell the device that we are going to start at a certain position */
-    long pp16th = (c_ppqn / 4);
-    long leftover = ( a_tick % pp16th );
-    long beats = ( a_tick / pp16th );
-    long starting_tick = a_tick - leftover;
-
-    /* was there anything left? Then wait for next beat (16th note) to start clocking */
-    if ( leftover > 0)
-    {
-        starting_tick += pp16th;
-    }
-    //printf ( "continue_from leftover[%ld] starting_tick[%ld]\n", leftover, starting_tick );
-
-    m_lasttick = starting_tick - 1;
-
-    if ( m_clock_type != e_clock_off )
-    {
-        //printf( "control value %ld\n",  beats);
-
-        snd_seq_event_t evc;
-        snd_seq_event_t ev;
-
-        ev.type = SND_SEQ_EVENT_CONTINUE;
-        evc.type = SND_SEQ_EVENT_SONGPOS;
-        evc.data.control.value = beats;
-        snd_seq_ev_set_fixed( &ev );
-        snd_seq_ev_set_fixed( &evc );
-
-        snd_seq_ev_set_priority( &ev, 1 );
-        snd_seq_ev_set_priority( &evc, 1 );
-
-        /* set source */
-        snd_seq_ev_set_source(&evc, m_local_addr_port );
-        snd_seq_ev_set_subs(&evc);
-        snd_seq_ev_set_source(&ev, m_local_addr_port );
-        snd_seq_ev_set_subs(&ev);
-
-        // its immediate
-        snd_seq_ev_set_direct( &ev );
-        snd_seq_ev_set_direct( &evc );
-
-        /* pump it into the queue */
-        snd_seq_event_output(m_seq, &evc);
-        flush();
-        snd_seq_event_output(m_seq, &ev);
-    }
-#endif
-}
-
-
-/* gets it a runnin */
-void
-midibus::start()
-{
-#ifdef HAVE_LIBASOUND
-    m_lasttick = -1;
-
-    if ( m_clock_type != e_clock_off ){
-
-	snd_seq_event_t ev;
-	ev.type = SND_SEQ_EVENT_START;
-	snd_seq_ev_set_fixed( &ev );
-	snd_seq_ev_set_priority( &ev, 1 );
-
-	/* set source */
-	snd_seq_ev_set_source(&ev, m_local_addr_port );
-	snd_seq_ev_set_subs(&ev);
-
-	// its immediate
-	snd_seq_ev_set_direct( &ev );
-
-	/* pump it into the queue */
-	snd_seq_event_output(m_seq, &ev);
-
-    }
-#endif
-}
-
-
-void
-midibus::set_clock( clock_e a_clock_type )
-{
-    m_clock_type = a_clock_type;
-}
-
-
-clock_e
-midibus::get_clock( )
-{
-    return m_clock_type;
-}
-
-
 void
 midibus::set_input( bool a_inputing )
 {
@@ -566,116 +433,9 @@ midibus::get_input( )
     return m_inputing;
 }
 
-
-void
-midibus::stop()
-{
-#ifdef HAVE_LIBASOUND
-    m_lasttick = -1;
-
-    if ( m_clock_type != e_clock_off ){
-
-	snd_seq_event_t ev;
-	ev.type = SND_SEQ_EVENT_STOP;
-	snd_seq_ev_set_fixed( &ev );
-	snd_seq_ev_set_priority( &ev, 1 );
-
-	/* set source */
-	snd_seq_ev_set_source(&ev, m_local_addr_port );
-	snd_seq_ev_set_subs(&ev);
-
-	// its immediate
-	snd_seq_ev_set_direct( &ev );
-
-	/* pump it into the queue */
-	snd_seq_event_output(m_seq, &ev);
-    }
-#endif
-}
-
-
-// generates midi clock
-void
-midibus::clock( long a_tick )
-{
-    lock();
-#ifdef HAVE_LIBASOUND
-    if ( m_clock_type != e_clock_off ){
-
-	bool done = false;
-	long uptotick = a_tick;
-
-	if ( m_lasttick >= uptotick )
-	    done = true;
-
-	while ( !done ){
-
-	    m_lasttick++;
-
-	    if ( m_lasttick >= uptotick )
-		done = true;
-
-	    /* tick time? */
-	    if ( m_lasttick % ( c_ppqn / 24 ) == 0 ){
-
-		snd_seq_event_t ev;
-		ev.type = SND_SEQ_EVENT_CLOCK;
-
-		/* set tag to 127 so the sequences
-		   wont remove it */
-		ev.tag = 127;
-
-		snd_seq_ev_set_fixed( &ev );
-		snd_seq_ev_set_priority( &ev, 1 );
-
-		/* set source */
-		snd_seq_ev_set_source(&ev, m_local_addr_port );
-		snd_seq_ev_set_subs(&ev);
-
-		// its immediate
-		snd_seq_ev_set_direct( &ev );
-
-		/* pump it into the queue */
-		snd_seq_event_output(m_seq, &ev);
-
-	    }
-	}
-	/* and send out */
-	flush();
-    }
-#endif
-    unlock();
-}
-
-/* deletes events in queue */
-/*void
-midibus::remove_queued_on_events( int a_tag )
-{
-    lock();
-
-    snd_seq_remove_events_t *remove_events;
-
-    snd_seq_remove_events_malloc( &remove_events );
-
-    snd_seq_remove_events_set_condition( remove_events,
-					 SND_SEQ_REMOVE_OUTPUT |
-					 SND_SEQ_REMOVE_TAG_MATCH |
-					 SND_SEQ_REMOVE_IGNORE_OFF );
-
-    snd_seq_remove_events_set_tag( remove_events, a_tag );
-    snd_seq_remove_events( m_seq, remove_events );
-
-    snd_seq_remove_events_free( remove_events );
-
-    unlock();
-}
-*/
-
-
 void
 mastermidibus::lock( )
 {
-   // printf( "mastermidibus::lock()\n" );
    m_mutex.lock();
 }
 
@@ -683,85 +443,9 @@ mastermidibus::lock( )
 void
 mastermidibus::unlock( )
 {
-   // printf( "mastermidibus::unlock()\n" );
    m_mutex.unlock();
 }
 
-
-
-/* gets it running */
-void
-mastermidibus::start()
-{
-    lock();
-#ifdef HAVE_LIBASOUND
-    /* start timer */
-    snd_seq_start_queue( m_alsa_seq, m_queue, NULL );
-
-    for ( int i=0; i < m_num_out_buses; i++ )
-	m_buses_out[i]->start();
-#endif
-     unlock();
-}
-
-
-/* gets it a runnin */
-    void
-mastermidibus::continue_from( long a_tick)
-{
-    lock();
-#ifdef HAVE_LIBASOUND
-    /* start timer */
-    snd_seq_start_queue( m_alsa_seq, m_queue, NULL );
-
-    for ( int i=0; i < m_num_out_buses; i++ )
-        m_buses_out[i]->continue_from( a_tick );
-#endif
-    unlock();
-}
-
-void
-mastermidibus::init_clock( long a_tick )
-{
-    lock();
-
-    for ( int i=0; i < m_num_out_buses; i++ )
-        m_buses_out[i]->init_clock( a_tick );
-
-    unlock();
-}
-
-void
-mastermidibus::stop()
-{
-    lock();
-
-    for ( int i=0; i < m_num_out_buses; i++ )
-        m_buses_out[i]->stop();
-
-
-#ifdef HAVE_LIBASOUND
-    snd_seq_drain_output( m_alsa_seq );
-    snd_seq_sync_output_queue( m_alsa_seq );
-
-    /* start timer */
-    snd_seq_stop_queue( m_alsa_seq, m_queue, NULL );
-#endif
-    unlock();
-}
-
-
-// generates midi clock
-void
-mastermidibus::clock( long a_tick )
-{
-    lock();
-
-    for ( int i=0; i < m_num_out_buses; i++ )
-	m_buses_out[i]->clock( a_tick );
-
-    unlock();
-}
 
 void
 mastermidibus::set_ppqn( int a_ppqn )
@@ -837,7 +521,6 @@ mastermidibus::mastermidibus()
         m_buses_in_init[i] = false;
         m_buses_out_init[i] = false;
 
-        m_init_clock[i] = e_clock_off;
         m_init_input[i] = false;
     }
 
@@ -1017,13 +700,6 @@ mastermidibus::init( )
 
     m_bus_announce->set_input(true);
 
-
-    for ( int i=0; i<m_num_out_buses; i++ )
-        set_clock(i,m_init_clock[i]);
-
-    for ( int i=0; i<m_num_in_buses; i++ )
-        set_input(i,m_init_input[i]);
-
 #endif
 }
 
@@ -1070,43 +746,6 @@ mastermidibus::play( unsigned char a_bus, event *a_e24, unsigned char a_channel 
 	}
 	unlock();
 }
-
-
-void
-mastermidibus::set_clock( unsigned char a_bus, clock_e a_clock_type )
-{
-    lock();
-    if ( a_bus < c_maxBuses ){
-        m_init_clock[a_bus] = a_clock_type;
-    }
-    if ( m_buses_out_active[a_bus] && a_bus < m_num_out_buses ){
-        m_buses_out[a_bus]->set_clock( a_clock_type );
-    }
-    unlock();
-}
-
-clock_e
-mastermidibus::get_clock( unsigned char a_bus )
-{
-	if ( m_buses_out_active[a_bus] && a_bus < m_num_out_buses ){
-		return m_buses_out[a_bus]->get_clock();
-	}
-	return e_clock_off;
-}
-
-void
-midibus::set_clock_mod( int a_clock_mod )
-{
-    if (a_clock_mod != 0 )
-        m_clock_mod = a_clock_mod;
-}
-
-int
-midibus::get_clock_mod()
-{
-    return m_clock_mod;
-}
-
 
 void
 mastermidibus::set_input( unsigned char a_bus, bool a_inputing )

@@ -483,18 +483,6 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
             }
         }
 
-        /* Get ID + Length */
-        ID = read_long ();
-        if (ID == c_midiclocks)
-        {
-            TrackLength = read_long ();
-            /* TrackLength is nyumber of buses */
-            for (unsigned int x = 0; x < TrackLength; x++)
-            {
-                int bus_on = m_d[m_pos++];
-                a_perf->get_master_midi_bus ()->set_clock (x, (clock_e) bus_on);
-            }
-        }
     }
 
     if ((file_size - m_pos) > (int) sizeof (unsigned long))

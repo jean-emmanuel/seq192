@@ -47,7 +47,6 @@ option long_options[] = {
     {"interaction_method",required_argument, 0, 'x'},
     {"jack_transport",0, 0, 'j'},
     {"manual_alsa_ports", 0, 0, 'm' },
-    {"pass_sysex", 0, 0, 'P'},
     {"show_keys", 0,0,'k'},
     {"osc_port", 1,0,'o'},
     {"key_size", 1,0,'o'},
@@ -60,7 +59,6 @@ bool global_showmidi = false;
 bool global_device_ignore = false;
 int global_device_ignore_num = 0;
 bool global_stats = false;
-bool global_pass_sysex = false;
 Glib::ustring global_filename = "";
 Glib::ustring last_used_dir ="/";
 std::string config_filename = ".seq24rc";
@@ -169,7 +167,6 @@ main (int argc, char *argv[])
                 printf( "    --file <filename> : load midi file on startup\n" );
                 printf( "    --manual_alsa_ports : seq24 won't attach alsa ports\n" );
                 printf( "    --showmidi : dumps incoming midi to screen\n" );
-                printf( "    --pass_sysex : passes any incoming sysex messages to all outputs \n" );
                 printf( "    --show_keys : prints pressed key value\n" );
                 printf( "    --interaction_method <number>: see .seq24rc for methods to use\n" );
                 printf( "    --jack_transport : seq24 will sync to jack transport\n" );
@@ -185,10 +182,6 @@ main (int argc, char *argv[])
 
             case 's':
                 global_showmidi = true;
-                break;
-
-            case 'P':
-                global_pass_sysex = true;
                 break;
 
             case 'k':

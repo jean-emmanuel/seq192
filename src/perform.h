@@ -133,10 +133,6 @@ class perform
     long m_starting_tick;
 
     long m_tick;
-    bool m_usemidiclock;
-    bool m_midiclockrunning; // stopped or started
-    int  m_midiclocktick;
-    int  m_midiclockpos;
 
     bool m_show_ui_sequence_key;
 
@@ -258,8 +254,6 @@ class perform
     midi_control *get_midi_control_toggle( unsigned int a_seq );
     midi_control *get_midi_control_on( unsigned int a_seq );
     midi_control *get_midi_control_off( unsigned int a_seq );
-
-    void handle_midi_control( int a_control, bool a_state );
 
     void set_screen_set_notepad( int a_screen_set, string *a_note );
     string *get_screen_set_notepad( int a_screen_set );

@@ -154,7 +154,6 @@ const int c_perf_scale_x = 32; /*ticks per pixel */
 
 extern bool global_showmidi;
 extern bool global_stats;
-extern bool global_pass_sysex;
 extern bool global_with_jack_transport;
 extern bool global_manual_alsa_ports;
 extern int global_oscport;

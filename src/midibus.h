@@ -43,15 +43,6 @@ const int c_midibus_output_size = 0x100000;
 const int c_midibus_input_size =  0x100000;
 const int c_midibus_sysex_chunk = 0x100;
 
-enum clock_e
-{
-    e_clock_off,
-    e_clock_pos,
-    e_clock_mod
-
-};
-
-
 class midibus
 {
 
@@ -59,10 +50,7 @@ class midibus
 
     int m_id;
 
-    clock_e m_clock_type;
     bool m_inputing;
-
-    static int m_clock_mod;
 
     /* sequencer client handle */
 #if HAVE_LIBASOUND
@@ -137,15 +125,6 @@ class midibus
     void sysex( event *a_e24 );
 
 
-    /* clock */
-    void start();
-    void stop();
-    void clock(  long a_tick );
-    void continue_from( long a_tick );
-    void init_clock( long a_tick );
-    void set_clock( clock_e a_clocking );
-    clock_e get_clock( );
-
     void set_input( bool a_inputing );
     bool get_input( );
 
@@ -160,9 +139,6 @@ class midibus
     int get_client() {  return m_dest_addr_client; };
     int get_port() { return m_dest_addr_port; };
 #endif
-
-    static void set_clock_mod( int a_clock_mod );
-    static int get_clock_mod();
 
 };
 
@@ -188,7 +164,6 @@ class mastermidibus
     bool m_buses_out_init[c_maxBuses];
     bool m_buses_in_init[c_maxBuses];
 
-    clock_e m_init_clock[c_maxBuses];
     bool m_init_input[c_maxBuses];
 
     /* id of queue */
@@ -242,10 +217,6 @@ class mastermidibus
     void start();
     void stop();
 
-    void clock(  long a_tick );
-    void continue_from( long a_tick );
-    void init_clock( long a_tick );
-
     int poll_for_midi( );
     bool is_more_input( );
     bool get_midi_event( event *a_in );
@@ -259,10 +230,6 @@ class mastermidibus
     void port_exit( int a_client, int a_port );
 
     void play( unsigned char a_bus, event *a_e24, unsigned char a_channel );
-
-    void set_clock( unsigned char a_bus, clock_e a_clock_type );
-    clock_e get_clock( unsigned char a_bus );
-
 
     void set_input( unsigned char a_bus, bool a_inputing );
     bool get_input( unsigned char a_bus );

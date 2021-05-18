@@ -47,10 +47,6 @@ perform::perform()
     m_inputing = true;
     m_outputing = true;
     m_tick = 0;
-    m_midiclockrunning = false;
-    m_usemidiclock = false;
-    m_midiclocktick = 0;
-    m_midiclockpos = -1;
 
     thread_trigger_width_ms = c_thread_trigger_width_ms;
 
@@ -1219,7 +1215,6 @@ void perform::inner_stop()
     set_running(false);
     //off_sequences();
     reset_sequences();
-    m_usemidiclock = false;
 }
 
 
@@ -1319,8 +1314,6 @@ void* output_thread_func(void *a_pef )
     /* set our performance */
     perform *p = (perform *) a_pef;
     assert(p);
-
-    struct sched_param *schp = new sched_param;
 
     p->output_func();
 
@@ -1439,8 +1432,6 @@ void perform::output_func()
         bool jack_stopped = false;
         bool dumping = false;
 
-        bool init_clock = true;
-
 #ifdef JACK_SUPPORT
         double jack_ticks_converted = 0.0;
         double jack_ticks_converted_last = 0.0;
@@ -1488,27 +1479,12 @@ void perform::output_func()
             /* get delta ticks, delta_ticks_f is in 1000th of a tick */
             double delta_tick = (double) (bpm * ppqn * (delta_us/60000000.0f));
 
-            if (m_usemidiclock) {
-                delta_tick = m_midiclocktick;
-                m_midiclocktick = 0;
-            }
-            if (0 <= m_midiclockpos) {
-                delta_tick = 0;
-                clock_tick     = m_midiclockpos;
-                current_tick   = m_midiclockpos;
-                total_tick     = m_midiclockpos;
-                m_midiclockpos = -1;
-                //init_clock = true;
-            }
-
             //printf ( "    delta_tick[%lf]\n", delta_tick  );
 #ifdef JACK_SUPPORT
 
             // no init until we get a good lock
 
             if ( m_jack_running ){
-
-                init_clock = false;
 
                 jack_position_t pos;
                 m_jack_transport_state = jack_transport_query( m_jack_client, &pos );
@@ -1543,7 +1519,6 @@ void perform::output_func()
 
                     set_orig_ticks( (long) jack_ticks_converted );
                     current_tick = clock_tick = total_tick = jack_ticks_converted_last = jack_ticks_converted;
-                    init_clock = true;
 
                 }
 
@@ -1648,23 +1623,11 @@ void perform::output_func()
             }
 #endif
 
-            /* init_clock will be true when we run for the first time, or
-             * as soon as jack gets a good lock on playback */
-
-            if (init_clock) {
-                m_master_bus.init_clock( (long)clock_tick );
-                init_clock = false;
-            }
-
             if (dumping) {
 
                 /* play */
                 play( (long) current_tick );
                 //printf( "play[%d]\n", current_tick );
-
-                /* midi clock */
-                m_master_bus.clock( (long) clock_tick );
-
 
                 if ( global_stats ){
 
@@ -1800,7 +1763,6 @@ void perform::output_func()
 
         m_tick = 0;
         m_master_bus.flush();
-        m_master_bus.stop();
     }
 
     pthread_exit(0);
@@ -1814,114 +1776,9 @@ void* input_thread_func(void *a_pef )
     perform *p = (perform *) a_pef;
     assert(p);
 
-
-    struct sched_param *schp = new sched_param;
-
     p->input_func();
 
     return 0;
-}
-
-
-void perform::handle_midi_control( int a_control, bool a_state )
-{
-
-    switch (a_control) {
-
-        case c_midi_control_bpm_up:
-            //printf ( "bpm up\n" );
-            set_bpm( get_bpm() + 1 );
-            break;
-
-        case c_midi_control_bpm_dn:
-            //printf ( "bpm dn\n" );
-            set_bpm( get_bpm() - 1 );
-            break;
-
-        case c_midi_control_ss_up:
-            //printf ( "ss up\n" );
-            set_screenset( get_screenset() + 1 );
-            break;
-
-        case c_midi_control_ss_dn:
-            //printf ( "ss dn\n" );
-            set_screenset( get_screenset() - 1 );
-            break;
-
-        case c_midi_control_mod_replace:
-            //printf ( "replace\n" );
-            if ( a_state )
-                set_sequence_control_status( c_status_replace );
-            else
-                unset_sequence_control_status( c_status_replace );
-            break;
-
-        case c_midi_control_mod_snapshot:
-            //printf ( "snapshot\n" );
-            if ( a_state )
-                set_sequence_control_status( c_status_snapshot );
-            else
-                unset_sequence_control_status( c_status_snapshot );
-            break;
-
-        case c_midi_control_mod_queue:
-            //printf ( "queue\n" );
-            if ( a_state )
-                set_sequence_control_status( c_status_queue );
-            else
-                unset_sequence_control_status( c_status_queue );
-
-            //andy cases
-        case c_midi_control_mod_gmute:
-            printf ( "gmute\n" );
-            if (a_state)
-                set_mode_group_mute();
-            else
-                unset_mode_group_mute();
-            break;
-
-        case c_midi_control_mod_glearn:
-            //printf ( "glearn\n" );
-            if (a_state)
-                set_mode_group_learn();
-            else
-                unset_mode_group_learn();
-            break;
-
-        case c_midi_control_play_ss:
-            //printf ( "play_ss\n" );
-            set_playing_screenset();
-            break;
-
-        /* Here I bind the midi_controls to start, jack relocation and stop */
-        case c_midi_control_playfrombeg:
-            //printf ( "[start playback]" );
-            start_playing();
-            break;
-
-        case c_midi_control_stop:
-            //printf ( "[stop playback]" );
-            stop_playing();
-            break;
-
-        default:
-            if ((a_control >= c_seqs_in_set) && (a_control < c_midi_track_ctrl)) {
-                //printf ( "group mute\n" );
-                select_and_mute_group(a_control - c_seqs_in_set);
-
-            }
-
-            /* Here I introduce a control which allows to switch to a screenset by using its idenfication number */
-            else if ( a_control >= c_midi_control_ss_nb && a_control < c_midi_control_ss_nb+c_max_sets ) {
-                for ( int ss=0; ss<c_max_sets; ss++) {
-                    if ( a_control == c_midi_control_ss_nb+ss )
-                        set_screenset( ss );
-                }
-            }
-            /* end of my mod */
-
-            break;
-    }
 }
 
 
@@ -1936,55 +1793,6 @@ void perform::input_func()
             do {
 
                 if (m_master_bus.get_midi_event(&ev)) {
-
-                    /* start propagation if not already running*/
-                    if (ev.get_status() == EVENT_MIDI_CLOCK)
-                    {
-                        if (m_midiclockrunning)
-                            m_midiclocktick += 8;
-                        else if (m_usemidiclock) {
-                            start();
-                            m_midiclockrunning = true;
-                        }
-                    }
-
-                    /*prapare for MIDI clock usage at song position 0*/
-                    else if (ev.get_status() == EVENT_MIDI_START)
-                    {
-                        if (!m_midiclockrunning) {
-                            m_usemidiclock = true;
-                            m_midiclocktick = 0;
-                            m_midiclockpos = 0;
-                        }
-                    }
-
-                    /*prapare for MIDI clock usage at current song position*/
-                    else if (ev.get_status() == EVENT_MIDI_CONTINUE)
-                    {
-                        if (!m_midiclockrunning) {
-                            m_usemidiclock = true;
-                        }
-                    }
-
-                    /*stop MIDI clock usage*/
-                    else if (ev.get_status() == EVENT_MIDI_STOP)
-                    {
-                        if (m_midiclockrunning) {
-                            m_midiclockrunning = false;
-                            m_usemidiclock = false;
-                            all_notes_off();
-                        }
-                    }
-
-                    /*adjust position if not in MIDI clock run mode*/
-                    else if (ev.get_status() == EVENT_MIDI_SONG_POS)
-                    {
-                        if (!m_midiclockrunning) {
-                            unsigned char a, b;
-                            ev.get_data(&a, &b);
-                            m_midiclockpos = ((unsigned int)a << 7) | b;
-                        }
-                    }
 
                     /* filter system wide messages */
                     if (ev.get_status() <= EVENT_SYSEX) {
@@ -2001,91 +1809,14 @@ void perform::input_func()
                             (m_master_bus.get_sequence())->stream_event(&ev);
                         }
 
-                        /* use it to control our sequencer */
-                        else {
-
-                            for (int i = 0; i < c_midi_controls; i++) {
-
-                                unsigned char data[2] = {0,0};
-                                unsigned char status = ev.get_status();
-
-                                ev.get_data( &data[0], &data[1] );
-
-                                if (get_midi_control_toggle(i)->m_active &&
-                                        status  == get_midi_control_toggle(i)->m_status &&
-                                        data[0] == get_midi_control_toggle(i)->m_data ){
-
-                                    if (data[1] >= get_midi_control_toggle(i)->m_min_value &&
-                                            data[1] <= get_midi_control_toggle(i)->m_max_value ){
-
-                                        if ( i <  c_seqs_in_set )
-                                            sequence_playing_toggle( i + m_offset );
-                                    }
-                                }
-
-                                if ( get_midi_control_on(i)->m_active &&
-                                        status  == get_midi_control_on(i)->m_status &&
-                                        data[0] == get_midi_control_on(i)->m_data ){
-
-                                    if ( data[1] >= get_midi_control_on(i)->m_min_value &&
-                                            data[1] <= get_midi_control_on(i)->m_max_value ){
-
-                                        if ( i <  c_seqs_in_set )
-                                            sequence_playing_on( i  + m_offset);
-                                        else
-                                            handle_midi_control( i, true );
-
-                                    } else if (  get_midi_control_on(i)->m_inverse_active ){
-
-                                        if ( i <  c_seqs_in_set )
-                                            sequence_playing_off(  i + m_offset );
-                                        else
-                                            handle_midi_control( i, false );
-                                    }
-
-                                }
-
-                                if ( get_midi_control_off(i)->m_active &&
-                                        status  == get_midi_control_off(i)->m_status &&
-                                        data[0] == get_midi_control_off(i)->m_data ){
-
-                                    if ( data[1] >= get_midi_control_off(i)->m_min_value &&
-                                            data[1] <= get_midi_control_off(i)->m_max_value ){
-
-                                        if ( i <  c_seqs_in_set )
-                                            sequence_playing_off(  i + m_offset );
-                                        else
-                                            handle_midi_control( i, false );
-
-                                    } else if ( get_midi_control_off(i)->m_inverse_active ){
-
-                                        if ( i <  c_seqs_in_set )
-                                            sequence_playing_on(  i + m_offset );
-                                        else
-                                            handle_midi_control( i, true );
-
-                                    }
-
-                                }
-
-                            }
-                        }
-
                     }
 
-                    if (ev.get_status() == EVENT_SYSEX) {
-
-                        if (global_showmidi)
-                            ev.print();
-
-                        if (global_pass_sysex)
-                            m_master_bus.sysex(&ev);
-                    }
                 }
 
             } while (m_master_bus.is_more_input());
         }
     }
+
     pthread_exit(0);
 }
 

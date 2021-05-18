@@ -11,6 +11,7 @@
 - sequence: fix start/stop keyboard shortcuts
 - main: (seq32) global is_modified flag (warning when quitting with unsaved changes)
 - main: remove option panel
+- midi: remove midi controls, midi clock and sysex passing
 - build: drop windows support
 - build: drop old gtkmm version
 - misc: remove --priority
