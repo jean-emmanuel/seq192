@@ -153,7 +153,6 @@ const int c_names_y = 22;
 const int c_perf_scale_x = 32; /*ticks per pixel */
 
 extern bool global_showmidi;
-extern bool global_priority;
 extern bool global_stats;
 extern bool global_pass_sysex;
 extern bool global_with_jack_transport;

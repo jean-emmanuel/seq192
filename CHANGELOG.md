@@ -13,6 +13,7 @@
 - main: remove option panel
 - build: drop windows support
 - build: drop old gtkmm version
+- misc: remove --priority
 
 ## 0.11.0
 

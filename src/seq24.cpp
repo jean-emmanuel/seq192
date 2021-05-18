@@ -43,7 +43,6 @@ option long_options[] = {
     {"showmidi",     0, 0, 's'},
     {"show_keys",     0, 0, 'k' },
     {"stats",     0, 0, 'S' },
-    {"priority", 0, 0, 'p' },
     {"ignore",required_argument, 0, 'i'},
     {"interaction_method",required_argument, 0, 'x'},
     {"jack_transport",0, 0, 'j'},
@@ -58,7 +57,6 @@ option long_options[] = {
 
 bool global_manual_alsa_ports = false;
 bool global_showmidi = false;
-bool global_priority = false;
 bool global_device_ignore = false;
 int global_device_ignore_num = 0;
 bool global_stats = false;
@@ -171,7 +169,6 @@ main (int argc, char *argv[])
                 printf( "    --file <filename> : load midi file on startup\n" );
                 printf( "    --manual_alsa_ports : seq24 won't attach alsa ports\n" );
                 printf( "    --showmidi : dumps incoming midi to screen\n" );
-                printf( "    --priority : runs higher priority with FIFO scheduler (must be root)\n" );
                 printf( "    --pass_sysex : passes any incoming sysex messages to all outputs \n" );
                 printf( "    --show_keys : prints pressed key value\n" );
                 printf( "    --interaction_method <number>: see .seq24rc for methods to use\n" );
@@ -188,10 +185,6 @@ main (int argc, char *argv[])
 
             case 's':
                 global_showmidi = true;
-                break;
-
-            case 'p':
-                global_priority = true;
                 break;
 
             case 'P':
