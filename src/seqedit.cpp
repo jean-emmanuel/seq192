@@ -765,6 +765,7 @@ seqedit::do_action( int a_action, int a_var )
     m_seqtime_wid->redraw();
     m_seqdata_wid->redraw();
     m_seqevent_wid->redraw();
+    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1012,54 +1013,13 @@ seqedit::fill_top_bar()
     m_hbox2->pack_start( *m_button_sequence , false, false );
     m_hbox2->pack_start( *m_entry_sequence , true, true );
 
-
-
-#if 0
-    /* Select */
-    m_radio_select = manage( new RadioButton( "Sel", true ));
-    m_radio_select->signal_clicked().connect( sigc::bind(mem_fun( *this, &seqedit::mouse_action ), e_action_select ));
-    m_hbox3->pack_start( *m_radio_select, false, false );
-
-    /* Draw */
-    m_radio_draw = manage( new RadioButton( "Draw" ));
-    m_radio_draw->signal_clicked().connect( sigc::bind(mem_fun( *this, &seqedit::mouse_action ), e_action_draw ));
-    m_hbox3->pack_start( *m_radio_draw, false, false );
-
-    /* Grow */
-    m_radio_grow = manage( new RadioButton( "Grow" ));
-    m_radio_grow->signal_clicked().connect( sigc::bind(mem_fun( *this, &seqedit::mouse_action ), e_action_grow ));
-    m_hbox3->pack_start( *m_radio_grow, false, false );
-
-    /* Stretch */
-
-    Gtk::RadioButton::Group g = m_radio_select->get_group();
-    m_radio_draw->set_group(g);
-    m_radio_grow->set_group(g);
-#endif
 }
-
-#if 0
-void
-seqedit::mouse_action( mouse_action_e a_action )
-{
-    if ( a_action == e_action_select && m_radio_select->get_active())
-        printf( "mouse_action() select [%d]\n", a_action );
-
-    if ( a_action == e_action_draw && m_radio_draw->get_active())
-        printf( "mouse_action() draw [%d]\n", a_action );
-
-    if ( a_action == e_action_grow && m_radio_grow->get_active())
-        printf( "mouse_action() grow [%d]\n", a_action );
-}
-#endif
 
 void
 seqedit::popup_menu(Menu *a_menu)
 {
     a_menu->popup(0,0);
 }
-
-
 
 void
 seqedit::popup_midibus_menu()
@@ -1176,6 +1136,9 @@ seqedit::set_background_sequence( int a_seq )
         m_seqroll_wid->set_background_sequence( true, a_seq );
 
     }
+
+    m_seqroll_wid->grab_focus();
+
 }
 
 
@@ -1316,7 +1279,7 @@ seqedit::set_midi_channel( int a_midichannel  )
     }
     m_entry_channel->set_text(name);
     m_seq->set_midi_channel( a_midichannel );
-    // m_mainwid->update_sequence_on_window( m_pos );
+    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1330,6 +1293,7 @@ seqedit::set_midi_bus( int a_midibus )
     }
     mastermidibus *mmb =  m_mainperf->get_master_midi_bus();
     m_entry_bus->set_text( mmb->get_midi_out_bus_name( a_midibus ));
+    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1347,6 +1311,7 @@ seqedit::set_zoom( int a_zoom  )
     m_seqtime_wid->set_zoom( m_zoom );
     m_seqdata_wid->set_zoom( m_zoom );
     m_seqevent_wid->set_zoom( m_zoom );
+    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1363,6 +1328,7 @@ seqedit::set_snap( int a_snap  )
     m_seqroll_wid->set_snap( m_snap );
     m_seqevent_wid->set_snap( m_snap );
     m_seq->set_snap_tick(a_snap);
+    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1377,6 +1343,7 @@ seqedit::set_note_length( int a_note_length  )
     m_note_length = a_note_length;
     m_initial_note_length = a_note_length;
     m_seqroll_wid->set_note_length( m_note_length );
+    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1389,8 +1356,7 @@ seqedit::set_scale( int a_scale )
 
   m_seqroll_wid->set_scale( m_scale );
   m_seqkeys_wid->set_scale( m_scale );
-
-
+  m_seqroll_wid->grab_focus();
 }
 
 void
@@ -1402,7 +1368,7 @@ seqedit::set_key( int a_note )
 
   m_seqroll_wid->set_key( m_key );
   m_seqkeys_wid->set_key( m_key );
-
+  m_seqroll_wid->grab_focus();
 }
 
 
@@ -1466,6 +1432,7 @@ seqedit::measures_change_callback(GdkEventFocus *focus)
     }
 
     set_measures(a_length_measures);
+    m_seqroll_wid->grab_focus();
 
     return true;
 }
@@ -1475,7 +1442,6 @@ seqedit::measures_change_enter_callback()
 {
     GdkEventFocus event = GdkEventFocus();
     this->measures_change_callback(&event);
-    m_seqroll_wid->grab_focus();
 }
 
 void
@@ -1511,7 +1477,7 @@ seqedit::bpm_change_callback(GdkEventFocus *focus)
     }
 
     set_bpm( a_beats_per_measure );
-
+    m_seqroll_wid->grab_focus();
 
     return true;
 }
@@ -1521,7 +1487,6 @@ seqedit::bpm_change_enter_callback()
 {
     GdkEventFocus event = GdkEventFocus();
     this->bpm_change_callback(&event);
-    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1555,7 +1520,7 @@ seqedit::name_change_callback( GdkEventFocus *focus  )
 {
     m_seq->set_name( m_entry_name->get_text());
     global_is_modified = true;
-    // m_mainwid->update_sequence_on_window( m_pos );
+    m_seqroll_wid->grab_focus();
     return true;
 }
 
@@ -1563,8 +1528,7 @@ void
 seqedit::name_change_enter_callback( )
 {
     GdkEventFocus event = GdkEventFocus();
-    this->measures_change_callback(&event);
-    m_seqroll_wid->grab_focus();
+    this->name_change_callback(&event);
 }
 
 
@@ -1572,7 +1536,7 @@ void
 seqedit::play_change_callback()
 {
     m_seq->set_playing( m_toggle_play->get_active() );
-    // m_mainwid->update_sequence_on_window( m_pos );
+    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1581,6 +1545,7 @@ seqedit::record_change_callback()
 {
     m_mainperf->get_master_midi_bus()->set_sequence_input( true, m_seq );
     m_seq->set_recording( m_toggle_record->get_active() );
+    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1588,6 +1553,7 @@ void
 seqedit::q_rec_change_callback()
 {
     m_seq->set_quanized_rec( m_toggle_q_rec->get_active() );
+    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1601,6 +1567,7 @@ seqedit::undo_callback()
     m_seqdata_wid->redraw();
     m_seqevent_wid->redraw();
     m_seq->set_dirty();
+    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1614,6 +1581,7 @@ seqedit::redo_callback()
     m_seqdata_wid->redraw();
     m_seqevent_wid->redraw();
     m_seq->set_dirty();
+    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1622,6 +1590,7 @@ seqedit::thru_change_callback()
 {
     m_mainperf->get_master_midi_bus()->set_sequence_input( true, m_seq );
     m_seq->set_thru( m_toggle_thru->get_active() );
+    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1675,6 +1644,8 @@ seqedit::set_data_type( unsigned char a_status, unsigned char a_control  )
     snprintf(text, sizeof(text), "%s %s", hex, type );
 
     m_entry_data->set_text( text );
+    m_seqroll_wid->grab_focus();
+
 }
 
 
