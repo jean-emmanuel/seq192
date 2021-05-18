@@ -215,9 +215,6 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                 /* set the members in event */
                 e.set_status (status);
 
-                // ORL rajoute ici le BITWISE AND pour le truc cu channelless
-                //fprintf(stderr,"status %d | 0xF0 %d | status & 0xF0 %d\n",status,0xF0,status & 0xF0);
-
                 RunningTime += Delta;
                 /* current time is ppqn according to the file,
                    we have to adjust it to our own ppqn.

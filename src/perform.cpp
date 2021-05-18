@@ -2044,13 +2044,7 @@ void perform::input_func()
                                 unsigned char data[2] = {0,0};
                                 unsigned char status = ev.get_status();
 
-                                // ORL test
-//                                fprintf(stderr,"Status: %i\n",status);
-                                // ORL
                                 ev.get_data( &data[0], &data[1] );
-                                // ORL test
-  //                              fprintf(stderr,"Status: %i - %i\n",data[0], data[1]);
-                                // ORL
 
                                 if (get_midi_control_toggle(i)->m_active &&
                                         status  == get_midi_control_toggle(i)->m_status &&

@@ -1457,10 +1457,7 @@ mastermidibus::get_midi_event( event *a_in )
     }
 
     a_in->set_timestamp( ev->time.tick );
-    // ORL qui fait des trucs
-    a_in->set_status_midibus( buffer[0] );
-    //fprintf(stderr,"midibus.cpp buffer[0] %d\n",buffer[0]);
-    // ORL
+    a_in->set_status_midibus( buffer[0] );     // keep channel bit
     a_in->set_size( bytes );
 
     /* we will only get EVENT_SYSEX on the first

@@ -68,36 +68,18 @@ event::set_status( const char a_status  )
    /* bitwise AND to clear the channel portion of the status */
     if ( (unsigned char) a_status >= 0xF0 ){
       m_status = (char) a_status;
-//      fprintf(stderr, ">=0xF0 m_status: %i | a_status: %i\n",m_status, a_status);
     }
     else
     {
-//ORL fait de la merde
-  //    fprintf(stderr,"a_status: %i| uc a_status %i \n",a_status, (unsigned char) a_status);
       m_status = (char) (a_status & EVENT_CLEAR_CHAN_MASK);
-  //    m_status = (unsigned char) a_status;
-//      fprintf(stderr, "<0xF0 m_status: %i | a_status: %i | EVENT_CLEAR_CHAN_MASK: %i\n",m_status,a_status,EVENT_CLEAR_CHAN_MASK);
-// ORL a fini
     }
 }
 
 void
 event::set_status_midibus( const char a_status  )
 {
-   /* bitwise AND to clear the channel portion of the status */
-    if ( (unsigned char) a_status >= 0xF0 ){
-      m_status = (char) a_status;
-//      fprintf(stderr, ">=0xF0 m_status: %i | a_status: %i\n",m_status, a_status);
-    }
-    else
-    {
-//ORL fait de la merde
-  //    fprintf(stderr,"a_status: %i| uc a_status %i \n",a_status, (unsigned char) a_status);
-//      m_status = (char) (a_status & EVENT_CLEAR_CHAN_MASK);
-      m_status = (unsigned char) a_status;
-//      fprintf(stderr, "<0xF0 m_status: %i | a_status: %i | EVENT_CLEAR_CHAN_MASK: %i\n",m_status,a_status,EVENT_CLEAR_CHAN_MASK);
-// ORL a fini
-    }
+    /* keep the channel portion of the status */
+    m_status = (char) a_status;
 }
 
 void
@@ -110,8 +92,6 @@ void
 event::set_data( char a_D1  )
 {
     m_data[0] = a_D1 & 0x7F;
-    //ORL
-    //fprintf(stderr,"m_data[0] %d | a_D1 %d | 0x7F %d | a_D1 & 0x7F %d\n",m_data[0],a_D1,0x7F,a_D1 & 0x7F);
 }
 
 void
@@ -119,9 +99,6 @@ event::set_data( char a_D1, char a_D2 )
 {
     m_data[0] = a_D1 & 0x7F;
     m_data[1] = a_D2 & 0x7F;
-    // ORL
-    //fprintf(stderr,"m_data[0] / [1] %d / %d | a_D1 / D2 %d / %d | 0x7F %d | a_D1 / D2 & 0x7F %d / %d\n",m_data[0],m_data[1],a_D1,a_D2,0x7F,a_D1 & 0x7F,a_D2 & 0x7F);
-
 }
 
 void
