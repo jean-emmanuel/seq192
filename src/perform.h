@@ -177,7 +177,6 @@ class perform
 #endif
 
     bool m_jack_running;
-    bool m_jack_master;
 
     void inner_start();
     void inner_stop();

@@ -159,7 +159,6 @@ perform::perform()
     m_screen_set = 0;
 
     m_jack_running = false;
-    m_jack_master = false;
 
     m_out_thread_launched = false;
     m_in_thread_launched = false;
@@ -426,7 +425,6 @@ void perform::init_jack()
     if ( global_with_jack_transport  && !m_jack_running){
 
         m_jack_running = true;
-        m_jack_master = true;
 
         //printf ( "init_jack() m_jack_running[%d]\n", m_jack_running );
 
@@ -447,21 +445,6 @@ void perform::init_jack()
             jack_set_sync_callback(m_jack_client, jack_sync_callback,
                     (void *) this );
 
-            /* true if we want to fail if there is already a master */
-            bool cond = global_with_jack_master_cond;
-
-            if ( global_with_jack_master &&
-                    jack_set_timebase_callback(m_jack_client, cond,
-                        jack_timebase_callback, this) == 0){
-
-                printf("[JACK transport master]\n");
-                m_jack_master = true;
-            }
-            else {
-                printf("[JACK transport slave]\n");
-                m_jack_master = false;
-
-            }
             if (jack_activate(m_jack_client)) {
                 printf("Cannot register as JACK client\n");
                 m_jack_running = false;
@@ -483,7 +466,6 @@ void perform::deinit_jack()
         //printf ( "deinit_jack() m_jack_running[%d]\n", m_jack_running );
 
         m_jack_running = false;
-        m_jack_master = false;
 
         if ( jack_release_timebase(m_jack_client)){
             printf("Cannot release Timebase.\n");

@@ -352,20 +352,6 @@ simple interface.
         --jack_transport : seq24 will sync to JACK transport
                            if the JACK server is available.
 
-        --jack_master : seq24 will try to be JACK master
-
-        --jack_master_cond : The attempt to be JACK master will
-                             fail if there is already a master,
-                             otherwise it will just take over.
-
-        --jack_start_mode <x> : When seq24 is synced to JACK,
-                                The playback command comes
-                                from the JACK server.  seq24 will
-                                play in performance mode
-                                by default (section [3d]).
-                                If you want live mode, set
-                                --jack_start_mode 0.
-
         It is best to run seq24 with another master like ardour.  You
         can not change the BPM of seq24 while rolling in JACK sync mode.
 

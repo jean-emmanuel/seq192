@@ -361,27 +361,6 @@ options::options (Gtk::Window & parent, perform * a_p):
                  check));
     vbox2->pack_start (*check, false, false);
 
-    check = manage (new CheckButton ("Transport Master"));
-    check->set_active (global_with_jack_master);
-    check->set_tooltip_text("Seq24 will attempt to serve as JACK Master.");
-    check->signal_toggled ().
-        connect (bind
-                (mem_fun (*this, &options::transport_callback), e_jack_master,
-                 check));
-
-    vbox2->pack_start (*check, false, false);
-
-    check = manage (new CheckButton ("Master Conditional"));
-    check->set_active (global_with_jack_master_cond);
-    check->set_tooltip_text("Seq24 will fail to be master if there is already a master set.");
-    check->signal_toggled ().
-        connect (bind
-                (mem_fun (*this, &options::transport_callback), e_jack_master_cond,
-                 check));
-
-    vbox2->pack_start (*check, false, false);
-
-
     Gtk::Button * button = manage (new Button ("Connect"));
     button->set_tooltip_text("Connect to Jack.");
     button->signal_clicked().connect(bind(mem_fun(*this,
@@ -472,18 +451,6 @@ options::transport_callback (button a_type, Button * a_check)
         case e_jack_transport:
             {
                 global_with_jack_transport = check->get_active ();
-            }
-            break;
-
-        case e_jack_master:
-            {
-                global_with_jack_master = check->get_active ();
-            }
-            break;
-
-        case e_jack_master_cond:
-            {
-                global_with_jack_master_cond = check->get_active ();
             }
             break;
 

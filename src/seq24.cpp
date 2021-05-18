@@ -47,8 +47,6 @@ option long_options[] = {
     {"ignore",required_argument, 0, 'i'},
     {"interaction_method",required_argument, 0, 'x'},
     {"jack_transport",0, 0, 'j'},
-    {"jack_master",0, 0, 'J'},
-    {"jack_master_cond",0,0,'C'},
     {"manual_alsa_ports", 0, 0, 'm' },
     {"pass_sysex", 0, 0, 'P'},
     {"show_keys", 0,0,'k'},
@@ -73,8 +71,6 @@ bool global_print_keys = false;
 interaction_method_e global_interactionmethod = e_seq24_interaction;
 
 bool global_with_jack_transport = false;
-bool global_with_jack_master = false;
-bool global_with_jack_master_cond = false;
 
 int global_oscport = 0;
 
@@ -180,8 +176,6 @@ main (int argc, char *argv[])
                 printf( "    --show_keys : prints pressed key value\n" );
                 printf( "    --interaction_method <number>: see .seq24rc for methods to use\n" );
                 printf( "    --jack_transport : seq24 will sync to jack transport\n" );
-                printf( "    --jack_master : seq24 will try to be jack master\n" );
-                printf( "    --jack_master_cond : jack master will fail if there is already a master\n" );
                 printf( "    --osc_port : osc input port\n" );
                 printf( "\n\n\n" );
 
@@ -210,14 +204,6 @@ main (int argc, char *argv[])
 
             case 'j':
                 global_with_jack_transport = true;
-                break;
-
-            case 'J':
-                global_with_jack_master = true;
-                break;
-
-            case 'C':
-                global_with_jack_master_cond = true;
                 break;
 
             case 'm':

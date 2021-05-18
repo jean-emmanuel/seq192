@@ -72,8 +72,6 @@ class options : public Gtk::Dialog
 
     enum button {
         e_jack_transport,
-        e_jack_master,
-        e_jack_master_cond,
 
         e_jack_connect,
         e_jack_disconnect
