@@ -63,7 +63,7 @@ interaction_method_e global_interactionmethod = e_seq24_interaction;
 
 bool global_with_jack_transport = false;
 
-int global_oscport = 0;
+char* global_oscport;
 
 user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];
 user_instrument_definition global_user_instrument_definitions[c_max_instruments];
@@ -155,7 +155,7 @@ main (int argc, char *argv[])
                 printf( "    --show_keys : prints pressed key value\n" );
                 printf( "    --interaction_method <number>: see .seq24rc for methods to use\n" );
                 printf( "    --jack_transport : seq24 will sync to jack transport\n" );
-                printf( "    --osc_port : osc input port\n" );
+                printf( "    --osc_port : osc input port (udp port number or unix socket path)\n" );
                 printf( "\n\n\n" );
 
                 return 0;
@@ -192,7 +192,7 @@ main (int argc, char *argv[])
                 break;
 
             case 'o':
-                global_oscport = atoi( optarg );
+                global_oscport = optarg;
                 break;
 
             default:

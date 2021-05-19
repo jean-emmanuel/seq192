@@ -1,5 +1,5 @@
-#ifndef __OSC_H
-#define __OSC_H
+#ifndef SEQ24_OSC
+#define SEQ24_OSC
 
 #include <lo/lo.h>
 #include <string>
@@ -11,10 +11,11 @@ class OSCServer
 
 public:
 
-    OSCServer(const int port);
+    OSCServer(const char* port);
     ~OSCServer();
 
-    int _port;
+    int protocol;
+
 
     void start();
     void stop();
