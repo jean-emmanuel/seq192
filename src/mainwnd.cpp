@@ -233,8 +233,6 @@ mainwnd::mainwnd(perform *a_p)
     m_timeout_connect = Glib::signal_timeout().connect(
             mem_fun(*this, &mainwnd::timer_callback), 25);
 
-    global_is_modified = false;
-
 }
 
 
@@ -718,7 +716,6 @@ mainwnd::adj_callback_ss( )
     m_main_wid->set_screenset( m_mainperf->get_screenset());
     m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                 m_mainperf->get_screenset()));
-    global_is_modified = true;
 }
 
 
@@ -726,7 +723,6 @@ void
 mainwnd::adj_callback_bpm( )
 {
     m_mainperf->set_bpm( (int) m_adjust_bpm->get_value());
-    global_is_modified = true;
 }
 
 void

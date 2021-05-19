@@ -578,8 +578,11 @@ void perform::set_bpm(int a_bpm)
 {
     if ( a_bpm < 20 )  a_bpm = 20;
     if ( a_bpm > 500 ) a_bpm = 500;
-
-    m_master_bus.set_bpm( a_bpm );
+    if (a_bpm != get_bpm())
+    {
+        m_master_bus.set_bpm( a_bpm );
+        global_is_modified = true;
+    }
 }
 
 
