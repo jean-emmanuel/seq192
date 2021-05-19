@@ -103,6 +103,12 @@ sequence::push_undo(bool a_hold)
         m_list_undo.push( m_list_event );
     unlock();
     set_have_undo();
+    if (m_have_redo) {
+        while (!m_list_redo.empty()) {
+            m_list_redo.pop();
+        }
+        set_have_redo();
+    }
 }
 
 void
