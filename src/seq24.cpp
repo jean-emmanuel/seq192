@@ -25,9 +25,6 @@
 #include "config.h"
 
 #include "font.h"
-#ifdef LASH_SUPPORT
-#    include "lash.h"
-#endif
 #include "mainwnd.h"
 #include "midifile.h"
 #include "optionsfile.h"
@@ -73,10 +70,6 @@ user_instrument_definition global_user_instrument_definitions[c_max_instruments]
 
 font *p_font_renderer;
 
-#ifdef LASH_SUPPORT
-lash *lash_driver = NULL;
-#endif
-
 #define HOME "HOME"
 #define SLASH "/"
 
@@ -94,11 +87,6 @@ main (int argc, char *argv[])
         for ( int j=0; j<128; j++ )
             global_user_instrument_definitions[i].controllers_active[j] = false;
     }
-
-	/* init the lash driver (strips lash specific cmdline arguments */
-#ifdef LASH_SUPPORT
-	lash_driver = new lash(&argc, &argv);
-#endif
 
     /* the main performance object */
     perform p;
@@ -229,9 +217,6 @@ main (int argc, char *argv[])
 
     mainwnd seq24_window( &p );
 
-#ifdef LASH_SUPPORT
-	lash_driver->start( &p );
-#endif
     kit.run(seq24_window);
 
     p.deinit_jack();
@@ -256,10 +241,6 @@ main (int argc, char *argv[])
 
         printf( "Error calling getenv( \"%s\" )\n", HOME );
     }
-
-#ifdef LASH_SUPPORT
-	delete lash_driver;
-#endif
 
     return 0;
 }

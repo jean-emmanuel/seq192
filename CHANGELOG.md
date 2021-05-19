@@ -16,8 +16,9 @@
 - build: drop windows support
 - build: drop old gtkmm version
 - misc: remove --priority
+- misc: remove lash support
 - userfile: apply user bus/channel/control definitions
-- sequence: display user channel definition 
+- sequence: display user channel definition
 
 ## 0.11.0
 

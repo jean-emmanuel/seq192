@@ -11,7 +11,6 @@ seq24_SOURCES = \
 	event.cpp event.h \
 	font.cpp font.h \
 	globals.h \
-	lash.cpp lash.h \
 	maintime.cpp maintime.h \
 	mainwid.cpp mainwid.h \
 	mainwnd.cpp mainwnd.h \
