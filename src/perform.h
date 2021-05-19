@@ -80,8 +80,6 @@ class perform
     bool m_outputing;
     bool m_looping;
 
-    int thread_trigger_width_ms;
-
     long m_tick;
 
     void set_running( bool a_running );
@@ -104,13 +102,6 @@ class perform
 #ifdef JACK_SUPPORT
 
     jack_client_t *m_jack_client;
-    jack_nframes_t m_jack_frame_current,
-                   m_jack_frame_last,
-                   m_jack_frame_rate;
-    jack_position_t m_jack_pos;
-    jack_transport_state_t m_jack_transport_state;
-    jack_transport_state_t m_jack_transport_state_last;
-    double m_jack_tick;
     double m_jack_bpm;
 
 #endif
@@ -122,7 +113,6 @@ class perform
 
  public:
     bool is_running();
-    bool is_learn_mode() const { return m_mode_group_learn; }
 
     unsigned int m_key_bpm_up;
     unsigned int m_key_bpm_dn;
@@ -267,8 +257,7 @@ class perform
 
     friend int jack_process_callback(jack_nframes_t nframes, void* arg);
     friend void jack_shutdown(void *arg);
-    friend void jack_timebase_callback(jack_transport_state_t state, jack_nframes_t nframes,
-                                       jack_position_t *pos, int new_pos, void *arg);
+
 #endif
 };
 
@@ -281,10 +270,8 @@ extern void *input_thread_func(void *a_p);
 #ifdef JACK_SUPPORT
 
 int jack_process_callback(jack_nframes_t nframes, void* arg);
-void print_jack_pos( jack_position_t* jack_pos );
 void jack_shutdown(void *arg);
-void jack_timebase_callback(jack_transport_state_t state, jack_nframes_t nframes,
-                            jack_position_t *pos, int new_pos, void *arg);
+
 #endif
 
 

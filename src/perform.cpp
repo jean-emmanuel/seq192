@@ -46,8 +46,6 @@ perform::perform()
     m_outputing = true;
     m_tick = 0;
 
-    thread_trigger_width_ms = c_thread_trigger_width_ms;
-
     m_key_start  = GDK_space;
     m_key_stop   = GDK_Escape;
 
@@ -63,7 +61,10 @@ void
 perform::start_playing()
 {
     inner_stop();
-    // usleep(c_thread_trigger_width_ms * 1000);
+
+    if (!m_jack_running) {
+        usleep(1000);
+    }
 
     position_jack();
     start_jack();
@@ -322,7 +323,9 @@ void perform::init_jack()
 
         do
         {
-            /* become a new client of the JACK server */
+            // register as a jack client
+            // only to retreive transport state changes and time
+
             m_jack_client = jack_client_open(PACKAGE, JackNullOption, NULL );
 
             if (m_jack_client == 0)
@@ -331,30 +334,8 @@ void perform::init_jack()
                 m_jack_running = false;
                 break;
             }
-            else
-                m_jack_frame_rate = jack_get_sample_rate( m_jack_client );
-
-            /*
-                The call to jack_timebase_callback() to supply jack with BBT, etc would
-                occasionally fail when the *pos information had zero or some garbage in
-                the pos.frame_rate variable. This would occur when there was a rapid change
-                of frame position by another client... i.e. qjackctl.
-                From the jack API:
-
-                "   pos	address of the position structure for the next cycle;
-                    pos->frame will be its frame number. If new_pos is FALSE,
-                    this structure contains extended position information from the current cycle.
-                    If TRUE, it contains whatever was set by the requester.
-                    The timebase_callback's task is to update the extended information here."
-
-                The "If TRUE" line seems to be the issue. It seems that qjackctl does not
-                always set pos.frame_rate so we get garbage and some strange BBT calculations
-                that display in qjackctl. So we need to set it here and just use m_jack_frame_rate
-                for calculations instead of pos.frame_rate.
-            */
 
             jack_on_shutdown( m_jack_client, jack_shutdown,(void *) this );
-
             jack_set_process_callback(m_jack_client, jack_process_callback, (void *) this);
 
             if (jack_activate(m_jack_client))
@@ -756,51 +737,6 @@ void perform::position_jack()
     if ( m_jack_running ){
         jack_transport_locate( m_jack_client, 0 );
     }
-    return;
-
-
-    jack_nframes_t rate = jack_get_sample_rate( m_jack_client ) ;
-
-    long current_tick = 0;
-
-    jack_position_t pos;
-
-    pos.valid = JackPositionBBT;
-    pos.beats_per_bar = 4;
-    pos.beat_type = 4;
-    pos.ticks_per_beat = c_ppqn * 10;
-    pos.beats_per_minute =  m_master_bus.get_bpm();
-
-    /* Compute BBT info from frame number.  This is relatively
-     * simple here, but would become complex if we supported tempo
-     * or time signature changes at specific locations in the
-     * transport timeline. */
-
-    current_tick *= 10;
-
-    pos.bar = (int32_t) (current_tick / (long) pos.ticks_per_beat
-            / pos.beats_per_bar);
-    pos.beat = (int32_t) ((current_tick / (long) pos.ticks_per_beat) % 4);
-    pos.tick = (int32_t) (current_tick % (c_ppqn * 10));
-
-    pos.bar_start_tick = pos.bar * pos.beats_per_bar * pos.ticks_per_beat;
-    pos.frame_rate = rate;
-    pos.frame = (jack_nframes_t) ( (current_tick * rate * 60.0)
-            / (pos.ticks_per_beat * pos.beats_per_minute) );
-
-    /*
-       ticks * 10 = jack ticks;
-       jack ticks / ticks per beat = num beats;
-       num beats / beats per minute = num minutes
-       num minutes * 60 = num seconds
-       num secords * frame_rate  = frame */
-
-    pos.bar++;
-    pos.beat++;
-
-    //printf( "position bbb[%d:%d:%4d]\n", pos.bar, pos.beat, pos.tick );
-
-    jack_transport_reposition( m_jack_client, &pos );
 
 #endif
 }
@@ -977,230 +913,66 @@ void perform::output_func()
 
         m_condition_var.unlock();
 
-        /* begning time */
-        struct timespec last;
-        /* current time */
-        struct timespec current;
+        // system time
+        struct timespec system_time;
 
-        struct timespec stats_loop_start;
-        struct timespec stats_loop_finish;
+        // loop timeout: 0.1ms
+        struct timespec ts = {
+            .tv_sec = 0,
+            .tv_nsec = 100000
+        };
 
+        long long last_time;
+        long long delta_time;
 
-        /* difference between last and current */
-        struct timespec delta;
-
-
-        /* tick and tick fraction */
-        double current_tick   = 0.0;
-        double total_tick   = 0.0;
-        double clock_tick = 0.0;
-
-        long stats_total_tick = 0;
-
-        long stats_loop_index = 0;
-        long stats_min = 0x7FFFFFFF;
-        long stats_max = 0;
-        long stats_avg = 0;
-        long stats_last_clock_us = 0;
-        long stats_clock_width_us = 0;
-
-        long stats_all[100];
-        long stats_clock[100];
-
-        bool jack_stopped = false;
-        bool dumping = false;
-
-        for( int i=0; i<100; i++ ){
-            stats_all[i] = 0;
-            stats_clock[i] = 0;
+        if (m_jack_running) {
+#ifdef JACK_SUPPORT
+            last_time = jack_get_time();
+#endif
+        } else {
+            clock_gettime(CLOCK_REALTIME, &system_time);
+            last_time = (system_time.tv_sec * 1000000) + (system_time.tv_nsec / 1000);
         }
 
         int ppqn = m_master_bus.get_ppqn();
-        /* get start time position */
-        clock_gettime(CLOCK_REALTIME, &last);
-
-        if ( global_stats )
-            stats_last_clock_us= (last.tv_sec * 1000000) + (last.tv_nsec / 1000);
+        long current_tick = 0;
 
         while( m_running ){
 
-            /************************************
-
-              Get delta time ( current - last )
-              Get delta ticks from time
-              Add to current_ticks
-              Compute prebuffer ticks
-              play from current tick to prebuffer
-
-             **************************************/
-
-            if ( global_stats ){
-                clock_gettime(CLOCK_REALTIME, &stats_loop_start);
-            }
-
-
-            /* delta time */
-            clock_gettime(CLOCK_REALTIME, &current);
-            delta.tv_sec  =  (current.tv_sec  - last.tv_sec  );
-            delta.tv_nsec =  (current.tv_nsec - last.tv_nsec );
-            long delta_us = (delta.tv_sec * 1000000) + (delta.tv_nsec / 1000);
-
-            /* delta time to ticks */
-
-            /* bpm */
+            // bpm
             double bpm;
             if (m_jack_running && m_jack_bpm > 0.1) {
+                // jack transport
                 bpm = m_jack_bpm;
             } else {
+                // or file
                 bpm = m_master_bus.get_bpm();
             }
-            // printf( "bpm: %f\n", bpm );
 
-            /* get delta ticks, delta_ticks_f is in 1000th of a tick */
-            double delta_tick = (double) (bpm * ppqn * (delta_us/60000000.0f));
-
-            clock_tick     += delta_tick;
-            current_tick   += delta_tick;
-            total_tick     += delta_tick;
-
-            dumping = true;
-
-            if (dumping) {
-
-                /* play */
-                play( (long) current_tick );
-                //printf( "play[%d]\n", current_tick );
-
-                if ( global_stats ){
-
-                    while ( stats_total_tick <= total_tick ){
-
-                        /* was there a tick ? */
-                        if ( stats_total_tick % (c_ppqn / 24) == 0 ){
-
-                            long current_us = (current.tv_sec * 1000000) + (current.tv_nsec / 1000);
-
-                            stats_clock_width_us = current_us - stats_last_clock_us;
-                            stats_last_clock_us = current_us;
-
-                            int index = stats_clock_width_us / 300;
-                            if ( index >= 100 ) index = 99;
-                            stats_clock[index]++;
-
-                        }
-                        stats_total_tick++;
-                    }
-                }
+            // delta time
+            if (m_jack_running) {
+                // jack
+#ifdef JACK_SUPPORT
+                delta_time = jack_get_time() - last_time;
+#endif
+            } else {
+                // or system
+                clock_gettime(CLOCK_REALTIME, &system_time);
+                delta_time = ((system_time.tv_sec * 1000000) + (system_time.tv_nsec / 1000)) - last_time;
             }
 
-            /***********************************
+            // delta time to ticks
+            double tick_duration = 1000000 * 60. / bpm / ppqn;
+            int ticks = (int)(delta_time / tick_duration);
+            current_tick += ticks;
 
-              Figure out how much time
-              we need to sleep, and do it
+            // increment time
+            last_time += ticks * tick_duration;
 
-             ************************************/
+            // play sequences at current tick
+            play(current_tick);
 
-            /* set last */
-            last = current;
-
-            clock_gettime(CLOCK_REALTIME, &current);
-            delta.tv_sec  =  (current.tv_sec  - last.tv_sec  );
-            delta.tv_nsec =  (current.tv_nsec - last.tv_nsec );
-            long elapsed_us = (delta.tv_sec * 1000000) + (delta.tv_nsec / 1000);
-            //printf( "elapsed_us[%ld]\n", elapsed_us );
-
-            /* now, we want to trigger every c_thread_trigger_width_ms,
-               and it took us delta_us to play() */
-
-            delta_us = (c_thread_trigger_width_ms * 1000) - elapsed_us;
-            //printf( "sleeping_us[%ld]\n", delta_us );
-
-
-            /* check midi clock adjustment */
-
-            double next_total_tick = (total_tick + (c_ppqn / 24.0));
-            double next_clock_delta   = (next_total_tick - total_tick - 1);
-
-
-            double next_clock_delta_us =  (( next_clock_delta ) * 60000000.0f / c_ppqn  / bpm );
-
-            if ( next_clock_delta_us < (c_thread_trigger_width_ms * 1000.0f * 2.0f) ){
-                delta_us = (long)next_clock_delta_us;
-            }
-
-            if ( delta_us > 0.0 ){
-
-                delta.tv_sec =  (delta_us / 1000000);
-                delta.tv_nsec = (delta_us % 1000000) * 1000;
-
-                //printf("sleeping() ");
-                nanosleep( &delta, NULL );
-
-            }
-
-            else {
-
-                if ( global_stats )
-                    printf ("underrun\n" );
-            }
-
-            if ( global_stats ){
-                clock_gettime(CLOCK_REALTIME, &stats_loop_finish);
-            }
-
-            if ( global_stats ){
-
-                delta.tv_sec  =  (stats_loop_finish.tv_sec  - stats_loop_start.tv_sec  );
-                delta.tv_nsec =  (stats_loop_finish.tv_nsec - stats_loop_start.tv_nsec );
-                long delta_us = (delta.tv_sec * 1000000) + (delta.tv_nsec / 1000);
-
-                int index = delta_us / 100;
-                if ( index >= 100  ) index = 99;
-
-                stats_all[index]++;
-
-                if ( delta_us > stats_max )
-                    stats_max = delta_us;
-                if ( delta_us < stats_min )
-                    stats_min = delta_us;
-
-                stats_avg += delta_us;
-                stats_loop_index++;
-
-                if ( stats_loop_index > 200 ){
-
-                    stats_loop_index = 0;
-                    stats_avg /= 200;
-
-                    printf("stats_avg[%ld]us stats_min[%ld]us"
-                            " stats_max[%ld]us\n", stats_avg,
-                            stats_min, stats_max);
-
-                    stats_min = 0x7FFFFFFF;
-                    stats_max = 0;
-                    stats_avg = 0;
-                }
-            }
-
-            if (jack_stopped)
-                inner_stop();
-        }
-
-
-        if (global_stats){
-
-            printf("\n\n-- trigger width --\n");
-            for (int i=0; i<100; i++ ){
-                printf( "[%3d][%8ld]\n", i * 100, stats_all[i] );
-            }
-            printf("\n\n-- clock width --\n" );
-            int bpm  = m_master_bus.get_bpm();
-
-            printf("optimal: [%d]us\n", ((c_ppqn / 24)* 60000000 / c_ppqn / bpm));
-
-            for ( int i=0; i<100; i++ ){
-                printf( "[%3d][%8ld]\n", i * 300, stats_clock[i] );
-            }
+            nanosleep(&ts, NULL);
         }
 
         m_tick = 0;
@@ -1297,23 +1069,5 @@ void jack_shutdown(void *arg)
 
     printf("JACK shut down.\nJACK sync Disabled.\n");
 }
-
-
-void print_jack_pos( jack_position_t* jack_pos ){
-
-    return;
-    printf( "print_jack_pos()\n" );
-    printf( "    bar  [%d]\n", jack_pos->bar  );
-    printf( "    beat [%d]\n", jack_pos->beat );
-    printf( "    tick [%d]\n", jack_pos->tick );
-    printf( "    bar_start_tick   [%lf]\n", jack_pos->bar_start_tick );
-    printf( "    beats_per_bar    [%f]\n", jack_pos->beats_per_bar );
-    printf( "    beat_type        [%f]\n", jack_pos->beat_type );
-    printf( "    ticks_per_beat   [%lf]\n", jack_pos->ticks_per_beat );
-    printf( "    beats_per_minute [%lf]\n", jack_pos->beats_per_minute );
-    printf( "    frame_time       [%lf]\n", jack_pos->frame_time );
-    printf( "    next_time        [%lf]\n", jack_pos->next_time );
-}
-
 
 #endif

@@ -56,12 +56,6 @@ const int c_maxBuses = 32;
 
 const int c_note_off_margin = 2;  // # ticks to shave off end of painted notes
 
-/* trigger width in milliseconds */
-// PLAGIAT: divide by two
-const int c_thread_trigger_width_ms = 2;
-const int c_thread_trigger_lookahead_ms = 1;
-// PLAGIAT done
-
 /* for the seqarea class */
 const int c_text_x = 6;
 const int c_text_y = 12;
