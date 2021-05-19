@@ -572,10 +572,10 @@ bool perform::is_running()
     return m_running;
 }
 
-void perform::set_bpm(int a_bpm)
+void perform::set_bpm(double a_bpm)
 {
-    if ( a_bpm < 20 )  a_bpm = 20;
-    if ( a_bpm > 500 ) a_bpm = 500;
+    if ( a_bpm < c_bpm_minimum ) a_bpm = c_bpm_minimum;
+    if ( a_bpm > c_bpm_maximum ) a_bpm = c_bpm_maximum;
     if (a_bpm != get_bpm())
     {
         m_master_bus.set_bpm( a_bpm );
@@ -584,7 +584,7 @@ void perform::set_bpm(int a_bpm)
 }
 
 
-int  perform::get_bpm( )
+double  perform::get_bpm( )
 {
     return  m_master_bus.get_bpm( );
 }

@@ -155,7 +155,7 @@ class mastermidibus
     int m_queue;
 
     int m_ppqn;
-    int m_bpm;
+    double m_bpm;
 
     int  m_num_poll_descriptors;
     struct pollfd *m_poll_descriptors;
@@ -183,9 +183,9 @@ class mastermidibus
     int get_num_out_buses();
     int get_num_in_buses();
 
-    void set_bpm(int a_bpm);
+    void set_bpm(double a_bpm);
     void set_ppqn(int a_ppqn);
-    int get_bpm(){ return m_bpm;}
+    double get_bpm(){ return m_bpm;}
     int get_ppqn(){ return m_ppqn;}
 
     string get_midi_out_bus_name( int a_bus );

@@ -193,8 +193,8 @@ class perform
 
     void reset_sequences();
 
-    void set_bpm(int a_bpm);
-    int  get_bpm( );
+    void set_bpm(double a_bpm);
+    double  get_bpm( );
 
     mastermidibus* get_master_midi_bus( );
 

@@ -100,10 +100,11 @@ mainwnd::mainwnd(perform *a_p)
     hbox->pack_start(*m_button_play, false, false);
 
     /* bpm spin button */
-    m_adjust_bpm = manage(new Adjustment(m_mainperf->get_bpm(), 20, 500, 1));
+    m_adjust_bpm = manage(new Adjustment(m_mainperf->get_bpm(), c_bpm_minimum, c_bpm_maximum, 1));
     m_spinbutton_bpm = manage( new SpinButton( *m_adjust_bpm ));
     m_spinbutton_bpm->set_name( "BPM Edit" );
     m_spinbutton_bpm->set_editable( true );
+    m_spinbutton_bpm->set_digits(2);
     m_adjust_bpm->signal_value_changed().connect(
             mem_fun(*this, &mainwnd::adj_callback_bpm ));
     m_spinbutton_bpm->set_tooltip_text( "Adjust beats per minute (BPM) value" );
@@ -727,7 +728,7 @@ mainwnd::adj_callback_ss( )
 void
 mainwnd::adj_callback_bpm( )
 {
-    m_mainperf->set_bpm( (int) m_adjust_bpm->get_value());
+    m_mainperf->set_bpm(m_adjust_bpm->get_value());
 }
 
 bool

@@ -444,7 +444,9 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
         ID = read_long ();
         if (ID == c_bpmtag)
         {
-            long bpm = read_long ();
+            double bpm = (double) read_long ();
+            if(bpm > (c_bpm_scale_factor - 1.0))
+                bpm /= c_bpm_scale_factor;
             a_perf->set_bpm (bpm);
         }
     }
@@ -554,7 +556,12 @@ bool midifile::write (perform * a_perf)
 
     /* bpm */
     write_long (c_bpmtag);
-    write_long (a_perf->get_bpm ());
+    /* From sequencer64
+     * We now encode the Sequencer64-specific BPM value by multiplying it
+     *  by 1000.0 first, to get more implicit precision in the number.
+     */
+    long scaled_bpm = long(a_perf->get_bpm() * c_bpm_scale_factor);
+    write_long (scaled_bpm);
 
     int data_size = m_l.size ();
     m_d = (unsigned char *) new char[data_size];

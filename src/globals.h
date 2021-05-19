@@ -51,7 +51,11 @@ const int c_ppwn         = c_ppqn * 4;  // whole note
 const int c_ppen         = c_ppqn / 2;  // eighth note
 const int c_ppsn         = c_ppqn / 4;  // 16th note
 
-const int c_bpm          = 120;  /* default */
+const double c_bpm                       = 120.0;   /* default */
+const double c_bpm_scale_factor          = 1000.0;  /* used in midifile for doubles */
+const double c_bpm_minimum               = 1.0;
+const double c_bpm_maximum               = 600.0;
+
 const int c_maxBuses = 32;
 
 const int c_note_off_margin = 2;  // # ticks to shave off end of painted notes

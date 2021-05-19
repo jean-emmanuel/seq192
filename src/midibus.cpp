@@ -460,7 +460,7 @@ mastermidibus::set_ppqn( int a_ppqn )
 
 
 void
-mastermidibus::set_bpm( int a_bpm )
+mastermidibus::set_bpm( double a_bpm )
 {
     lock();
 
