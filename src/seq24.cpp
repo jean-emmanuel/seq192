@@ -223,6 +223,7 @@ main (int argc, char *argv[])
 
     if (global_oscport != 0) {
         p.oscserver->stop();
+        delete p.oscserver;
     }
 
     if ( getenv( HOME ) != NULL ){

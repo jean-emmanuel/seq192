@@ -19,7 +19,7 @@ OSCServer::OSCServer( const char* port )
 
 OSCServer::~OSCServer()
 {
-    if( serverThread )
+    if (serverThread)
         lo_server_thread_free( serverThread );
 }
 
