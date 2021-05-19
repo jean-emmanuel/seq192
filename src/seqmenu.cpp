@@ -190,17 +190,3 @@ seqmenu::seq_paste(){
 
     }
 }
-
-
-void
-seqmenu::seq_clear_perf(){
-
-    if ( m_mainperf->is_active( m_current_seq )){
-
-        m_mainperf->push_trigger_undo();
-
-        m_mainperf->clear_sequence_triggers( m_current_seq  );
-        m_mainperf->get_sequence( m_current_seq )->set_dirty();
-
-    }
-}

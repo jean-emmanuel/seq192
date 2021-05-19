@@ -313,38 +313,6 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                         len -= 2;
                                     }
 
-                                    else if (proprietary == c_triggers)
-                                    {
-                                        int num_triggers = len / 4;
-
-                                        for (int i = 0; i < num_triggers; i += 2)
-                                        {
-                                            unsigned long on = read_long ();
-                                            unsigned long length = (read_long () - on);
-                                            len -= 8;
-                                            seq->add_trigger(on, length, 0, false);
-                                        }
-                                    }
-
-                                    else if (proprietary == c_triggers_new)
-                                    {
-                                        int num_triggers = len / 12;
-
-                                        //printf( "num_triggers[%d]\n", num_triggers );
-                                        for (int i = 0; i < num_triggers; i++)
-                                        {
-                                            unsigned long on = read_long ();
-                                            unsigned long off = read_long ();
-                                            unsigned long length = off - on + 1;
-                                            unsigned long offset = read_long ();
-
-                                            //printf( "< start[%d] end[%d] offset[%d]\n",
-                                            //        on, off, offset );
-
-                                            len -= 12;
-                                            seq->add_trigger (on, length, offset, false);
-                                        }
-                                    }
 
                                     /* eat the rest */
                                     m_pos += len;
@@ -361,7 +329,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                         CurrentTime += 1;
                                     }
 
-                                    seq->set_length (CurrentTime, false);
+                                    seq->set_length (CurrentTime);
                                     seq->zero_markers ();
                                     done = true;
                                     break;
@@ -445,46 +413,6 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
     }				/* for(eachtrack) */
 
-    //printf ( "file_size[%d] m_pos[%d]\n", file_size, m_pos );
-
-    if ((file_size - m_pos) > (int) sizeof (unsigned long))
-    {
-        ID = read_long ();
-        if (ID == c_midictrl)
-        {
-            unsigned long seqs = read_long ();
-
-            for (unsigned int i = 0; i < seqs; i++)
-            {
-
-                a_perf->get_midi_control_toggle (i)->m_active = m_d[m_pos++];
-                a_perf->get_midi_control_toggle (i)->m_inverse_active =
-                    m_d[m_pos++];
-                a_perf->get_midi_control_toggle (i)->m_status = m_d[m_pos++];
-                a_perf->get_midi_control_toggle (i)->m_data = m_d[m_pos++];
-                a_perf->get_midi_control_toggle (i)->m_min_value = m_d[m_pos++];
-                a_perf->get_midi_control_toggle (i)->m_max_value = m_d[m_pos++];
-
-                a_perf->get_midi_control_on (i)->m_active = m_d[m_pos++];
-                a_perf->get_midi_control_on (i)->m_inverse_active =
-                    m_d[m_pos++];
-                a_perf->get_midi_control_on (i)->m_status = m_d[m_pos++];
-                a_perf->get_midi_control_on (i)->m_data = m_d[m_pos++];
-                a_perf->get_midi_control_on (i)->m_min_value = m_d[m_pos++];
-                a_perf->get_midi_control_on (i)->m_max_value = m_d[m_pos++];
-
-                a_perf->get_midi_control_off (i)->m_active = m_d[m_pos++];
-                a_perf->get_midi_control_off (i)->m_inverse_active =
-                    m_d[m_pos++];
-                a_perf->get_midi_control_off (i)->m_status = m_d[m_pos++];
-                a_perf->get_midi_control_off (i)->m_data = m_d[m_pos++];
-                a_perf->get_midi_control_off (i)->m_min_value = m_d[m_pos++];
-                a_perf->get_midi_control_off (i)->m_max_value = m_d[m_pos++];
-            }
-        }
-
-    }
-
     if ((file_size - m_pos) > (int) sizeof (unsigned long))
     {
         /* Get ID + Length */
@@ -518,27 +446,6 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
         {
             long bpm = read_long ();
             a_perf->set_bpm (bpm);
-        }
-    }
-
-    // read in the mute group info.
-    if ((file_size - m_pos) > (int) sizeof (unsigned long))
-    {
-        ID = read_long ();
-        if (ID == c_mutegroups)
-        {
-            long length = read_long ();
-            if (c_gmute_tracks != length)
-            {
-                printf( "corrupt data in mutegroup section\n" );
-            }
-            for (int i = 0; i < c_seqs_in_set; i++)
-            {
-                a_perf->select_group_mute(read_long ());
-                for (int k = 0; k < c_seqs_in_set; ++k) {
-                    a_perf->set_group_mute_state(k, read_long ());
-                }
-            }
         }
     }
 
@@ -631,17 +538,6 @@ bool midifile::write (perform * a_perf)
         }
     }
 
-
-    /* midi control */
-    write_long (c_midictrl);
-    write_long (0);
-
-
-    /* bus mute/unmute data */
-    write_long (c_midiclocks);
-    write_long (0);
-
-
     /* notepad data */
     write_long (c_notes);
     write_short (c_max_sets);
@@ -660,17 +556,6 @@ bool midifile::write (perform * a_perf)
     write_long (c_bpmtag);
     write_long (a_perf->get_bpm ());
 
-    /* write out the mute groups */
-    write_long (c_mutegroups);
-    write_long (c_gmute_tracks);
-    for (int j=0; j < c_seqs_in_set; ++j){
-        a_perf->select_group_mute(j);
-        write_long(j);
-        for (int i=0; i < c_seqs_in_set; ++i) {
-            write_long( a_perf->get_group_mute_state(i) );
-        }
-    }
-
     int data_size = m_l.size ();
     m_d = (unsigned char *) new char[data_size];
 
@@ -683,12 +568,6 @@ bool midifile::write (perform * a_perf)
     }
 
     m_l.clear ();
-
-    // super slow
-    //while ( m_l.size() > 0 ){
-    //m_d[m_pos++] =  m_l.back();
-    //  m_l.pop_back();
-    //}
 
     file.write ((char *) m_d, data_size);
     file.close ();

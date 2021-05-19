@@ -206,21 +206,7 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
                                                     m_pixmap, name, col);
 
 	    /* midi channel + key + timesig */
-
-		/*char key =  m_seq_to_char[local_seq];*/
-
 	    char str[20];
-
-        if (m_mainperf->show_ui_sequence_key())
-        {
-    	    sprintf( str, "%c", (char)m_mainperf->lookup_keyevent_key( a_seq ) );
-
-    	    p_font_renderer->render_string_on_drawable(m_gc,
-                                                       base_x + c_seqarea_x - 7,
-                                                       base_y + c_text_y * 4 - 2,
-                                                       m_pixmap, str, col );
-        }
-
 	    sprintf( str,
 		     "%d-%d %ld/%ld",
 		     seq->get_midi_bus()+1,
@@ -388,7 +374,7 @@ mainwid::draw_marker_on_sequence( int a_seq, int a_tick )
 	int rectangle_y = base_y + c_text_y + c_text_x - 1;
 
 	int length = seq->get_length( );
-        a_tick += (length - seq->get_trigger_offset( ));
+
 	a_tick %= length;
 
 	long tick_x = a_tick * c_seqarea_seq_x / length;
@@ -540,7 +526,7 @@ mainwid::on_button_release_event(GdkEventButton* a_p0)
             //sequence *seq = m_mainperf->get_sequence(  m_current_seq );
             //seq->set_playing( !seq->get_playing() );
 
-            m_mainperf->sequence_playing_toggle( m_current_seq );
+            m_mainperf->m_seqs[m_current_seq]->toggle_playing();
 
             draw_sequence_on_pixmap(  m_current_seq );
             draw_sequence_pixmap_on_window( m_current_seq);
@@ -637,7 +623,7 @@ mainwid::set_screenset( int a_ss )
         m_screenset = 0;
     }
 
-	m_mainperf->set_offset(m_screenset);
+	m_mainperf->set_screenset(m_screenset);
 
     reset();
 }

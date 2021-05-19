@@ -40,8 +40,6 @@ perform::perform()
         m_seqs_active[i] = false;
     }
 
-    m_mute_group_selected = 0;
-    m_mode_group = true;
     m_running = false;
     m_looping = false;
     m_inputing = true;
@@ -50,108 +48,9 @@ perform::perform()
 
     thread_trigger_width_ms = c_thread_trigger_width_ms;
 
-    m_left_tick = 0;
-    m_right_tick = c_ppqn * 16;
-    m_starting_tick = 0;
-
-    midi_control zero = {false,false,0,0,0};
-
-    for ( int i=0; i<c_midi_controls; i++ ){
-
-        m_midi_cc_toggle[i] = zero;
-        m_midi_cc_on[i] = zero;
-        m_midi_cc_off[i] = zero;
-    }
-
-    m_show_ui_sequence_key = true;
-
-    set_key_event( GDK_1, 0 );
-    set_key_event( GDK_q, 1 );
-    set_key_event( GDK_a, 2 );
-    set_key_event( GDK_z, 3 );
-    set_key_event( GDK_2, 4 );
-    set_key_event( GDK_w, 5 );
-    set_key_event( GDK_s, 6 );
-    set_key_event( GDK_x, 7 );
-    set_key_event( GDK_3, 8 );
-    set_key_event( GDK_e, 9 );
-    set_key_event( GDK_d, 10 );
-    set_key_event( GDK_c, 11 );
-    set_key_event( GDK_4, 12 );
-    set_key_event( GDK_r, 13 );
-    set_key_event( GDK_f, 14 );
-    set_key_event( GDK_v, 15 );
-    set_key_event( GDK_5, 16 );
-    set_key_event( GDK_t, 17 );
-    set_key_event( GDK_g, 18 );
-    set_key_event( GDK_b, 19 );
-    set_key_event( GDK_6, 20 );
-    set_key_event( GDK_y, 21 );
-    set_key_event( GDK_h, 22 );
-    set_key_event( GDK_n, 23 );
-    set_key_event( GDK_7, 24 );
-    set_key_event( GDK_u, 25 );
-    set_key_event( GDK_j, 26 );
-    set_key_event( GDK_m, 27 );
-    set_key_event( GDK_8, 28 );
-    set_key_event( GDK_i, 29 );
-    set_key_event( GDK_k, 30 );
-    set_key_event( GDK_comma, 31 );
-
-    set_key_group( GDK_exclam,  0 );
-    set_key_group( GDK_quotedbl,  1  );
-    set_key_group( GDK_numbersign,  2  );
-    set_key_group( GDK_dollar,  3  );
-    set_key_group( GDK_percent,  4  );
-    set_key_group( GDK_ampersand,  5  );
-    set_key_group( GDK_parenleft,  7  );
-    set_key_group( GDK_slash,  6  );
-    set_key_group( GDK_semicolon,  31 );
-    set_key_group( GDK_A,  16 );
-    set_key_group( GDK_B,  28 );
-    set_key_group( GDK_C,  26 );
-    set_key_group( GDK_D,  18 );
-    set_key_group( GDK_E,  10 );
-    set_key_group( GDK_F,  19 );
-    set_key_group( GDK_G,  20 );
-    set_key_group( GDK_H,  21 );
-    set_key_group( GDK_I,  15 );
-    set_key_group( GDK_J,  22 );
-    set_key_group( GDK_K,  23 );
-    set_key_group( GDK_M,  30 );
-    set_key_group( GDK_N,  29 );
-    set_key_group( GDK_Q,  8  );
-    set_key_group( GDK_R,  11 );
-    set_key_group( GDK_S,  17 );
-    set_key_group( GDK_T,  12 );
-    set_key_group( GDK_U,  14 );
-    set_key_group( GDK_V,  27 );
-    set_key_group( GDK_W,  9  );
-    set_key_group( GDK_X,  25 );
-    set_key_group( GDK_Y,  13 );
-    set_key_group( GDK_Z,  24 );
-
-    m_key_bpm_up = GDK_apostrophe;
-    m_key_bpm_dn = GDK_semicolon;
-
-    m_key_replace = GDK_Control_L;
-    m_key_queue = GDK_Control_R;
-    m_key_snapshot_1 = GDK_Alt_L;
-    m_key_snapshot_2 = GDK_Alt_R;
-    m_key_keep_queue = GDK_backslash;
-
-    m_key_screenset_up = GDK_bracketright;
-    m_key_screenset_dn = GDK_bracketleft;
-    m_key_set_playing_screenset = GDK_Home;
-    m_key_group_on = GDK_igrave;
-    m_key_group_off = GDK_apostrophe;
-    m_key_group_learn = GDK_Insert;
-
     m_key_start  = GDK_space;
     m_key_stop   = GDK_Escape;
 
-    m_offset = 0;
-    m_control_status = 0;
     m_screen_set = 0;
 
     m_jack_running = false;
@@ -166,7 +65,7 @@ perform::start_playing()
     inner_stop();
     usleep(c_thread_trigger_width_ms * 1000);
 
-    position_jack( false );
+    position_jack();
     start_jack();
 
     start();
@@ -497,119 +396,6 @@ void perform::clear_all()
     }
 }
 
-
-void perform::set_mode_group_mute ()
-{
-    m_mode_group = true;
-}
-
-void perform::unset_mode_group_mute ()
-{
-    m_mode_group = false;
-}
-
-
-void perform::set_group_mute_state (int a_g_track, bool a_mute_state)
-{
-    if (a_g_track < 0)
-        a_g_track = 0;
-    if (a_g_track > c_seqs_in_set)
-        a_g_track = c_seqs_in_set -1;
-    m_mute_group[a_g_track + m_mute_group_selected * c_seqs_in_set] = a_mute_state;
-}
-
-
-bool perform::get_group_mute_state (int a_g_track)
-{
-    if (a_g_track < 0)
-        a_g_track = 0;
-    if (a_g_track > c_seqs_in_set)
-        a_g_track = c_seqs_in_set -1;
-    return m_mute_group[a_g_track + m_mute_group_selected * c_seqs_in_set];
-}
-
-
-void perform::select_group_mute (int a_g_mute)
-{
-    int j = (a_g_mute * c_seqs_in_set);
-    int k = m_playing_screen * c_seqs_in_set;
-    if (a_g_mute < 0)
-        a_g_mute = 0;
-    if (a_g_mute > c_seqs_in_set)
-        a_g_mute = c_seqs_in_set -1;
-    if (m_mode_group_learn)
-        for (int i = 0; i < c_seqs_in_set; i++) {
-            if (is_active(i + k)) {
-                assert(m_seqs[i + k]);
-                m_mute_group[i + j] = m_seqs[i + k]->get_playing();
-            }
-        }
-    m_mute_group_selected = a_g_mute;
-}
-
-
-void perform::set_mode_group_learn()
-{
-    set_mode_group_mute();
-    m_mode_group_learn = true;
-    for (size_t x = 0; x < m_notify.size(); ++x)
-        m_notify[x]->on_grouplearnchange( true );
-}
-
-
-void perform::unset_mode_group_learn()
-{
-    for (size_t x = 0; x < m_notify.size(); ++x)
-        m_notify[x]->on_grouplearnchange( false );
-    m_mode_group_learn = false;
-}
-
-
-void perform::select_mute_group ( int a_group )
-{
-    int j = (a_group * c_seqs_in_set);
-    int k = m_playing_screen * c_seqs_in_set;
-    if (a_group < 0)
-        a_group = 0;
-    if (a_group > c_seqs_in_set)
-        a_group = c_seqs_in_set -1;
-    m_mute_group_selected = a_group;
-    for (int i = 0; i < c_seqs_in_set; i++) {
-        if ((m_mode_group_learn) && (is_active(i + k))) {
-            assert(m_seqs[i + k]);
-            m_mute_group[i + j] = m_seqs[i + k]->get_playing();
-        }
-        m_tracks_mute_state[i] = m_mute_group[i + m_mute_group_selected * c_seqs_in_set];
-    }
-}
-
-
-void perform::mute_group_tracks()
-{
-    if (m_mode_group) {
-        for (int i=0; i< c_seqs_in_set; i++) {
-            for (int j=0; j < c_seqs_in_set; j++) {
-                if ( is_active(i * c_seqs_in_set + j) ) {
-                    if ((i == m_playing_screen) && (m_tracks_mute_state[j])) {
-                        sequence_playing_on (i * c_seqs_in_set + j);
-                    } else {
-                        sequence_playing_off (i * c_seqs_in_set + j);
-                    }
-                }
-            }
-
-        }
-    }
-}
-
-
-void perform::select_and_mute_group (int a_g_group)
-{
-    select_mute_group(a_g_group);
-    mute_group_tracks();
-}
-
-
 perform::~perform()
 {
     m_inputing = false;
@@ -630,56 +416,6 @@ perform::~perform()
         }
     }
 }
-
-
-void perform::set_left_tick( long a_tick )
-{
-    m_left_tick = a_tick;
-    m_starting_tick = a_tick;
-
-    if ( m_left_tick >= m_right_tick )
-        m_right_tick = m_left_tick + c_ppqn * 4;
-
-}
-
-
-long perform::get_left_tick()
-{
-    return m_left_tick;
-}
-
-
-void perform::set_starting_tick( long a_tick )
-{
-    m_starting_tick = a_tick;
-}
-
-
-long perform::get_starting_tick()
-{
-    return m_starting_tick;
-}
-
-
-void perform::set_right_tick( long a_tick )
-{
-    if ( a_tick >= c_ppqn * 4 ){
-
-        m_right_tick = a_tick;
-
-        if ( m_right_tick <= m_left_tick ){
-            m_left_tick = m_right_tick - c_ppqn * 4;
-            m_starting_tick = m_left_tick;
-        }
-    }
-}
-
-
-long perform::get_right_tick()
-{
-    return m_right_tick;
-}
-
 
 void perform::add_sequence( sequence *a_seq, int a_perf )
 {
@@ -884,31 +620,6 @@ void perform::new_sequence( int a_sequence )
 }
 
 
-midi_control * perform::get_midi_control_toggle( unsigned int a_seq )
-{
-    if ( a_seq >= (unsigned int) c_midi_controls )
-        return NULL;
-    return &m_midi_cc_toggle[a_seq];
-
-}
-
-
-midi_control * perform::get_midi_control_on( unsigned int a_seq )
-{
-    if ( a_seq >= (unsigned int) c_midi_controls )
-        return NULL;
-    return &m_midi_cc_on[a_seq];
-}
-
-
-midi_control* perform::get_midi_control_off( unsigned int a_seq )
-{
-    if ( a_seq >= (unsigned int) c_midi_controls )
-        return NULL;
-    return &m_midi_cc_off[a_seq];
-}
-
-
 void perform::print()
 {
     //   for( int i=0; i<m_numSeq; i++ ){
@@ -944,41 +655,12 @@ void perform::set_screenset( int a_ss )
     if ( m_screen_set >= c_max_sets )
         m_screen_set = 0;
 
-    /* If screenset change is to quick, replace cannot affect sequences from previous screenset */
-//    usleep ( 30000 );
-    /* This value works for my 4-core with 4*64 samples buffers and FFADO!! Got to find a way to write it precisely */
 }
 
 
 int perform::get_screenset()
 {
     return m_screen_set;
-}
-
-
-void perform::set_playing_screenset()
-{
-    for (int j, i = 0; i < c_seqs_in_set; i++) {
-        j = i + m_playing_screen * c_seqs_in_set;
-        if ( is_active(j) ){
-            assert( m_seqs[j] );
-            m_tracks_mute_state[i] = m_seqs[j]->get_playing();
-        }
-    }
-    m_playing_screen = m_screen_set;
-    mute_group_tracks();
-}
-
-
-int perform::get_playing_screenset()
-{
-    return m_playing_screen;
-}
-
-
-void perform::set_offset( int a_offset )
-{
-    m_offset = a_offset  * c_mainwnd_rows * c_mainwnd_cols;
 }
 
 
@@ -1024,74 +706,6 @@ void perform::set_orig_ticks( long a_tick  )
 }
 
 
-void perform::clear_sequence_triggers( int a_seq  )
-{
-    if ( is_active(a_seq) == true ){
-        assert( m_seqs[a_seq] );
-        m_seqs[a_seq]->clear_triggers( );
-    }
-}
-
-
-void perform::move_triggers( bool a_direction )
-{
-    if ( m_left_tick < m_right_tick ){
-
-        long distance = m_right_tick - m_left_tick;
-
-        for (int i=0; i< c_max_sequence; i++ ){
-
-            if ( is_active(i) == true ){
-                assert( m_seqs[i] );
-                m_seqs[i]->move_triggers( m_left_tick, distance, a_direction );
-            }
-        }
-    }
-}
-
-
-void perform::push_trigger_undo()
-{
-    for (int i=0; i< c_max_sequence; i++ ){
-
-        if ( is_active(i) == true ){
-            assert( m_seqs[i] );
-            m_seqs[i]->push_trigger_undo( );
-        }
-    }
-}
-
-
-void perform::pop_trigger_undo()
-{
-    for (int i=0; i< c_max_sequence; i++ ){
-
-        if ( is_active(i) == true ){
-            assert( m_seqs[i] );
-            m_seqs[i]->pop_trigger_undo( );
-        }
-    }
-}
-
-
-/* copies between L and R -> R */
-void perform::copy_triggers( )
-{
-    if ( m_left_tick < m_right_tick ){
-
-        long distance = m_right_tick - m_left_tick;
-
-        for (int i=0; i< c_max_sequence; i++ ){
-
-            if ( is_active(i) == true ){
-                assert( m_seqs[i] );
-                m_seqs[i]->copy_triggers( m_left_tick, distance );
-            }
-        }
-    }
-}
-
-
 void perform::start_jack(  )
 {
     //printf( "perform::start_jack()\n" );
@@ -1112,7 +726,7 @@ void perform::stop_jack(  )
 }
 
 
-void perform::position_jack( bool a_state )
+void perform::position_jack()
 {
 
     //printf( "perform::position_jack()\n" );
@@ -1128,10 +742,6 @@ void perform::position_jack( bool a_state )
     jack_nframes_t rate = jack_get_sample_rate( m_jack_client ) ;
 
     long current_tick = 0;
-
-    if ( a_state ){
-        current_tick = m_left_tick;
-    }
 
     jack_position_t pos;
 
@@ -1287,25 +897,6 @@ void perform::launch_input_thread()
     }
     else
     m_in_thread_launched = true;
-}
-
-
-long perform::get_max_trigger()
-{
-    long ret = 0, t;
-
-    for (int i=0; i< c_max_sequence; i++ ){
-
-        if ( is_active(i) == true ){
-            assert( m_seqs[i] );
-
-            t = m_seqs[i]->get_max_trigger( );
-            if ( t > ret )
-                ret = t;
-        }
-    }
-
-    return ret;
 }
 
 
@@ -1847,143 +1438,6 @@ void perform::restore_playing_state()
 }
 
 
-void perform::set_sequence_control_status( int a_status )
-{
-    if ( a_status & c_status_snapshot ){
-        save_playing_state(  );
-    }
-
-    m_control_status |= a_status;
-}
-
-
-void perform::unset_sequence_control_status( int a_status )
-{
-    if ( a_status & c_status_snapshot ){
-        restore_playing_state(  );
-    }
-
-    m_control_status &= (~a_status);
-}
-
-
-void perform::sequence_playing_toggle( int a_sequence )
-{
-    if ( is_active(a_sequence) == true ){
-        assert( m_seqs[a_sequence] );
-
-        if ( m_control_status & c_status_queue ){
-            m_seqs[a_sequence]->toggle_queued();
-        }
-        else {
-
-            if (  m_control_status & c_status_replace ){
-                unset_sequence_control_status( c_status_replace );
-                off_sequences( );
-            }
-
-            m_seqs[a_sequence]->toggle_playing();
-
-        }
-    }
-}
-
-
-void perform::sequence_playing_on( int a_sequence )
-{
-    if ( is_active(a_sequence) == true ){
-        if (m_mode_group && (m_playing_screen == m_screen_set)
-                && (a_sequence >= (m_playing_screen * c_seqs_in_set))
-                && (a_sequence < ((m_playing_screen + 1) * c_seqs_in_set)))
-            m_tracks_mute_state[a_sequence - m_playing_screen * c_seqs_in_set] = true;
-        assert( m_seqs[a_sequence] );
-        if (!(m_seqs[a_sequence]->get_playing())) {
-            if (m_control_status & c_status_queue ) {
-                if (!(m_seqs[a_sequence]->get_queued()))
-                    m_seqs[a_sequence]->toggle_queued();
-            } else
-                m_seqs[a_sequence]->set_playing(true);
-        } else {
-            if ((m_seqs[a_sequence]->get_queued()) && (m_control_status & c_status_queue ))
-                m_seqs[a_sequence]->toggle_queued();
-        }
-    }
-}
-
-
-void perform::sequence_playing_off( int a_sequence )
-{
-    if ( is_active(a_sequence) == true ){
-        if (m_mode_group && (m_playing_screen == m_screen_set)
-                && (a_sequence >= (m_playing_screen * c_seqs_in_set))
-                && (a_sequence < ((m_playing_screen + 1) * c_seqs_in_set)))
-            m_tracks_mute_state[a_sequence - m_playing_screen * c_seqs_in_set] = false;
-        assert( m_seqs[a_sequence] );
-        if (m_seqs[a_sequence]->get_playing()) {
-            if (m_control_status & c_status_queue ) {
-                if (!(m_seqs[a_sequence]->get_queued()))
-                    m_seqs[a_sequence]->toggle_queued();
-            } else
-                m_seqs[a_sequence]->set_playing(false);
-        } else {
-            if ((m_seqs[a_sequence]->get_queued()) && (m_control_status & c_status_queue ))
-                m_seqs[a_sequence]->toggle_queued();
-        }
-    }
-}
-
-
-void perform::set_key_event( unsigned int keycode, long sequence_slot )
-{
-    // unhook previous binding...
-    std::map<unsigned int,long>::iterator it1 = key_events.find( keycode );
-    if (it1 != key_events.end())
-    {
-        std::map<long,unsigned int>::iterator i = key_events_rev.find( it1->second );
-        if (i != key_events_rev.end())
-            key_events_rev.erase( i );
-        key_events.erase( it1 );
-    }
-    std::map<long,unsigned int>::iterator it2 = key_events_rev.find( sequence_slot );
-    if (it2 != key_events_rev.end())
-    {
-        std::map<unsigned int,long>::iterator i = key_events.find( it2->second );
-        if (i != key_events.end())
-            key_events.erase( i );
-        key_events_rev.erase( it2 );
-    }
-    // set
-    key_events[keycode] = sequence_slot;
-    key_events_rev[sequence_slot] = keycode;
-}
-
-
-void perform::set_key_group( unsigned int keycode, long group_slot )
-{
-    // unhook previous binding...
-    std::map<unsigned int,long>::iterator it1 = key_groups.find( keycode );
-    if (it1 != key_groups.end())
-    {
-        std::map<long,unsigned int>::iterator i = key_groups_rev.find( it1->second );
-        if (i != key_groups_rev.end())
-            key_groups_rev.erase( i );
-        key_groups.erase( it1 );
-    }
-    std::map<long,unsigned int>::iterator it2 = key_groups_rev.find( group_slot );
-    if (it2 != key_groups_rev.end())
-    {
-        std::map<unsigned int,long>::iterator i = key_groups.find( it2->second );
-        if (i != key_groups.end())
-            key_groups.erase( i );
-        key_groups_rev.erase( it2 );
-    }
-    // set
-    key_groups[keycode] = group_slot;
-    key_groups_rev[group_slot] = keycode;
-}
-
-
-
 #ifdef JACK_SUPPORT
 void jack_timebase_callback(jack_transport_state_t state,
         jack_nframes_t nframes,
@@ -2082,66 +1536,6 @@ void print_jack_pos( jack_position_t* jack_pos ){
     printf( "    frame_time       [%lf]\n", jack_pos->frame_time );
     printf( "    next_time        [%lf]\n", jack_pos->next_time );
 }
-
-
-#if 0
-
-int main()
-{
-    jack_client_t *client;
-
-    /* become a new client of the JACK server */
-    if ((client = jack_client_new("transport tester")) == 0) {
-        fprintf(stderr, "jack server not running?\n");
-        return 1;
-    }
-
-    jack_on_shutdown(client, jack_shutdown, 0);
-    jack_set_sync_callback(client, jack_sync_callback, NULL);
-
-    if (jack_activate(client)) {
-        fprintf(stderr, "cannot activate client");
-        return 1;
-    }
-
-    bool cond = false; /* true if we want to fail if there is already a master */
-    if (jack_set_timebase_callback(client, cond, timebase, NULL) != 0){
-        printf("Unable to take over timebase or there is already a master.\n");
-        exit(1);
-    }
-
-    jack_position_t pos;
-
-    pos.valid = JackPositionBBT;
-
-    pos.bar = 0;
-    pos.beat = 0;
-    pos.tick = 0;
-
-    pos.beats_per_bar = time_beats_per_bar;
-    pos.beat_type = time_beat_type;
-    pos.ticks_per_beat = time_ticks_per_beat;
-    pos.beats_per_minute = time_beats_per_minute;
-    pos.bar_start_tick = 0.0;
-
-
-    //jack_transport_reposition( client, &pos );
-
-    jack_transport_start (client);
-
-    //void jack_transport_stop (jack_client_t *client);
-
-    int bob;
-    scanf ("%d", &bob);
-
-    jack_transport_stop (client);
-    jack_release_timebase(client);
-    jack_client_close(client);
-
-    return 0;
-}
-
-#endif
 
 
 #endif

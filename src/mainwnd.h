@@ -44,10 +44,8 @@ using namespace Gtk;
 using namespace Menu_Helpers;
 
 
-class mainwnd : public Gtk::Window, public performcallback
+class mainwnd : public Gtk::Window
 {
-    /* notification handler for learn mode toggle */
-    virtual void on_grouplearnchange(bool state);
 
  private:
 
@@ -58,14 +56,12 @@ class mainwnd : public Gtk::Window, public performcallback
     Menu     *m_menu_view;
     Menu     *m_menu_help;
 
-    // SCROLL MOD
     Adjustment * m_hadjust;
     Adjustment * m_vadjust;
     HScrollbar * m_hscroll;
     VScrollbar * m_vscroll;
     void on_scrollbar_resize ();
     bool on_scroll_event (GdkEventScroll * ev);
-    // SCROLL MOD
 
     perform  *m_mainperf;
 
@@ -73,8 +69,6 @@ class mainwnd : public Gtk::Window, public performcallback
     maintime *m_main_time;
 
     Gdk::Cursor   m_main_cursor;
-
-    Button      *m_button_learn;
 
     Button      *m_button_stop;
     Button      *m_button_play;
@@ -103,8 +97,6 @@ class mainwnd : public Gtk::Window, public performcallback
 
     void start_playing();
     void stop_playing();
-    void learn_toggle();
-    void sequence_key( int a_seq );
     void update_window_title();
     void toLower(basic_string<char>&);
     bool is_modified();
@@ -127,8 +119,6 @@ class mainwnd : public Gtk::Window, public performcallback
 
     bool on_delete_event(GdkEventAny *a_e);
     bool on_key_press_event(GdkEventKey* a_ev);
-    bool on_key_release_event(GdkEventKey* a_ev);
-
 
 };
 

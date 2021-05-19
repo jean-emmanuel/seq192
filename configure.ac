@@ -8,9 +8,6 @@ AM_INIT_AUTOMAKE([dist-bzip2])
 
 AC_DEFINE(_GNU_SOURCE, 1, [gnu source])
 
-AC_DEFINE(DISABLE_KEYBOARD, 1, [disable keyboard shortcuts])
-AC_DEFINE(DISABLE_SONG_EDITOR, 1, [disable song editor])
-
 dnl Checks for programs.
 AC_PROG_AWK
 AC_PROG_CC

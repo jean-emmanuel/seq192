@@ -41,34 +41,6 @@ enum draw_type
     DRAW_NOTE_OFF
 };
 
-/* used in playback */
-class trigger
-{
-public:
-
-    long m_tick_start;
-    long m_tick_end;
-
-    bool m_selected;
-
-    long m_offset;
-
-    trigger (){
-        m_tick_start = 0;
-        m_tick_end = 0;
-        m_offset = 0;
-        m_selected = false;
-    };
-
-    bool operator< (trigger rhs){
-
-        if (m_tick_start < rhs.m_tick_start)
-            return true;
-
-        return false;
-    };
-};
-
 class sequence
 {
 
@@ -80,20 +52,12 @@ class sequence
 
     list < event > m_list_undo_hold; // seqdata
 
-    list < trigger > m_list_trigger;
-    trigger m_trigger_clipboard;
-
     stack < list < event > >m_list_undo;
     stack < list < event > >m_list_redo;
-    stack < list < trigger > >m_list_trigger_undo;
-    stack < list < trigger > >m_list_trigger_redo;
 
     /* markers */
     list < event >::iterator m_iterator_play;
     list < event >::iterator m_iterator_draw;
-
-    list < trigger >::iterator m_iterator_play_trigger;
-    list < trigger >::iterator m_iterator_draw_trigger;
 
     /* contains the proper midi channel */
     char m_midi_channel;
@@ -114,8 +78,6 @@ class sequence
     bool m_thru;
     bool m_queued;
 
-    bool m_trigger_copied;
-
     /* flag indicates that contents has changed from
        a recording */
     bool m_dirty_main;
@@ -133,8 +95,6 @@ class sequence
     /* where were we */
     long m_last_tick;
     long m_queued_tick;
-
-    long m_trigger_offset;
 
     /* length of sequence in pulses
        should be powers of two in bars */
@@ -167,10 +127,6 @@ class sequence
     void lock ();
     void unlock ();
 
-    /* sets m_trigger_offset and wraps it to length */
-    void set_trigger_offset (long a_trigger_offset);
-    void split_trigger( trigger &trig, long a_split_tick);
-    void adjust_trigger_offsets_to_legnth( long a_new_len );
     long adjust_offset( long a_offset );
     void remove( list<event>::iterator i );
     void remove( event* e );
@@ -191,10 +147,6 @@ class sequence
     void push_undo (bool a_hold = false);
     void pop_undo ();
     void pop_redo ();
-
-    void push_trigger_undo ();
-    void pop_trigger_undo ();
-    void pop_trigger_redo ();
 
     //
     //  Gets and Sets
@@ -239,7 +191,7 @@ class sequence
 
 
     /* length in ticks */
-    void set_length (long a_len, bool a_adjust_triggers = true);
+    void set_length (long a_len);
     long get_length ();
 
     /* returns last tick played..  used by
@@ -284,7 +236,6 @@ class sequence
 
     /* dumps contents to stdout */
     void print ();
-    void print_triggers();
 
     /* dumps notes from tick and prebuffers to
        ahead.  Called by sequencer thread - performance */
@@ -298,36 +249,8 @@ class sequence
     /* adds event to internal list */
     void add_event (const event * a_e);
 
-    void add_trigger (long a_tick, long a_length, long a_offset = 0, bool a_adjust_offset = true);
-    void split_trigger( long a_tick );
-    void grow_trigger (long a_tick_from, long a_tick_to, long a_length);
-    void del_trigger (long a_tick );
-    bool get_trigger_state (long a_tick);
-    bool select_trigger(long a_tick);
-    bool unselect_triggers();
-
-    bool intersectTriggers( long position, long& start, long& end );
     bool intersectNotes( long position, long position_note, long& start, long& end, long& note );
     bool intersectEvents( long posstart, long posend, long status, long& start );
-
-
-    void del_selected_trigger();
-    void cut_selected_trigger();
-    void copy_selected_trigger();
-    void paste_trigger();
-
-    void move_selected_triggers_to(long a_tick, bool a_adjust_offset, int a_which=2);
-    long get_selected_trigger_start_tick();
-    long get_selected_trigger_end_tick();
-
-    long get_max_trigger();
-
-    void move_triggers (long a_start_tick, long a_distance, bool a_direction);
-    void copy_triggers (long a_start_tick, long a_distance);
-    void clear_triggers();
-
-
-    long get_trigger_offset();
 
     /* sets the midibus to dump to */
     void set_midi_bus (char a_mb);
@@ -446,7 +369,6 @@ class sequence
     /* resets draw marker so calls to getNextnoteEvent
        will start from the first */
     void reset_draw_marker();
-    void reset_draw_trigger_marker();
 
     /* each call seqdata( sequence *a_seq, int a_scale );fills the passed refrences with a
        events elements, and returns true.  When it
@@ -466,10 +388,6 @@ class sequence
                          unsigned char *a_D1, bool * a_selected, int type = ALL_EVENTS);
 
     bool get_next_event (unsigned char *a_status, unsigned char *a_cc);
-
-    bool get_next_trigger (long *a_tick_on,
-			   long *a_tick_off,
-			   bool * a_selected, long *a_tick_offset);
 
     sequence & operator= (const sequence & a_rhs);
 
