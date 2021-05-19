@@ -102,7 +102,8 @@ mainwnd::mainwnd(perform *a_p)
     /* bpm spin button */
     m_adjust_bpm = manage(new Adjustment(m_mainperf->get_bpm(), 20, 500, 1));
     m_spinbutton_bpm = manage( new SpinButton( *m_adjust_bpm ));
-    m_spinbutton_bpm->set_editable( false );
+    m_spinbutton_bpm->set_name( "BPM Edit" );
+    m_spinbutton_bpm->set_editable( true );
     m_adjust_bpm->signal_value_changed().connect(
             mem_fun(*this, &mainwnd::adj_callback_bpm ));
     m_spinbutton_bpm->set_tooltip_text( "Adjust beats per minute (BPM) value" );
@@ -112,7 +113,8 @@ mainwnd::mainwnd(perform *a_p)
     /* sequence set spin button */
     m_adjust_ss = manage( new Adjustment( 0, 0, c_max_sets - 1, 1 ));
     m_spinbutton_ss = manage( new SpinButton( *m_adjust_ss ));
-    m_spinbutton_ss->set_editable( false );
+    m_spinbutton_ss->set_name( "Screen Set" );
+    m_spinbutton_ss->set_editable( true );
     m_spinbutton_ss->set_wrap( true );
     m_adjust_ss->signal_value_changed().connect(
             mem_fun(*this, &mainwnd::adj_callback_ss ));
@@ -122,8 +124,11 @@ mainwnd::mainwnd(perform *a_p)
 
     /* screen set name edit line */
     m_entry_notes = manage( new Entry());
-    m_entry_notes->signal_changed().connect(
+    m_entry_notes->set_name( "Screen Name" );
+    m_entry_notes->signal_focus_out_event().connect(
             mem_fun(*this, &mainwnd::edit_callback_notepad));
+    m_entry_notes->signal_activate().connect(
+            mem_fun(*this, &mainwnd::edit_enter_callback_notepad));
     m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                 m_mainperf->get_screenset()));
     m_entry_notes->set_tooltip_text( "Enter screen set name" );
@@ -725,49 +730,77 @@ mainwnd::adj_callback_bpm( )
     m_mainperf->set_bpm( (int) m_adjust_bpm->get_value());
 }
 
-void
-mainwnd::edit_callback_notepad( )
+bool
+mainwnd::edit_callback_notepad( GdkEventFocus *focus )
 {
     string text = m_entry_notes->get_text();
     m_mainperf->set_screen_set_notepad( m_mainperf->get_screenset(),
 				        &text );
     global_is_modified = true;
+    m_main_wid->grab_focus();
+    return true;
+}
+
+void
+mainwnd::edit_enter_callback_notepad( )
+{
+    GdkEventFocus event = GdkEventFocus();
+    this->edit_callback_notepad(&event);
 }
 
 
 bool
 mainwnd::on_key_press_event(GdkEventKey* a_ev)
 {
-    // control and modifier key combinations matching
-    // menu items have first priority
-    /*if (*/Gtk::Window::on_key_press_event(a_ev);
-        //return true;  // on win32, it'd always return true here (i.e. for SPACE bar)... ?
 
-    /*else */if ( m_entry_notes->has_focus()) {
-        m_entry_notes->event( (GdkEvent*) a_ev );
-        return false;
-    }
-    else {
-        if ( a_ev->type == GDK_KEY_PRESS ){
+    if ( a_ev->type == GDK_KEY_PRESS )
+    {
 
-            // the start/end key may be the same key (i.e. SPACE)
-            // allow toggling when the same key is mapped to both
-            // triggers (i.e. SPACEBAR)
-            bool dont_toggle = m_mainperf->m_key_start
-                != m_mainperf->m_key_stop;
-
-            if ( a_ev->keyval == m_mainperf->m_key_start
-                    && (dont_toggle || !is_pattern_playing))
+        if ( a_ev->state & GDK_MOD1_MASK ) // alt key
+        {
+            if ((a_ev->keyval == GDK_f || a_ev->keyval == GDK_F) || // file
+                (a_ev->keyval == GDK_h || a_ev->keyval == GDK_H))   // help
             {
-                start_playing();
+                return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
             }
-            else if ( a_ev->keyval == m_mainperf->m_key_stop
-                    && (dont_toggle || is_pattern_playing))
-            {
-                stop_playing();
-            }
-
         }
+
+        if ( a_ev->state & GDK_CONTROL_MASK ) // ctrl key
+        {
+            if ((a_ev->keyval == GDK_n || a_ev->keyval == GDK_N) || // new file
+                (a_ev->keyval == GDK_o || a_ev->keyval == GDK_O) || // open file
+                (a_ev->keyval == GDK_q || a_ev->keyval == GDK_Q) || // quit
+                (a_ev->keyval == GDK_s || a_ev->keyval == GDK_S))  // save
+            {
+                return Gtk::Window::on_key_press_event(a_ev); // return =  don't do anything else
+            }
+        }
+
+        if (get_focus()->get_name() == "Screen Name")      // if we are on the screen name
+            return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
+
+        if (get_focus()->get_name() == "BPM Edit")        // if we are on the BPM spin button - allow editing
+            return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
+
+        if (get_focus()->get_name() == "Screen Set")        // if we are on the Screen Set spin button - allow editing
+            return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
+
+        // the start/end key may be the same key (i.e. SPACE)
+        // allow toggling when the same key is mapped to both
+        // triggers (i.e. SPACEBAR)
+        bool dont_toggle = m_mainperf->m_key_start != m_mainperf->m_key_stop;
+
+        if ( a_ev->keyval == m_mainperf->m_key_start
+                && (dont_toggle || !is_pattern_playing))
+        {
+            start_playing();
+        }
+        else if ( a_ev->keyval == m_mainperf->m_key_stop
+                && (dont_toggle || is_pattern_playing))
+        {
+            stop_playing();
+        }
+
     }
 
     return false;

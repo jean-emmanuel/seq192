@@ -92,7 +92,8 @@ class mainwnd : public Gtk::Window
 
     void adj_callback_ss( );
     void adj_callback_bpm( );
-    void edit_callback_notepad( );
+    bool edit_callback_notepad( GdkEventFocus *focus );
+    void edit_enter_callback_notepad( );
     bool timer_callback( );
 
     void start_playing();
