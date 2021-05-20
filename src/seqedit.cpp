@@ -222,6 +222,8 @@ seqedit::seqedit( sequence *a_seq,
     m_button_data = manage( new Button( " Event " ));
     m_button_data->signal_clicked().connect(
             mem_fun( *this, &seqedit::popup_event_menu));
+    m_button_data->set_focus_on_click(false);
+
 
     m_entry_data = manage( new Entry( ));
     m_entry_data->set_size_request(40,-1);
@@ -237,24 +239,28 @@ seqedit::seqedit( sequence *a_seq,
     m_toggle_play->signal_clicked().connect(
             mem_fun( *this, &seqedit::play_change_callback));
     m_toggle_play->set_tooltip_text( "Sequence dumps data to midi bus." );
+    m_toggle_play->set_focus_on_click(false);
 
     m_toggle_record = manage( new ToggleButton(  ));
     m_toggle_record->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( rec_xpm ))));
     m_toggle_record->signal_clicked().connect(
             mem_fun( *this, &seqedit::record_change_callback));
     m_toggle_record->set_tooltip_text( "Records incoming midi data." );
+    m_toggle_record->set_focus_on_click(false);
 
     m_toggle_q_rec = manage( new ToggleButton(  ));
     m_toggle_q_rec->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( q_rec_xpm ))));
     m_toggle_q_rec->signal_clicked().connect(
             mem_fun( *this, &seqedit::q_rec_change_callback));
     m_toggle_q_rec->set_tooltip_text( "Quantized Record." );
+    m_toggle_q_rec->set_focus_on_click(false);
 
     m_button_rec_vol = manage( new Button());
     m_button_rec_vol->add( *manage( new Label("Vol")));
     m_button_rec_vol->signal_clicked().connect(
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_rec_vol  ));
     m_button_rec_vol->set_tooltip_text( "Select recording volume" );
+    m_button_rec_vol->set_focus_on_click(false);
 
     m_toggle_thru = manage( new ToggleButton(  ));
     m_toggle_thru->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( thru_xpm ))));
@@ -262,6 +268,7 @@ seqedit::seqedit( sequence *a_seq,
             mem_fun( *this, &seqedit::thru_change_callback));
     m_toggle_thru->set_tooltip_text( "Incoming midi data passes "
             "thru to sequences midi bus and channel." );
+    m_toggle_thru->set_focus_on_click(false);
 
     m_toggle_play->set_active( m_seq->get_playing());
     m_toggle_record->set_active( m_seq->get_recording());
@@ -765,7 +772,6 @@ seqedit::do_action( int a_action, int a_var )
     m_seqtime_wid->redraw();
     m_seqdata_wid->redraw();
     m_seqevent_wid->redraw();
-    m_seqroll_wid->grab_focus();
 }
 
 
@@ -795,6 +801,9 @@ seqedit::fill_top_bar()
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu),
                 m_menu_bpm  ));
     m_button_bpm->set_tooltip_text( "Time Signature. Beats per Measure" );
+    m_button_bpm->set_focus_on_click(false);
+
+
     m_entry_bpm = manage( new Entry());
     m_entry_bpm->set_width_chars(2);
     m_entry_bpm->set_editable( true );
@@ -815,6 +824,9 @@ seqedit::fill_top_bar()
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu),
                 m_menu_bw  ));
     m_button_bw->set_tooltip_text( "Time Signature. Length of Beat" );
+    m_button_bw->set_focus_on_click(false);
+
+
     m_entry_bw = manage( new Entry());
     m_entry_bw->set_width_chars(2);
     m_entry_bw->set_editable( false );
@@ -831,6 +843,8 @@ seqedit::fill_top_bar()
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu),
                 m_menu_length  ));
     m_button_length->set_tooltip_text( "Sequence length in Bars." );
+    m_button_length->set_focus_on_click(false);
+
     m_entry_length = manage( new Entry());
     m_entry_length->set_width_chars(3);
     m_entry_length->set_editable( true );
@@ -851,6 +865,7 @@ seqedit::fill_top_bar()
     m_button_bus->signal_clicked().connect(
             mem_fun( *this, &seqedit::popup_midibus_menu));
     m_button_bus->set_tooltip_text( "Select Output Bus." );
+    m_button_bus->set_focus_on_click(false);
 
     m_entry_bus = manage( new Entry());
     m_entry_bus->set_max_length(60);
@@ -867,6 +882,8 @@ seqedit::fill_top_bar()
     m_button_channel->signal_clicked().connect(
             mem_fun( *this, &seqedit::popup_midich_menu ));
     m_button_channel->set_tooltip_text( "Select Midi channel." );
+    m_button_channel->set_focus_on_click(false);
+
     m_entry_channel = manage( new Entry());
     m_entry_channel->set_max_length(30);
     m_entry_channel->set_width_chars(30);
@@ -884,6 +901,7 @@ seqedit::fill_top_bar()
     m_button_undo->signal_clicked().connect(
             mem_fun( *this, &seqedit::undo_callback));
     m_button_undo->set_tooltip_text( "Undo." );
+    m_button_undo->set_focus_on_click(false);
 
     m_hbox2->pack_start( *m_button_undo , false, false );
 
@@ -894,6 +912,7 @@ seqedit::fill_top_bar()
     m_button_redo->signal_clicked().connect(
             mem_fun( *this, &seqedit::redo_callback));
     m_button_redo->set_tooltip_text( "Redo." );
+    m_button_redo->set_focus_on_click(false);
 
     m_hbox2->pack_start( *m_button_redo , false, false );
 
@@ -903,6 +922,7 @@ seqedit::fill_top_bar()
     m_button_quanize->signal_clicked().connect(
             sigc::bind(mem_fun(*this, &seqedit::do_action), quantize_notes, 0));
     m_button_quanize->set_tooltip_text( "Quantize Selection." );
+    m_button_quanize->set_focus_on_click(false);
 
     m_hbox2->pack_start( *m_button_quanize , false, false );
 
@@ -913,6 +933,8 @@ seqedit::fill_top_bar()
     m_button_tools->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( tools_xpm  ))));
     m_button_tools->signal_clicked().connect(
             mem_fun( *this, &seqedit::popup_tool_menu ));
+    m_button_tools->set_focus_on_click(false);
+    
     m_tooltips->set_tip(  *m_button_tools, "Tools." );
 
     m_hbox2->pack_start( *m_button_tools , false, false );
@@ -924,6 +946,9 @@ seqedit::fill_top_bar()
     m_button_snap->signal_clicked().connect(
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu),
                 m_menu_snap  ));
+    m_button_snap->set_focus_on_click(false);
+
+
     m_button_snap->set_tooltip_text( "Grid snap." );
     m_entry_snap = manage( new Entry());
     m_entry_snap->set_width_chars(5);
@@ -940,6 +965,8 @@ seqedit::fill_top_bar()
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu),
                 m_menu_note_length  ));
     m_button_note_length->set_tooltip_text( "Note Length." );
+    m_button_note_length->set_focus_on_click(false);
+
     m_entry_note_length = manage( new Entry());
     m_entry_note_length->set_width_chars(5);
     m_entry_note_length->set_editable( false );
@@ -956,6 +983,8 @@ seqedit::fill_top_bar()
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu),
                 m_menu_zoom  ));
     m_button_zoom->set_tooltip_text( "Zoom. Pixels to Ticks" );
+    m_button_zoom->set_focus_on_click(false);
+
     m_entry_zoom = manage( new Entry());
     m_entry_zoom->set_width_chars(4);
     m_entry_zoom->set_editable( false );
@@ -974,6 +1003,8 @@ seqedit::fill_top_bar()
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu),
                 m_menu_key  ));
     m_button_key->set_tooltip_text( "Key of Sequence" );
+    m_button_key->set_focus_on_click(false);
+
     m_entry_key = manage( new Entry());
     m_entry_key->set_width_chars(5);
     m_entry_key->set_editable( false );
@@ -989,6 +1020,8 @@ seqedit::fill_top_bar()
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu),
                 m_menu_scale  ));
     m_button_scale->set_tooltip_text( "Musical Scale" );
+    m_button_scale->set_focus_on_click(false);
+
     m_entry_scale = manage( new Entry());
     m_entry_scale->set_width_chars(5);
     m_entry_scale->set_editable( false );
@@ -1005,6 +1038,8 @@ seqedit::fill_top_bar()
     m_button_sequence->signal_clicked().connect(
             mem_fun( *this, &seqedit::popup_sequence_menu));
     m_button_sequence->set_tooltip_text( "Background Sequence" );
+    m_button_sequence->set_focus_on_click(false);
+
     m_entry_sequence = manage( new Entry());
     m_entry_sequence->set_width_chars(14);
     m_entry_sequence->set_editable( false );
@@ -1136,9 +1171,6 @@ seqedit::set_background_sequence( int a_seq )
         m_seqroll_wid->set_background_sequence( true, a_seq );
 
     }
-
-    m_seqroll_wid->grab_focus();
-
 }
 
 
@@ -1279,7 +1311,6 @@ seqedit::set_midi_channel( int a_midichannel  )
     }
     m_entry_channel->set_text(name);
     m_seq->set_midi_channel( a_midichannel );
-    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1293,7 +1324,6 @@ seqedit::set_midi_bus( int a_midibus )
     }
     mastermidibus *mmb =  m_mainperf->get_master_midi_bus();
     m_entry_bus->set_text( mmb->get_midi_out_bus_name( a_midibus ));
-    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1311,7 +1341,6 @@ seqedit::set_zoom( int a_zoom  )
     m_seqtime_wid->set_zoom( m_zoom );
     m_seqdata_wid->set_zoom( m_zoom );
     m_seqevent_wid->set_zoom( m_zoom );
-    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1328,7 +1357,6 @@ seqedit::set_snap( int a_snap  )
     m_seqroll_wid->set_snap( m_snap );
     m_seqevent_wid->set_snap( m_snap );
     m_seq->set_snap_tick(a_snap);
-    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1343,7 +1371,6 @@ seqedit::set_note_length( int a_note_length  )
     m_note_length = a_note_length;
     m_initial_note_length = a_note_length;
     m_seqroll_wid->set_note_length( m_note_length );
-    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1356,7 +1383,6 @@ seqedit::set_scale( int a_scale )
 
   m_seqroll_wid->set_scale( m_scale );
   m_seqkeys_wid->set_scale( m_scale );
-  m_seqroll_wid->grab_focus();
 }
 
 void
@@ -1368,7 +1394,6 @@ seqedit::set_key( int a_note )
 
   m_seqroll_wid->set_key( m_key );
   m_seqkeys_wid->set_key( m_key );
-  m_seqroll_wid->grab_focus();
 }
 
 
@@ -1536,7 +1561,6 @@ void
 seqedit::play_change_callback()
 {
     m_seq->set_playing( m_toggle_play->get_active() );
-    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1545,7 +1569,6 @@ seqedit::record_change_callback()
 {
     m_mainperf->get_master_midi_bus()->set_sequence_input( true, m_seq );
     m_seq->set_recording( m_toggle_record->get_active() );
-    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1553,7 +1576,6 @@ void
 seqedit::q_rec_change_callback()
 {
     m_seq->set_quanized_rec( m_toggle_q_rec->get_active() );
-    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1567,7 +1589,6 @@ seqedit::undo_callback()
     m_seqdata_wid->redraw();
     m_seqevent_wid->redraw();
     m_seq->set_dirty();
-    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1581,7 +1602,6 @@ seqedit::redo_callback()
     m_seqdata_wid->redraw();
     m_seqevent_wid->redraw();
     m_seq->set_dirty();
-    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1590,7 +1610,6 @@ seqedit::thru_change_callback()
 {
     m_mainperf->get_master_midi_bus()->set_sequence_input( true, m_seq );
     m_seq->set_thru( m_toggle_thru->get_active() );
-    m_seqroll_wid->grab_focus();
 }
 
 
@@ -1644,8 +1663,6 @@ seqedit::set_data_type( unsigned char a_status, unsigned char a_control  )
     snprintf(text, sizeof(text), "%s %s", hex, type );
 
     m_entry_data->set_text( text );
-    m_seqroll_wid->grab_focus();
-
 }
 
 

@@ -88,6 +88,7 @@ mainwnd::mainwnd(perform *a_p)
     m_button_stop->signal_clicked().connect(
             mem_fun(*this, &mainwnd::stop_playing));
     m_button_stop->set_tooltip_text( "Stop playing MIDI sequence" );
+    m_button_stop->set_focus_on_click(false);
     hbox->pack_start(*m_button_stop, false, false);
 
     /* play button */
@@ -96,7 +97,9 @@ mainwnd::mainwnd(perform *a_p)
                     Gdk::Pixbuf::create_from_xpm_data( play2_xpm ))));
     m_button_play->signal_clicked().connect(
             mem_fun( *this, &mainwnd::start_playing));
-    m_button_play->set_tooltip_text( "Play MIDI sequence" );
+            m_button_play->set_tooltip_text( "Play MIDI sequence" );
+    m_button_play->set_focus_on_click(false);
+
     hbox->pack_start(*m_button_play, false, false);
 
     /* bpm spin button */
