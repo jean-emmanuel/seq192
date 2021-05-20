@@ -66,58 +66,12 @@ AC_CHECK_FUNCS(select)
 
 AM_PATH_ALSA(0.9.0)
 
-####AM_PATH_GTKMM(1.2.0) OLD
-
 PKG_CHECK_MODULES(GTKMM, gtkmm-2.4 >= 2.4.0)
 AC_SUBST(GTKMM_CFLAGS)
 AC_SUBST(GTKMM_LIBS)
 
-dnl
-dnl     JACK SUPPORT
-dnl
-jack_support=yes
-
-AC_ARG_ENABLE(jack-support, [AS_HELP_STRING(--disable-jack-support, [Compile without JACK support])], [jack_support=$enableval])
-
-JACK_SUPPORT=0
-
-if test "$jack_support" != "no"; then
-        PKG_CHECK_MODULES(JACK, jack >= 0.90.0, jack_found="yes", jack_found="no")
-        if test "$jack_found" = "yes"; then
-                JACK_SUPPORT=1
-                AC_DEFINE(JACK_SUPPORT, 1, [Define to enable JACK driver])
-                USER_LDFLAGS="${USER_LDFLAGS} $(pkg-config --libs jack )"
-                features_list="${features_list} (Jack)"
-        else
-                AC_MSG_WARN([ *** Could not find the JACK library, disabling JACK support])
-        fi
-fi
-
+PKG_CHECK_MODULES(JACK, jack >= 0.90.0)
 AC_SUBST(JACK_CFLAGS)
 AC_SUBST(JACK_LIBS)
-
-
-dnl
-dnl    LASH SUPPORT
-dnl
-lash_support="yes"
-AC_ARG_ENABLE(lash,
-        [AS_HELP_STRING(--enable-lash, [Enable LASH session management support (true)])],
-        [ if test x$enable_lash = xno ; then lash_support=no ; fi ])
-
-lash_found="no"
-if test "$lash_support" = "yes"; then
-    PKG_CHECK_MODULES(LASH, lash-1.0 >= 0.5.0, lash_found="yes", lash_found="no")
-	if test "$lash_found" = "yes"; then
-		AC_DEFINE(LASH_SUPPORT, 1, [Define to enable LASH support])
-		AC_SUBST(LASH_CFLAGS)
-		AC_SUBST(LASH_LIBS)
-	else
-        AC_MSG_WARN([ *** LASH not found, session support will not be built.])
-	fi
-else
-	AC_MSG_WARN([ *** LASH support not enabled.]);
-fi
-
 
 AC_OUTPUT(Makefile man/Makefile src/Makefile)

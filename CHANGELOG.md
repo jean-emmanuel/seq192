@@ -15,6 +15,7 @@
 - midi: always use alsa ports
 - build: drop windows support
 - build: drop old gtkmm version
+- build: require jack
 - misc: remove --priority
 - misc: remove lash support
 - userfile: apply user bus/channel/control definitions

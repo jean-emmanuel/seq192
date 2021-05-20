@@ -313,9 +313,6 @@ void perform::osc_status( char* address, const char* path)
 
 void perform::init_jack()
 {
-
-#ifdef JACK_SUPPORT
-
     if ( global_with_jack_transport  && !m_jack_running)
     {
         m_jack_running = true;
@@ -348,14 +345,11 @@ void perform::init_jack()
         while (0);
     }
 
-#endif
 }
 
 
 void perform::deinit_jack()
 {
-#ifdef JACK_SUPPORT
-
     if ( m_jack_running){
 
         //printf ( "deinit_jack() m_jack_running[%d]\n", m_jack_running );
@@ -372,8 +366,6 @@ void perform::deinit_jack()
     if ( !m_jack_running ){
         printf( "[JACK sync disabled]\n");
     }
-
-#endif
 }
 
 
@@ -710,35 +702,25 @@ void perform::set_orig_ticks( long a_tick  )
 void perform::start_jack(  )
 {
     //printf( "perform::start_jack()\n" );
-#ifdef JACK_SUPPORT
     if ( m_jack_running)
         jack_transport_start (m_jack_client );
-#endif
 }
 
 
 void perform::stop_jack(  )
 {
     //printf( "perform::stop_jack()\n" );
-#ifdef JACK_SUPPORT
     if( m_jack_running )
         jack_transport_stop (m_jack_client);
-#endif
 }
 
 
 void perform::position_jack()
 {
-
     //printf( "perform::position_jack()\n" );
-
-#ifdef JACK_SUPPORT
-
     if ( m_jack_running ){
         jack_transport_locate( m_jack_client, 0 );
     }
-
-#endif
 }
 
 
@@ -869,8 +851,6 @@ void* output_thread_func(void *a_pef )
 
 
 
-#ifdef JACK_SUPPORT
-
 int jack_process_callback(jack_nframes_t nframes, void* arg)
 {
     perform *m_mainperf = (perform *) arg;
@@ -891,7 +871,6 @@ int jack_process_callback(jack_nframes_t nframes, void* arg)
     return 0;
 }
 
-#endif
 
 
 void perform::output_func()
@@ -926,9 +905,7 @@ void perform::output_func()
         long long delta_time;
 
         if (m_jack_running) {
-#ifdef JACK_SUPPORT
             last_time = jack_get_time();
-#endif
         } else {
             clock_gettime(CLOCK_REALTIME, &system_time);
             last_time = (system_time.tv_sec * 1000000) + (system_time.tv_nsec / 1000);
@@ -952,9 +929,7 @@ void perform::output_func()
             // delta time
             if (m_jack_running) {
                 // jack
-#ifdef JACK_SUPPORT
                 delta_time = jack_get_time() - last_time;
-#endif
             } else {
                 // or system
                 clock_gettime(CLOCK_REALTIME, &system_time);
@@ -1060,8 +1035,6 @@ void perform::restore_playing_state()
     }
 }
 
-#ifdef JACK_SUPPORT
-
 void jack_shutdown(void *arg)
 {
     perform *p = (perform *) arg;
@@ -1069,5 +1042,3 @@ void jack_shutdown(void *arg)
 
     printf("JACK shut down.\nJACK sync Disabled.\n");
 }
-
-#endif

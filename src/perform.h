@@ -32,12 +32,8 @@ class perform;
 #include <unistd.h>
 #include <pthread.h>
 
-
-/* if we have jack, include the jack headers */
-#ifdef JACK_SUPPORT
 #include <jack/jack.h>
 #include <jack/transport.h>
-#endif
 
 
 /* class contains sequences that make up a live set */
@@ -99,13 +95,8 @@ class perform
     std::map<long,unsigned int> key_groups_rev; // reverse lookup, keep this in sync!!
 
 
-#ifdef JACK_SUPPORT
-
     jack_client_t *m_jack_client;
     double m_jack_bpm;
-
-#endif
-
     bool m_jack_running;
 
     void inner_start();
@@ -253,12 +244,8 @@ class perform
     friend class optionsfile;
     friend class options;
 
-#ifdef JACK_SUPPORT
-
     friend int jack_process_callback(jack_nframes_t nframes, void* arg);
     friend void jack_shutdown(void *arg);
-
-#endif
 };
 
 /* located in perform.C */
@@ -266,13 +253,7 @@ extern void *output_thread_func(void *a_p);
 extern void *input_thread_func(void *a_p);
 
 
-
-#ifdef JACK_SUPPORT
-
 int jack_process_callback(jack_nframes_t nframes, void* arg);
 void jack_shutdown(void *arg);
-
-#endif
-
 
 #endif
