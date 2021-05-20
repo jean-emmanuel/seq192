@@ -37,31 +37,19 @@ option long_options[] = {
 
     {"file",     required_argument, 0, 'f'},
     {"help",     0, 0, 'h'},
-    {"showmidi",     0, 0, 's'},
-    {"show_keys",     0, 0, 'k' },
-    {"stats",     0, 0, 'S' },
-    {"ignore",required_argument, 0, 'i'},
-    {"interaction_method",required_argument, 0, 'x'},
-    {"jack_transport",0, 0, 'j'},
-    {"show_keys", 0,0,'k'},
-    {"osc_port", 1,0,'o'},
-    {"key_size", 1,0,'o'},
+    {"jack-transport",0, 0, 'j'},
+    {"osc-port", 1,0,'p'},
     {0, 0, 0, 0}
 
 };
 
-bool global_showmidi = false;
-bool global_device_ignore = false;
-int global_device_ignore_num = 0;
-bool global_stats = false;
 Glib::ustring global_filename = "";
 Glib::ustring last_used_dir ="/";
 std::string config_filename = ".seq24rc";
 std::string user_filename = ".seq24usr";
-bool global_print_keys = false;
-interaction_method_e global_interactionmethod = e_seq24_interaction;
 
 bool global_with_jack_transport = false;
+interaction_method_e global_interactionmethod = e_seq24_interaction;
 
 char* global_oscport;
 
@@ -89,7 +77,7 @@ main (int argc, char *argv[])
     }
 
     /* the main performance object */
-    perform p;
+    perform * p = new perform();
 
     /* all GTK applications must have a gtk_main(). Control ends here
        and waits for an event to occur (like a key press or mouse event). */
@@ -107,7 +95,7 @@ main (int argc, char *argv[])
 
         optionsfile options( total_file );
 
-        if ( !options.parse( &p ) ){
+        if ( !options.parse( p ) ){
             printf( "Error Reading [%s]\n", total_file.c_str());
         }
 
@@ -116,7 +104,7 @@ main (int argc, char *argv[])
 
         userfile user( total_file );
 
-        if ( !user.parse( &p ) ){
+        if ( !user.parse( p ) ){
             printf( "Error Reading [%s]\n", total_file.c_str());
         }
 
@@ -129,8 +117,6 @@ main (int argc, char *argv[])
 
     /* parse parameters */
     int c;
-
-
     while (1){
 
         /* getopt_long stores the option index here. */
@@ -149,28 +135,13 @@ main (int argc, char *argv[])
 
                 printf( "usage: seq24 [options]\n\n" );
                 printf( "options:\n" );
-                printf( "    --help : show this message\n" );
-                printf( "    --file <filename> : load midi file on startup\n" );
-                printf( "    --showmidi : dumps incoming midi to screen\n" );
-                printf( "    --show_keys : prints pressed key value\n" );
-                printf( "    --interaction_method <number>: see .seq24rc for methods to use\n" );
-                printf( "    --jack_transport : seq24 will sync to jack transport\n" );
-                printf( "    --osc_port : osc input port (udp port number or unix socket path)\n" );
-                printf( "\n\n\n" );
+                printf( "  -h, --help : show this message\n" );
+                printf( "  -f, --file <filename> : load midi file on startup\n" );
+                printf( "  -p, --osc-port <port> : osc input port (udp port number or unix socket path)\n" );
+                printf( "  -j, --jack-transport : sync to jack transport\n" );
+                printf( "\n\n" );
 
                 return 0;
-                break;
-
-            case 'S':
-                global_stats = true;
-                break;
-
-            case 's':
-                global_showmidi = true;
-                break;
-
-            case 'k':
-                global_print_keys = true;
                 break;
 
             case 'j':
@@ -181,17 +152,7 @@ main (int argc, char *argv[])
                 global_filename = Glib::ustring(optarg);
                break;
 
-            case 'i':
-                /* ignore alsa device */
-                global_device_ignore = true;
-                global_device_ignore_num = atoi( optarg );
-                break;
-
-            case 'x':
-                global_interactionmethod = (interaction_method_e)atoi( optarg );
-                break;
-
-            case 'o':
+            case 'p':
                 global_oscport = optarg;
                 break;
 
@@ -199,32 +160,25 @@ main (int argc, char *argv[])
                 break;
         }
 
-    } /* end while */
+    }
 
 
-    p.init();
+    p->init();
 
-    p.launch_input_thread();
-    p.launch_output_thread();
-    p.init_jack();
+    p->launch_input_thread();
+    p->launch_output_thread();
+    p->init_jack();
 
     if (global_filename != "") {
         /* import that midi file */
         midifile *f = new midifile(global_filename);
-        f->parse( &p, 0 );
+        f->parse( p, 0 );
         delete f;
     }
 
-    mainwnd seq24_window( &p );
+    mainwnd seq24_window( p );
 
     kit.run(seq24_window);
-
-    p.deinit_jack();
-
-    if (global_oscport != 0) {
-        p.oscserver->stop();
-        delete p.oscserver;
-    }
 
     if ( getenv( HOME ) != NULL ){
 
@@ -234,7 +188,7 @@ main (int argc, char *argv[])
 
         optionsfile options( total_file );
 
-        if ( !options.write( &p ) ){
+        if ( !options.write( p ) ){
             printf( "Error writing [%s]\n", total_file.c_str());
         }
 
@@ -242,6 +196,8 @@ main (int argc, char *argv[])
 
         printf( "Error calling getenv( \"%s\" )\n", HOME );
     }
+
+    delete p;
 
     return 0;
 }

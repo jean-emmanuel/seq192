@@ -405,6 +405,13 @@ perform::~perform()
             delete m_seqs[i];
         }
     }
+
+    deinit_jack();
+
+    if (global_oscport != 0) {
+        oscserver->stop();
+        delete oscserver;
+    }
 }
 
 void perform::add_sequence( sequence *a_seq, int a_perf )
@@ -985,9 +992,6 @@ void perform::input_func()
 
                     /* filter system wide messages */
                     if (ev.get_status() <= EVENT_SYSEX) {
-
-                        if( global_showmidi)
-                            ev.print();
 
                         /* is there a sequence set? */
                         if (m_master_bus.is_dumping()) {

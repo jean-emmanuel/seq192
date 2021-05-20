@@ -46,9 +46,6 @@ class perform
     bool m_mode_group;
     bool m_mode_group_learn;
     int m_mute_group_selected;
-    //andy playing screen
-    int m_playing_screen;
-
 
     /* vector of sequences */
     sequence *m_seqs[c_max_sequence];

@@ -150,8 +150,6 @@ const int c_names_x = 6 * 24;
 const int c_names_y = 22;
 const int c_perf_scale_x = 32; /*ticks per pixel */
 
-extern bool global_showmidi;
-extern bool global_stats;
 extern bool global_with_jack_transport;
 extern char* global_oscport;
 
@@ -160,8 +158,6 @@ extern bool global_is_modified;
 extern Glib::ustring global_filename;
 extern Glib::ustring last_used_dir;
 extern bool is_pattern_playing;
-
-extern bool global_print_keys;
 
 const int c_max_instruments = 64;
 
