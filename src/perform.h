@@ -168,8 +168,6 @@ class perform
     bool is_active(int a_sequence);
     bool is_dirty_main (int a_sequence);
     bool is_dirty_edit (int a_sequence);
-    bool is_dirty_perf (int a_sequence);
-    bool is_dirty_names (int a_sequence);
 
     void new_sequence( int a_sequence );
 

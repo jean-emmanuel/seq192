@@ -56,8 +56,6 @@ sequence::sequence( )
     m_masterbus = NULL;
     m_dirty_main = true;
     m_dirty_edit = true;
-    m_dirty_perf = true;
-    m_dirty_names = true;
 
     m_have_undo = false;
     m_have_redo = false;
@@ -181,7 +179,7 @@ sequence::set_bpm( long a_beats_per_measure )
 {
     lock();
     m_time_beats_per_measure = a_beats_per_measure;
-    set_dirty_mp();
+    set_dirty_main();
     unlock();
 }
 
@@ -196,7 +194,7 @@ sequence::set_bw( long a_beat_width )
 {
     lock();
     m_time_beat_width = a_beat_width;
-    set_dirty_mp();
+    set_dirty_main();
     unlock();
 }
 
@@ -250,7 +248,7 @@ sequence::toggle_queued()
 {
     lock();
 
-    set_dirty_mp();
+    set_dirty_main();
 
     m_queued = !m_queued;
     m_queued_tick = m_last_tick - (m_last_tick % m_length) + m_length;
@@ -264,7 +262,7 @@ sequence::off_queued()
 
     lock();
 
-    set_dirty_mp();
+    set_dirty_main();
 
     m_queued = false;
 
@@ -1913,10 +1911,10 @@ sequence::stream_event(  event *a_ev  )
 
 
 void
-sequence::set_dirty_mp()
+sequence::set_dirty_main()
 {
     //printf( "set_dirtymp\n" );
-    m_dirty_names =  m_dirty_main =  m_dirty_perf = true;
+    m_dirty_main = true;
 }
 
 
@@ -1924,21 +1922,7 @@ void
 sequence::set_dirty()
 {
     //printf( "set_dirty\n" );
-    m_dirty_names = m_dirty_main =  m_dirty_perf = m_dirty_edit = true;
-}
-
-
-bool
-sequence::is_dirty_names( )
-{
-    lock();
-
-    bool ret = m_dirty_names;
-    m_dirty_names = false;
-
-    unlock();
-
-    return ret;
+    m_dirty_main = m_dirty_edit = true;
 }
 
 bool
@@ -1953,21 +1937,6 @@ sequence::is_dirty_main( )
 
     return ret;
 }
-
-
-bool
-sequence::is_dirty_perf( )
-{
-    lock();
-
-    bool ret = m_dirty_perf;
-    m_dirty_perf = false;
-
-    unlock();
-
-    return ret;
-}
-
 
 bool
 sequence::is_dirty_edit( )
@@ -2495,14 +2464,14 @@ void
 sequence::set_name( char *a_name )
 {
     m_name = a_name;
-    set_dirty_mp();
+    set_dirty_main();
 }
 
 void
 sequence::set_name( string a_name )
 {
     m_name = a_name;
-    set_dirty_mp();
+    set_dirty_main();
 }
 
 void

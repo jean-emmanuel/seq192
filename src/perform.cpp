@@ -516,39 +516,6 @@ bool perform::is_dirty_edit (int a_sequence)
 }
 
 
-bool perform::is_dirty_perf (int a_sequence)
-{
-    if ( a_sequence < 0 || a_sequence >= c_max_sequence )
-        return false;
-
-    if ( is_active(a_sequence) )
-    {
-        return m_seqs[a_sequence]->is_dirty_perf();
-    }
-
-    bool was_active = m_was_active_perf[ a_sequence ];
-    m_was_active_perf[ a_sequence ] = false;
-
-    return was_active;
-}
-
-
-bool perform::is_dirty_names (int a_sequence)
-{
-    if ( a_sequence < 0 || a_sequence >= c_max_sequence )
-        return false;
-
-    if ( is_active(a_sequence) )
-    {
-        return m_seqs[a_sequence]->is_dirty_names();
-    }
-
-    bool was_active = m_was_active_names[ a_sequence ];
-    m_was_active_names[ a_sequence ] = false;
-
-    return was_active;
-}
-
 sequence* perform::get_sequence( int a_sequence )
 {
     return m_seqs[a_sequence];

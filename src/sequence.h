@@ -82,8 +82,6 @@ class sequence
        a recording */
     bool m_dirty_main;
     bool m_dirty_edit;
-    bool m_dirty_perf;
-    bool m_dirty_names;
 
     /* anything editing currently ? */
     bool m_editing;
@@ -223,11 +221,8 @@ class sequence
     /* resets flag on call */
     bool is_dirty_main ();
     bool is_dirty_edit ();
-    bool is_dirty_perf ();
-    bool is_dirty_names ();
 
-
-    void set_dirty_mp();
+    void set_dirty_main();
     void set_dirty();
 
     /* midi channel */
