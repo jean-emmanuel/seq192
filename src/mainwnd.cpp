@@ -110,6 +110,9 @@ mainwnd::mainwnd(perform *a_p)
     m_spinbutton_bpm->set_digits(2);
     m_adjust_bpm->signal_value_changed().connect(
             mem_fun(*this, &mainwnd::adj_callback_bpm ));
+    m_spinbutton_bpm->signal_activate().connect(
+            mem_fun(*this, &mainwnd::adj_enter_callback_bpm));
+
     m_spinbutton_bpm->set_tooltip_text( "Adjust beats per minute (BPM) value" );
     hbox->pack_start(*(manage( new Label( "  bpm " ))), false, false, 4);
     hbox->pack_start(*m_spinbutton_bpm, false, false );
@@ -122,6 +125,8 @@ mainwnd::mainwnd(perform *a_p)
     m_spinbutton_ss->set_wrap( true );
     m_adjust_ss->signal_value_changed().connect(
             mem_fun(*this, &mainwnd::adj_callback_ss ));
+    m_spinbutton_ss->signal_activate().connect(
+            mem_fun(*this, &mainwnd::adj_enter_callback_ss));
     m_spinbutton_ss->set_tooltip_text( "Select sreen set" );
     hbox->pack_end(*m_spinbutton_ss, false, false );
     hbox->pack_end(*(manage( new Label( "  set " ))), false, false, 4);
@@ -724,15 +729,27 @@ mainwnd::adj_callback_ss( )
     m_mainperf->set_screenset( (int) m_adjust_ss->get_value());
     m_main_wid->set_screenset( m_mainperf->get_screenset());
     m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
-                m_mainperf->get_screenset()));
+    m_mainperf->get_screenset()));
 }
 
+void
+mainwnd::adj_enter_callback_ss( )
+{
+    m_main_wid->grab_focus();
+}
 
 void
 mainwnd::adj_callback_bpm( )
 {
     m_mainperf->set_bpm(m_adjust_bpm->get_value());
 }
+
+void
+mainwnd::adj_enter_callback_bpm( )
+{
+    m_main_wid->grab_focus();
+}
+
 
 bool
 mainwnd::edit_callback_notepad( GdkEventFocus *focus )

@@ -91,7 +91,9 @@ class mainwnd : public Gtk::Window
     void about_dialog();
 
     void adj_callback_ss( );
+    void adj_enter_callback_ss( );
     void adj_callback_bpm( );
+    void adj_enter_callback_bpm( );
     bool edit_callback_notepad( GdkEventFocus *focus );
     void edit_enter_callback_notepad( );
     bool timer_callback( );
