@@ -37,7 +37,6 @@ sequence::sequence( )
 
     m_time_beats_per_measure = 4;
     m_time_beat_width = 4;
-    m_rec_vol = 0;
 
     //m_tag           = 0;
 
@@ -196,14 +195,6 @@ sequence::set_bw( long a_beat_width )
     lock();
     m_time_beat_width = a_beat_width;
     set_dirty_main();
-    unlock();
-}
-
-void
-sequence::set_rec_vol( long a_rec_vol )
-{
-    lock();
-    m_rec_vol = a_rec_vol;
     unlock();
 }
 

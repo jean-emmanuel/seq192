@@ -106,7 +106,6 @@ class sequence
     //long m_length_measures;
     long m_time_beats_per_measure;
     long m_time_beat_width;
-    long m_rec_vol;
 
     /* locking */
     smutex m_mutex;
@@ -167,7 +166,6 @@ class sequence
 
     void set_bw (long a_beat_width);
     long get_bw();
-    void set_rec_vol (long a_rec_vol);
 
     /* returns string of name */
     const char *get_name();

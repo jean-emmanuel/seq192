@@ -166,7 +166,6 @@ seqedit::seqedit( sequence *a_seq,
     m_menu_length = manage( new Menu());
     m_menu_bpm = manage( new Menu() );
     m_menu_bw = manage( new Menu() );
-    m_menu_rec_vol = manage( new Menu() );
 
     m_menu_midich = NULL;
     m_menu_midibus = NULL;
@@ -262,13 +261,6 @@ seqedit::seqedit( sequence *a_seq,
     m_toggle_q_rec->set_tooltip_text( "Quantized Record." );
     m_toggle_q_rec->set_focus_on_click(false);
 
-    m_button_rec_vol = manage( new Button());
-    m_button_rec_vol->add( *manage( new Label("Vol")));
-    m_button_rec_vol->signal_clicked().connect(
-            sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_rec_vol  ));
-    m_button_rec_vol->set_tooltip_text( "Select recording volume" );
-    m_button_rec_vol->set_focus_on_click(false);
-
     m_toggle_thru = manage( new ToggleButton(  ));
     m_toggle_thru->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( thru_xpm ))));
     m_toggle_thru->signal_clicked().connect(
@@ -281,7 +273,6 @@ seqedit::seqedit( sequence *a_seq,
     m_toggle_record->set_active( m_seq->get_recording());
     m_toggle_thru->set_active( m_seq->get_thru());
 
-    dhbox->pack_end( *m_button_rec_vol, false, false, 4);
     dhbox->pack_end( *m_toggle_q_rec, false, false, 4);
     dhbox->pack_end( *m_toggle_record, false, false, 4);
     dhbox->pack_end( *m_toggle_thru, false, false, 4);
@@ -489,26 +480,6 @@ seqedit::create_menus()
                 sigc::bind(mem_fun(*this, &seqedit::set_bw), 64 )));
     m_menu_bw->items().push_back(MenuElem("128",
                 sigc::bind(mem_fun(*this, &seqedit::set_bw), 128 )));
-
-    /* record volume */
-    m_menu_rec_vol->items().push_back(MenuElem("Free",
-                sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 0)));
-    m_menu_rec_vol->items().push_back(MenuElem("Fixed 8",
-                sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 127)));
-    m_menu_rec_vol->items().push_back(MenuElem("Fixed 7",
-                sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 111)));
-    m_menu_rec_vol->items().push_back(MenuElem("Fixed 6",
-                sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 95)));
-    m_menu_rec_vol->items().push_back(MenuElem("Fixed 5",
-                sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 79)));
-    m_menu_rec_vol->items().push_back(MenuElem("Fixed 4",
-                sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 63)));
-    m_menu_rec_vol->items().push_back(MenuElem("Fixed 3",
-                sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 47)));
-    m_menu_rec_vol->items().push_back(MenuElem("Fixed 2",
-                sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 31)));
-    m_menu_rec_vol->items().push_back(MenuElem("Fixed 1",
-                sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 15)));
 
     /* music scale */
     m_menu_scale->items().push_back(MenuElem(c_scales_text[0],
@@ -1539,12 +1510,6 @@ seqedit::set_bw( int a_beat_width  )
     }
 }
 
-
-void
-seqedit::set_rec_vol( int a_rec_vol  )
-{
-    m_seq->set_rec_vol( a_rec_vol );
-}
 
 
 bool
