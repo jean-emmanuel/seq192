@@ -125,6 +125,7 @@ class seqdata : public Gtk::DrawingArea
 
     friend class seqroll;
     friend class seqevent;
+    friend class lfownd;
 
 };
 

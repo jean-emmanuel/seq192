@@ -155,6 +155,7 @@ seqedit::seqedit( sequence *a_seq,
                                            m_vadjust ));
 
 
+    m_lfo_wnd =  new lfownd( m_seq, m_seqdata_wid);  // child window not managed - must be deleted on seqedit delete_event
 
     /* menus */
     m_menubar   =  manage( new MenuBar());
@@ -232,6 +233,12 @@ seqedit::seqedit( sequence *a_seq,
 
     dhbox->pack_start( *m_button_data, false, false );
     dhbox->pack_start( *m_entry_data, true, true );
+
+    /* lfo button */
+    m_button_lfo = manage (new Button("LFO") );
+    m_button_lfo->set_focus_on_click(false);
+    dhbox->pack_start(*m_button_lfo, false, false);
+    m_button_lfo->signal_clicked().connect ( mem_fun(m_lfo_wnd, &lfownd::toggle_visible));
 
     /* play, rec, thru */
     m_toggle_play = manage( new ToggleButton() );
@@ -934,7 +941,7 @@ seqedit::fill_top_bar()
     m_button_tools->signal_clicked().connect(
             mem_fun( *this, &seqedit::popup_tool_menu ));
     m_button_tools->set_focus_on_click(false);
-    
+
     m_tooltips->set_tip(  *m_button_tools, "Tools." );
 
     m_hbox2->pack_start( *m_button_tools , false, false );
@@ -1723,6 +1730,7 @@ seqedit::on_delete_event(GdkEventAny *a_event)
     m_mainperf->get_master_midi_bus()->set_sequence_input( false, NULL );
     m_seq->set_editing( false );
 
+    delete m_lfo_wnd;
     delete this;
 
     return false;

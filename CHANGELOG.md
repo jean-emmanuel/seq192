@@ -6,6 +6,7 @@
 - sequence: (seq32) trigger value handle undo/redo
 - sequence: (seq32) nudge notes with keyboard arrows
 - sequence: (seq32) pitch/time menu actions
+- sequence: (seq32) lfo editor
 - sequence: redo on ctrl+y and ctrl+shift+z
 - sequence: unselect on ctrl+shift+a
 - sequence: fix start/stop keyboard shortcuts

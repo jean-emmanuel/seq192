@@ -323,6 +323,11 @@ class sequence
 				  int a_d_s, int a_d_f);
 				  //unsigned char a_d_s, unsigned char a_d_f);
 
+    /* lfo tool */
+    void change_event_data_lfo(double a_value, double a_range,
+                               double a_speed, double a_phase, int a_wave,
+                               unsigned char a_status, unsigned char a_cc);
+
     /* moves note off event */
     void increment_selected (unsigned char a_status, unsigned char a_control);
     void decrement_selected (unsigned char a_status, unsigned char a_control);
