@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.12.0
+## 0.12.0
 
 - sequence: (seq32) trigger undo/redo
 - sequence: (seq32) trigger value handle undo/redo
@@ -17,7 +17,7 @@
 - build: drop windows support
 - build: drop old gtkmm version
 - build: require jack
-- misc: remove --priority
+- misc: remove cli options except --jack-transport and --osc-port
 - misc: remove lash support
 - userfile: apply user bus/channel/control definitions
 - sequence: display user channel definition
