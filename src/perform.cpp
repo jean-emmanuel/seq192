@@ -351,21 +351,24 @@ void perform::init_jack()
 
 void perform::deinit_jack()
 {
-    if ( m_jack_running){
+    if (global_with_jack_transport) {
 
-        //printf ( "deinit_jack() m_jack_running[%d]\n", m_jack_running );
+        if (m_jack_running) {
 
-        m_jack_running = false;
+            //printf ( "deinit_jack() m_jack_running[%d]\n", m_jack_running );
 
-        if (jack_client_close(m_jack_client)) {
-            printf("Cannot close JACK client.\n");
+            m_jack_running = false;
+
+            if (jack_client_close(m_jack_client)) {
+                printf("Cannot close JACK client.\n");
+            }
+
         }
 
+        if (!m_jack_running){
+            printf( "[JACK sync disabled]\n");
+        }
 
-    }
-
-    if ( !m_jack_running ){
-        printf( "[JACK sync disabled]\n");
     }
 }
 
