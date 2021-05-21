@@ -19,7 +19,7 @@ seq24_SOURCES = \
 	midifile.cpp midifile.h \
 	mutex.cpp mutex.h \
 	optionsfile.cpp optionsfile.h \
-	oscserver.cpp oscserver.h \
+	osc.cpp osc.h \
 	perform.cpp perform.h \
 	seq24.cpp \
 	seqdata.cpp seqdata.h \

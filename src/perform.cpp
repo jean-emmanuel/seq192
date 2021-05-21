@@ -19,7 +19,7 @@
 //-----------------------------------------------------------------------------
 
 #include "perform.h"
-#include "oscserver.h"
+#include "osc.h"
 #include "midibus.h"
 #include "event.h"
 #include <stdio.h>

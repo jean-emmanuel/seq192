@@ -28,7 +28,7 @@ class perform;
 #include "midibus.h"
 #include "midifile.h"
 #include "sequence.h"
-#include "oscserver.h"
+#include "osc.h"
 #include <unistd.h>
 #include <pthread.h>
 
