@@ -57,7 +57,8 @@ Send sequencer's status as json, including sequences informations
             "bars": <int>,
             "ticks": <int>,
             "queued": <int>,
-            "on": <int>
+            "playing": <int>,
+            "timesPlayed": <int>
         },
         ...
     ]
@@ -81,4 +82,5 @@ Send sequencer's status as json, including sequences informations
 - bars: number of bars in sequence
 - ticks: sequence length
 - queued: sequence's queued state
-- on: sequence's playing state
+- playing: sequence's playing state
+- timesPlayed: number of times the sequence played since last enabled

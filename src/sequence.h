@@ -94,6 +94,8 @@ class sequence
     long m_last_tick;
     long m_queued_tick;
 
+    long m_starting_tick;
+
     /* length of sequence in pulses
        should be powers of two in bars */
     long m_length;
@@ -207,6 +209,7 @@ class sequence
     void off_queued();
     bool get_queued();
     long get_queued_tick();
+    long get_times_played();
 
     void set_recording (bool);
     bool get_recording ();

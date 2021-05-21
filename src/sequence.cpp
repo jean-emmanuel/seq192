@@ -52,6 +52,7 @@ sequence::sequence( )
         m_playing_notes[i] = 0;
 
     m_last_tick = 0;
+    m_starting_tick = 0;
 
     m_masterbus = NULL;
     m_dirty_main = true;
@@ -280,6 +281,13 @@ sequence::get_queued_tick()
 {
     return m_queued_tick;
 }
+
+long
+sequence::get_times_played()
+{
+    return m_playing ? (m_last_tick - m_starting_tick) / m_length : 0;
+}
+
 
 
 /* tick comes in as global tick */
@@ -2371,6 +2379,8 @@ sequence::set_playing( bool a_p )
 
             /* turn on */
             m_playing = true;
+
+            m_starting_tick = m_last_tick - (m_last_tick % m_length);
 
         } else {
 
