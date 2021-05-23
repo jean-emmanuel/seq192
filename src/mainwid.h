@@ -25,6 +25,7 @@
 #include "seqmenu.h"
 
 class seqedit;
+class mainwnd;
 
 #ifndef SEQ24_MAINWID
 #define SEQ24_MAINWID
@@ -119,7 +120,7 @@ class mainwid : public Gtk::DrawingArea, public seqmenu
 
  public:
 
-    mainwid( perform *a_p );
+    mainwid( perform *a_p, mainwnd *a_main );
     ~mainwid( );
 
     void reset();

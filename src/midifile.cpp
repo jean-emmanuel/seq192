@@ -476,7 +476,7 @@ midifile::write_short (unsigned short a_x)
     m_l.push_front ((a_x & 0x00FF));
 }
 
-bool midifile::write (perform * a_perf)
+bool midifile::write (perform * a_perf, int a_screen_set, int a_sequence)
 {
     /* open binary file */
     ofstream file (m_name.c_str (), ios::out | ios::binary | ios::trunc);
@@ -492,13 +492,30 @@ bool midifile::write (perform * a_perf)
     event e;
     list<char> l;
 
-    int numtracks = 0;
-
     /* get number of tracks */
-    for (i = 0; i < c_max_sequence; i++)
-    {
-        if (a_perf->is_active (i))
-            numtracks++;
+    int numtracks = 0;
+    int minTrack = 0;
+    int maxTrack = 0;
+    if (a_sequence != -1) {
+        // sequence export
+        numtracks = 1;
+        minTrack = a_sequence;
+        maxTrack = a_sequence + 1;
+    } else {
+        if (a_screen_set != -1) {
+            // screenset export
+            minTrack = a_screen_set * c_seqs_in_set;
+            maxTrack = minTrack + c_seqs_in_set;
+        } else {
+            // session export
+            minTrack = 0;
+            maxTrack = c_max_sequence;
+        }
+        for (i = minTrack; i < maxTrack; i++)
+        {
+            if (a_perf->is_active (i))
+                numtracks++;
+        }
     }
 
     //printf ("numtracks[%d]\n", numtracks );
@@ -515,7 +532,7 @@ bool midifile::write (perform * a_perf)
 
     /* We should be good to load now   */
     /* for each Track in the midi file */
-    for (int curTrack = 0; curTrack < c_max_sequence; curTrack++)
+    for (int curTrack = minTrack; curTrack < maxTrack; curTrack++)
     {
 
         if (a_perf->is_active (curTrack))
@@ -524,7 +541,7 @@ bool midifile::write (perform * a_perf)
             //printf ("track[%d]\n", curTrack );
 
             seq = a_perf->get_sequence (curTrack);
-            seq->fill_list (&l, curTrack);
+            seq->fill_list (&l, curTrack - minTrack);
 
             /* magic number 'MTrk' */
             write_long (0x4D54726B);
@@ -541,16 +558,26 @@ bool midifile::write (perform * a_perf)
     }
 
     /* notepad data */
-    write_long (c_notes);
-    write_short (c_max_sets);
-
-    for (i = 0; i < c_max_sets; i++)
-    {
-        string * note = a_perf->get_screen_set_notepad (i);
+    if (a_screen_set != -1) {
+        write_long (c_notes);
+        write_short (1);
+        string * note = a_perf->get_screen_set_notepad (a_screen_set);
         write_short (note->length ());
 
         for (unsigned int j = 0; j < note->length (); j++)
             m_l.push_front ((*note)[j]);
+    } else {
+        write_long (c_notes);
+        write_short (c_max_sets);
+
+        for (i = 0; i < c_max_sets; i++)
+        {
+            string * note = a_perf->get_screen_set_notepad (i);
+            write_short (note->length ());
+
+            for (unsigned int j = 0; j < note->length (); j++)
+                m_l.push_front ((*note)[j]);
+        }
     }
 
 

@@ -42,7 +42,7 @@ mainwnd::mainwnd(perform *a_p)
     /* main window */
     update_window_title();
 
-    m_main_wid = manage( new mainwid( m_mainperf ));
+    m_main_wid = manage( new mainwid( m_mainperf, this ));
     m_main_time = manage( new maintime( ));
 
     m_menubar = manage(new MenuBar());
@@ -64,10 +64,12 @@ mainwnd::mainwnd(perform *a_p)
                 Gtk::AccelKey("<control>S"),
                 mem_fun(*this, &mainwnd::file_save)));
     m_menu_file->items().push_back(MenuElem("Save _as...",
-                mem_fun(*this, &mainwnd::file_save_as)));
+                sigc::bind(mem_fun(*this, &mainwnd::file_save_as), E_MIDI_SEQ24_SESSION, -1, -1)));
     m_menu_file->items().push_back(SeparatorElem());
     m_menu_file->items().push_back(MenuElem("_Import...",
                 mem_fun(*this, &mainwnd::file_import_dialog)));
+    m_menu_file->items().push_back(MenuElem("Export Screen Set...",
+                sigc::bind(mem_fun(*this, &mainwnd::file_save_as), E_MIDI_SEQ24_SCREENSET, 1, -1)));
     m_menu_file->items().push_back(SeparatorElem());
     m_menu_file->items().push_back(MenuElem("E_xit",
                 Gtk::AccelKey("<control>Q"),
@@ -371,10 +373,27 @@ void mainwnd::file_save()
 
 
 /* callback function */
-void mainwnd::file_save_as()
+void mainwnd::file_save_as(file_type_e type, int a_sset, int a_seq)
 {
     Gtk::FileChooserDialog dialog("Save file as",
                       Gtk::FILE_CHOOSER_ACTION_SAVE);
+
+    switch(type)
+    {
+        case E_MIDI_SEQ24_SEQUENCE:
+            dialog.set_title("Midi export sequence");
+            break;
+        case E_MIDI_SEQ24_SCREENSET:
+            dialog.set_title("Midi export screenset");
+            break;
+        case E_MIDI_SEQ24_SESSION:
+            break;
+    }
+
+    if (a_sset != -1) {
+        a_sset = m_mainperf->get_screenset();
+    }
+
     dialog.set_transient_for(*this);
 
     dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -422,9 +441,17 @@ void mainwnd::file_save_as()
                 if (result == Gtk::RESPONSE_NO)
                     return;
             }
-            global_filename = fname;
-            update_window_title();
-            save_file();
+
+            if(type == E_MIDI_SEQ24_SESSION)
+            {
+                global_filename = fname;
+                update_window_title();
+                save_file();
+            }
+            else
+            {
+                file_export(fname, a_sset, a_seq);
+            }
             break;
         }
 
@@ -510,12 +537,12 @@ bool mainwnd::save_file()
     bool result = false;
 
     if (global_filename == "") {
-        file_save_as();
+        file_save_as(E_MIDI_SEQ24_SESSION, -1, -1);
         return true;
     }
 
     midifile f(global_filename);
-    result = f.write(m_mainperf);
+    result = f.write(m_mainperf, -1, -1);
 
     if (!result) {
         Gtk::MessageDialog errdialog(*this,
@@ -525,6 +552,29 @@ bool mainwnd::save_file()
     }
     global_is_modified = !result;
     return result;
+}
+
+
+void mainwnd::file_export(const Glib::ustring& fn, int a_sset, int a_seq)
+{
+    bool result = false;
+
+    midifile f(fn);
+
+    result = f.write(m_mainperf, a_sset, a_seq);
+
+    if (!result)
+    {
+        Gtk::MessageDialog errdialog
+        (
+            *this,
+            "Error writing file.",
+            false,
+            Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK,
+            true
+        );
+        errdialog.run();
+    }
 }
 
 

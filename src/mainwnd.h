@@ -25,6 +25,7 @@
 #include "event.h"
 #include "maintime.h"
 
+class maintime;
 
 
 #ifndef SEQ24_MAINWINDOW
@@ -106,7 +107,9 @@ class mainwnd : public Gtk::Window
     void file_new();
     void file_open();
     void file_save();
-    void file_save_as();
+    void file_save_as(file_type_e type, int a_sset, int a_seq);
+    void file_export(const Glib::ustring& fn, int a_sset, int a_seq);
+
     void file_exit();
     void new_file();
     void open_file(const Glib::ustring&);
@@ -122,6 +125,8 @@ class mainwnd : public Gtk::Window
 
     bool on_delete_event(GdkEventAny *a_e);
     bool on_key_press_event(GdkEventKey* a_ev);
+
+    friend class seqmenu;
 
 };
 

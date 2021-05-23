@@ -21,15 +21,17 @@
 #include "seqmenu.h"
 #include "seqedit.h"
 #include "font.h"
+#include "mainwnd.h"
 
 
 // Constructor
 
-seqmenu::seqmenu( perform *a_p  )
+seqmenu::seqmenu( perform *a_p, mainwnd *a_main )
 {
     using namespace Menu_Helpers;
 
     m_mainperf = a_p;
+    m_mainwnd = a_main;
     m_menu = NULL;
 
     // init the clipboard, so that we don't get a crash
@@ -64,6 +66,8 @@ seqmenu::popup_menu()
     if ( m_mainperf->is_active( m_current_seq )) {
         m_menu->items().push_back(MenuElem("Cut", mem_fun(*this,&seqmenu::seq_cut)));
         m_menu->items().push_back(MenuElem("Copy", mem_fun(*this,&seqmenu::seq_copy)));
+        m_menu->items().push_back(MenuElem("Export sequence", mem_fun(*this,&seqmenu::seq_export)));
+
     } else {
         m_menu->items().push_back(MenuElem("Paste", mem_fun(*this,&seqmenu::seq_paste)));
     }
@@ -161,6 +165,16 @@ seqmenu::seq_copy(){
 
     if ( m_mainperf->is_active( m_current_seq ))
         m_clipboard = *(m_mainperf->get_sequence( m_current_seq ));
+}
+
+// Exports sequence to selected midi file
+void
+seqmenu::seq_export()
+{
+    if ( m_mainperf->is_active( m_current_seq ))
+    {
+        m_mainwnd->file_save_as(E_MIDI_SEQ24_SEQUENCE, -1, m_current_seq);
+    }
 }
 
 // Deletes and Copies to Clipboard */

@@ -327,4 +327,11 @@ const char* const c_interaction_method_descs[] =
 
 extern interaction_method_e global_interactionmethod;
 
+enum file_type_e
+{
+    E_MIDI_SEQ24_SESSION,
+    E_MIDI_SEQ24_SEQUENCE,
+    E_MIDI_SEQ24_SCREENSET
+};
+
 #endif

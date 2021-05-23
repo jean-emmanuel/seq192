@@ -24,6 +24,7 @@
 #include "perform.h"
 
 class seqedit;
+class mainwnd;
 
 #ifndef SEQ24_MENU
 #define SEQ24_MENU
@@ -55,6 +56,7 @@ class seqmenu : public virtual Glib::ObjectBase
 
     Menu         *m_menu;
     perform      *m_mainperf;
+    mainwnd      *m_mainwnd;
     sequence     m_clipboard;
 
     void on_realize();
@@ -64,6 +66,7 @@ class seqmenu : public virtual Glib::ObjectBase
 
     void seq_copy();
     void seq_cut();
+    void seq_export();
     void seq_paste();
 
     void set_bus_and_midi_channel( int a_bus, int a_ch );
@@ -77,7 +80,7 @@ class seqmenu : public virtual Glib::ObjectBase
 
  public:
 
-    seqmenu( perform *a_p );
+    seqmenu( perform *a_p, mainwnd *a_main );
     virtual ~seqmenu( ){ };
 };
 

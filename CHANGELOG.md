@@ -21,6 +21,8 @@
 - misc: remove lash support
 - userfile: apply user bus/channel/control definitions
 - sequence: display user channel definition
+- main: (seq32) export single sequence
+- main: export single screenset
 
 ## 0.11.0
 
