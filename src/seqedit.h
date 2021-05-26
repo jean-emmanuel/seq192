@@ -174,6 +174,7 @@ class seqedit : public Gtk::Window
     ToggleButton *m_toggle_record;
     ToggleButton *m_toggle_q_rec;
     ToggleButton *m_toggle_thru;
+    ToggleButton *m_toggle_resume;
 
     RadioButton *m_radio_select;
     RadioButton *m_radio_grow;
@@ -239,6 +240,7 @@ class seqedit : public Gtk::Window
     void record_change_callback();
     void q_rec_change_callback();
     void thru_change_callback();
+    void resume_change_callback();
     void undo_callback();
     void redo_callback();
 

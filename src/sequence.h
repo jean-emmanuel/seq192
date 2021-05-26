@@ -77,6 +77,8 @@ class sequence
     bool m_quanized_rec;
     bool m_thru;
     bool m_queued;
+    bool m_resume;
+    bool m_resume_next;
 
     /* flag indicates that contents has changed from
        a recording */
@@ -208,6 +210,8 @@ class sequence
     bool get_queued();
     long get_queued_tick();
     long get_times_played();
+    void set_resume(bool a_resume);
+    bool get_resume();
 
     void set_recording (bool);
     bool get_recording ();

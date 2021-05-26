@@ -269,14 +269,23 @@ seqedit::seqedit( sequence *a_seq,
             "thru to sequences midi bus and channel." );
     m_toggle_thru->set_focus_on_click(false);
 
+
+    m_toggle_resume = manage( new ToggleButton( "Resume" ));
+    m_toggle_resume->signal_clicked().connect(
+            mem_fun( *this, &seqedit::resume_change_callback));
+    m_toggle_resume->set_tooltip_text( "Resume notes when enabled while playing" );
+    m_toggle_resume->set_focus_on_click(false);
+
     m_toggle_play->set_active( m_seq->get_playing());
     m_toggle_record->set_active( m_seq->get_recording());
     m_toggle_thru->set_active( m_seq->get_thru());
+    m_toggle_resume->set_active( m_seq->get_resume());
 
     dhbox->pack_end( *m_toggle_q_rec, false, false, 4);
     dhbox->pack_end( *m_toggle_record, false, false, 4);
     dhbox->pack_end( *m_toggle_thru, false, false, 4);
     dhbox->pack_end( *m_toggle_play, false, false, 4);
+    dhbox->pack_end( *m_toggle_resume, false, false, 4);
     dhbox->pack_end( *(manage(new VSeparator( ))), false, false, 4);
 
     /* dummy (avoid focus on name entry) */
@@ -1582,6 +1591,12 @@ seqedit::thru_change_callback()
 {
     m_mainperf->get_master_midi_bus()->set_sequence_input( true, m_seq );
     m_seq->set_thru( m_toggle_thru->get_active() );
+}
+
+void
+seqedit::resume_change_callback()
+{
+    m_seq->set_resume( m_toggle_resume->get_active() );
 }
 
 

@@ -23,6 +23,7 @@
 - sequence: display user channel definition
 - main: (seq32) export single sequence
 - main: export single screenset
+- sequence: add "resume" mode (resumes note when enabling sequence)
 
 ## 0.11.0
 

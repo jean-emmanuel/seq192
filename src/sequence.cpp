@@ -34,6 +34,8 @@ sequence::sequence( )
     m_quanized_rec  = false;
     m_thru          = false;
     m_queued        = false;
+    m_resume        = false;
+    m_resume_next   = false;
 
     m_time_beats_per_measure = 4;
     m_time_beat_width = 4;
@@ -279,6 +281,17 @@ sequence::get_times_played()
     return m_playing ? (m_last_tick - m_starting_tick) / m_length : 0;
 }
 
+void
+sequence::set_resume(bool a_resume)
+{
+    m_resume = a_resume;
+}
+
+bool
+sequence::get_resume()
+{
+    return m_resume;
+}
 
 
 /* tick comes in as global tick */
@@ -305,6 +318,14 @@ sequence::play( long a_tick )
         while ( e != m_list_event.end()){
 
 
+            if ( m_resume_next &&
+                 (*e).is_note_on() &&
+                 ((*e).get_timestamp() + offset_base ) < (start_tick_offset) &&
+                 ((*(e->get_linked())).get_timestamp() + offset_base ) > (end_tick_offset) )
+            {
+                put_event_on_bus( &(*e) );
+            }
+
             //printf ( "s[%ld] -> t[%ld] ", start_tick, end_tick  ); (*e).print();
             if ( ((*e).get_timestamp() + offset_base ) >= (start_tick_offset) &&
                     ((*e).get_timestamp() + offset_base ) <= (end_tick_offset) ){
@@ -328,6 +349,8 @@ sequence::play( long a_tick )
             }
         }
     }
+
+    if (m_resume_next) m_resume_next = false;
 
     /* update for next frame */
     m_last_tick = end_tick + 1;
@@ -2461,6 +2484,8 @@ sequence::set_playing( bool a_p )
             /* turn on */
             m_playing = true;
 
+            if (m_resume) m_resume_next = true;
+
             m_starting_tick = m_last_tick - (m_last_tick % m_length);
 
         } else {
@@ -3219,6 +3244,14 @@ sequence::fill_list( list<char> *a_list, int a_pos )
     a_list->push_front( 0x05 );
     addLongList( a_list, c_midich );
     a_list->push_front( m_midi_channel );
+
+    /* resume */
+    addListVar( a_list, 0 );
+    a_list->push_front( 0xFF );
+    a_list->push_front( 0x7F );
+    a_list->push_front( 0x05 );
+    addLongList( a_list, c_resume );
+    a_list->push_front( m_resume );
 
     delta_time = m_length - prev_timestamp;
 

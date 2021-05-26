@@ -313,6 +313,11 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                         len -= 2;
                                     }
 
+                                    else if (proprietary == c_resume)
+                                    {
+                                        seq->set_resume (m_d[m_pos++]);
+                                        len--;
+                                    }
 
                                     /* eat the rest */
                                     m_pos += len;
