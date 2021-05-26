@@ -77,7 +77,7 @@ lfownd::lfownd(sequence *a_seq, seqdata *a_seqdata)
     m_seqdata = a_seqdata;
     m_hbox = manage(new HBox(true, 8));
     /* main window */
-    string title = "seq32 - LFO Editor - ";
+    string title = "seq24 - LFO Editor - ";
     title.append(m_seq->get_name());
     set_title(title);
     set_size_request(400, 300);
