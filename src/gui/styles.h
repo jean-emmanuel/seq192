@@ -13,6 +13,8 @@ const int c_grid_spacing = 1;
 // Sequence button
 const int c_sequence_padding = 4;
 const int c_sequence_fontsize = 8;
+const char * const c_sequence_font = "sans";
+
 
 const color c_sequence_background = {0.26, 0.27, 0.29};
 const color c_sequence_background_on = {0.78, 0.78, 0.79};

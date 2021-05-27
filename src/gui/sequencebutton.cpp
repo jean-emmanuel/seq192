@@ -5,6 +5,7 @@ SequenceButton::SequenceButton(perform * p, int seqnum)
     m_perform = p;
     m_seqnum = seqnum;
     m_clear = true;
+    m_click = false;
 
     Gtk::Allocation allocation = get_allocation();
     m_surface = ImageSurface::create(
@@ -15,6 +16,10 @@ SequenceButton::SequenceButton(perform * p, int seqnum)
 
     // draw callback
     this->signal_draw().connect(sigc::mem_fun(*this, &SequenceButton::on_draw));
+
+    add_events( Gdk::BUTTON_PRESS_MASK |
+        Gdk::BUTTON_RELEASE_MASK |
+        Gdk::BUTTON1_MOTION_MASK);
 }
 
 SequenceButton::~SequenceButton()
@@ -56,14 +61,14 @@ SequenceButton::draw_background()
         cr->rectangle(0, 0, width, height);
         cr->fill();
 
-        // text
+        // name
         color = seq->get_playing() ? c_sequence_text_on : c_sequence_text;
         cr->set_source_rgb(color.r, color.g, color.b);
         Pango::FontDescription font;
         int text_width;
         int text_height;
 
-        font.set_family("sans");
+        font.set_family(c_sequence_font);
         font.set_size(c_sequence_fontsize * Pango::SCALE);
         font.set_weight(Pango::WEIGHT_NORMAL);
 
@@ -95,7 +100,7 @@ SequenceButton::draw_background()
 
 
 
-        // sequence preview
+        // events
         color = seq->get_playing() ? c_sequence_events_background_on : c_sequence_events_background;
         cr->set_source_rgb(color.r, color.g, color.b);
         int rect_x = 0;
@@ -198,4 +203,136 @@ SequenceButton::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     }
 
     return true;
+}
+
+bool
+SequenceButton::on_button_press_event(GdkEventButton* event)
+{
+    m_click = true;
+    return true;
+}
+
+bool
+SequenceButton::on_motion_notify_event(GdkEventMotion* event)
+{
+    m_click = false;
+    return true;
+}
+
+bool
+SequenceButton::on_button_release_event(GdkEventButton* event)
+{
+    if (m_click) {
+        sequence * seq = get_sequence();
+
+        if (event->button == 1 && seq != NULL) {
+            seq->toggle_playing();
+        }
+
+        else if (event->button == 3) {
+
+            Menu * menu = new Menu();
+            menu->attach_to_widget(*this);
+
+            if (seq != NULL) {
+                MenuItem * menu_item1 = new MenuItem("Edit");
+                menu_item1->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_EDIT, 0, 0));
+                menu->append(*menu_item1);
+            } else {
+                MenuItem * menu_item2 = new MenuItem("New");
+                menu_item2->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_NEW, 0, 0));
+                menu->append(*menu_item2);
+            }
+
+
+            MenuItem * sep1 = new SeparatorMenuItem();
+            menu->append(*sep1);
+
+            if (seq != NULL) {
+                MenuItem * menu_item3 = new MenuItem("Cut");
+                menu_item3->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_CUT, 0, 0));
+                menu->append(*menu_item3);
+
+                MenuItem * menu_item4 = new MenuItem("Copy");
+                menu_item4->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_COPY, 0, 0));
+                menu->append(*menu_item4);
+
+                MenuItem * menu_item5 = new MenuItem("Export sequence");
+                menu_item5->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_COPY, 0, 0));
+                menu->append(*menu_item5);
+            } else {
+                MenuItem * menu_item6 = new MenuItem("Paste");
+                menu_item6->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_EXPORT, 0, 0));
+                menu->append(*menu_item6);
+            }
+
+            if (seq != NULL) {
+                MenuItem * sep2 = new SeparatorMenuItem();
+                menu->append(*sep2);
+
+                MenuItem * menu_item7 = new MenuItem("Midi Bus");
+                menu->append(*menu_item7);
+
+                Menu *menu_buses = new Menu();
+                menu_item7->set_submenu(*menu_buses);
+
+                char b[4];
+
+                mastermidibus *masterbus = m_perform->get_master_midi_bus();
+                for ( int i=0; i< masterbus->get_num_out_buses(); i++ ){
+                    Menu *menu_channels = new Menu();
+
+                    MenuItem * menu_item_bus = new MenuItem(masterbus->get_midi_out_bus_name(i));
+                    menu_item_bus->set_submenu(*menu_channels);
+                    menu_buses->append(*menu_item_bus);
+
+
+                    for( int j=0; j<16; j++ ){
+                        snprintf(b, sizeof(b), "%d", j + 1);
+                        std::string name = string(b);
+                        int instrument = global_user_midi_bus_definitions[i].instrument[j];
+                        if ( instrument >= 0 && instrument < c_maxBuses )
+                        {
+                            name = name + (string(" (") +
+                                    global_user_instrument_definitions[instrument].instrument +
+                                    string(")") );
+                        }
+
+                        MenuItem * menu_item_channel = new MenuItem(name);
+                        menu_item_channel->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_MIDI_BUS, i, j));
+                        menu_channels->append(*menu_item_channel);
+                        //
+                        // menu_channels->items().push_back(MenuElem(name,
+                        //             sigc::bind(mem_fun(*this,&seqmenu::set_bus_and_midi_channel),
+                        //                 i, j )));
+                    }
+
+                }
+
+            }
+
+            menu->show_all();
+            menu->popup_at_pointer(NULL);
+
+        }
+    }
+    return true;
+}
+
+void
+SequenceButton::menu_callback(context_menu_action action, int data1, int data2)
+{
+    switch (action) {
+        case MENU_NEW:
+            m_perform->new_sequence(get_sequence_number());
+            get_sequence()->set_dirty();
+            break;
+        case MENU_EDIT:
+        case MENU_CUT:
+        case MENU_COPY:
+        case MENU_EXPORT:
+        case MENU_PASTE:
+        case MENU_MIDI_BUS:
+            break;
+    }
 }

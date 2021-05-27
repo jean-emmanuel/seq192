@@ -11,6 +11,17 @@
 using namespace Cairo;
 using namespace Gtk;
 
+enum context_menu_action
+{
+    MENU_NEW = 0,
+    MENU_EDIT,
+    MENU_CUT,
+    MENU_COPY,
+    MENU_EXPORT,
+    MENU_PASTE,
+    MENU_MIDI_BUS
+};
+
 class SequenceButton : public DrawingArea {
 
     public:
@@ -24,6 +35,10 @@ class SequenceButton : public DrawingArea {
     protected:
 
         bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
+        bool on_button_release_event(GdkEventButton* event);
+        bool on_button_press_event(GdkEventButton* event);
+        bool on_motion_notify_event(GdkEventMotion* event);
+
 
     private:
 
@@ -31,11 +46,13 @@ class SequenceButton : public DrawingArea {
         int m_seqnum;
         int m_lastseqnum;
         bool m_clear;
+        bool m_click;
         Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
         void draw_background();
         int get_sequence_number();
         sequence * get_sequence();
+        void menu_callback(context_menu_action action, int data1, int data2);
 
         int m_rect_x;
         int m_rect_y;

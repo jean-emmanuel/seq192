@@ -9,13 +9,18 @@ MainWindow::MainWindow(perform * p)
     Glib::RefPtr<Gtk::CssProvider> css_provider = Gtk::CssProvider::create();
     css_provider->load_from_data(c_mainwindow_css);
     this->get_style_context()->add_class("MainWindow");
-    this->get_style_context()->add_provider(css_provider,GTK_STYLE_PROVIDER_PRIORITY_APPLICATION );
+    this->get_style_context()->add_provider(css_provider, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
     add(m_main_vbox);
 
     // menu bar
-    m_main_menu_file.set_label("File");
+    m_main_menu_file.set_label("_File");
+    m_main_menu_file.set_use_underline(true);
+    m_main_menu_file.set_submenu(m_main_submenu_file);
     m_main_menu.append(m_main_menu_file);
+    m_main_submenu_file.append(m_main_menu_file_new);
+    m_main_menu_file_new.set_label("_New");
+    m_main_menu_file_new.set_use_underline(true);
 
     // scroll wrapper
     m_scroll_wrapper.set_overlay_scrolling(false);
@@ -45,7 +50,7 @@ MainWindow::MainWindow(perform * p)
     m_main_vbox.pack_start(m_main_menu, false, false);
     m_main_vbox.pack_end(m_scroll_wrapper, true, true);
 
-    // timer callback (25 fps) 
+    // timer callback (25 fps)
     signal_timeout().connect(mem_fun(*this, &MainWindow::timer_callback), 40);
 
     resize(800, 600);

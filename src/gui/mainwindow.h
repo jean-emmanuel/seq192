@@ -29,6 +29,8 @@ class MainWindow : public Window {
 
         MenuBar m_main_menu;
         MenuItem m_main_menu_file;
+        Menu m_main_submenu_file;
+        MenuItem m_main_menu_file_new;
 
         ScrolledWindow m_scroll_wrapper;
         Grid m_sequence_grid;
