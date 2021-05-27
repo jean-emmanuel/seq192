@@ -24,12 +24,16 @@
 
 #include "config.h"
 
-#include "font.h"
-#include "mainwnd.h"
-#include "midifile.h"
-#include "optionsfile.h"
-#include "perform.h"
-#include "userfile.h"
+#include "core/midifile.h"
+#include "core/optionsfile.h"
+#include "core/perform.h"
+#include "core/userfile.h"
+
+#include "gui/mainwindow.h"
+#include <gtkmm.h>
+
+using namespace Glib;
+using namespace Gtk;
 
 /* struct for command parsing */
 static struct
@@ -56,8 +60,6 @@ char* global_oscport;
 user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];
 user_instrument_definition global_user_instrument_definitions[c_max_instruments];
 
-font *p_font_renderer;
-
 #define HOME "HOME"
 #define SLASH "/"
 
@@ -81,9 +83,9 @@ main (int argc, char *argv[])
 
     /* all GTK applications must have a gtk_main(). Control ends here
        and waits for an event to occur (like a key press or mouse event). */
-    Gtk::Main kit(argc, argv);
-
-    p_font_renderer = new font();
+    // Gtk::Main kit(argc, argv);
+    //
+    // p_font_renderer = new font();
 
 
     if ( getenv( HOME ) != NULL ){
@@ -176,9 +178,15 @@ main (int argc, char *argv[])
         delete f;
     }
 
-    mainwnd seq24_window( p );
+    MainWindow yrdy();
 
-    kit.run(seq24_window);
+    auto application = Application::create();
+    MainWindow window(p);
+    int status = application->run(window);
+
+    // mainwnd seq24_window( p );
+    //
+    // kit.run(seq24_window);
 
     if ( getenv( HOME ) != NULL ){
 
@@ -199,5 +207,5 @@ main (int argc, char *argv[])
 
     delete p;
 
-    return 0;
+    return status;
 }

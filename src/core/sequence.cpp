@@ -18,7 +18,6 @@
 //
 //-----------------------------------------------------------------------------
 #include "sequence.h"
-#include "seqedit.h"
 #include <stdlib.h>
 
 list < event > sequence::m_list_clipboard;
@@ -1769,98 +1768,6 @@ sequence::change_event_data_range( long a_tick_s, long a_tick_f,
     unlock();
 }
 
-
-void sequence::change_event_data_lfo(double a_value, double a_range,
-                                     double a_speed, double a_phase, int a_wave,
-                                     unsigned char a_status,
-                                     unsigned char a_cc)
-{
-    lock();
-
-    unsigned char d0, d1;
-    list<event>::iterator i;
-
-    /* change only selected events, if any */
-    bool have_selection = false;
-    if( get_num_selected_events(a_status, a_cc) )
-        have_selection = true;
-
-    for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
-    {
-        /* initially false */
-        bool set = false;
-        (*i).get_data( &d0, &d1 );
-
-        /* correct status and not CC */
-        if ( a_status != EVENT_CONTROL_CHANGE && (*i).get_status() == a_status )
-            set = true;
-
-        /* correct status and correct cc */
-        if ( a_status == EVENT_CONTROL_CHANGE &&
-                (*i).get_status() == a_status &&
-                d0 == a_cc )
-            set = true;
-
-//        /* in range? */
-//        if ( !((*i).get_timestamp() >= a_tick_s &&
-//                    (*i).get_timestamp() <= a_tick_f ))
-//            set = false;
-
-        /* in selection? */
-        if ( have_selection && (!(*i).is_selected()) )
-            set = false;
-
-        if ( set )
-        {
-            if(!get_hold_undo())
-                set_hold_undo(true);
-
-            //float weight;
-
-            /* no divide by 0 */
-//            if( a_tick_f == a_tick_s )
-//                a_tick_f = a_tick_s + 1;
-            int tick = (*i).get_timestamp();
-
-            //printf("ticks: %d %d %d\n", a_tick_s, tick, a_tick_f);
-            //printf("datas: %d %d\n", a_data_s, a_data_f);
-
-//            int newdata = ((tick-a_tick_s)*a_data_f + (a_tick_f-tick)*a_data_s)
-//                /(a_tick_f - a_tick_s);
-
-            int newdata = a_value + lfownd::wave_func((a_speed * (double)tick / (double) m_length * (double) m_time_beat_width + a_phase), a_wave) * a_range;
-
-            if ( newdata < 0 ) newdata = 0;
-
-            if ( newdata > 127 ) newdata = 127;
-
-            if ( a_status == EVENT_NOTE_ON )
-                d1 = newdata;
-
-            if ( a_status == EVENT_NOTE_OFF )
-                d1 = newdata;
-
-            if ( a_status == EVENT_AFTERTOUCH )
-                d1 = newdata;
-
-            if ( a_status == EVENT_CONTROL_CHANGE )
-                d1 = newdata;
-
-            if ( a_status == EVENT_PROGRAM_CHANGE )
-                d0 = newdata; /* d0 == new patch */
-
-            if ( a_status == EVENT_CHANNEL_PRESSURE )
-                d0 = newdata; /* d0 == pressure */
-
-            if ( a_status == EVENT_PITCH_WHEEL )
-                d1 = newdata;
-
-            (*i).set_data( d0, d1 );
-        }
-    }
-
-    unlock();
-}
 
 void
 sequence::add_note( long a_tick, long a_length, int a_note, bool a_paint)

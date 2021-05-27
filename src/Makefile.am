@@ -1,36 +1,27 @@
 # Makefile.am for seq24
 
-AM_CXXFLAGS = $(GTKMM_CFLAGS) $(JACK_CFLAGS) $(LASH_CFLAGS) -Wall -Wno-deprecated-declarations -Werror
+AM_CXXFLAGS = $(GTKMM_CFLAGS) $(JACK_CFLAGS) $(LASH_CFLAGS) -Wall -Werror
 seq24_LDADD = $(GTKMM_LIBS) $(ALSA_LIBS) $(JACK_LIBS) $(LASH_LIBS) -llo
 
 bin_PROGRAMS = seq24
 
 seq24_SOURCES = \
-	configfile.cpp configfile.h \
-	controllers.h \
-	event.cpp event.h \
-	font.cpp font.h \
-	globals.h \
-	lfownd.cpp lfownd.h \
-	maintime.cpp maintime.h \
-	mainwid.cpp mainwid.h \
-	mainwnd.cpp mainwnd.h \
-	midibus.cpp midibus.h \
-	midifile.cpp midifile.h \
-	mutex.cpp mutex.h \
-	optionsfile.cpp optionsfile.h \
-	osc.cpp osc.h \
-	perform.cpp perform.h \
-	seq24.cpp \
-	seqdata.cpp seqdata.h \
-	seqedit.cpp seqedit.h \
-	seqevent.cpp seqevent.h \
-	seqkeys.cpp seqkeys.h \
-	seqmenu.cpp seqmenu.h \
-	seqroll.cpp seqroll.h \
-	seqtime.cpp seqtime.h \
-	sequence.cpp sequence.h \
-	userfile.cpp userfile.h
+	core/globals.h \
+	core/controllers.h \
+	core/configfile.cpp core/configfile.h \
+	core/event.cpp core/event.h \
+	core/midibus.cpp core/midibus.h \
+	core/midifile.cpp core/midifile.h \
+	core/mutex.cpp core/mutex.h \
+	core/optionsfile.cpp core/optionsfile.h \
+	core/osc.cpp core/osc.h \
+	core/perform.cpp core/perform.h \
+	core/sequence.cpp core/sequence.h \
+	core/userfile.cpp core/userfile.h \
+	gui/mainwindow.cpp gui/mainwindow.h \
+	gui/sequencebutton.cpp gui/sequencebutton.h \
+	seq24.cpp
+
 
 EXTRA_DIST = xpm/*.xpm
 

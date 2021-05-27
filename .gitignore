@@ -1,7 +1,8 @@
 src/seq24
-src/.deps
-src/*.o
-src/stamp-h1
+**/.deps
+**/*.o
+**/stamp-h1
+**/.dirstamp
 src/config.h*
 **Makefile.in
 Makefile

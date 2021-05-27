@@ -26,11 +26,8 @@
 #include <time.h>
 #include <sched.h>
 
-//For keys
-#include <gtkmm/accelkey.h>
 
-
-using namespace Gtk;
+bool global_is_modified = false;
 
 perform::perform()
 {
@@ -46,8 +43,8 @@ perform::perform()
     m_outputing = true;
     m_tick = 0;
 
-    m_key_start  = GDK_space;
-    m_key_stop   = GDK_Escape;
+    // m_key_start  = GDK_space;
+    // m_key_stop   = GDK_Escape;
 
     m_screen_set = 0;
 
