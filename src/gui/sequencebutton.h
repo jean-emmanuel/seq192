@@ -6,8 +6,9 @@
 #include "../core/globals.h"
 #include "../core/perform.h"
 
+#include "styles.h"
+
 using namespace Cairo;
-using namespace Glib;
 using namespace Gtk;
 
 class SequenceButton : public DrawingArea {
@@ -32,6 +33,7 @@ class SequenceButton : public DrawingArea {
         Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
         void draw_background();
+        sequence * get_sequence();
 
         int m_rect_x;
         int m_rect_y;

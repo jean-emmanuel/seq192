@@ -5,6 +5,7 @@
 
 #include "../core/globals.h"
 
+#include "styles.h"
 #include "sequencebutton.h"
 
 

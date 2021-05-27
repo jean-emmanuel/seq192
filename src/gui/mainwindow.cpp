@@ -6,6 +6,11 @@ MainWindow::MainWindow(perform * p)
 
     m_perform = p;
 
+    Glib::RefPtr<Gtk::CssProvider> css_provider = Gtk::CssProvider::create();
+    css_provider->load_from_data(c_mainwindow_css);
+    this->get_style_context()->add_class("MainWindow");
+    this->get_style_context()->add_provider(css_provider,GTK_STYLE_PROVIDER_PRIORITY_APPLICATION );
+
     add(m_main_vbox);
 
     // menu bar
@@ -27,9 +32,12 @@ MainWindow::MainWindow(perform * p)
     m_sequence_grid.set_size_request(c_mainwid_x, c_mainwid_y);
     m_sequence_grid.set_column_homogeneous(true);
     m_sequence_grid.set_row_homogeneous(true);
-    m_sequence_grid.set_column_spacing(2);
-    m_sequence_grid.set_row_spacing(2);
-
+    m_sequence_grid.set_column_spacing(c_grid_spacing);
+    m_sequence_grid.set_row_spacing(c_grid_spacing);
+    m_sequence_grid.set_margin_left(c_grid_padding);
+    m_sequence_grid.set_margin_right(c_grid_padding);
+    m_sequence_grid.set_margin_top(c_grid_padding);
+    m_sequence_grid.set_margin_bottom(c_grid_padding);
     m_scroll_wrapper.add(m_sequence_grid);
 
     // main layout packing

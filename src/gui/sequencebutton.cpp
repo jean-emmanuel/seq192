@@ -6,7 +6,6 @@ SequenceButton::SequenceButton(perform * p, int seqnum)
     m_seqnum = seqnum;
     m_clear = true;
 
-
     Gtk::Allocation allocation = get_allocation();
     m_surface = ImageSurface::create(
         Cairo::Format::FORMAT_ARGB32,
@@ -23,6 +22,17 @@ SequenceButton::~SequenceButton()
 
 }
 
+sequence *
+SequenceButton::get_sequence() {
+    int seqnum = m_seqnum + m_perform->get_screenset() * c_seqs_in_set;
+    if (m_perform->is_active(seqnum)) {
+        return m_perform->get_sequence(seqnum);
+    } else {
+        return NULL;
+    }
+}
+
+
 void
 SequenceButton::draw_background()
 {
@@ -31,42 +41,34 @@ SequenceButton::draw_background()
     const int width = allocation.get_width();
     const int height = allocation.get_height();
 
-    int seqnum = m_seqnum + m_perform->get_screenset() * c_seqs_in_set;
-    if (m_perform->is_active(seqnum)) {
-        auto seq = m_perform->get_sequence(seqnum);
+    sequence * seq = get_sequence();
+    if (seq != NULL) {
 
-        const int margin = 4;
-        const int fontsize = 8;
+        color color;
 
         // background
-        if (seq->get_playing()) {
-            cr->set_source_rgb(0.0, 0.0, 0.0);
-        } else {
-            cr->set_source_rgb(1.0, 1.0, 1.0);
-        }
+        color = seq->get_playing() ? c_sequence_background_on : c_sequence_background;
+        cr->set_source_rgb(color.r, color.g, color.b);
         cr->rectangle(0, 0, width, height);
         cr->fill();
 
         // text
-        if (seq->get_playing()) {
-            cr->set_source_rgb(1.0, 1.0, 1.0);
-        } else {
-            cr->set_source_rgb(0.0, 0.0, 0.0);
-        }
+        color = seq->get_playing() ? c_sequence_text_on : c_sequence_text;
+        cr->set_source_rgb(color.r, color.g, color.b);
         Pango::FontDescription font;
         int text_width;
         int text_height;
 
         font.set_family("sans");
-        font.set_size(fontsize * Pango::SCALE);
+        font.set_size(c_sequence_fontsize * Pango::SCALE);
         font.set_weight(Pango::WEIGHT_NORMAL);
 
         auto name = create_pango_layout(seq->get_name());
         name->set_font_description(font);
         name->get_pixel_size(text_width, text_height);
-        name->set_width((width - margin * 2) * Pango::SCALE);
+        name->set_width((width - c_sequence_padding * 2) * Pango::SCALE);
         name->set_ellipsize(Pango::ELLIPSIZE_END);
-        cr->move_to(margin, margin);
+        cr->move_to(c_sequence_padding, c_sequence_padding);
         name->show_in_cairo_context(cr);
 
 
@@ -80,23 +82,20 @@ SequenceButton::draw_background()
         auto timesig = create_pango_layout(str);
         timesig->set_font_description(font);
         timesig->get_pixel_size(text_width, text_height);
-        timesig->set_width((width - margin * 2) * Pango::SCALE);
+        timesig->set_width((width - c_sequence_padding * 2) * Pango::SCALE);
         timesig->set_ellipsize(Pango::ELLIPSIZE_END);
-        cr->move_to(margin, height - margin - text_height);
+        cr->move_to(c_sequence_padding, height - c_sequence_padding - text_height);
         timesig->show_in_cairo_context(cr);
 
 
 
         // sequence preview
-        if (seq->get_playing()) {
-            cr->set_source_rgb(1.0, 1.0, 1.0);
-        } else {
-            cr->set_source_rgb(0.0, 0.0, 0.0);
-        }
-        int rect_x = margin;
-        int rect_y = margin * 2 + text_height;
-        int rect_w = width - margin * 2;
-        int rect_h = height - margin * 4 - text_height * 2;
+        color = seq->get_playing() ? c_sequence_events_on : c_sequence_events;
+        cr->set_source_rgb(color.r, color.g, color.b);
+        int rect_x = c_sequence_padding;
+        int rect_y = c_sequence_padding * 2 + text_height;
+        int rect_w = width - c_sequence_padding * 2;
+        int rect_h = height - c_sequence_padding * 4 - text_height * 2;
         cr->set_line_width(1.0);
         cr->rectangle(rect_x + 0.5, rect_y - 0.5, rect_w - 1, rect_h);
         cr->stroke();
@@ -130,11 +129,6 @@ SequenceButton::draw_background()
             cr->line_to(rect_x + tick_f_x, rect_y + note_y - 1.5);
         }
 
-        if (seq->get_playing()) {
-            cr->set_source_rgb(1.0, 1.0, 1.0);
-        } else {
-            cr->set_source_rgb(0.0, 0.0, 0.0);
-        }
         cr->stroke();
 
         m_rect_x = rect_x;
@@ -164,10 +158,8 @@ SequenceButton::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         draw_background();
     }
 
-    int seqnum = m_seqnum + m_perform->get_screenset() * c_seqs_in_set;
-    if (m_perform->is_active(seqnum)) {
-
-        auto seq = m_perform->get_sequence(seqnum);
+    sequence * seq = get_sequence();
+    if (seq != NULL) {
 
         // draw background
         cr->set_source(m_surface, 0.0, 0.0);
@@ -176,8 +168,9 @@ SequenceButton::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         // draw marker
         long tick = seq->get_last_tick();
         int tick_x = tick * (m_rect_w - 4) / seq->get_length();
+        color color = seq->get_playing() ? c_sequence_marker_on : c_sequence_marker;
+        cr->set_source_rgb(color.r, color.g, color.b);
         cr->set_line_width(1.0);
-        cr->set_source_rgb(0.0, 0.0, 1.0);
         cr->move_to(m_rect_x + tick_x + 2.5, m_rect_y + 1);
         cr->line_to(m_rect_x + tick_x + 2.5, m_rect_y + m_rect_h - 2);
         cr->stroke();

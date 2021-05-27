@@ -18,6 +18,7 @@ seq24_SOURCES = \
 	core/perform.cpp core/perform.h \
 	core/sequence.cpp core/sequence.h \
 	core/userfile.cpp core/userfile.h \
+	gui/styles.h \
 	gui/mainwindow.cpp gui/mainwindow.h \
 	gui/sequencebutton.cpp gui/sequencebutton.h \
 	seq24.cpp
