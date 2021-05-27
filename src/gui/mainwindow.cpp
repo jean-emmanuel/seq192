@@ -45,7 +45,8 @@ MainWindow::MainWindow(perform * p)
     m_main_vbox.pack_start(m_main_menu, false, false);
     m_main_vbox.pack_end(m_scroll_wrapper, true, true);
 
-    signal_timeout().connect(mem_fun(*this, &MainWindow::timer_callback), 25);
+    // timer callback (25 fps) 
+    signal_timeout().connect(mem_fun(*this, &MainWindow::timer_callback), 40);
 
     resize(800, 600);
     show_all();

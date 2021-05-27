@@ -22,16 +22,20 @@ SequenceButton::~SequenceButton()
 
 }
 
+int
+SequenceButton::get_sequence_number() {
+    return m_seqnum + m_perform->get_screenset() * c_seqs_in_set;
+}
+
 sequence *
 SequenceButton::get_sequence() {
-    int seqnum = m_seqnum + m_perform->get_screenset() * c_seqs_in_set;
+    int seqnum = get_sequence_number();
     if (m_perform->is_active(seqnum)) {
         return m_perform->get_sequence(seqnum);
     } else {
         return NULL;
     }
 }
-
 
 void
 SequenceButton::draw_background()
@@ -71,7 +75,9 @@ SequenceButton::draw_background()
         cr->move_to(c_sequence_padding, c_sequence_padding);
         name->show_in_cairo_context(cr);
 
-
+        // timesig
+        color = seq->get_playing() ? c_sequence_text_faded_on : c_sequence_text_faded;
+        cr->set_source_rgb(color.r, color.g, color.b);
         char str[20];
         sprintf( str,
             "%d-%d %ld/%ld",
@@ -84,23 +90,25 @@ SequenceButton::draw_background()
         timesig->get_pixel_size(text_width, text_height);
         timesig->set_width((width - c_sequence_padding * 2) * Pango::SCALE);
         timesig->set_ellipsize(Pango::ELLIPSIZE_END);
-        cr->move_to(c_sequence_padding, height - c_sequence_padding - text_height);
+        cr->move_to(c_sequence_padding, c_sequence_padding + text_height);
         timesig->show_in_cairo_context(cr);
 
 
 
         // sequence preview
+        color = seq->get_playing() ? c_sequence_events_background_on : c_sequence_events_background;
+        cr->set_source_rgb(color.r, color.g, color.b);
+        int rect_x = 0;
+        int rect_y = c_sequence_padding * 2 + text_height * 2;
+        int rect_w = width ;
+        int rect_h = height - c_sequence_padding * 2 - text_height * 2;
+        cr->set_line_width(1.0);
+        cr->rectangle(rect_x , rect_y , rect_w, rect_h);
+        cr->fill();
+        // cr->stroke();
+
         color = seq->get_playing() ? c_sequence_events_on : c_sequence_events;
         cr->set_source_rgb(color.r, color.g, color.b);
-        int rect_x = c_sequence_padding;
-        int rect_y = c_sequence_padding * 2 + text_height;
-        int rect_w = width - c_sequence_padding * 2;
-        int rect_h = height - c_sequence_padding * 4 - text_height * 2;
-        cr->set_line_width(1.0);
-        cr->rectangle(rect_x + 0.5, rect_y - 0.5, rect_w - 1, rect_h);
-        cr->stroke();
-
-
         long tick_s;
         long tick_f;
         int note;
@@ -137,6 +145,7 @@ SequenceButton::draw_background()
         m_rect_h = rect_h;
 
         m_clear = false;
+        m_lastseqnum = get_sequence_number();
 
     }
 
@@ -148,7 +157,9 @@ SequenceButton::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     Gtk::Allocation allocation = get_allocation();
     const int width = allocation.get_width();
     const int height = allocation.get_height();
+    bool newsurface = false;
 
+    // resize handler
     if (width != m_surface->get_width() || height != m_surface->get_height()){
         m_surface = ImageSurface::create(
             Cairo::Format::FORMAT_ARGB32,
@@ -156,10 +167,19 @@ SequenceButton::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             allocation.get_height()
         );
         draw_background();
+        newsurface = true;
     }
 
     sequence * seq = get_sequence();
     if (seq != NULL) {
+
+        // sequence changed or screenset change
+        if (!newsurface && (
+            seq->is_dirty_main() ||
+            m_lastseqnum != get_sequence_number()))
+        {
+            draw_background();
+        }
 
         // draw background
         cr->set_source(m_surface, 0.0, 0.0);
@@ -172,15 +192,10 @@ SequenceButton::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         cr->set_source_rgb(color.r, color.g, color.b);
         cr->set_line_width(1.0);
         cr->move_to(m_rect_x + tick_x + 2.5, m_rect_y + 1);
-        cr->line_to(m_rect_x + tick_x + 2.5, m_rect_y + m_rect_h - 2);
+        cr->line_to(m_rect_x + tick_x + 2.5, m_rect_y + m_rect_h - 1);
         cr->stroke();
 
     }
-
-
-
-
-
 
     return true;
 }

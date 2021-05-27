@@ -29,10 +29,12 @@ class SequenceButton : public DrawingArea {
 
         perform * m_perform;
         int m_seqnum;
+        int m_lastseqnum;
         bool m_clear;
         Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
         void draw_background();
+        int get_sequence_number();
         sequence * get_sequence();
 
         int m_rect_x;
