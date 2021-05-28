@@ -6,6 +6,8 @@ MainWindow::MainWindow(perform * p)
 {
 
     m_perform = p;
+    m_drag_source = NULL;
+    m_drag_destination = NULL;
 
     Glib::RefPtr<Gtk::CssProvider> css_provider = Gtk::CssProvider::create();
     css_provider->load_from_data(c_mainwindow_css);
@@ -67,7 +69,7 @@ MainWindow::MainWindow(perform * p)
 
 
     // scroll wrapper
-    m_scroll_wrapper.set_overlay_scrolling(false);
+    m_scroll_wrapper.set_overlay_scrolling(true);
     m_scroll_wrapper.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 
     for (int i = 0; i < c_mainwnd_rows; i++) {
@@ -339,4 +341,21 @@ MainWindow::unsaved_changes()
     }
 
     return result;
+}
+
+void
+MainWindow::set_drag_source(SequenceButton *s)
+{
+    m_drag_source = s;
+}
+
+void
+MainWindow::set_drag_destination(SequenceButton *s)
+{
+    if (m_drag_source != NULL && m_drag_source != s) {
+        m_drag_destination = s;
+        m_perform->move_sequence(m_drag_source->get_sequence_number(), m_drag_destination->get_sequence_number());
+        m_drag_source = NULL;
+        m_drag_destination = NULL;
+    }
 }

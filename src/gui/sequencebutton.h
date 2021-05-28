@@ -39,6 +39,7 @@ class SequenceButton : public DrawingArea {
         bool on_button_release_event(GdkEventButton* event);
         bool on_button_press_event(GdkEventButton* event);
         bool on_leave_notify_event(GdkEventCrossing* event);
+        bool on_enter_notify_event(GdkEventCrossing* event);
 
     private:
 
@@ -48,6 +49,7 @@ class SequenceButton : public DrawingArea {
         int m_lastseqnum;
         bool m_clear;
         bool m_click;
+        bool m_drag_start;
         Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
         void draw_background();
@@ -60,6 +62,7 @@ class SequenceButton : public DrawingArea {
         int m_rect_w;
         int m_rect_h;
 
+        friend class MainWindow;
 
 };
 

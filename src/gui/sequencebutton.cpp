@@ -7,6 +7,7 @@ SequenceButton::SequenceButton(perform * p, MainWindow * m, int seqnum)
     m_seqnum = seqnum;
     m_clear = true;
     m_click = false;
+    m_drag_start = false;
 
     Gtk::Allocation allocation = get_allocation();
     m_surface = Cairo::ImageSurface::create(
@@ -20,6 +21,7 @@ SequenceButton::SequenceButton(perform * p, MainWindow * m, int seqnum)
 
     add_events( Gdk::BUTTON_PRESS_MASK |
         Gdk::BUTTON_RELEASE_MASK |
+        Gdk::ENTER_NOTIFY_MASK |
         Gdk::LEAVE_NOTIFY_MASK
     );
 }
@@ -210,13 +212,26 @@ SequenceButton::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 bool
 SequenceButton::on_button_press_event(GdkEventButton* event)
 {
+    if (event->button == 1) m_drag_start = true;
     m_click = true;
+    return false;
+}
+
+bool
+SequenceButton::on_enter_notify_event(GdkEventCrossing* event)
+{
+    if (!m_drag_start && !m_click) m_mainwindow->set_drag_destination(this);
     return true;
 }
 
 bool
 SequenceButton::on_leave_notify_event(GdkEventCrossing* event)
 {
+    if (m_click) {
+        if (m_drag_start) m_mainwindow->set_drag_source(this);
+        set_opacity(0.5);
+        m_drag_start = false;
+    }
     m_click = false;
     return true;
 }
@@ -224,7 +239,14 @@ SequenceButton::on_leave_notify_event(GdkEventCrossing* event)
 bool
 SequenceButton::on_button_release_event(GdkEventButton* event)
 {
+    if (event->button == 1) {
+        m_drag_start = false;
+        set_opacity(1.0);
+    }
     if (m_click) {
+
+        m_click = false;
+
         sequence * seq = get_sequence();
 
         if (event->button == 1 && seq != NULL) {
@@ -316,6 +338,8 @@ SequenceButton::on_button_release_event(GdkEventButton* event)
     }
     return true;
 }
+
+
 
 void
 SequenceButton::menu_callback(context_menu_action action, int data1, int data2)

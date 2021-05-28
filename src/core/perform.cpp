@@ -574,7 +574,7 @@ void perform::delete_sequence( int a_num )
 void perform::copy_sequence( int a_num )
 {
     if (is_active(a_num)) {
-        m_clipboard = *(get_sequence(a_num));
+        m_clipboard = *get_sequence(a_num);
     }
 }
 
@@ -582,7 +582,7 @@ void perform::copy_sequence( int a_num )
 void perform::cut_sequence( int a_num )
 {
     if (is_active(a_num)) {
-        m_clipboard = *(get_sequence(a_num));
+        m_clipboard = *get_sequence(a_num);
         delete_sequence(a_num);
     }
 }
@@ -591,7 +591,16 @@ void perform::paste_sequence( int a_num )
 {
     if (!is_active(a_num)) {
         new_sequence(a_num);
-        *(get_sequence(a_num)) = m_clipboard;
+        *get_sequence(a_num) = m_clipboard;
+    }
+}
+
+void perform::move_sequence( int a_from, int a_to )
+{
+    if (is_active(a_from) && !is_active(a_to)) {
+        new_sequence(a_to);
+        *get_sequence(a_to) = *get_sequence(a_from);
+        delete_sequence(a_from);
     }
 }
 
