@@ -7,8 +7,8 @@
 #include "../core/perform.h"
 
 #include "styles.h"
+#include "mainwindow.h"
 
-using namespace Cairo;
 using namespace Gtk;
 
 enum context_menu_action
@@ -22,11 +22,12 @@ enum context_menu_action
     MENU_MIDI_BUS
 };
 
+class MainWindow;
 class SequenceButton : public DrawingArea {
 
     public:
 
-        SequenceButton(perform * p, int seqnum);
+        SequenceButton(perform * p, MainWindow * m, int seqnum);
         ~SequenceButton();
 
         bool get_clear() {return m_clear;};
@@ -42,6 +43,7 @@ class SequenceButton : public DrawingArea {
     private:
 
         perform * m_perform;
+        MainWindow * m_mainwindow;
         int m_seqnum;
         int m_lastseqnum;
         bool m_clear;

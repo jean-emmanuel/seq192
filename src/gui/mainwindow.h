@@ -8,7 +8,6 @@
 #include "styles.h"
 #include "sequencebutton.h"
 
-
 using namespace Gtk;
 
 enum main_menu_action
@@ -23,7 +22,7 @@ enum main_menu_action
     MAIN_MENU_QUIT
 };
 
-
+class SequenceButton;
 class MainWindow : public Window {
 
     public:
@@ -64,6 +63,8 @@ class MainWindow : public Window {
         bool on_delete_event(GdkEventAny *event);
 
         bool unsaved_changes();
+
+    friend class SequenceButton;
 };
 
 #endif

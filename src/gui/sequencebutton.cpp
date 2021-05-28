@@ -1,21 +1,22 @@
 #include "sequencebutton.h"
 
-SequenceButton::SequenceButton(perform * p, int seqnum)
+SequenceButton::SequenceButton(perform * p, MainWindow * m, int seqnum)
 {
     m_perform = p;
+    m_mainwindow = m;
     m_seqnum = seqnum;
     m_clear = true;
     m_click = false;
 
     Gtk::Allocation allocation = get_allocation();
-    m_surface = ImageSurface::create(
+    m_surface = Cairo::ImageSurface::create(
         Cairo::Format::FORMAT_ARGB32,
         allocation.get_width(),
         allocation.get_height()
     );
 
     // draw callback
-    this->signal_draw().connect(sigc::mem_fun(*this, &SequenceButton::on_draw));
+    signal_draw().connect(sigc::mem_fun(*this, &SequenceButton::on_draw));
 
     add_events( Gdk::BUTTON_PRESS_MASK |
         Gdk::BUTTON_RELEASE_MASK |
@@ -167,7 +168,7 @@ SequenceButton::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
     // resize handler
     if (width != m_surface->get_width() || height != m_surface->get_height()){
-        m_surface = ImageSurface::create(
+        m_surface = Cairo::ImageSurface::create(
             Cairo::Format::FORMAT_ARGB32,
             allocation.get_width(),
             allocation.get_height()
@@ -333,6 +334,7 @@ SequenceButton::menu_callback(context_menu_action action, int data1, int data2)
             m_perform->copy_sequence(get_sequence_number());
             break;
         case MENU_EXPORT:
+            m_mainwindow->menu_callback(MAIN_MENU_EXPORT_SEQUENCE, get_sequence_number(), -1);
             break;
         case MENU_PASTE:
             m_perform->paste_sequence(get_sequence_number());

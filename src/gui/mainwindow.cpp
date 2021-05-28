@@ -73,7 +73,7 @@ MainWindow::MainWindow(perform * p)
     for (int i = 0; i < c_mainwnd_rows; i++) {
         for (int j = 0; j < c_mainwnd_cols; j++) {
             int n = i + j * c_mainwnd_rows;
-            m_sequences[n] = new SequenceButton(m_perform, n);
+            m_sequences[n] = new SequenceButton(m_perform, this, n);
             m_sequences[n]->set_can_focus(false);
             m_sequence_grid.attach(*m_sequences[n], j, i);
         }
@@ -130,7 +130,7 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
 
     switch (action) {
         case MAIN_MENU_NEW:
-            if (!unsaved_changes()) return;
+            if (global_is_modified && !unsaved_changes()) return;
             m_perform->clear_all();
             global_filename = "";
             update_window_title();
@@ -140,7 +140,7 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
         case MAIN_MENU_OPEN:
         case MAIN_MENU_IMPORT:
             {
-                if (action == MAIN_MENU_OPEN && !unsaved_changes()) return;
+                if (action == MAIN_MENU_OPEN && global_is_modified && !unsaved_changes()) return;
 
                 FileChooserDialog dialog("Open MIDI file", Gtk::FILE_CHOOSER_ACTION_OPEN);
 
