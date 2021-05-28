@@ -81,6 +81,7 @@ perform::stop_playing()
 void perform::init()
 {
     m_master_bus.init();
+    m_clipboard.set_master_midi_bus(get_master_midi_bus());
 
     if (global_oscport != 0) {
         oscserver = new OSCServer(global_oscport);
@@ -570,6 +571,29 @@ void perform::delete_sequence( int a_num )
     }
 }
 
+void perform::copy_sequence( int a_num )
+{
+    if (is_active(a_num)) {
+        m_clipboard = *(get_sequence(a_num));
+    }
+}
+
+
+void perform::cut_sequence( int a_num )
+{
+    if (is_active(a_num)) {
+        m_clipboard = *(get_sequence(a_num));
+        delete_sequence(a_num);
+    }
+}
+
+void perform::paste_sequence( int a_num )
+{
+    if (!is_active(a_num)) {
+        new_sequence(a_num);
+        *(get_sequence(a_num)) = m_clipboard;
+    }
+}
 
 bool perform::is_sequence_in_edit( int a_num )
 {

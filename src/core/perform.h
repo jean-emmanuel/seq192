@@ -49,6 +49,7 @@ class perform
 
     /* vector of sequences */
     sequence *m_seqs[c_max_sequence];
+    sequence m_clipboard;
 
     bool m_seqs_active[ c_max_sequence ];
 
@@ -141,6 +142,9 @@ class perform
 
     void add_sequence( sequence *a_seq, int a_perf );
     void delete_sequence( int a_num );
+    void copy_sequence( int a_num );
+    void paste_sequence( int a_num );
+    void cut_sequence( int a_num );
     bool is_sequence_in_edit( int a_num );
 
     long get_tick( ) { return m_tick; };

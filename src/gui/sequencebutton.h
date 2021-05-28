@@ -37,8 +37,7 @@ class SequenceButton : public DrawingArea {
         bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
         bool on_button_release_event(GdkEventButton* event);
         bool on_button_press_event(GdkEventButton* event);
-        bool on_motion_notify_event(GdkEventMotion* event);
-
+        bool on_leave_notify_event(GdkEventCrossing* event);
 
     private:
 

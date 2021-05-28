@@ -19,7 +19,8 @@ SequenceButton::SequenceButton(perform * p, int seqnum)
 
     add_events( Gdk::BUTTON_PRESS_MASK |
         Gdk::BUTTON_RELEASE_MASK |
-        Gdk::BUTTON1_MOTION_MASK);
+        Gdk::LEAVE_NOTIFY_MASK
+    );
 }
 
 SequenceButton::~SequenceButton()
@@ -213,7 +214,7 @@ SequenceButton::on_button_press_event(GdkEventButton* event)
 }
 
 bool
-SequenceButton::on_motion_notify_event(GdkEventMotion* event)
+SequenceButton::on_leave_notify_event(GdkEventCrossing* event)
 {
     m_click = false;
     return true;
@@ -258,11 +259,11 @@ SequenceButton::on_button_release_event(GdkEventButton* event)
                 menu->append(*menu_item4);
 
                 MenuItem * menu_item5 = new MenuItem("Export sequence");
-                menu_item5->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_COPY, 0, 0));
+                menu_item5->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_EXPORT, 0, 0));
                 menu->append(*menu_item5);
             } else {
                 MenuItem * menu_item6 = new MenuItem("Paste");
-                menu_item6->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_EXPORT, 0, 0));
+                menu_item6->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_PASTE, 0, 0));
                 menu->append(*menu_item6);
             }
 
@@ -301,10 +302,6 @@ SequenceButton::on_button_release_event(GdkEventButton* event)
                         MenuItem * menu_item_channel = new MenuItem(name);
                         menu_item_channel->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_MIDI_BUS, i, j));
                         menu_channels->append(*menu_item_channel);
-                        //
-                        // menu_channels->items().push_back(MenuElem(name,
-                        //             sigc::bind(mem_fun(*this,&seqmenu::set_bus_and_midi_channel),
-                        //                 i, j )));
                     }
 
                 }
@@ -325,14 +322,27 @@ SequenceButton::menu_callback(context_menu_action action, int data1, int data2)
     switch (action) {
         case MENU_NEW:
             m_perform->new_sequence(get_sequence_number());
-            get_sequence()->set_dirty();
             break;
         case MENU_EDIT:
+            // TODO
+            break;
         case MENU_CUT:
+            m_perform->cut_sequence(get_sequence_number());
+            break;
         case MENU_COPY:
+            m_perform->copy_sequence(get_sequence_number());
+            break;
         case MENU_EXPORT:
+            break;
         case MENU_PASTE:
+            m_perform->paste_sequence(get_sequence_number());
+            break;
         case MENU_MIDI_BUS:
+            sequence * seq = get_sequence();
+            if (seq != NULL) {
+                seq->set_midi_bus(data1);
+                seq->set_midi_channel(data2);
+            }
             break;
     }
 }
