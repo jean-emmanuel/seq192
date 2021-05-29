@@ -2,70 +2,141 @@
 #include "../core/globals.h"
 #include <time.h>
 
+#include "xpm/seq24.xpm"
+// #include "xpm/play.xpm"
+
 MainWindow::MainWindow(perform * p)
 {
 
     m_perform = p;
+
     m_drag_source = NULL;
     m_drag_destination = NULL;
 
     Glib::RefPtr<Gtk::CssProvider> css_provider = Gtk::CssProvider::create();
     css_provider->load_from_data(c_mainwindow_css);
-    this->get_style_context()->add_class("MainWindow");
-    this->get_style_context()->add_provider(css_provider, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    this->get_style_context()->add_class("mainwindow");
+    this->get_style_context()->add_provider_for_screen(Gdk::Screen::get_default(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-    add(m_main_vbox);
+    add(m_vbox);
 
     // menu bar
-    m_main_menu_file.set_label("_File");
-    m_main_menu_file.set_use_underline(true);
-    m_main_menu_file.set_submenu(m_main_submenu_file);
-    m_main_menu.append(m_main_menu_file);
+    m_menu_file.set_label("_File");
+    m_menu_file.set_use_underline(true);
+    m_menu_file.set_submenu(m_submenu_file);
+    m_menu.append(m_menu_file);
 
-    m_main_menu_file_new.set_label("_New");
-    m_main_menu_file_new.set_use_underline(true);
-    m_main_menu_file_new.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'n', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-    m_main_menu_file_new.signal_activate().connect([this]{menu_callback(MAIN_MENU_NEW, 0, 0);});
-    m_main_submenu_file.append(m_main_menu_file_new);
+    m_menu_file_new.set_label("_New");
+    m_menu_file_new.set_use_underline(true);
+    m_menu_file_new.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'n', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_file_new.signal_activate().connect([this]{menu_callback(MAIN_MENU_NEW, 0, 0);});
+    m_submenu_file.append(m_menu_file_new);
 
-    m_main_menu_file_open.set_label("_Open");
-    m_main_menu_file_open.set_use_underline(true);
-    m_main_menu_file_open.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'o', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-    m_main_menu_file_open.signal_activate().connect([this]{menu_callback(MAIN_MENU_OPEN, 0, 0);});
-    m_main_submenu_file.append(m_main_menu_file_open);
+    m_menu_file_open.set_label("_Open");
+    m_menu_file_open.set_use_underline(true);
+    m_menu_file_open.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'o', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_file_open.signal_activate().connect([this]{menu_callback(MAIN_MENU_OPEN, 0, 0);});
+    m_submenu_file.append(m_menu_file_open);
 
-    m_main_menu_file_save.set_label("_Save");
-    m_main_menu_file_save.set_use_underline(true);
-    m_main_menu_file_save.Gtk::Widget::add_accelerator("activate", get_accel_group(), 's', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-    m_main_menu_file_save.signal_activate().connect([this]{menu_callback(MAIN_MENU_SAVE, 0, 0);});
-    m_main_submenu_file.append(m_main_menu_file_save);
+    m_menu_file_save.set_label("_Save");
+    m_menu_file_save.set_use_underline(true);
+    m_menu_file_save.Gtk::Widget::add_accelerator("activate", get_accel_group(), 's', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_file_save.signal_activate().connect([this]{menu_callback(MAIN_MENU_SAVE, 0, 0);});
+    m_submenu_file.append(m_menu_file_save);
 
-    m_main_menu_file_saveas.set_label("Save _As");
-    m_main_menu_file_saveas.set_use_underline(true);
-    m_main_menu_file_saveas.Gtk::Widget::add_accelerator("activate", get_accel_group(), 's', Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
-    m_main_menu_file_saveas.signal_activate().connect([this]{menu_callback(MAIN_MENU_SAVEAS, 0, 0);});
-    m_main_submenu_file.append(m_main_menu_file_saveas);
+    m_menu_file_saveas.set_label("Save _As");
+    m_menu_file_saveas.set_use_underline(true);
+    m_menu_file_saveas.Gtk::Widget::add_accelerator("activate", get_accel_group(), 's', Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_file_saveas.signal_activate().connect([this]{menu_callback(MAIN_MENU_SAVEAS, 0, 0);});
+    m_submenu_file.append(m_menu_file_saveas);
 
-    m_main_submenu_file.append(m_main_menu_separator1);
+    m_submenu_file.append(m_menu_separator1);
 
-    m_main_menu_file_import.set_label("_Import");
-    m_main_menu_file_import.set_use_underline(true);
-    m_main_menu_file_import.signal_activate().connect([this]{menu_callback(MAIN_MENU_IMPORT, 0, 0);});
-    m_main_submenu_file.append(m_main_menu_file_import);
+    m_menu_file_import.set_label("_Import");
+    m_menu_file_import.set_use_underline(true);
+    m_menu_file_import.signal_activate().connect([this]{menu_callback(MAIN_MENU_IMPORT, 0, 0);});
+    m_submenu_file.append(m_menu_file_import);
 
-    m_main_menu_file_export.set_label("_Export Screeen Set");
-    m_main_menu_file_export.set_use_underline(true);
-    m_main_menu_file_export.signal_activate().connect([this]{menu_callback(MAIN_MENU_EXPORT_SCREENSET, 0, 0);});
-    m_main_submenu_file.append(m_main_menu_file_export);
+    m_menu_file_export.set_label("_Export Screeen Set");
+    m_menu_file_export.set_use_underline(true);
+    m_menu_file_export.signal_activate().connect([this]{menu_callback(MAIN_MENU_EXPORT_SCREENSET, 0, 0);});
+    m_submenu_file.append(m_menu_file_export);
 
-    m_main_submenu_file.append(m_main_menu_separator2);
+    m_submenu_file.append(m_menu_separator2);
 
-    m_main_menu_file_quit.set_label("_Quit");
-    m_main_menu_file_quit.set_use_underline(true);
-    m_main_menu_file_quit.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'q', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-    m_main_menu_file_quit.signal_activate().connect([this]{menu_callback(MAIN_MENU_QUIT, 0, 0);});
-    m_main_submenu_file.append(m_main_menu_file_quit);
+    m_menu_file_quit.set_label("_Quit");
+    m_menu_file_quit.set_use_underline(true);
+    m_menu_file_quit.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'q', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_file_quit.signal_activate().connect([this]{menu_callback(MAIN_MENU_QUIT, 0, 0);});
+    m_submenu_file.append(m_menu_file_quit);
 
+
+    // toolbar
+    m_toolbar.set_size_request(0, 55);
+    m_toolbar.get_style_context()->add_class("toolbar");
+    m_toolbar.get_style_context()->add_provider(css_provider, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    m_toolbar.set_spacing(c_toolbar_spacing);
+
+    m_toolbar_panic.set_size_request(36, 0);
+    m_toolbar_panic.set_can_focus(false);
+    m_toolbar_panic.set_label("◭");
+    m_toolbar_panic.get_style_context()->add_class("panic");
+    m_toolbar_panic.signal_clicked().connect([&]{m_perform->panic();clear_focus();});
+    m_toolbar.pack_start(m_toolbar_panic, false, false);
+
+    m_toolbar_stop.set_size_request(36, 0);
+    m_toolbar_stop.set_can_focus(false);
+    m_toolbar_stop.set_label("◼");
+    m_toolbar_stop.get_style_context()->add_class("stop");
+    m_toolbar_stop.signal_clicked().connect([&]{m_perform->stop_playing();clear_focus();});
+    m_toolbar.pack_start(m_toolbar_stop, false, false);
+
+    m_toolbar_play.set_size_request(36, 0);
+    m_toolbar_play.set_can_focus(false);
+    m_toolbar_play.set_label("▶");
+    m_toolbar_play.get_style_context()->add_class("play");
+    m_toolbar_play.signal_clicked().connect([&]{m_perform->start_playing();clear_focus();});
+    m_toolbar.pack_start(m_toolbar_play, false, false);
+
+    m_toolbar_bpm_adj = Gtk::Adjustment::create(m_perform->get_bpm(), c_bpm_minimum, c_bpm_maximum, 1, 10, 1);
+    m_toolbar_bpm.set_name("bpm");
+    m_toolbar_bpm.set_size_request(36, 0);
+    m_toolbar_bpm.set_digits(2);
+    m_toolbar_bpm.set_numeric(true);
+    m_toolbar_bpm.set_alignment(0.5);
+    m_toolbar_bpm.set_adjustment(m_toolbar_bpm_adj);
+    m_toolbar_bpm.signal_activate().connect([&]{clear_focus();});
+    m_toolbar_bpm.signal_value_changed().connect([&]{
+        m_perform->set_bpm(m_toolbar_bpm.get_value());
+    });
+    m_toolbar.pack_start(m_toolbar_bpm, false, false);
+
+    m_toolbar_sset_name.set_name("sset_name");
+    m_toolbar_sset_name.set_alignment(0.5);
+    m_toolbar_sset_name.signal_activate().connect([&]{
+        string s = m_toolbar_sset_name.get_text();
+        m_perform->set_screen_set_notepad(m_toolbar_sset.get_value(), &s);
+        clear_focus();
+    });
+    m_toolbar.pack_start(m_toolbar_sset_name);
+
+    m_toolbar_sset_adj = Gtk::Adjustment::create(0, 0, c_max_sets, 1, 1, 1);
+    m_toolbar_sset.set_name("sset");
+    m_toolbar_sset.set_size_request(50, 0);
+    m_toolbar_sset.set_numeric(true);
+    m_toolbar_sset.set_alignment(0.5);
+    m_toolbar_sset.set_adjustment(m_toolbar_sset_adj);
+    m_toolbar_sset.signal_activate().connect([&]{clear_focus();});
+    m_toolbar_sset.signal_value_changed().connect([&]{
+        int sset = m_toolbar_sset.get_value();
+        m_perform->set_screenset(sset);
+        update_sset_name(sset);
+    });
+    m_toolbar.pack_start(m_toolbar_sset, false, false);
+    update_sset_name(m_perform->get_screenset());
+
+    m_toolbar_logo.set(Gdk::Pixbuf::create_from_xpm_data(seq24_xpm));
+    m_toolbar.pack_end(m_toolbar_logo, false, false);
 
 
     // scroll wrapper
@@ -92,13 +163,18 @@ MainWindow::MainWindow(perform * p)
     m_scroll_wrapper.add(m_sequence_grid);
 
     // main layout packing
-    m_main_vbox.pack_start(m_toolbar_vbox, false, false);
-    m_main_vbox.pack_start(m_main_menu, false, false);
-    m_main_vbox.pack_end(m_scroll_wrapper, true, true);
+    m_vbox.pack_start(m_menu, false, false);
+    m_vbox.pack_start(m_toolbar, false, false);
+    m_vbox.pack_end(m_scroll_wrapper, true, true);
+
+    // accelerators
+    signal_key_press_event().connect(mem_fun(*this, &MainWindow::on_key_press), false);
 
     // timer callback (25 fps)
     Glib::signal_timeout().connect(mem_fun(*this, &MainWindow::timer_callback), 40);
 
+    clear_focus();
+    update_window_title();
     resize(800, 600);
     show_all();
 
@@ -110,20 +186,65 @@ MainWindow::~MainWindow()
 }
 
 bool
+MainWindow::on_key_press(GdkEventKey* event)
+{
+    string focus = get_focus()->get_name();
+    if (focus == "bpm" || focus == "sset" || focus == "sset_name") {
+        if (event->keyval == GDK_KEY_Escape) clear_focus();
+        return false;
+    }
+    switch (event->keyval) {
+        case GDK_KEY_Escape:
+            m_perform->stop_playing();
+            break;
+        case GDK_KEY_space:
+            m_perform->start_playing();
+            break;
+        default:
+            return false;
+    }
+
+    return false;
+}
+
+bool
 MainWindow::timer_callback()
 {
+
+    int sset = m_perform->get_screenset();
+    if (m_toolbar_sset.get_value() != sset) {
+        update_sset_name(sset);
+        m_toolbar_sset.set_value(sset);
+    }
+
+    double bpm = m_perform->get_bpm();
+    if (m_toolbar_bpm.get_value() != bpm) {
+        m_toolbar_bpm.set_value(bpm);
+    }
 
     for (int i = 0; i < c_seqs_in_set; i++) {
         int seqnum = i + m_perform->get_screenset() * c_seqs_in_set;
         if (m_perform->is_active(seqnum)) {
             m_sequences[i]->queue_draw();
-        } else if (!m_sequences[i]->get_clear()) {
+        } else if (m_sequences[i]->get_last_sequence_number() != m_sequences[i]->get_sequence_number()) {
             m_sequences[i]->queue_draw();
             m_sequences[i]->set_clear();
         }
     }
 
     return true;
+}
+
+void
+MainWindow::update_sset_name(int sset)
+{
+    m_toolbar_sset_name.set_text(*m_perform->get_screen_set_notepad(sset));
+}
+
+void
+MainWindow::clear_focus()
+{
+    m_scroll_wrapper.grab_focus();
 }
 
 void
@@ -135,9 +256,12 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
             if (global_is_modified && !unsaved_changes()) return;
             m_perform->clear_all();
             global_filename = "";
-            update_window_title();
             global_is_modified = false;
-            // TODO: ajust bpm & sset name
+            update_window_title();
+            update_sset_name(m_perform->get_screenset());
+            for (int i = 0; i < c_seqs_in_set; i++) {
+                m_sequences[i]->queue_draw();
+            }
             break;
         case MAIN_MENU_OPEN:
         case MAIN_MENU_IMPORT:
@@ -184,8 +308,10 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
                     last_used_dir = fn.substr(0, fn.rfind("/") + 1);
                     global_filename = fn;
                     update_window_title();
-
-                    // TODO: ajust bpm & sset name
+                    update_sset_name(m_perform->get_screenset());
+                    for (int i = 0; i < c_seqs_in_set; i++) {
+                        m_sequences[i]->queue_draw();
+                    }
                 }
                 break;
             }

@@ -46,7 +46,7 @@ class SequenceButton : public DrawingArea {
         perform * m_perform;
         MainWindow * m_mainwindow;
         int m_seqnum;
-        int m_lastseqnum;
+        int m_last_seqnum;
         bool m_clear;
         bool m_click;
         bool m_drag_start;
@@ -54,6 +54,7 @@ class SequenceButton : public DrawingArea {
 
         void draw_background();
         int get_sequence_number();
+        int get_last_sequence_number();
         sequence * get_sequence();
         void menu_callback(context_menu_action action, int data1, int data2);
 

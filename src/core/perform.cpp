@@ -77,6 +77,19 @@ perform::stop_playing()
     stop();
 }
 
+void
+perform::panic()
+{
+    for (int i = 0; i < c_max_sequence; i++) {
+        if (is_active(i)) {
+            m_seqs[i]->set_playing(false);
+            if (m_seqs[i]->get_queued()) {
+                m_seqs[i]->toggle_queued();
+            }
+        }
+    }
+}
+
 
 void perform::init()
 {
@@ -122,14 +135,7 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
             self->set_screenset((int) argv[0]->i);
             break;
         case SEQ_PANIC:
-            for (int i = 0; i < c_max_sequence; i++) {
-                if (self->is_active(i)) {
-                    self->m_seqs[i]->set_playing(false);
-                    if (self->m_seqs[i]->get_queued()) {
-                        self->m_seqs[i]->toggle_queued();
-                    }
-                }
-            }
+            self->panic();
             break;
         case SEQ_SSEQ:
         case SEQ_SSEQ_AND_PLAY:

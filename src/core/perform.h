@@ -134,6 +134,7 @@ class perform
 
     void start_playing();
     void stop_playing();
+    void panic();
 
     void launch_input_thread();
     void launch_output_thread();

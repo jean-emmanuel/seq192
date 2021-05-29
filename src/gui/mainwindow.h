@@ -36,27 +36,43 @@ class MainWindow : public Window {
 
 
         // layout
-        VBox                m_main_vbox;
-        VBox                m_toolbar_vbox;
+        VBox                m_vbox;
+        HBox                m_toolbar;
         ScrolledWindow      m_scroll_wrapper;
         Grid                m_sequence_grid;
         SequenceButton     *m_sequences[c_max_sequence];
 
         // menu
-        MenuBar             m_main_menu;
-        MenuItem            m_main_menu_file;
-        Menu                m_main_submenu_file;
-        MenuItem            m_main_menu_file_new;
-        MenuItem            m_main_menu_file_open;
-        MenuItem            m_main_menu_file_save;
-        MenuItem            m_main_menu_file_saveas;
-        MenuItem            m_main_menu_file_import;
-        MenuItem            m_main_menu_file_export;
-        MenuItem            m_main_menu_file_quit;
-        SeparatorMenuItem   m_main_menu_separator1;
-        SeparatorMenuItem   m_main_menu_separator2;
+        MenuBar             m_menu;
+        MenuItem            m_menu_file;
+        Menu                m_submenu_file;
+        MenuItem            m_menu_file_new;
+        MenuItem            m_menu_file_open;
+        MenuItem            m_menu_file_save;
+        MenuItem            m_menu_file_saveas;
+        MenuItem            m_menu_file_import;
+        MenuItem            m_menu_file_export;
+        MenuItem            m_menu_file_quit;
+        SeparatorMenuItem   m_menu_separator1;
+        SeparatorMenuItem   m_menu_separator2;
 
         void menu_callback(main_menu_action action, int data1, int data2);
+
+        // toolbar
+        Button              m_toolbar_panic;
+        Button              m_toolbar_stop;
+        Button              m_toolbar_play;
+        Entry               m_toolbar_bpm_entry;
+        Glib::RefPtr<Gtk::Adjustment> m_toolbar_bpm_adj;
+        SpinButton          m_toolbar_bpm;
+        Entry               m_toolbar_sset_name;
+        Glib::RefPtr<Gtk::Adjustment> m_toolbar_sset_adj;
+        SpinButton          m_toolbar_sset;
+        Entry               m_toolbar_sset_entry;
+        Image               m_toolbar_logo;
+        Image               m_toolbar_play_icon;
+        Image               m_toolbar_stop_icon;
+        Image               m_toolbar_panic_icon;
 
         // drag and drop
         SequenceButton     *m_drag_source;
@@ -70,6 +86,9 @@ class MainWindow : public Window {
         bool timer_callback();
         bool unsaved_changes();
         void update_window_title();
+        void update_sset_name(int sset);
+        void clear_focus();
+        bool on_key_press(GdkEventKey* event);
         bool on_delete_event(GdkEventAny *event);
 
     friend class SequenceButton;

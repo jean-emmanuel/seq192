@@ -4,7 +4,21 @@
 struct color { float r; float g; float b; };
 
 // Main window
-const char * const c_mainwindow_css = ".MainWindow {background: #21252b}";
+const char * const c_mainwindow_css = "\
+.mainwindow {background: #21252b; color: #cccccc}\
+.toolbar {box-shadow: inset 0 -1px 1px 0 rgba(0, 0, 0, 0.25)}\
+.toolbar {background: rgb(66, 69, 74);padding:10px;}\
+.toolbar > button, .toolbar > spinbutton button {border: 0; border-radius: 0; background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); color: inherit}\
+.toolbar > entry, .toolbar > spinbutton entry {border: 0; border-radius: 0; background: rgba(0, 0, 0, 0.2); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); color: inherit}\
+.toolbar > spinbutton {background:transparent; border: 0; border-radius: 0; box-shadow: none; color: inherit}\
+.panic, .play, .stop {font-size: 16px}\
+button:hover, spinbutton button:hover {background: rgba(255, 255, 255, 0.2)}\
+button:active, spinbutton button:active {opacity: 0.8}\
+";
+
+// toolbar
+const int c_toolbar_spacing = 10;
+
 
 // Sequence grid
 const int c_grid_padding = 4;

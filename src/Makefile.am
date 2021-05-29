@@ -24,6 +24,6 @@ seq24_SOURCES = \
 	seq24.cpp
 
 
-EXTRA_DIST = xpm/*.xpm
+EXTRA_DIST = xpm/*.xpm icons/*.png
 
 MOSTLYCLEANFILES = *~

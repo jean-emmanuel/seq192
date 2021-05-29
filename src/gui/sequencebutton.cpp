@@ -36,6 +36,11 @@ SequenceButton::get_sequence_number() {
     return m_seqnum + m_perform->get_screenset() * c_seqs_in_set;
 }
 
+int
+SequenceButton::get_last_sequence_number() {
+    return m_last_seqnum;
+}
+
 sequence *
 SequenceButton::get_sequence() {
     int seqnum = get_sequence_number();
@@ -154,7 +159,7 @@ SequenceButton::draw_background()
         m_rect_h = rect_h;
 
         m_clear = false;
-        m_lastseqnum = get_sequence_number();
+        m_last_seqnum = get_sequence_number();
 
     }
 
@@ -183,9 +188,7 @@ SequenceButton::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     if (seq != NULL) {
 
         // sequence changed or screenset change
-        if (!newsurface && (
-            seq->is_dirty_main() ||
-            m_lastseqnum != get_sequence_number()))
+        if (!newsurface && seq->is_dirty_main())
         {
             draw_background();
         }
@@ -213,6 +216,7 @@ bool
 SequenceButton::on_button_press_event(GdkEventButton* event)
 {
     if (event->button == 1) m_drag_start = true;
+    m_mainwindow->clear_focus();
     m_click = true;
     return false;
 }
