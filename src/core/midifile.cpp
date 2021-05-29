@@ -452,7 +452,10 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
             double bpm = (double) read_long ();
             if(bpm > (c_bpm_scale_factor - 1.0))
                 bpm /= c_bpm_scale_factor;
-            a_perf->set_bpm (bpm);
+
+            if ( bpm < c_bpm_minimum ) bpm = c_bpm_minimum;
+            if ( bpm > c_bpm_maximum ) bpm = c_bpm_maximum;
+            a_perf->m_master_bus.set_bpm(bpm);
         }
     }
 
