@@ -30,8 +30,10 @@ class SequenceButton : public DrawingArea {
         SequenceButton(perform * p, MainWindow * m, int seqnum);
         ~SequenceButton();
 
-        bool get_clear() {return m_clear;};
-        void set_clear() {m_clear = true;};
+        int get_sequence_number();
+        int get_last_sequence_number();
+        void set_last_sequence_number();
+        void draw_background();
 
     protected:
 
@@ -47,14 +49,10 @@ class SequenceButton : public DrawingArea {
         MainWindow * m_mainwindow;
         int m_seqnum;
         int m_last_seqnum;
-        bool m_clear;
         bool m_click;
         bool m_drag_start;
         Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
-        void draw_background();
-        int get_sequence_number();
-        int get_last_sequence_number();
         sequence * get_sequence();
         void menu_callback(context_menu_action action, int data1, int data2);
 
@@ -62,8 +60,6 @@ class SequenceButton : public DrawingArea {
         int m_rect_y;
         int m_rect_w;
         int m_rect_h;
-
-        friend class MainWindow;
 
 };
 

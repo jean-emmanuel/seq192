@@ -224,11 +224,14 @@ MainWindow::timer_callback()
 
     for (int i = 0; i < c_seqs_in_set; i++) {
         int seqnum = i + m_perform->get_screenset() * c_seqs_in_set;
-        if (m_perform->is_active(seqnum)) {
+        int changed = m_sequences[i]->get_last_sequence_number() != m_sequences[i]->get_sequence_number();
+        if (changed) {
+            m_sequences[i]->set_last_sequence_number();
+            m_sequences[i]->draw_background();
             m_sequences[i]->queue_draw();
-        } else if (m_sequences[i]->get_last_sequence_number() != m_sequences[i]->get_sequence_number()) {
+        }
+        else if (m_perform->is_active(seqnum)) {
             m_sequences[i]->queue_draw();
-            m_sequences[i]->set_clear();
         }
     }
 

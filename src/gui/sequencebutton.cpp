@@ -5,7 +5,6 @@ SequenceButton::SequenceButton(perform * p, MainWindow * m, int seqnum)
     m_perform = p;
     m_mainwindow = m;
     m_seqnum = seqnum;
-    m_clear = true;
     m_click = false;
     m_drag_start = false;
 
@@ -39,6 +38,11 @@ SequenceButton::get_sequence_number() {
 int
 SequenceButton::get_last_sequence_number() {
     return m_last_seqnum;
+}
+
+void
+SequenceButton::set_last_sequence_number() {
+    m_last_seqnum = get_sequence_number();
 }
 
 sequence *
@@ -157,9 +161,6 @@ SequenceButton::draw_background()
         m_rect_y = rect_y;
         m_rect_w = rect_w;
         m_rect_h = rect_h;
-
-        m_clear = false;
-        m_last_seqnum = get_sequence_number();
 
     }
 
