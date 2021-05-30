@@ -358,6 +358,7 @@ SequenceButton::menu_callback(context_menu_action action, int data1, int data2)
             break;
         case MENU_CUT:
             m_perform->cut_sequence(get_sequence_number());
+            queue_draw();
             break;
         case MENU_COPY:
             m_perform->copy_sequence(get_sequence_number());
