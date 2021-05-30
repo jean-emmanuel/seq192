@@ -62,6 +62,7 @@ class MainWindow : public Window {
         Button              m_toolbar_panic;
         Button              m_toolbar_stop;
         Button              m_toolbar_play;
+        bool                m_toolbar_play_state;
         Entry               m_toolbar_bpm_entry;
         Glib::RefPtr<Gtk::Adjustment> m_toolbar_bpm_adj;
         SpinButton          m_toolbar_bpm;
@@ -77,7 +78,7 @@ class MainWindow : public Window {
         // drag and drop
         SequenceButton     *m_drag_source;
         SequenceButton     *m_drag_destination;
-        bool m_button_pressed;
+        bool                m_button_pressed;
         void set_drag_source(SequenceButton *s);
         void set_drag_destination(SequenceButton *s);
 

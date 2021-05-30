@@ -9,9 +9,13 @@ const char * const c_mainwindow_css = "\
 .toolbar {box-shadow: inset 0 -1px 1px 0 rgba(0, 0, 0, 0.25)}\
 .toolbar {background: rgb(66, 69, 74);padding:10px;}\
 .toolbar > button, .toolbar > spinbutton button {border: 0; border-radius: 0; background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); color: inherit}\
-.toolbar > entry, .toolbar > spinbutton entry {border: 0; border-radius: 0; background: rgba(0, 0, 0, 0.2); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); color: inherit}\
-.toolbar > spinbutton {background:transparent; border: 0; border-radius: 0; box-shadow: none; color: inherit}\
+.toolbar > entry {border: 0; border-radius: 0; background: rgba(0, 0, 0, 0.2); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); color: inherit}\
+.toolbar > spinbutton entry {border: 0; border-radius: 0; background: rgba(0, 0, 0, 0.2);color: inherit; box-shadow: none}\
+.toolbar > spinbutton {background:transparent; border: 0; border-radius: 0; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); color: inherit;}\
+.toolbar > spinbutton button {box-shadow:none;}\
+.toolbar > spinbutton button:last-child {margin-left:1px;}\
 .panic, .play, .stop {font-size: 16px}\
+button.on {color:rgba(117, 170, 229, 1.0);}\
 button:hover, spinbutton button:hover {background: rgba(255, 255, 255, 0.2)}\
 button:active, spinbutton button:active {opacity: 0.8}\
 ";

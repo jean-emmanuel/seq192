@@ -232,8 +232,8 @@ SequenceButton::on_enter_notify_event(GdkEventCrossing* event)
 bool
 SequenceButton::on_leave_notify_event(GdkEventCrossing* event)
 {
-    if (m_click) {
-        if (m_drag_start) m_mainwindow->set_drag_source(this);
+    if (m_click && m_drag_start) {
+        m_mainwindow->set_drag_source(this);
         set_opacity(0.5);
         m_drag_start = false;
     }

@@ -13,6 +13,8 @@ MainWindow::MainWindow(perform * p)
     m_drag_source = NULL;
     m_drag_destination = NULL;
 
+    m_toolbar_play_state = false;
+
     Glib::RefPtr<Gtk::CssProvider> css_provider = Gtk::CssProvider::create();
     css_provider->load_from_data(c_mainwindow_css);
     this->get_style_context()->add_class("mainwindow");
@@ -88,14 +90,20 @@ MainWindow::MainWindow(perform * p)
     m_toolbar_stop.set_can_focus(false);
     m_toolbar_stop.set_label("◼");
     m_toolbar_stop.get_style_context()->add_class("stop");
-    m_toolbar_stop.signal_clicked().connect([&]{m_perform->stop_playing();clear_focus();});
+    m_toolbar_stop.signal_clicked().connect([&]{
+        m_perform->stop_playing();
+        clear_focus();
+    });
     m_toolbar.pack_start(m_toolbar_stop, false, false);
 
     m_toolbar_play.set_size_request(36, 0);
     m_toolbar_play.set_can_focus(false);
     m_toolbar_play.set_label("▶");
     m_toolbar_play.get_style_context()->add_class("play");
-    m_toolbar_play.signal_clicked().connect([&]{m_perform->start_playing();clear_focus();});
+    m_toolbar_play.signal_clicked().connect([&]{
+        m_perform->start_playing();
+        clear_focus();
+    });
     m_toolbar.pack_start(m_toolbar_play, false, false);
 
     m_toolbar_bpm_adj = Gtk::Adjustment::create(m_perform->get_bpm(), c_bpm_minimum, c_bpm_maximum, 1, 10, 1);
@@ -188,10 +196,12 @@ MainWindow::~MainWindow()
 bool
 MainWindow::on_key_press(GdkEventKey* event)
 {
-    string focus = get_focus()->get_name();
-    if (focus == "bpm" || focus == "sset" || focus == "sset_name") {
-        if (event->keyval == GDK_KEY_Escape) clear_focus();
-        return false;
+    if (get_focus() != NULL) {
+        string focus = get_focus()->get_name();
+        if (focus == "bpm" || focus == "sset" || focus == "sset_name") {
+            if (event->keyval == GDK_KEY_Escape) clear_focus();
+            return false;
+        }
     }
     switch (event->keyval) {
         case GDK_KEY_Escape:
@@ -211,17 +221,31 @@ bool
 MainWindow::timer_callback()
 {
 
+    // play button state
+    bool playing = m_perform->is_running();
+    if (playing != m_toolbar_play_state) {
+        m_toolbar_play_state = playing;
+        if (playing) {
+            m_toolbar_play.get_style_context()->add_class("on");
+        } else {
+            m_toolbar_play.get_style_context()->remove_class("on");
+        }
+    }
+
+    // screenset name
     int sset = m_perform->get_screenset();
     if (m_toolbar_sset.get_value() != sset) {
         update_sset_name(sset);
         m_toolbar_sset.set_value(sset);
     }
 
+    // bpm
     double bpm = m_perform->get_bpm();
     if (m_toolbar_bpm.get_value() != bpm) {
         m_toolbar_bpm.set_value(bpm);
     }
 
+    // sequence grid
     for (int i = 0; i < c_seqs_in_set; i++) {
         int seqnum = i + m_perform->get_screenset() * c_seqs_in_set;
         int changed = m_sequences[i]->get_last_sequence_number() != m_sequences[i]->get_sequence_number();
@@ -247,7 +271,12 @@ MainWindow::update_sset_name(int sset)
 void
 MainWindow::clear_focus()
 {
+    m_toolbar_bpm.select_region(0, 0);
+    m_toolbar_sset_name.select_region(0, 0);
+    m_toolbar_sset.select_region(0, 0);
+    m_scroll_wrapper.set_can_focus(true);
     m_scroll_wrapper.grab_focus();
+    m_scroll_wrapper.set_can_focus(false);
 }
 
 void
@@ -484,6 +513,7 @@ MainWindow::set_drag_destination(SequenceButton *s)
     if (m_drag_source != NULL && m_drag_source != s) {
         m_drag_destination = s;
         m_perform->move_sequence(m_drag_source->get_sequence_number(), m_drag_destination->get_sequence_number());
+        m_drag_source->queue_draw();
         m_drag_source = NULL;
         m_drag_destination = NULL;
     }
