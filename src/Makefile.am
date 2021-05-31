@@ -20,6 +20,7 @@ seq24_SOURCES = \
 	core/userfile.cpp core/userfile.h \
 	gui/styles.h \
 	gui/mainwindow.cpp gui/mainwindow.h \
+	gui/editwindow.cpp gui/editwindow.h \
 	gui/sequencebutton.cpp gui/sequencebutton.h \
 	seq24.cpp
 

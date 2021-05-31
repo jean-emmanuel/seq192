@@ -121,10 +121,11 @@ MainWindow::MainWindow(perform * p)
 
     m_toolbar_sset_name.set_name("sset_name");
     m_toolbar_sset_name.set_alignment(0.5);
-    m_toolbar_sset_name.signal_activate().connect([&]{
+    m_toolbar_sset_name.signal_activate().connect([&]{clear_focus();});
+    m_toolbar_sset_name.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
         string s = m_toolbar_sset_name.get_text();
         m_perform->set_screen_set_notepad(m_toolbar_sset.get_value(), &s);
-        clear_focus();
+        return false;
     });
     m_toolbar.pack_start(m_toolbar_sset_name);
 
@@ -198,17 +199,16 @@ MainWindow::on_key_press(GdkEventKey* event)
 {
     if (get_focus() != NULL) {
         string focus = get_focus()->get_name();
-        if (focus == "bpm" || focus == "sset" || focus == "sset_name") {
-            if (event->keyval == GDK_KEY_Escape) clear_focus();
-            return false;
-        }
+        if (event->keyval == GDK_KEY_space && focus == "sset_name") return false;
     }
     switch (event->keyval) {
         case GDK_KEY_Escape:
             m_perform->stop_playing();
+            clear_focus();
             break;
         case GDK_KEY_space:
             m_perform->start_playing();
+            clear_focus();
             break;
         default:
             return false;

@@ -1,4 +1,5 @@
 #include "sequencebutton.h"
+#include "editwindow.h"
 
 SequenceButton::SequenceButton(perform * p, MainWindow * m, int seqnum)
 {
@@ -354,7 +355,7 @@ SequenceButton::menu_callback(context_menu_action action, int data1, int data2)
             m_perform->new_sequence(get_sequence_number());
             break;
         case MENU_EDIT:
-            // TODO
+            new EditWindow(m_perform, get_sequence());
             break;
         case MENU_CUT:
             m_perform->cut_sequence(get_sequence_number());
