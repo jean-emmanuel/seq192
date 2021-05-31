@@ -21,6 +21,7 @@ seq24_SOURCES = \
 	gui/styles.h \
 	gui/mainwindow.cpp gui/mainwindow.h \
 	gui/editwindow.cpp gui/editwindow.h \
+	gui/pianoroll.cpp gui/pianoroll.h \
 	gui/sequencebutton.cpp gui/sequencebutton.h \
 	seq24.cpp
 

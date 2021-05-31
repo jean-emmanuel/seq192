@@ -147,7 +147,6 @@ class perform
     void paste_sequence( int a_num );
     void cut_sequence( int a_num );
     void move_sequence( int a_from, int a_to );
-    bool is_sequence_in_edit( int a_num );
 
     long get_tick( ) { return m_tick; };
 

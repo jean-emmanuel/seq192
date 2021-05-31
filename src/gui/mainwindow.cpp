@@ -517,3 +517,20 @@ MainWindow::set_drag_destination(SequenceButton *s)
         m_drag_destination = NULL;
     }
 }
+
+
+void
+MainWindow::open_edit_window(int seqnum, sequence * seq)
+{
+    if (m_editwindows[seqnum] == NULL) {
+        m_editwindows[seqnum] = new EditWindow(m_perform, this, seqnum, seq);
+    } else {
+        m_editwindows[seqnum]->raise();
+    }
+}
+
+void
+MainWindow::close_edit_window(int seqnum)
+{
+    m_editwindows[seqnum] = NULL;
+}

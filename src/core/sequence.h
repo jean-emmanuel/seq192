@@ -85,10 +85,6 @@ class sequence
     bool m_dirty_main;
     bool m_dirty_edit;
 
-    /* anything editing currently ? */
-    bool m_editing;
-    bool m_raise;
-
     /* named sequence */
     string m_name;
 
@@ -171,24 +167,6 @@ class sequence
 
     /* returns string of name */
     const char *get_name();
-
-    void set_editing (bool a_edit)
-    {
-	m_editing = a_edit;
-    };
-    bool get_editing()
-    {
-	return m_editing;
-    };
-    void set_raise (bool a_edit)
-    {
-	m_raise = a_edit;
-    };
-    bool get_raise()
-    {
-	return m_raise;
-    };
-
 
     /* length in ticks */
     void set_length (long a_len);

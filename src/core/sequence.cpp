@@ -25,8 +25,6 @@ list < event > sequence::m_list_clipboard;
 sequence::sequence( )
 {
 
-    m_editing       = false;
-    m_raise         = false;
     m_playing       = false;
     m_was_playing   = false;
     m_recording     = false;

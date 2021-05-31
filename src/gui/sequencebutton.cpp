@@ -1,11 +1,11 @@
 #include "sequencebutton.h"
 #include "editwindow.h"
 
-SequenceButton::SequenceButton(perform * p, MainWindow * m, int seqnum)
+SequenceButton::SequenceButton(perform * p, MainWindow * m, int seqpos)
 {
     m_perform = p;
     m_mainwindow = m;
-    m_seqnum = seqnum;
+    m_seqpos = seqpos;
     m_click = false;
     m_drag_start = false;
 
@@ -33,7 +33,7 @@ SequenceButton::~SequenceButton()
 
 int
 SequenceButton::get_sequence_number() {
-    return m_seqnum + m_perform->get_screenset() * c_seqs_in_set;
+    return m_seqpos + m_perform->get_screenset() * c_seqs_in_set;
 }
 
 int
@@ -355,7 +355,7 @@ SequenceButton::menu_callback(context_menu_action action, int data1, int data2)
             m_perform->new_sequence(get_sequence_number());
             break;
         case MENU_EDIT:
-            new EditWindow(m_perform, get_sequence());
+            m_mainwindow->open_edit_window(get_sequence_number(), get_sequence());
             break;
         case MENU_CUT:
             m_perform->cut_sequence(get_sequence_number());

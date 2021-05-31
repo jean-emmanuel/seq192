@@ -7,6 +7,7 @@
 
 #include "styles.h"
 #include "sequencebutton.h"
+#include "editwindow.h"
 
 using namespace Gtk;
 
@@ -23,6 +24,7 @@ enum main_menu_action
 };
 
 class SequenceButton;
+class EditWindow;
 class MainWindow : public Window {
 
     public:
@@ -40,7 +42,8 @@ class MainWindow : public Window {
         HBox                m_toolbar;
         ScrolledWindow      m_scroll_wrapper;
         Grid                m_sequence_grid;
-        SequenceButton     *m_sequences[c_max_sequence];
+        SequenceButton     *m_sequences[c_seqs_in_set];
+        EditWindow         *m_editwindows[c_max_sequence];
 
         // menu
         MenuBar             m_menu;
@@ -83,6 +86,10 @@ class MainWindow : public Window {
         void set_drag_destination(SequenceButton *s);
 
 
+        // edit
+        void open_edit_window(int seqnum, sequence * seq);
+        void close_edit_window(int seqnum);
+
         // misc
         bool timer_callback();
         bool unsaved_changes();
@@ -93,6 +100,7 @@ class MainWindow : public Window {
         bool on_delete_event(GdkEventAny *event);
 
     friend class SequenceButton;
+    friend class EditWindow;
 };
 
 #endif

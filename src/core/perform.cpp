@@ -568,8 +568,7 @@ void perform::delete_sequence( int a_num )
 {
     set_active(a_num, false);
 
-    if ( m_seqs[a_num] != NULL &&
-            !m_seqs[a_num]->get_editing() ){
+    if ( m_seqs[a_num] != NULL ){
 
         m_seqs[a_num]->set_playing( false );
         delete m_seqs[a_num];
@@ -609,14 +608,6 @@ void perform::move_sequence( int a_from, int a_to )
         delete_sequence(a_from);
     }
 }
-
-bool perform::is_sequence_in_edit( int a_num )
-{
-    return ( m_seqs[a_num] != NULL &&
-            m_seqs[a_num]->get_editing());
-
-}
-
 
 void perform::new_sequence( int a_sequence )
 {

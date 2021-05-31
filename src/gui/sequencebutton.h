@@ -27,7 +27,7 @@ class SequenceButton : public DrawingArea {
 
     public:
 
-        SequenceButton(perform * p, MainWindow * m, int seqnum);
+        SequenceButton(perform * p, MainWindow * m, int seqpos);
         ~SequenceButton();
 
         int get_sequence_number();
@@ -47,7 +47,7 @@ class SequenceButton : public DrawingArea {
 
         perform * m_perform;
         MainWindow * m_mainwindow;
-        int m_seqnum;
+        int m_seqpos;
         int m_last_seqnum;
         bool m_click;
         bool m_drag_start;
