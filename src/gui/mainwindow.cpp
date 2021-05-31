@@ -3,7 +3,6 @@
 #include <time.h>
 
 #include "xpm/seq24.xpm"
-// #include "xpm/play.xpm"
 
 MainWindow::MainWindow(perform * p)
 {
