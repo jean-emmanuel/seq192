@@ -82,7 +82,7 @@ SequenceButton::draw_background()
         int text_width;
         int text_height;
 
-        font.set_family(c_sequence_font);
+        font.set_family(c_font);
         font.set_size(c_sequence_fontsize * Pango::SCALE);
         font.set_weight(Pango::WEIGHT_NORMAL);
 

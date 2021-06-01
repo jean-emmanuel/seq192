@@ -1,19 +1,18 @@
-#ifndef SEQ24_PIANOROLL
-#define SEQ24_PIANOROLL
+#ifndef SEQ24_PIANOKEYS
+#define SEQ24_PIANOKEYS
 
 #include <gtkmm.h>
 
 #include "../core/perform.h"
-#include "pianokeys.h"
 
 using namespace Gtk;
 
-class PianoRoll : public DrawingArea {
+class PianoKeys : public DrawingArea {
 
     public:
 
-        PianoRoll(perform * p, sequence * seq, PianoKeys * pianokeys);
-        ~PianoRoll();
+        PianoKeys(perform * p, sequence * seq);
+        ~PianoKeys();
 
     protected:
 
@@ -24,21 +23,22 @@ class PianoRoll : public DrawingArea {
 
         perform            *m_perform;
         sequence           *m_sequence;
-        PianoKeys          *m_pianokeys;
 
         Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
         // zoom: ticks per pixel
         int                 m_zoom;
 
+        int                 m_min_note;
+        int                 m_max_note;
+        int                 m_hint_key;
 
-
+        void hint_key(int y);
+        
         bool on_motion_notify_event(GdkEventMotion* event);
         bool on_leave_notify_event(GdkEventCrossing* event);
 
-
-
-
+    friend class PianoRoll;
 };
 
 #endif

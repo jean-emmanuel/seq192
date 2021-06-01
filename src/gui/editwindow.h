@@ -9,6 +9,8 @@
 #include "mainwindow.h"
 #include "sequencebutton.h"
 #include "pianoroll.h"
+#include "dataroll.h"
+#include "pianokeys.h"
 
 using namespace Gtk;
 
@@ -28,12 +30,29 @@ class EditWindow : public Window {
         int                 m_seqnum;
 
         VBox                m_vbox;
-        ScrolledWindow      m_scroll_wrapper;
+        Grid                m_grid;
+        HBox                m_hbox;
+        VBox                m_left_vbox;
+        VBox                m_right_vbox;
+        ScrolledWindow      m_hscroll_wrapper;
+        VBox                m_hscroll_vbox;
+        PianoKeys           m_pianokeys;
+        ScrolledWindow      m_pianokeys_scroller;
+        ScrolledWindow      m_pianoroll_scroller;
         PianoRoll           m_pianoroll;
+        DataRoll            m_dataroll;
+        Scrollbar           m_vscrollbar;
+        Label               m_dummy1;
+        Label               m_dummy2;
 
 
+        int                 m_zoom;
 
+
+        void update_size();
+        void update_scroll();
         bool on_delete_event(GdkEventAny *event);
+        bool timer_callback();
 
 };
 
