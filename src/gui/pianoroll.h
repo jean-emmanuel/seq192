@@ -22,6 +22,8 @@ class PianoRoll : public DrawingArea {
         PianoRoll(perform * p, sequence * seq, PianoKeys * pianokeys, DataRoll * dataroll);
         ~PianoRoll();
 
+        sigc::signal<bool(GdkEventScroll*)> signal_scroll;
+
     protected:
 
         bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
@@ -68,6 +70,7 @@ class PianoRoll : public DrawingArea {
         int m_current_x;
         int m_current_y;
 
+        int  get_zoom() {return m_zoom;};
         void set_zoom(int zoom);
         void set_snap(int snap);
         void set_note_length(int note_length);

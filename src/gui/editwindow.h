@@ -29,6 +29,12 @@ class EditWindow : public Window {
         MainWindow         *m_mainwindow;
         int                 m_seqnum;
 
+        // components
+        PianoKeys           m_pianokeys;
+        DataRoll            m_dataroll;
+        PianoRoll           m_pianoroll;
+
+        // layout
         VBox                m_vbox;
         Grid                m_grid;
         HBox                m_hbox;
@@ -36,22 +42,31 @@ class EditWindow : public Window {
         VBox                m_right_vbox;
         ScrolledWindow      m_hscroll_wrapper;
         VBox                m_hscroll_vbox;
-        PianoKeys           m_pianokeys;
-        DataRoll            m_dataroll;
         ScrolledWindow      m_pianokeys_scroller;
         ScrolledWindow      m_pianoroll_scroller;
-        PianoRoll           m_pianoroll;
         Scrollbar           m_vscrollbar;
         Label               m_dummy1;
         Label               m_dummy2;
 
+        // menu
+        MenuBar             m_menu;
+        MenuItem            m_menu_edit;
+        Menu                m_submenu_edit;
+        MenuItem            m_menu_edit_cut;
+        MenuItem            m_menu_edit_copy;
+        MenuItem            m_menu_edit_paste;
+        MenuItem            m_menu_edit_delete;
+        MenuItem            m_menu_edit_selectall;
+        MenuItem            m_menu_edit_unselect;
+        MenuItem            m_menu_edit_close;
+        SeparatorMenuItem   m_menu_separator1;
+        SeparatorMenuItem   m_menu_separator2;
 
-        void update_size();
-        bool on_delete_event(GdkEventAny *event);
+
         bool timer_callback();
+        bool scroll_callback(GdkEventScroll* event);
 
-        bool on_hscroll_event(GdkEventScroll* event);
-
+        bool on_delete_event(GdkEventAny *event);
 };
 
 #endif

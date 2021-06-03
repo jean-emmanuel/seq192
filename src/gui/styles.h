@@ -27,6 +27,7 @@ const std::string c_mainwindow_css = "\
 button.on {color:rgba(117, 170, 229, 1.0);}\
 button:hover, spinbutton button:hover {background: rgba(255, 255, 255, 0.2)}\
 button:active, spinbutton button:active {opacity: 0.8}\
+overshoot, undershoot {background: none;}\
 ";
 
 // toolbar

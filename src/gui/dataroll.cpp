@@ -55,25 +55,8 @@ DataRoll::set_zoom(int zoom)
 bool
 DataRoll::on_scroll_event(GdkEventScroll* event)
 {
-    // guint modifiers = gtk_accelerator_get_default_mod_mask ();
-    //
-    // if ((event->state & modifiers) == GDK_CONTROL_MASK)
-    // {
-    //     if (event->direction == GDK_SCROLL_DOWN)
-    //     {
-    //         if (m_zoom * 2 <= c_max_zoom) {
-    //             set_zoom(m_zoom * 2);
-    //         }
-    //     }
-    //     else if (event->direction == GDK_SCROLL_UP)
-    //     {
-    //         if (m_zoom / 2 >= c_min_zoom) {
-    //             set_zoom(m_zoom / 2);
-    //
-    //         }
-    //     }
-    //     return true;
-    // }
+
+    if (signal_scroll.emit(event)) return true;
 
     return false;
 }

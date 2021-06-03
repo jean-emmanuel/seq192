@@ -14,6 +14,9 @@ class DataRoll : public DrawingArea {
         DataRoll(perform * p, sequence * seq);
         ~DataRoll();
 
+        sigc::signal<bool(GdkEventScroll*)> signal_scroll;
+        
+
     protected:
 
         bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);

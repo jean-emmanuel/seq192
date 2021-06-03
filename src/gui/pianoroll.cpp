@@ -124,44 +124,47 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
     while ((dt = m_sequence->get_next_note_event( &tick_s, &tick_f, &note, &selected, &velocity )) != DRAW_FIN)
     {
-
-        if (selected)
+        if ((tick_s >= start_tick && tick_s <= end_tick) || ((dt == DRAW_NORMAL_LINKED) && (tick_f >= start_tick && tick_f <= end_tick)))
         {
-            cr->set_source_rgba(c_color_secondary.get_red(), c_color_secondary.get_green(), c_color_secondary.get_blue(), 0.75);
-        }
-        else
-        {
-            cr->set_source_rgba(c_color_primary.get_red(), c_color_primary.get_green(), c_color_primary.get_blue(), 0.75);
-        }
 
-        note_x = tick_s / m_zoom;
-        note_y = height - c_key_height * (note + 1) + 1;
-
-        if (dt == DRAW_NORMAL_LINKED)
-        {
-            if (tick_f >= tick_s)
+            if (selected)
             {
-                note_width = (tick_f - tick_s) / m_zoom;
-                if ( note_width < 1 ) note_width = 1;
+                cr->set_source_rgba(c_color_secondary.get_red(), c_color_secondary.get_green(), c_color_secondary.get_blue(), 0.75);
             }
             else
             {
-                note_width = (m_sequence->get_length() - tick_s) / m_zoom;
+                cr->set_source_rgba(c_color_primary.get_red(), c_color_primary.get_green(), c_color_primary.get_blue(), 0.75);
             }
-        }
-        else
-        {
-            note_width = 16 / m_zoom;
-        }
 
-        cr->rectangle(note_x + 1, note_y, note_width - 2, note_height);
+            note_x = tick_s / m_zoom;
+            note_y = height - c_key_height * (note + 1) + 1;
 
-        if (tick_f < tick_s)
-        {
-            cr->rectangle(0, note_y, tick_f / m_zoom - 2, note_height);
+            if (dt == DRAW_NORMAL_LINKED)
+            {
+                if (tick_f >= tick_s)
+                {
+                    note_width = (tick_f - tick_s) / m_zoom;
+                    if ( note_width < 4 ) note_width = 4;
+                }
+                else
+                {
+                    note_width = (m_sequence->get_length() - tick_s) / m_zoom;
+                }
+            }
+            else
+            {
+                note_width = 16 / m_zoom;
+            }
+            // printf("%i %i\n", note_x, note_width);
+            cr->rectangle(note_x + 1, note_y, note_width - 2, note_height);
+
+            if (tick_f < tick_s)
+            {
+                cr->rectangle(0, note_y, tick_f / m_zoom - 2, note_height);
+            }
+
+            cr->fill();
         }
-
-        cr->fill();
     }
 
     // mouse edition
@@ -641,22 +644,10 @@ PianoRoll::on_focus_out_event(GdkEventFocus*)
 bool
 PianoRoll::on_scroll_event(GdkEventScroll* event)
 {
-    guint modifiers = gtk_accelerator_get_default_mod_mask ();
 
-    if ((event->state & modifiers) == GDK_CONTROL_MASK)
-    {
-        if (event->direction == GDK_SCROLL_DOWN)
-        {
-            m_dataroll->set_zoom(m_zoom * 2);
-            set_zoom(m_zoom * 2);
-        }
-        else if (event->direction == GDK_SCROLL_UP)
-        {
-            m_dataroll->set_zoom(m_zoom / 2);
-            set_zoom(m_zoom / 2);
-        }
-        return true;
-    }
+    if (signal_scroll.emit(event)) return true;
+
+    m_pianokeys->hint_key(-1);
 
     return false;
 }

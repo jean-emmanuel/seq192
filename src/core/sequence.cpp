@@ -1381,6 +1381,11 @@ sequence::grow_selected( long a_delta_tick )
                 off->get_timestamp() +
                 a_delta_tick;
 
+            // prevent excessive shrinking
+            if (a_delta_tick < 0 && length - on->get_timestamp() < c_min_note_length) {
+                length = on->get_timestamp() + c_min_note_length;
+            }
+
             /*
                 If timestamp + delta is greater that m_length we do round robin magic.
                 If length > m_length then adjust to the beginning.
