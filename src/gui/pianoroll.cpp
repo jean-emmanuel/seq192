@@ -91,7 +91,12 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         }
         else
         {
-            cr->set_source_rgba(1.0, 1.0, 1.0, 0.1);
+            int i_snap = i - (i % m_snap);
+            if (i == i_snap){
+                cr->set_source_rgba(1.0, 1.0, 1.0, 0.1);
+            } else {
+                cr->set_source_rgba(1.0, 1.0, 1.0, 0.01);
+            }
         }
 
         cr->move_to(base_line - 0.5, 0);
