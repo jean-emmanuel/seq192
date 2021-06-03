@@ -7,6 +7,7 @@ const Gdk::RGBA c_color_background = Gdk::RGBA("#21252b");
 const Gdk::RGBA c_color_text = Gdk::RGBA("#cccccc");
 
 const Gdk::RGBA c_color_primary = Gdk::RGBA("rgb(117, 170, 229)");
+const Gdk::RGBA c_color_secondary = Gdk::RGBA("rgb(229, 170, 117)");
 
 
 struct color { double r; double g; double b; };
@@ -62,8 +63,9 @@ const color c_sequence_marker_on = {0.26, 0.47, 0.80};
 
 
 
-// PianoKeys / PianoRoll
+// PianoKeys
 const int c_key_height = 20;
+const int c_keys_height = c_key_height * c_num_keys;
 const color c_key_white = {c_color_text.get_red(), c_color_text.get_green(), c_color_text.get_blue()};
 const color c_key_black = {c_color_background.get_red(), c_color_background.get_green(), c_color_background.get_blue()};
 const int c_key_fontsize = 8;
@@ -71,6 +73,10 @@ const int c_key_padding = 4;
 // const color c_key_black = {1.0, 1.0, 1.0, 0.1};
 // const color c_pianoroll_lines = {1.0, 1.0, 1.0};
 
+// PianoRoll
+const int c_default_zoom = 2;
+const int c_min_zoom = 1;
+const int c_max_zoom = 32;
 
 
 

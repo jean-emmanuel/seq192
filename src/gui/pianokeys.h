@@ -26,15 +26,9 @@ class PianoKeys : public DrawingArea {
 
         Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
-        // zoom: ticks per pixel
-        int                 m_zoom;
-
-        int                 m_min_note;
-        int                 m_max_note;
         int                 m_hint_key;
-
         void hint_key(int y);
-        
+
         bool on_motion_notify_event(GdkEventMotion* event);
         bool on_leave_notify_event(GdkEventCrossing* event);
 

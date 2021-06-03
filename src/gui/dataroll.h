@@ -28,9 +28,16 @@ class DataRoll : public DrawingArea {
 
         // zoom: ticks per pixel
         int                 m_zoom;
+        void set_zoom(int zoom);
 
 
         void update_width();
+
+        bool on_scroll_event(GdkEventScroll* event);
+
+
+    friend class EditWindow;
+    friend class PianoRoll;
 
 };
 

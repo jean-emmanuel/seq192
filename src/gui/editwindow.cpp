@@ -8,11 +8,9 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_mainwindow(m),
     m_seqnum(seqnum),
     m_pianokeys(p, seq),
-    m_pianoroll(p, seq, &m_pianokeys),
     m_dataroll(p, seq),
-    m_zoom(2)
+    m_pianoroll(p, seq, &m_pianokeys, &m_dataroll)
 {
-    // m_pianoroll= new PianoRoll(p, seq, m_pianokeys);
 
     Glib::RefPtr<Gtk::CssProvider> css_provider = Gtk::CssProvider::create();
     css_provider->load_from_data(c_mainwindow_css);
@@ -43,7 +41,6 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_pianoroll_scroller.add(m_pianoroll);
     m_hscroll_vbox.pack_start(m_pianoroll_scroller, true, true);
     m_hscroll_vbox.pack_end(m_dataroll, false, true);
-    m_dataroll.set_size_request(0, 100);
 
     m_vscrollbar.set_orientation(ORIENTATION_VERTICAL);
     m_vscrollbar.set_adjustment(m_pianokeys_scroller.get_vadjustment());
@@ -55,6 +52,8 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
 
     // timer callback (25 fps)
     Glib::signal_timeout().connect(mem_fun(*this, &EditWindow::timer_callback), 40);
+
+    // add_events(Gdk::SCROLL_MASK);
 
     resize(800, 600);
     show_all();
@@ -79,11 +78,12 @@ EditWindow::on_delete_event(GdkEventAny *event)
 void
 EditWindow::update_size()
 {
-    int width = m_sequence->get_length() / 2;
+    int width = m_sequence->get_length();
     int height = c_key_height * c_num_keys;
     m_pianoroll_scroller.set_size_request(width, -1);
     m_pianoroll.set_size_request(-1, height);
     m_pianokeys.set_size_request(-1, height);
+    m_dataroll.set_size_request(-1, 100);
     m_pianokeys_scroller.get_vadjustment()->configure((height - 500) / 2.0, 0.0, height, c_key_height, c_key_height * 12, 1);
 
 }

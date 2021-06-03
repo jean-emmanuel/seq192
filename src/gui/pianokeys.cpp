@@ -7,9 +7,6 @@ PianoKeys::PianoKeys(perform * p, sequence * seq)
     m_perform = p;
     m_sequence = seq;
 
-    m_zoom = 2;
-    m_min_note = 48;
-    m_max_note = 72;
     m_hint_key = -1;
 
     // draw callback
@@ -86,7 +83,7 @@ PianoKeys::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
     }
 
-    cr->set_source_rgb(c_key_white.r, c_key_white.g, c_key_white.b);
+    cr->set_source_rgb(c_key_black.r, c_key_black.g, c_key_black.b);
     cr->move_to(width - 0.5, 0);
     cr->line_to(width - 0.5, height);
     cr->stroke();
