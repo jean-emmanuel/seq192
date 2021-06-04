@@ -1,27 +1,23 @@
-#ifndef SEQ24_PIANOROLL
-#define SEQ24_PIANOROLL
+#ifndef SEQ24_EventRoll
+#define SEQ24_EventRoll
 
 #include <gtkmm.h>
 
 #include "../core/perform.h"
-#include "pianokeys.h"
+#include "pianoroll.h"
 
 using namespace Gtk;
 
-class rect
-{
- public:
-    int x, y, height, width;
-};
 
-class PianoRoll : public DrawingArea {
+class EventRoll : public DrawingArea {
 
     public:
 
-        PianoRoll(perform * p, sequence * seq, PianoKeys * pianokeys);
-        ~PianoRoll();
+        EventRoll(perform * p, sequence * seq);
+        ~EventRoll();
 
         sigc::signal<bool(GdkEventScroll*)> signal_scroll;
+
 
     protected:
 
@@ -32,7 +28,6 @@ class PianoRoll : public DrawingArea {
 
         perform            *m_perform;
         sequence           *m_sequence;
-        PianoKeys          *m_pianokeys;
 
         Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
@@ -42,9 +37,11 @@ class PianoRoll : public DrawingArea {
 
         // zoom: ticks per pixel
         int                 m_zoom;
-        int                 m_note_length;
         int                 m_snap;
 
+        /* what is the data window currently editing ? */
+        unsigned char m_status;
+        unsigned char m_cc;
 
         // edit mode (right click pressed)
         bool                m_adding;
@@ -72,37 +69,25 @@ class PianoRoll : public DrawingArea {
         int m_current_x;
         int m_current_y;
 
-        int  get_zoom() {return m_zoom;};
         void set_zoom(int zoom);
         void set_snap(int snap);
-        void set_note_length(int note_length);
+
         void set_adding(bool adding);
-        void start_paste();
 
-        // coords to notes & ticks
-        void convert_xy( int a_x, int a_y, long *ticks, int *note);
-        // notes & ticks to coords
-        void convert_tn( long a_ticks, int a_note, int *x, int *y);
 
-        // apply y snap
-        void snap_y( int *y );
-        // apply x snap
-        void snap_x( int *x );
+        void convert_x( int a_x, long *a_ticks );
+        void convert_t( long a_ticks, int *a_x );
 
-        void xy_to_rect( int x1,  int y1,
-                         int x2,  int y2,
-                         int *x,  int *y,
-                         int *w,  int *h );
+        void snap_y( int *a_y );
+        void snap_x( int *a_x );
 
-        void convert_tn_box_to_rect( long tick_s, long tick_f,
-                                     int note_h, int note_l,
-                                     int *x, int *y,
-                                     int *w, int *h );
+        void x_to_w( int a_x1, int a_x2, int *a_x, int *a_w  );
 
+        void drop_event(long a_tick);
+
+        void update_width();
 
         bool on_motion_notify_event(GdkEventMotion* event);
-        bool on_leave_notify_event(GdkEventCrossing* event);
-        bool on_enter_notify_event(GdkEventCrossing* event);
 
         bool on_expose_event(GdkEventExpose* event);
         bool on_button_press_event(GdkEventButton* event);
@@ -113,7 +98,8 @@ class PianoRoll : public DrawingArea {
         bool on_scroll_event(GdkEventScroll* event);
 
 
-        friend class EditWindow;
+    friend class EditWindow;
+    friend class PianoRoll;
 
 };
 

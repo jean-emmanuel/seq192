@@ -8,6 +8,7 @@ DataRoll::DataRoll(perform * p, sequence * seq)
     m_perform = p;
     m_sequence = seq;
 
+    m_hscroll = 0;
     m_zoom = c_default_zoom;
 
     // draw callback
@@ -26,18 +27,9 @@ DataRoll::~DataRoll()
 bool
 DataRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
-    Gtk::Allocation allocation = get_allocation();
-    const int width = allocation.get_width();
-    const int height = allocation.get_height();
-
-    cr->set_source_rgb(1.0, 0.0, 1.0);
-    cr->set_line_width(1.0);
-    cr->move_to(0,0);
-    cr->line_to(width / m_zoom ,height);
-    cr->stroke();
-    cr->move_to(0,height);
-    cr->line_to(width / m_zoom,0);
-    cr->stroke();
+    // Gtk::Allocation allocation = get_allocation();
+    // const int width = allocation.get_width();
+    // const int height = allocation.get_height();
 
     return true;
 }

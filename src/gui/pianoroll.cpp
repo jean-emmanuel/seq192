@@ -2,13 +2,13 @@
 #include "../core/globals.h"
 #include "styles.h"
 
-PianoRoll::PianoRoll(perform * p, sequence * seq, PianoKeys * pianokeys, DataRoll * dataroll)
+PianoRoll::PianoRoll(perform * p, sequence * seq, PianoKeys * pianokeys)
 {
     m_perform = p;
     m_sequence = seq;
     m_pianokeys = pianokeys;
-    m_dataroll = dataroll;
 
+    m_hscroll = 0;
     m_zoom = c_default_zoom;
     m_snap = 192;
     m_note_length = 192;
@@ -23,9 +23,6 @@ PianoRoll::PianoRoll(perform * p, sequence * seq, PianoKeys * pianokeys, DataRol
     m_is_drag_pasting = false;
     m_is_drag_pasting_start = false;
     m_justselected_one = false;
-
-    // draw callback
-    signal_draw().connect(sigc::mem_fun(*this, &PianoRoll::on_draw));
 
     add_events( Gdk::POINTER_MOTION_MASK |
                 Gdk::BUTTON_PRESS_MASK |
@@ -54,10 +51,9 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     const int width = allocation.get_width();
     const int height = allocation.get_height();
 
-
     // Horizontal lines
 
-    cr->set_source_rgba(1.0, 1.0, 1.0, 0.1);
+    cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_key);
     cr->set_line_width(1.0);
     int i;
     for (i = 0; i < c_num_keys; i++) {
@@ -74,28 +70,28 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     int ticks_per_beat =  (4 * c_ppqn) / m_sequence->get_bw();
     int ticks_per_step = 6 * m_zoom;
     int ticks_per_m_line =  ticks_per_measure * measures_per_line;
-    int start_tick = 0;
-    int end_tick = width + 1;
+    int start_tick = m_hscroll - (m_hscroll % ticks_per_step);
+    int end_tick = m_sequence->get_length();
 
-    for (int i=start_tick; i<end_tick; i += ticks_per_step)
+    for (int i=start_tick; i<=end_tick; i += ticks_per_step)
     {
-        int base_line = i / m_zoom;
+        int base_line = (i - m_hscroll) / m_zoom;
 
         if ( i % ticks_per_m_line == 0 )
         {
-            cr->set_source_rgba(1.0, 1.0, 1.0, 0.8);
+            cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_measure);
         }
         else if (i % ticks_per_beat == 0 )
         {
-            cr->set_source_rgba(1.0, 1.0, 1.0, 0.3);
+            cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_beat);
         }
         else
         {
             int i_snap = i - (i % m_snap);
             if (i == i_snap){
-                cr->set_source_rgba(1.0, 1.0, 1.0, 0.1);
+                cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_snap);
             } else {
-                cr->set_source_rgba(1.0, 1.0, 1.0, 0.01);
+                cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_off);
             }
         }
 
@@ -120,8 +116,6 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
     m_sequence->reset_draw_marker();
 
-    cr->set_source_rgba(c_color_primary.get_red(), c_color_primary.get_green(), c_color_primary.get_blue(), 0.75);
-
     while ((dt = m_sequence->get_next_note_event( &tick_s, &tick_f, &note, &selected, &velocity )) != DRAW_FIN)
     {
         if ((tick_s >= start_tick && tick_s <= end_tick) || ((dt == DRAW_NORMAL_LINKED) && (tick_f >= start_tick && tick_f <= end_tick)))
@@ -129,11 +123,11 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
             if (selected)
             {
-                cr->set_source_rgba(c_color_secondary.get_red(), c_color_secondary.get_green(), c_color_secondary.get_blue(), 0.75);
+                cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_event);
             }
             else
             {
-                cr->set_source_rgba(c_color_primary.get_red(), c_color_primary.get_green(), c_color_primary.get_blue(), 0.75);
+                cr->set_source_rgba(c_color_event.r, c_color_event.g, c_color_event.b, c_alpha_event);
             }
 
             note_x = tick_s / m_zoom;
@@ -155,6 +149,9 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             {
                 note_width = 16 / m_zoom;
             }
+
+            note_x -= m_hscroll / m_zoom;
+
             // printf("%i %i\n", note_x, note_width);
             cr->rectangle(note_x + 1, note_y, note_width - 2, note_height);
 
@@ -171,14 +168,19 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     if (m_selecting || m_moving || m_paste ||  m_growing)
     {
         int x,y,w,h;
-        cr->set_source_rgba(c_color_secondary.get_red(), c_color_secondary.get_green(), c_color_secondary.get_blue(), 1);
+        cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_lasso);
         if (m_selecting)
         {
 
             xy_to_rect(m_drop_x,  m_drop_y, m_current_x, m_current_y, &x, &y, &w, &h);
 
-            cr->rectangle(x - 0.5, y - 0.5, w, h + c_key_height);
-            cr->stroke();
+            if (w > 0)
+            {
+                x -= m_hscroll / m_zoom;
+
+                cr->rectangle(x - 0.5, y - 0.5, w, h + c_key_height);
+                cr->stroke();
+            }
 
         }
         if (m_moving || m_paste)
@@ -189,6 +191,8 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
             x = m_selected.x + delta_x;
             y = m_selected.y + delta_y;
+
+            x -= m_hscroll / m_zoom;
 
             cr->rectangle(x - 0.5, y + 0.5, m_selected.width + 1, m_selected.height);
             cr->stroke();
@@ -204,6 +208,8 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             x = m_selected.x;
             y = m_selected.y;
 
+            x -= m_hscroll / m_zoom;
+
             cr->rectangle(x - 0.5, y + 0.5, width + 1, m_selected.height);
             cr->stroke();
 
@@ -212,7 +218,7 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
 
     // progress marker
-    long tick = m_sequence->get_last_tick() / m_zoom;
+    long tick = (m_sequence->get_last_tick() - m_hscroll) / m_zoom;
     cr->set_line_width(1.0);
     cr->set_source_rgba(c_color_primary.get_red(), c_color_primary.get_green(), c_color_primary.get_blue(), 0.75);
     cr->move_to(tick - 0.5, 0);
@@ -381,7 +387,7 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
     int note_l;
     int norm_x, norm_y, snapped_x, snapped_y;
 
-    snapped_x = norm_x = (int) event->x;
+    snapped_x = norm_x = (int) (event->x + m_hscroll / m_zoom);
     snapped_y = norm_y = (int) event->y;
 
     snap_x( &snapped_x );
@@ -491,7 +497,7 @@ bool
 PianoRoll::on_motion_notify_event(GdkEventMotion* event)
 {
 
-    m_current_x = (int) event->x ;
+    m_current_x = (int) (event->x + m_hscroll / m_zoom);
     m_current_y = (int) event->y;
 
     int note;
@@ -550,7 +556,7 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
     int note_l;
     int x,y,w,h;
 
-    m_current_x = (int) event->x;
+    m_current_x = (int) (event->x + m_hscroll / m_zoom);
     m_current_y = (int) event->y;
 
     snap_y (&m_current_y);

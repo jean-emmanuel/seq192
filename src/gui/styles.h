@@ -67,6 +67,7 @@ const color c_sequence_marker_on = {0.26, 0.47, 0.80};
 // PianoKeys
 const int c_key_height = 20;
 const int c_keys_height = c_key_height * c_num_keys;
+const int c_keys_width =  100;
 const color c_key_white = {c_color_text.get_red(), c_color_text.get_green(), c_color_text.get_blue()};
 const color c_key_black = {c_color_background.get_red(), c_color_background.get_green(), c_color_background.get_blue()};
 const int c_key_fontsize = 8;
@@ -78,7 +79,23 @@ const int c_key_padding = 4;
 const int c_default_zoom = 2;
 const int c_min_zoom = 1;
 const int c_max_zoom = 32;
+const color c_color_grid = {1.0, 1.0, 1.0};
+const double c_alpha_grid_measure = 0.8;
+const double c_alpha_grid_beat = 0.3;
+const double c_alpha_grid_snap = 0.1;
+const double c_alpha_grid_off = 0.01;
+const double c_alpha_grid_key = 0.1;
+const color c_color_event = {c_color_primary.get_red(), c_color_primary.get_green(), c_color_primary.get_blue()};
+const color c_color_event_selected = {c_color_secondary.get_red(), c_color_secondary.get_green(), c_color_secondary.get_blue()};
+const double c_alpha_event = 0.75;
+const double c_alpha_lasso = 1;
 
+// EventRoll
+const int c_eventroll_height =  c_key_height;
+const int c_event_width =  4;
+const double c_alpha_grid_separator = 0.5;
 
+// EventData
+const int c_dataroll_height =  150;
 
 #endif

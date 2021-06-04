@@ -8,8 +8,9 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_mainwindow(m),
     m_seqnum(seqnum),
     m_pianokeys(p, seq),
-    m_dataroll(p, seq),
-    m_pianoroll(p, seq, &m_pianokeys, &m_dataroll)
+    m_eventroll(p, seq),
+    m_pianoroll(p, seq, &m_pianokeys),
+    m_dataroll(p, seq)
 {
 
     Glib::RefPtr<Gtk::CssProvider> css_provider = Gtk::CssProvider::create();
@@ -73,49 +74,88 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
 
     // layout
     m_vbox.pack_start(m_menu, false, false);
-    m_vbox.pack_start(m_hbox, true, true);
+    // m_vbox.pack_start(m_hbox, true, true);
+    //
+    // m_hbox.pack_start(m_left_vbox, false, true);
+    // m_hbox.pack_start(m_hscroll_wrapper, false, true);
+    // m_hbox.pack_end(m_right_vbox, false, false);
+    //
+    // m_left_vbox.set_size_request(100, 0);
+    // m_pianokeys_scroller.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_EXTERNAL);
+    // m_pianokeys_scroller.add(m_pianokeys);
+    // m_left_vbox.pack_start(m_pianokeys_scroller, true, true);
+    // m_left_vbox.pack_end(m_dummy1, false, false);
+    // m_dummy1.set_size_request(0, 100);
+    //
+    // m_hscroll_wrapper.set_hexpand(true);
+    // m_hscroll_wrapper.set_vexpand(true);
+    // m_hscroll_wrapper.add(m_hscroll_vbox);
+    //
+    // m_pianoroll_scroller.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_EXTERNAL);
+    // m_pianoroll_scroller.set_vadjustment(m_pianokeys_scroller.get_vadjustment());
+    // m_pianoroll_scroller.add(m_pianoroll);
+    // m_hscroll_vbox.pack_start(m_pianoroll_scroller, true, true);
+    // m_hscroll_vbox.pack_end(m_eventroll, false, true);
+    //
+    // m_vscrollbar.set_orientation(ORIENTATION_VERTICAL);
+    // m_vscrollbar.set_adjustment(m_pianokeys_scroller.get_vadjustment());
+    // m_right_vbox.pack_start(m_vscrollbar, true, true);
+    // m_right_vbox.pack_end(m_dummy2, false, false);
+    // m_dummy2.set_size_request(0, 100);
+    //
+    // int width = m_sequence->get_length();
+    // int height = c_key_height * c_num_keys;
+    // m_pianoroll_scroller.set_size_request(width, -1);
+    // m_pianoroll.set_size_request(-1, height);
+    // m_pianokeys.set_size_request(-1, height);
+    // m_eventroll.set_size_request(-1, 100);
+    // m_pianokeys_scroller.get_vadjustment()->configure((height - 500) / 2.0, 0.0, height, c_key_height, c_key_height * 12, 1);
 
-    m_hbox.pack_start(m_left_vbox, false, true);
-    m_hbox.pack_start(m_hscroll_wrapper, false, true);
-    m_hbox.pack_end(m_right_vbox, false, false);
+    m_vbox.pack_end(m_grid, true, true);
 
-    m_left_vbox.set_size_request(100, 0);
+    m_grid.insert_row(0);
+    m_grid.insert_row(0);
+    m_grid.insert_column(0);
+    m_grid.insert_column(0);
+    m_grid.insert_column(0);
+    m_pianokeys_scroller.set_size_request(c_keys_width, -1);
+    m_pianokeys.set_size_request(-1, c_key_height * c_num_keys);
     m_pianokeys_scroller.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_EXTERNAL);
     m_pianokeys_scroller.add(m_pianokeys);
-    m_left_vbox.pack_start(m_pianokeys_scroller, true, true);
-    m_left_vbox.pack_end(m_dummy1, false, false);
-    m_dummy1.set_size_request(0, 100);
+    m_grid.attach(m_pianokeys_scroller, 0, 0);
 
-    m_hscroll_wrapper.set_hexpand(true);
-    m_hscroll_wrapper.set_vexpand(true);
-    m_hscroll_wrapper.add(m_hscroll_vbox);
-
+    m_pianoroll_scroller.set_hexpand(true);
+    m_pianoroll_scroller.set_vexpand(true);
+    m_pianoroll.set_size_request(-1, c_key_height * c_num_keys);
     m_pianoroll_scroller.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_EXTERNAL);
     m_pianoroll_scroller.set_vadjustment(m_pianokeys_scroller.get_vadjustment());
     m_pianoroll_scroller.add(m_pianoroll);
-    m_hscroll_vbox.pack_start(m_pianoroll_scroller, true, true);
-    m_hscroll_vbox.pack_end(m_dataroll, false, true);
+    m_grid.attach(m_pianoroll_scroller, 1, 0);
 
     m_vscrollbar.set_orientation(ORIENTATION_VERTICAL);
     m_vscrollbar.set_adjustment(m_pianokeys_scroller.get_vadjustment());
-    m_right_vbox.pack_start(m_vscrollbar, true, true);
-    m_right_vbox.pack_end(m_dummy2, false, false);
-    m_dummy2.set_size_request(0, 100);
+    m_grid.attach(m_vscrollbar, 2, 0);
 
-    int width = m_sequence->get_length();
+    m_eventroll.set_size_request(-1, c_eventroll_height + 1);
+    m_grid.attach(m_eventroll, 1, 1);
+
+    m_dataroll.set_size_request(-1, c_dataroll_height + 1);
+    m_grid.attach(m_dataroll, 1, 2);
+
+    m_grid.attach(m_hscrollbar, 1, 3);
+
     int height = c_key_height * c_num_keys;
-    m_pianoroll_scroller.set_size_request(width, -1);
-    m_pianoroll.set_size_request(-1, height);
-    m_pianokeys.set_size_request(-1, height);
-    m_dataroll.set_size_request(-1, 100);
     m_pianokeys_scroller.get_vadjustment()->configure((height - 500) / 2.0, 0.0, height, c_key_height, c_key_height * 12, 1);
+
+    m_hscrollbar.get_adjustment()->configure(0, 0, m_sequence->get_length(), 1, 1, 1);
+
 
     // timer callback (50 fps)
     Glib::signal_timeout().connect(mem_fun(*this, &EditWindow::timer_callback), 20);
 
     // zoom callback
     m_pianoroll.signal_scroll.connect(mem_fun(*this, &EditWindow::scroll_callback));
-    m_dataroll.signal_scroll.connect(mem_fun(*this, &EditWindow::scroll_callback));
+    m_eventroll.signal_scroll.connect(mem_fun(*this, &EditWindow::scroll_callback));
 
     // add_events(Gdk::SCROLL_MASK);
 
@@ -142,9 +182,20 @@ EditWindow::on_delete_event(GdkEventAny *event)
 bool
 EditWindow::timer_callback()
 {
+    auto adj = m_hscrollbar.get_adjustment();
+    adj->set_lower(0);
+    adj->set_upper(m_sequence->get_length());
+    adj->set_page_size(m_pianoroll.get_width() * m_pianoroll.get_zoom());
+    adj->set_step_increment(c_ppqn / 4 * m_pianoroll.get_zoom());
+    adj->set_page_increment(c_ppqn * m_sequence->get_bpm() * 4.0 / m_sequence->get_bw() * m_pianoroll.get_zoom());
+    if (adj->get_value() > adj->get_upper()) adj->set_value(adj->get_upper());
+
+    m_eventroll.set_hscroll(adj->get_value());
+    m_pianoroll.set_hscroll(adj->get_value());
+
+    m_eventroll.queue_draw();
     m_pianoroll.queue_draw();
-    int width = m_sequence->get_length() + 192  ;
-    m_hscroll_wrapper.get_hadjustment()->set_upper(width / m_pianoroll.get_zoom());
+
     return true;
 }
 
@@ -159,20 +210,27 @@ EditWindow::scroll_callback(GdkEventScroll* event)
         int zoom = m_pianoroll.get_zoom();
         if (event->direction == GDK_SCROLL_DOWN)
         {
-            m_dataroll.set_zoom(zoom * 2);
+            m_eventroll.set_zoom(zoom * 2);
             m_pianoroll.set_zoom(zoom * 2);
         }
         else if (event->direction == GDK_SCROLL_UP)
         {
-            m_dataroll.set_zoom(zoom / 2);
+            m_eventroll.set_zoom(zoom / 2);
             m_pianoroll.set_zoom(zoom / 2);
         }
-        int scroll = m_hscroll_wrapper.get_hadjustment()->get_value();
-        int oldwidth = m_hscroll_wrapper.get_hadjustment()->get_upper();
-        int width = m_sequence->get_length() / m_pianoroll.get_zoom() + 192;
-        m_hscroll_wrapper.get_hadjustment()->set_upper(width);
-        m_hscroll_wrapper.get_hadjustment()->set_value(width * scroll / oldwidth);
         return true;
+    }
+    else if ((event->state & modifiers) == GDK_SHIFT_MASK)
+    {
+        auto adj = m_hscrollbar.get_adjustment();
+        if (event->direction == GDK_SCROLL_DOWN)
+        {
+            adj->set_value(adj->get_value() + adj->get_step_increment());
+        }
+        else if (event->direction == GDK_SCROLL_UP)
+        {
+            adj->set_value(adj->get_value() - adj->get_step_increment());
+        }
     }
 
     return false;

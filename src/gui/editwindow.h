@@ -9,8 +9,9 @@
 #include "mainwindow.h"
 #include "sequencebutton.h"
 #include "pianoroll.h"
-#include "dataroll.h"
+#include "eventroll.h"
 #include "pianokeys.h"
+#include "dataroll.h"
 
 using namespace Gtk;
 
@@ -31,8 +32,9 @@ class EditWindow : public Window {
 
         // components
         PianoKeys           m_pianokeys;
-        DataRoll            m_dataroll;
+        EventRoll           m_eventroll;
         PianoRoll           m_pianoroll;
+        DataRoll            m_dataroll;
 
         // layout
         VBox                m_vbox;
@@ -45,6 +47,7 @@ class EditWindow : public Window {
         ScrolledWindow      m_pianokeys_scroller;
         ScrolledWindow      m_pianoroll_scroller;
         Scrollbar           m_vscrollbar;
+        Scrollbar           m_hscrollbar;
         Label               m_dummy1;
         Label               m_dummy2;
 

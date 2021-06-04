@@ -15,7 +15,7 @@ class DataRoll : public DrawingArea {
         ~DataRoll();
 
         sigc::signal<bool(GdkEventScroll*)> signal_scroll;
-        
+
 
     protected:
 
@@ -28,6 +28,10 @@ class DataRoll : public DrawingArea {
         sequence           *m_sequence;
 
         Cairo::RefPtr<Cairo::ImageSurface> m_surface;
+
+        // hscroll
+        int                 m_hscroll;
+        void set_hscroll(int s){m_hscroll = s;};
 
         // zoom: ticks per pixel
         int                 m_zoom;
