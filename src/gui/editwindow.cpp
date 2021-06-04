@@ -223,6 +223,11 @@ EditWindow::timer_callback()
     m_eventroll.queue_draw();
     m_pianoroll.queue_draw();
 
+    if (m_sequence->m_have_undo && !m_menu_edit_undo.get_sensitive()) m_menu_edit_undo.set_sensitive(true);
+    else if (!m_sequence->m_have_undo && m_menu_edit_undo.get_sensitive()) m_menu_edit_undo.set_sensitive(false);
+    if (m_sequence->m_have_redo && !m_menu_edit_redo.get_sensitive()) m_menu_edit_redo.set_sensitive(true);
+    else if (!m_sequence->m_have_redo && m_menu_edit_redo.get_sensitive()) m_menu_edit_redo.set_sensitive(false);
+
     return true;
 }
 
