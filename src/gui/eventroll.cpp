@@ -29,13 +29,10 @@ EventRoll::EventRoll(perform * p, sequence * seq)
                 Gdk::BUTTON_PRESS_MASK |
                 Gdk::BUTTON_RELEASE_MASK |
                 Gdk::POINTER_MOTION_MASK |
-                Gdk::KEY_PRESS_MASK |
-                Gdk::KEY_RELEASE_MASK |
-                Gdk::FOCUS_CHANGE_MASK |
                 Gdk::ENTER_NOTIFY_MASK |
                 Gdk::LEAVE_NOTIFY_MASK |
                 Gdk::SCROLL_MASK
-  );
+ );
 }
 
 EventRoll::~EventRoll()
@@ -137,7 +134,7 @@ EventRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     if (m_selecting)
     {
 
-    	x_to_w( m_drop_x, m_current_x, &x,&w );
+    	x_to_w(m_drop_x, m_current_x, &x,&w);
         if (w > 0)
         {
             x -= m_hscroll / m_zoom;
@@ -225,7 +222,7 @@ EventRoll::snap_x(int *a_x)
 /* checks mins / maxes..  the fills in x,y
    and width and height */
 void
-EventRoll::x_to_w(int a_x1, int a_x2, int *a_x, int *a_w )
+EventRoll::x_to_w(int a_x1, int a_x2, int *a_x, int *a_w)
 {
     if (a_x1 < a_x2){
     	*a_x = a_x1;
@@ -253,6 +250,45 @@ EventRoll::drop_event(long a_tick)
 }
 
 
+void
+EventRoll::start_paste()
+{
+     long tick_s;
+     long tick_f;
+     int note_h;
+     int note_l;
+     int x, w;
+
+     snap_x(&m_current_x);
+     snap_y(&m_current_x);
+
+     m_drop_x = m_current_x;
+     m_drop_y = m_current_y;
+
+     m_paste = true;
+
+     /* get the box that selected elements are in */
+     m_sequence->get_clipboard_box(&tick_s, &note_h, &tick_f, &note_l);
+
+     /* convert box to X,Y values */
+     convert_t(tick_s, &x);
+     convert_t(tick_f, &w);
+
+     /* w is actually corrids now, so we have to change */
+     w = w-x;
+
+     /* set the m_selected rectangle to hold the
+	x,y,w,h of our selected events */
+
+     m_selected.x = x;
+     m_selected.width = w;
+
+     /* adjust for clipboard being shifted to tick 0 */
+     m_selected.x  += m_drop_x;
+}
+
+
+
 bool
 EventRoll::on_scroll_event(GdkEventScroll* event)
 {
@@ -265,6 +301,8 @@ EventRoll::on_scroll_event(GdkEventScroll* event)
 bool
 EventRoll::on_button_press_event(GdkEventButton* event)
 {
+
+    signal_focus.emit((string)"eventroll");
 
     int x,w,numsel;
 
@@ -493,20 +531,5 @@ EventRoll::on_button_release_event(GdkEventButton* event)
 
     m_sequence->unpaint_all();
 
-    return true;
-}
-bool
-EventRoll::on_key_press_event(GdkEventKey* event)
-{
-    return true;
-}
-bool
-EventRoll::on_focus_in_event(GdkEventFocus*)
-{
-    return true;
-}
-bool
-EventRoll::on_focus_out_event(GdkEventFocus*)
-{
     return true;
 }

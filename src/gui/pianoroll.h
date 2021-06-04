@@ -22,6 +22,7 @@ class PianoRoll : public DrawingArea {
         ~PianoRoll();
 
         sigc::signal<bool(GdkEventScroll*)> signal_scroll;
+        sigc::signal<void(string name)> signal_focus;
 
     protected:
 
@@ -107,9 +108,6 @@ class PianoRoll : public DrawingArea {
         bool on_expose_event(GdkEventExpose* event);
         bool on_button_press_event(GdkEventButton* event);
         bool on_button_release_event(GdkEventButton* event);
-        bool on_key_press_event(GdkEventKey* event);
-        bool on_focus_in_event(GdkEventFocus*);
-        bool on_focus_out_event(GdkEventFocus*);
         bool on_scroll_event(GdkEventScroll* event);
 
 

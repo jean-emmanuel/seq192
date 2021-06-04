@@ -93,7 +93,7 @@ const double c_alpha_lasso = 1;
 // EventRoll
 const int c_eventroll_height =  c_key_height;
 const int c_event_width =  4;
-const double c_alpha_grid_separator = 0.5;
+const double c_alpha_grid_separator = 0.3;
 
 // EventData
 const int c_dataroll_height =  150;

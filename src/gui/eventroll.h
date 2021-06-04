@@ -17,6 +17,7 @@ class EventRoll : public DrawingArea {
         ~EventRoll();
 
         sigc::signal<bool(GdkEventScroll*)> signal_scroll;
+        sigc::signal<void(string name)> signal_focus;
 
 
     protected:
@@ -84,6 +85,7 @@ class EventRoll : public DrawingArea {
         void x_to_w( int a_x1, int a_x2, int *a_x, int *a_w  );
 
         void drop_event(long a_tick);
+        void start_paste();
 
         void update_width();
 
@@ -92,9 +94,6 @@ class EventRoll : public DrawingArea {
         bool on_expose_event(GdkEventExpose* event);
         bool on_button_press_event(GdkEventButton* event);
         bool on_button_release_event(GdkEventButton* event);
-        bool on_key_press_event(GdkEventKey* event);
-        bool on_focus_in_event(GdkEventFocus*);
-        bool on_focus_out_event(GdkEventFocus*);
         bool on_scroll_event(GdkEventScroll* event);
 
 

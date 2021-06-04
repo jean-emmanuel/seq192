@@ -28,9 +28,6 @@ PianoRoll::PianoRoll(perform * p, sequence * seq, PianoKeys * pianokeys)
                 Gdk::BUTTON_PRESS_MASK |
                 Gdk::BUTTON_RELEASE_MASK |
                 Gdk::POINTER_MOTION_MASK |
-                Gdk::KEY_PRESS_MASK |
-                Gdk::KEY_RELEASE_MASK |
-                Gdk::FOCUS_CHANGE_MASK |
                 Gdk::ENTER_NOTIFY_MASK |
                 Gdk::LEAVE_NOTIFY_MASK |
                 Gdk::SCROLL_MASK
@@ -380,6 +377,8 @@ bool
 PianoRoll::on_button_press_event(GdkEventButton* event)
 {
 
+    signal_focus.emit((string)"pianoroll");
+
     int numsel;
     long tick_s;
     long tick_f;
@@ -629,21 +628,6 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
 
     m_sequence->unpaint_all();
 
-    return true;
-}
-bool
-PianoRoll::on_key_press_event(GdkEventKey* event)
-{
-    return true;
-}
-bool
-PianoRoll::on_focus_in_event(GdkEventFocus*)
-{
-    return true;
-}
-bool
-PianoRoll::on_focus_out_event(GdkEventFocus*)
-{
     return true;
 }
 

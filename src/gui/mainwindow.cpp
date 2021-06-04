@@ -524,6 +524,7 @@ MainWindow::open_edit_window(int seqnum, sequence * seq)
 {
     if (m_editwindows[seqnum] == NULL) {
         m_editwindows[seqnum] = new EditWindow(m_perform, this, seqnum, seq);
+        m_editwindows[seqnum]->signal_key_press_event().connect(mem_fun(*this, &MainWindow::on_key_press), false);
     } else {
         m_editwindows[seqnum]->raise();
     }
