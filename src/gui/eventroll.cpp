@@ -130,7 +130,7 @@ EventRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     int w;
     int y = 1;
     int h = c_eventroll_height;
-    cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_lasso);
+    cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_lasso_stroke);
     if (m_selecting)
     {
 
@@ -139,7 +139,12 @@ EventRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         {
             x -= m_hscroll / m_zoom;
 
-            cr->rectangle(x - 0.5, y - 0.5, w, h);
+
+            cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_lasso_fill);
+            cr->rectangle(x, y - 1, w, h + 1);
+            cr->fill();
+            cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_lasso_stroke);
+            cr->rectangle(x - 0.5, y -0.5, w, h );
             cr->stroke();
         }
 

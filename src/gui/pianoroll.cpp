@@ -165,7 +165,7 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     if (m_selecting || m_moving || m_paste ||  m_growing)
     {
         int x,y,w,h;
-        cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_lasso);
+        cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_lasso_stroke);
         if (m_selecting)
         {
 
@@ -175,6 +175,10 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             {
                 x -= m_hscroll / m_zoom;
 
+                cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_lasso_fill);
+                cr->rectangle(x, y - 1, w, h + c_key_height + 1);
+                cr->fill();
+                cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_lasso_stroke);
                 cr->rectangle(x - 0.5, y - 0.5, w, h + c_key_height);
                 cr->stroke();
             }

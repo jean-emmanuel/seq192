@@ -88,7 +88,10 @@ const double c_alpha_grid_key = 0.1;
 const color c_color_event = {c_color_primary.get_red(), c_color_primary.get_green(), c_color_primary.get_blue()};
 const color c_color_event_selected = {c_color_secondary.get_red(), c_color_secondary.get_green(), c_color_secondary.get_blue()};
 const double c_alpha_event = 0.75;
-const double c_alpha_lasso = 1;
+
+const color c_color_lasso = {c_color_secondary.get_red(), c_color_secondary.get_green(), c_color_secondary.get_blue()};
+const double c_alpha_lasso_stroke = 0.8;
+const double c_alpha_lasso_fill = 0.2;
 
 // EventRoll
 const int c_eventroll_height =  c_key_height;
