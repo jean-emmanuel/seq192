@@ -919,6 +919,10 @@ void perform::output_func()
         int ppqn = m_master_bus.get_ppqn();
         long current_tick = 0;
 
+        // stats
+        // long x = 0;
+        // long long t = 0;
+
         while( m_running ){
 
             // bpm
@@ -946,6 +950,10 @@ void perform::output_func()
             int ticks = (int)(delta_time / tick_duration);
             current_tick += ticks;
 
+            // stats
+            // x++;
+            // t+=delta_time;
+
             // increment time
             last_time += ticks * tick_duration;
 
@@ -954,6 +962,9 @@ void perform::output_func()
 
             nanosleep(&ts, NULL);
         }
+
+        // stats
+        // printf("average time: %lli\n", t / x);
 
         m_tick = 0;
         m_master_bus.flush();
