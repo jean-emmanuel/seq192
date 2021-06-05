@@ -900,10 +900,10 @@ void perform::output_func()
         // system time
         struct timespec system_time;
 
-        // loop timeout: 0.1ms
+        // loop timeout: 1ms
         struct timespec ts = {
             .tv_sec = 0,
-            .tv_nsec = 100000
+            .tv_nsec = 1000000
         };
 
         long long last_time;
