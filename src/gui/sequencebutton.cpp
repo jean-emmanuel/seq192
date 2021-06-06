@@ -95,8 +95,7 @@ SequenceButton::draw_background()
         name->show_in_cairo_context(cr);
 
         // timesig
-        color = seq->get_playing() ? c_sequence_text_faded_on : c_sequence_text_faded;
-        cr->set_source_rgb(color.r, color.g, color.b);
+        cr->set_source_rgba(color.r, color.g, color.b, 0.6);
         char str[20];
         sprintf( str,
             "%d-%d %ld/%ld",
@@ -115,8 +114,7 @@ SequenceButton::draw_background()
 
 
         // events
-        color = seq->get_playing() ? c_sequence_events_background_on : c_sequence_events_background;
-        cr->set_source_rgb(color.r, color.g, color.b);
+        cr->set_source_rgba(color.r, color.g, color.b, 0.1);
         int rect_x = 0;
         int rect_y = c_sequence_padding * 2 + text_height * 2;
         int rect_w = width ;
@@ -126,8 +124,7 @@ SequenceButton::draw_background()
         cr->fill();
         // cr->stroke();
 
-        color = seq->get_playing() ? c_sequence_events_on : c_sequence_events;
-        cr->set_source_rgb(color.r, color.g, color.b);
+        cr->set_source_rgba(color.r, color.g, color.b, 0.8);
         long tick_s;
         long tick_f;
         int note;

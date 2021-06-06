@@ -4,6 +4,7 @@
 #include <gtkmm.h>
 
 #include "../core/globals.h"
+#include "../core/mutex.h"
 
 #include "styles.h"
 #include "mainwindow.h"
@@ -53,6 +54,7 @@ class EditWindow : public Window {
 
         // layout
         VBox                m_vbox;
+        HBox                m_toolbar;
         Grid                m_grid;
         HBox                m_hbox;
         VBox                m_left_vbox;
@@ -76,20 +78,36 @@ class EditWindow : public Window {
         MenuItem            m_menu_edit_copy;
         MenuItem            m_menu_edit_paste;
         MenuItem            m_menu_edit_delete;
+        MenuItem            m_menu_edit_close;
+
+        Menu                m_submenu_select;
+        MenuItem            m_menu_edit_select;
         MenuItem            m_menu_edit_selectall;
         MenuItem            m_menu_edit_unselect;
-        MenuItem            m_menu_edit_close;
+
         SeparatorMenuItem   m_menu_separator0;
         SeparatorMenuItem   m_menu_separator1;
         SeparatorMenuItem   m_menu_separator2;
 
-        void menu_callback(edit_menu_action action);
+        // toolbar
+        Entry               m_toolbar_name;
+        Entry               m_toolbar_bpm;
+        Label               m_toolbar_slash;
+        Entry               m_toolbar_bw;
+        Label               m_toolbar_times;
+        Entry               m_toolbar_measures;
 
+
+        int                 m_bpm;
+        int                 m_bw;
+        int                 m_measures;
+
+        void menu_callback(edit_menu_action action);
 
         bool timer_callback();
         bool scroll_callback(GdkEventScroll* event);
         void focus_callback(string name);
-
+        void clear_focus();
         bool on_delete_event(GdkEventAny *event);
 };
 

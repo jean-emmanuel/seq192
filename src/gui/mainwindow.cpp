@@ -14,6 +14,11 @@ MainWindow::MainWindow(perform * p)
 
     m_toolbar_play_state = false;
 
+    for (int i = 0; i < c_max_sequence; i++)
+    {
+        m_editwindows[i] = NULL;
+    }
+
     Glib::RefPtr<Gtk::CssProvider> css_provider = Gtk::CssProvider::create();
     css_provider->load_from_data(c_mainwindow_css);
     this->get_style_context()->add_class("mainwindow");
@@ -107,7 +112,7 @@ MainWindow::MainWindow(perform * p)
 
     m_toolbar_bpm_adj = Gtk::Adjustment::create(m_perform->get_bpm(), c_bpm_minimum, c_bpm_maximum, 1, 10, 1);
     m_toolbar_bpm.set_name("bpm");
-    m_toolbar_bpm.set_size_request(36, 0);
+    m_toolbar_bpm.set_width_chars(6);
     m_toolbar_bpm.set_digits(2);
     m_toolbar_bpm.set_numeric(true);
     m_toolbar_bpm.set_alignment(0.5);
@@ -130,7 +135,7 @@ MainWindow::MainWindow(perform * p)
 
     m_toolbar_sset_adj = Gtk::Adjustment::create(0, 0, c_max_sets, 1, 1, 1);
     m_toolbar_sset.set_name("sset");
-    m_toolbar_sset.set_size_request(50, 0);
+    m_toolbar_sset.set_width_chars(2);
     m_toolbar_sset.set_numeric(true);
     m_toolbar_sset.set_alignment(0.5);
     m_toolbar_sset.set_adjustment(m_toolbar_sset_adj);
@@ -285,6 +290,7 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
     switch (action) {
         case MAIN_MENU_NEW:
             if (global_is_modified && !unsaved_changes()) return;
+            close_all_edit_windows();
             m_perform->clear_all();
             global_filename = "";
             global_is_modified = false;
@@ -298,6 +304,8 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
         case MAIN_MENU_IMPORT:
             {
                 if (action == MAIN_MENU_OPEN && global_is_modified && !unsaved_changes()) return;
+
+                if (action == MAIN_MENU_OPEN) close_all_edit_windows();
 
                 FileChooserDialog dialog("Open MIDI file", Gtk::FILE_CHOOSER_ACTION_OPEN);
 
@@ -511,7 +519,10 @@ MainWindow::set_drag_destination(SequenceButton *s)
 {
     if (m_drag_source != NULL && m_drag_source != s) {
         m_drag_destination = s;
-        m_perform->move_sequence(m_drag_source->get_sequence_number(), m_drag_destination->get_sequence_number());
+        int seqnum_src = m_drag_source->get_sequence_number();
+        int seqnum_dest = m_drag_destination->get_sequence_number();
+        if (m_editwindows[seqnum_src] != NULL) m_editwindows[seqnum_src]->close();
+        m_perform->move_sequence(seqnum_src, seqnum_dest);
         m_drag_source->queue_draw();
         m_drag_source = NULL;
         m_drag_destination = NULL;
@@ -534,4 +545,17 @@ void
 MainWindow::close_edit_window(int seqnum)
 {
     m_editwindows[seqnum] = NULL;
+}
+
+void
+MainWindow::close_all_edit_windows()
+{
+    for (int i = 0; i < c_max_sequence; i++)
+    {
+        if (m_editwindows[i] != NULL)
+        {
+            m_editwindows[i]->close();
+
+        }
+    }
 }

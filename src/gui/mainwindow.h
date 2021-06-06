@@ -89,6 +89,7 @@ class MainWindow : public Window {
         // edit
         void open_edit_window(int seqnum, sequence * seq);
         void close_edit_window(int seqnum);
+        void close_all_edit_windows();
 
         // misc
         bool timer_callback();

@@ -175,11 +175,11 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             {
                 x -= m_hscroll / m_zoom;
 
-                cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_lasso_fill);
-                cr->rectangle(x, y - 1, w, h + c_key_height + 1);
+                cr->set_source_rgba(c_color_lasso.r, c_color_lasso.g, c_color_lasso.b, c_alpha_lasso_fill);
+                cr->rectangle(x, y - 1, w, h + 1);
                 cr->fill();
-                cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_lasso_stroke);
-                cr->rectangle(x - 0.5, y - 0.5, w, h + c_key_height);
+                cr->set_source_rgba(c_color_lasso.r, c_color_lasso.g, c_color_lasso.b, c_alpha_lasso_stroke);
+                cr->rectangle(x - 0.5, y - 0.5, w, h);
                 cr->stroke();
             }
 
@@ -193,9 +193,11 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             x = m_selected.x + delta_x;
             y = m_selected.y + delta_y;
 
+            snap_y(&y);
+
             x -= m_hscroll / m_zoom;
 
-            cr->rectangle(x - 0.5, y + 0.5, m_selected.width + 1, m_selected.height);
+            cr->rectangle(x - 0.5, y - 0.5, m_selected.width + 1, m_selected.height);
             cr->stroke();
         }
 
@@ -512,7 +514,7 @@ PianoRoll::on_motion_notify_event(GdkEventMotion* event)
     }
 
 
-    snap_y(&m_current_y);
+    // snap_y(&m_current_y);
     convert_xy(0, m_current_y, &tick, &note);
 
     m_pianokeys->hint_key(note);
@@ -522,8 +524,6 @@ PianoRoll::on_motion_notify_event(GdkEventMotion* event)
         if (m_moving || m_paste){
             snap_x(&m_current_x);
         }
-
-        // draw_selection_on_window();
         return true;
 
     }

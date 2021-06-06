@@ -59,25 +59,33 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_edit_paste.signal_activate().connect([this]{menu_callback(EDIT_MENU_PASTE);});
     m_submenu_edit.append(m_menu_edit_paste);
 
+    m_submenu_edit.append(m_menu_separator1);
+
+    m_menu_edit_select.set_label("_Select");
+    m_menu_edit_select.set_use_underline(true);
+    m_submenu_edit.append(m_menu_edit_select);
+    m_menu_edit_select.set_submenu(m_submenu_select);
+
+    m_menu_edit_selectall.set_label("Select _All");
+    m_menu_edit_selectall.set_use_underline(true);
+    m_menu_edit_selectall.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'a', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_selectall.signal_activate().connect([this]{menu_callback(EDIT_MENU_SELECTALL);});
+    m_submenu_select.append(m_menu_edit_selectall);
+
+    m_menu_edit_unselect.set_label("_Unselect All");
+    m_menu_edit_unselect.set_use_underline(true);
+    m_menu_edit_unselect.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'a', Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_unselect.signal_activate().connect([this]{menu_callback(EDIT_MENU_UNSELECT);});
+    m_submenu_select.append(m_menu_edit_unselect);
+
+
     m_menu_edit_delete.set_label("Delete");
     m_menu_edit_delete.set_use_underline(true);
     m_menu_edit_delete.Gtk::Widget::add_accelerator("activate", get_accel_group(), GDK_KEY_Delete, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
     m_menu_edit_delete.signal_activate().connect([this]{menu_callback(EDIT_MENU_DELETE);});
     m_submenu_edit.append(m_menu_edit_delete);
 
-    m_submenu_edit.append(m_menu_separator1);
 
-    m_menu_edit_selectall.set_label("Select _All");
-    m_menu_edit_selectall.set_use_underline(true);
-    m_menu_edit_selectall.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'a', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-    m_menu_edit_selectall.signal_activate().connect([this]{menu_callback(EDIT_MENU_SELECTALL);});
-    m_submenu_edit.append(m_menu_edit_selectall);
-
-    m_menu_edit_unselect.set_label("_Unselect");
-    m_menu_edit_unselect.set_use_underline(true);
-    m_menu_edit_unselect.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'a', Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
-    m_menu_edit_unselect.signal_activate().connect([this]{menu_callback(EDIT_MENU_UNSELECT);});
-    m_submenu_edit.append(m_menu_edit_unselect);
 
     m_submenu_edit.append(m_menu_separator2);
 
@@ -87,8 +95,84 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_edit_close.signal_activate().connect([this]{menu_callback(EDIT_MENU_CLOSE);});
     m_submenu_edit.append(m_menu_edit_close);
 
+
+    // toolbar
+    m_toolbar.set_size_request(0, 55);
+    m_toolbar.get_style_context()->add_class("toolbar");
+    m_toolbar.get_style_context()->add_provider(css_provider, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    m_toolbar.set_spacing(c_toolbar_spacing);
+
+    m_toolbar_name.set_name("seq_name");
+    m_toolbar_name.set_alignment(0);
+    m_toolbar_name.signal_activate().connect([&]{clear_focus();});
+    m_toolbar_name.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
+        string s = m_toolbar_name.get_text();
+        m_sequence->set_name(s);
+        return false;
+    });
+    m_toolbar_name.set_text(m_sequence->get_name());
+    m_toolbar.pack_start(m_toolbar_name);
+
+    m_toolbar_bpm.set_alignment(0.5);
+    m_toolbar_bpm.set_width_chars(2);
+    m_toolbar_bpm.signal_activate().connect([&]{clear_focus();});
+    m_toolbar_bpm.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
+        string s = m_toolbar_bpm.get_text();
+        int bpm = atof(s.c_str());
+        if (bpm > 0) m_bpm = bpm;
+        m_sequence->set_bpm(m_bpm);
+        m_sequence->set_length(m_measures * m_bpm * ((c_ppqn * 4) / m_bw));
+        m_toolbar_bpm.set_text(to_string(m_bpm));
+        return false;
+    });
+    m_bpm = m_sequence->get_bpm();
+    m_toolbar_bpm.set_text(to_string(m_bpm));
+    m_toolbar.pack_start(m_toolbar_bpm, false, false);
+
+    m_toolbar_slash.set_label("/");
+    m_toolbar.pack_start(m_toolbar_slash, false, false);
+
+    m_toolbar_bw.set_alignment(0.5);
+    m_toolbar_bw.set_width_chars(2);
+    m_toolbar_bw.signal_activate().connect([&]{clear_focus();});
+    m_toolbar_bw.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
+        string s = m_toolbar_bw.get_text();
+        int bw = atof(s.c_str());
+        if (bw > 0) m_bw = bw;
+        m_sequence->set_bw(m_bw);
+        m_sequence->set_length(m_measures * m_bpm * ((c_ppqn * 4) / m_bw));
+        m_toolbar_bpm.set_text(to_string(m_bw));
+        return false;
+    });
+    m_bw = m_sequence->get_bw();
+    m_toolbar_bw.set_text(to_string(m_bw));
+    m_toolbar.pack_start(m_toolbar_bw, false, false);
+
+    m_toolbar_times.set_label("x");
+    m_toolbar.pack_start(m_toolbar_times, false, false);
+
+    m_toolbar_measures.set_alignment(0.5);
+    m_toolbar_measures.set_width_chars(2);
+    m_toolbar_measures.signal_activate().connect([&]{clear_focus();});
+    m_toolbar_measures.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
+        string s = m_toolbar_measures.get_text();
+        int measures = atof(s.c_str());
+        if (measures > 0) m_measures = measures;
+        m_sequence->set_length(m_measures * m_bpm * ((c_ppqn * 4) / m_bw));
+        m_toolbar_measures.set_text(to_string(m_measures));
+        return false;
+    });
+    long units = ((m_sequence->get_bpm() * (c_ppqn * 4)) /  m_sequence->get_bw() );
+    m_measures = (m_sequence->get_length() / units);
+    if (m_sequence->get_length() % units != 0) m_measures++;
+    m_toolbar_measures.set_text(to_string(m_measures));
+    m_toolbar.pack_start(m_toolbar_measures, false, false);
+
+
+
     // layout
     m_vbox.pack_start(m_menu, false, false);
+    m_vbox.pack_start(m_toolbar, false, false);
     m_vbox.pack_end(m_grid, true, true);
 
     m_grid.insert_row(0);
@@ -139,6 +223,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
 
     // add_events(Gdk::SCROLL_MASK);
 
+    clear_focus();
     resize(800, 600);
     show_all();
 
@@ -147,15 +232,17 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
 
 EditWindow::~EditWindow()
 {
-    m_sequence->set_recording(false);
-    m_perform->get_master_midi_bus()->set_sequence_input(false, NULL);
 }
 
 bool
 EditWindow::on_delete_event(GdkEventAny *event)
 {
+    if (m_perform->is_active(m_seqnum) && m_sequence->get_recording())
+    {
+        m_sequence->set_recording(false);
+        m_perform->get_master_midi_bus()->set_sequence_input(false, NULL);
+    }
     m_mainwindow->close_edit_window(m_seqnum);
-    delete this;
     return false;
 }
 
@@ -209,6 +296,11 @@ EditWindow::menu_callback(edit_menu_action action)
 bool
 EditWindow::timer_callback()
 {
+    if (!m_perform->is_active(m_seqnum)) {
+        close();
+        return false;
+    }
+
     auto adj = m_hscrollbar.get_adjustment();
     adj->set_lower(0);
     adj->set_upper(m_sequence->get_length());
@@ -272,4 +364,15 @@ void
 EditWindow::focus_callback(string name)
 {
     m_focus = name;
+}
+
+void
+EditWindow::clear_focus()
+{
+    m_toolbar_bpm.select_region(0, 0);
+    m_toolbar_bw.select_region(0, 0);
+    m_toolbar_measures.select_region(0, 0);
+    m_pianokeys_scroller.set_can_focus(true);
+    m_pianokeys_scroller.grab_focus();
+    m_pianokeys_scroller.set_can_focus(false);
 }
