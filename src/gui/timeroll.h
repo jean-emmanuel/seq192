@@ -1,5 +1,5 @@
-#ifndef SEQ24_PIANOROLL
-#define SEQ24_PIANOROLL
+#ifndef SEQ192_PIANOROLL
+#define SEQ192_PIANOROLL
 
 #include <gtkmm.h>
 

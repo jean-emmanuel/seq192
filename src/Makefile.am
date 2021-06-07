@@ -1,11 +1,11 @@
-# Makefile.am for seq24
+# Makefile.am for seq192
 
 AM_CXXFLAGS = $(GTKMM_CFLAGS) $(JACK_CFLAGS) $(LASH_CFLAGS) -Wall -Werror
-seq24_LDADD = $(GTKMM_LIBS) $(ALSA_LIBS) $(JACK_LIBS) $(LASH_LIBS) -llo
+seq192_LDADD = $(GTKMM_LIBS) $(ALSA_LIBS) $(JACK_LIBS) $(LASH_LIBS) -llo
 
-bin_PROGRAMS = seq24
+bin_PROGRAMS = seq192
 
-seq24_SOURCES = \
+seq192_SOURCES = \
 	core/globals.h \
 	core/controllers.h \
 	core/configfile.cpp core/configfile.h \
@@ -27,9 +27,9 @@ seq24_SOURCES = \
 	gui/dataroll.cpp gui/dataroll.h \
 	gui/pianokeys.cpp gui/pianokeys.h \
 	gui/sequencebutton.cpp gui/sequencebutton.h \
-	seq24.cpp
+	seq192.cpp
 
 
-EXTRA_DIST = xpm/*.xpm icons/*.png
+EXTRA_DIST = xpm/*.xpm
 
 MOSTLYCLEANFILES = *~

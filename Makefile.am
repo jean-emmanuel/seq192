@@ -1,4 +1,4 @@
-# Makefile.am for seq24
+# Makefile.am for seq192
 
 SUBDIRS = src
 MOSTLYCLEANFILES = *~

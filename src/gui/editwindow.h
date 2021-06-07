@@ -1,5 +1,5 @@
-#ifndef SEQ24_EDITWINDOW
-#define SEQ24_EDITWINDOW
+#ifndef SEQ192_EDITWINDOW
+#define SEQ192_EDITWINDOW
 
 #include <gtkmm.h>
 

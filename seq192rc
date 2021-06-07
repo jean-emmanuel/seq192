@@ -650,37 +650,37 @@
 
 [midi-clock]
 16
-# [1] seq24 1
+# [1] seq192 1
 0 0
-# [2] seq24 2
+# [2] seq192 2
 1 0
-# [3] seq24 3
+# [3] seq192 3
 2 0
-# [4] seq24 4
+# [4] seq192 4
 3 0
-# [5] seq24 5
+# [5] seq192 5
 4 0
-# [6] seq24 6
+# [6] seq192 6
 5 0
-# [7] seq24 7
+# [7] seq192 7
 6 0
-# [8] seq24 8
+# [8] seq192 8
 7 0
-# [9] seq24 9
+# [9] seq192 9
 8 0
-# [10] seq24 10
+# [10] seq192 10
 9 0
-# [11] seq24 11
+# [11] seq192 11
 10 0
-# [12] seq24 12
+# [12] seq192 12
 11 0
-# [13] seq24 13
+# [13] seq192 13
 12 0
-# [14] seq24 14
+# [14] seq192 14
 13 0
-# [15] seq24 15
+# [15] seq192 15
 14 0
-# [16] seq24 16
+# [16] seq192 16
 15 0
 
 
@@ -691,20 +691,20 @@
 
 [midi-input]
 1
-# [0] seq24 0
+# [0] seq192 0
 0 0
 
 
 
 [manual-alsa-ports]
-# set to 1 if you want seq24 to create its own alsa ports and
+# set to 1 if you want seq192 to create its own alsa ports and
 # not connect to other clients
 1
 
 
 
 [interaction-method]
-# 0 - 'seq24' (original seq24 method)
+# 0 - 'seq192' (original seq192 method)
 # 1 - 'fruity' (similar to a certain fruity sequencer we like)
 0
 

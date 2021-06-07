@@ -24,16 +24,16 @@
 2009-06-18 Kevin Meinert <kevin@subatomicglue.com>
 	* src/globals.h, src/mainwnd.cpp, src/midibus_portmidi.cpp,
 	src/options.cpp, src/optionsfile.cpp, src/perfedit.cpp,
-	src/perform.cpp, src/seq24.cpp, src/seqroll.cpp: Some compiler
+	src/perform.cpp, src/seq192.cpp, src/seqroll.cpp: Some compiler
 	warnings fixed, generic key name translation.
 
 2009-05-29 Guido Scholz <guido.scholz@bayernline.de>
 	* src/options.cpp: Fixed missing return value for
 	on_key_press_event().
 	* src/midibus.cpp: Improved MIDI buffer size handling.
-	* man/seq24.1: Command line option for mouse interaction method
+	* man/seq192.1: Command line option for mouse interaction method
 	added.
-	* SEQ24: Documentation for mute groups added (provided by Andrea
+	* SEQ192: Documentation for mute groups added (provided by Andrea
 	delle Canne and Frank Kober).
 
 2009-05-29 Sebastien Alaiw <ace17@free.fr>
@@ -44,13 +44,13 @@
 <andreadellecanne@gmail.com>
 	* src/globals.h, src/learn.xpm, src/learn2.xpm, src/mainwid.*,
 	src/options.*, src/optionsfile.cpp, src/perfedit.cpp,
-	src/perform.*, src/seq24.cpp, src/seqedit.cpp, src/seqmenu.cpp,
+	src/perform.*, src/seq192.cpp, src/seqedit.cpp, src/seqmenu.cpp,
 	src/seqroll.cpp, src/userfile.cpp: Mute group feature added.
 
 2009-05-27 Kevin Meinert <kevin@subatomicglue.com>
 	* src/perform.*: Support for MIDI clock synchronization added.
 	* src/globals.h, src/mainwnd.cpp, src/options.h,
-	src/optionsfile.cpp, src/seq24.cpp, src/perfroll.*, src/seqroll.*,
+	src/optionsfile.cpp, src/seq192.cpp, src/perfroll.*, src/seqroll.*,
 	src/seqevent.*, src/sequence.*: Fruitty loop editing added.
 
 2009-05-22 Sebastien Alaiw <ace17@free.fr>
@@ -58,7 +58,7 @@
 	* src/midifile.cpp: Fixed MIDI sysex event reading.
 
 2009-05-22 Guido Scholz <guido.scholz@bayernline.de>
-	* src/seq24.cpp, src/midibus.*, midibus_portmidi.*, perform.cpp,
+	* src/seq192.cpp, src/midibus.*, midibus_portmidi.*, perform.cpp,
 	options.cpp, lash.*, seauence.h, globals.h, configwin32.h:
 	Support for (lost) Win32 platform support added (reworked
 	patch from Kevin Meinert, Rob Buse).
@@ -80,7 +80,7 @@
 
 2008-11-29 Guido Scholz <guido.scholz@bayernline.de>
 	* src/globals.h, src/configfile.*, src/midifile.*,
-	src/mainwnd.*, src/optionsfile.*, src/seq24.cpp: Handle
+	src/mainwnd.*, src/optionsfile.*, src/seq192.cpp: Handle
 	filenames more consistently as UTF-8 strings.
 
 +++ Release 0.9.0 (2008-11-27) +++
@@ -140,14 +140,14 @@
 	caused by buffer overflow.
 
 2008-08-30 Guido Scholz <guido.scholz@bayernline.de>
-	* man/seq24.1: Man page from Ubuntu added; written by Dana
+	* man/seq192.1: Man page from Ubuntu added; written by Dana
 	Olson.
 
 2008-08-27 Guido Scholz <guido.scholz@bayernline.de>
 	* src/*.xpm: Fixed missing "const" to avoid compiler warnings.
 	* configure.in: Enabled bzip2 tarball for make target "dist".
 	Checks for gtkmm-2.4 , sigc-2.0 and asound libraries added.
-	* main.cpp, src/seq24_32.xpm: Application icon added. Typos
+	* main.cpp, src/seq192_32.xpm: Application icon added. Typos
 	fixed.
 	* event.cpp, font.cpp: Missing include for header files added;
 	was complained by gcc 4.3.
@@ -222,7 +222,7 @@ v0.1.1 -------------------------------------------------
 v0.1.0 -------------------------------------------------
 
 2002-07-14    Rob Buse    rcbuse@filter24.org 
-	* Initial release of seq24-0.1.0  woohoo!
+	* Initial release of seq192-0.1.0  woohoo!
 
 
 	

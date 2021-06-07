@@ -1,19 +1,19 @@
 //----------------------------------------------------------------------------
 //
-//  This file is part of seq24.
+//  This file is part of seq192.
 //
-//  seq24 is free software; you can redistribute it and/or modify
+//  seq192 is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  seq24 is distributed in the hope that it will be useful,
+//  seq192 is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with seq24; if not, write to the Free Software
+//  along with seq192; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 //-----------------------------------------------------------------------------
@@ -49,11 +49,11 @@ option long_options[] = {
 
 Glib::ustring global_filename = "";
 Glib::ustring last_used_dir ="/";
-std::string config_filename = ".seq24rc";
-std::string user_filename = ".seq24usr";
+std::string config_filename = ".seq192rc";
+std::string user_filename = ".seq192usr";
 
 bool global_with_jack_transport = false;
-interaction_method_e global_interactionmethod = e_seq24_interaction;
+interaction_method_e global_interactionmethod = e_seq192_interaction;
 
 char* global_oscport;
 
@@ -135,7 +135,7 @@ main (int argc, char *argv[])
             case '?':
             case 'h':
 
-                printf( "usage: seq24 [options]\n\n" );
+                printf( "usage: seq192 [options]\n\n" );
                 printf( "options:\n" );
                 printf( "  -h, --help : show this message\n" );
                 printf( "  -f, --file <filename> : load midi file on startup\n" );
@@ -184,9 +184,9 @@ main (int argc, char *argv[])
     MainWindow window(p);
     int status = application->run(window);
 
-    // mainwnd seq24_window( p );
+    // mainwnd seq192_window( p );
     //
-    // kit.run(seq24_window);
+    // kit.run(seq192_window);
 
     if ( getenv( HOME ) != NULL ){
 

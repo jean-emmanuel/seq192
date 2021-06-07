@@ -1,5 +1,5 @@
-#ifndef SEQ24_TIMEROLL
-#define SEQ24_TIMEROLL
+#ifndef SEQ192_TIMEROLL
+#define SEQ192_TIMEROLL
 
 #include <gtkmm.h>
 

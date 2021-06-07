@@ -1,19 +1,19 @@
 //----------------------------------------------------------------------------
 //
-//  This file is part of seq24.
+//  This file is part of seq192.
 //
-//  seq24 is free software; you can redistribute it and/or modify
+//  seq192 is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  seq24 is distributed in the hope that it will be useful,
+//  seq192 is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with seq24; if not, write to the Free Software
+//  along with seq192; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 //-----------------------------------------------------------------------------
@@ -83,7 +83,7 @@ midibus::midibus( int a_localclient,
     }
     else
     {
-        snprintf(name,59,"seq24 %d", m_id);
+        snprintf(name,59,"seq192 %d", m_id);
     }
 
 
@@ -173,7 +173,7 @@ bool midibus::init_in( )
 
     /* create ports */
     ret = snd_seq_create_simple_port(m_seq,
-                                     "seq24 in",
+                                     "seq192 in",
                                      SND_SEQ_PORT_CAP_NO_EXPORT |
                                      SND_SEQ_PORT_CAP_WRITE,
                                      SND_SEQ_PORT_TYPE_MIDI_GENERIC |
@@ -221,7 +221,7 @@ bool midibus::init_in_sub( )
     int ret;
 
     /* create ports */
-    ret = snd_seq_create_simple_port(m_seq, "seq24 in",
+    ret = snd_seq_create_simple_port(m_seq, "seq192 in",
             SND_SEQ_PORT_CAP_WRITE |
             SND_SEQ_PORT_CAP_SUBS_WRITE,
             SND_SEQ_PORT_TYPE_MIDI_GENERIC |
@@ -521,7 +521,7 @@ mastermidibus::mastermidibus()
     }
 
     /* set our clients name */
-    snd_seq_set_client_name(m_alsa_seq, "seq24");
+    snd_seq_set_client_name(m_alsa_seq, "seq192");
 
     /* set up our clients queue */
     m_queue = snd_seq_alloc_queue( m_alsa_seq );

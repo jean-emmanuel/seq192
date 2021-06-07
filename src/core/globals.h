@@ -1,25 +1,25 @@
 //----------------------------------------------------------------------------
 //
-//  This file is part of seq24.
+//  This file is part of seq192.
 //
-//  seq24 is free software; you can redistribute it and/or modify
+//  seq192 is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  seq24 is distributed in the hope that it will be useful,
+//  seq192 is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with seq24; if not, write to the Free Software
+//  along with seq192; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 //-----------------------------------------------------------------------------
 
-#ifndef SEQ24_GLOBALS
-#define SEQ24_GLOBALS
+#ifndef SEQ192_GLOBALS
+#define SEQ192_GLOBALS
 
 #include "config.h"
 
@@ -308,21 +308,21 @@ enum mouse_action_e
 
 enum interaction_method_e
 {
-    e_seq24_interaction,
+    e_seq192_interaction,
     e_fruity_interaction,
     e_number_of_interactions // keep this one last...
 };
 
 const char* const c_interaction_method_names[] =
 {
-    "seq24",
+    "seq192",
     "fruity",
     NULL
 };
 
 const char* const c_interaction_method_descs[] =
 {
-    "original seq24 method",
+    "original seq192 method",
     "similar to a certain fruity sequencer we like",
     NULL
 };
@@ -331,9 +331,9 @@ extern interaction_method_e global_interactionmethod;
 
 enum file_type_e
 {
-    E_MIDI_SEQ24_SESSION,
-    E_MIDI_SEQ24_SEQUENCE,
-    E_MIDI_SEQ24_SCREENSET
+    E_MIDI_SEQ192_SESSION,
+    E_MIDI_SEQ192_SEQUENCE,
+    E_MIDI_SEQ192_SCREENSET
 };
 
 #endif

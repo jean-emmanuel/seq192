@@ -1,5 +1,5 @@
-#ifndef SEQ24_MAINWINDOW
-#define SEQ24_MAINWINDOW
+#ifndef SEQ192_MAINWINDOW
+#define SEQ192_MAINWINDOW
 
 #include <gtkmm.h>
 

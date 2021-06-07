@@ -1,5 +1,5 @@
-#ifndef SEQ24_DATAROLL
-#define SEQ24_DATAROLL
+#ifndef SEQ192_DATAROLL
+#define SEQ192_DATAROLL
 
 #include <gtkmm.h>
 

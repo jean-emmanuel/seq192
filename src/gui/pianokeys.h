@@ -1,5 +1,5 @@
-#ifndef SEQ24_PIANOKEYS
-#define SEQ24_PIANOKEYS
+#ifndef SEQ192_PIANOKEYS
+#define SEQ192_PIANOKEYS
 
 #include <gtkmm.h>
 

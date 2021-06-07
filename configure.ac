@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(seq24, [0.11.0], [seq24-devel@lists.sourceforge.net])
+AC_INIT(seq192, [0.11.0], [seq192-devel@lists.sourceforge.net])
 
 AC_CONFIG_HEADER([src/config.h])
 

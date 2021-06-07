@@ -1,5 +1,5 @@
-#ifndef SEQ24_STYLE
-#define SEQ24_STYLE
+#ifndef SEQ192_STYLE
+#define SEQ192_STYLE
 
 #include <gtkmm.h>
 

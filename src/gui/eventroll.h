@@ -1,5 +1,5 @@
-#ifndef SEQ24_EventRoll
-#define SEQ24_EventRoll
+#ifndef SEQ192_EventRoll
+#define SEQ192_EventRoll
 
 #include <gtkmm.h>
 
