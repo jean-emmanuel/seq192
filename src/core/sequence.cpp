@@ -2454,7 +2454,7 @@ sequence::set_snap_tick( int a_st )
 }
 
 void
-sequence::set_quanized_rec( bool a_qr )
+sequence::get_quantized_rec( bool a_qr )
 {
     lock();
     m_quanized_rec = a_qr;
@@ -2463,7 +2463,7 @@ sequence::set_quanized_rec( bool a_qr )
 
 
 bool
-sequence::get_quanidez_rec( )
+sequence::get_quantized_rec( )
 {
     return m_quanized_rec;
 }

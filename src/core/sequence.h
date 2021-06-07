@@ -194,8 +194,8 @@ class sequence
     void set_recording (bool);
     bool get_recording ();
     void set_snap_tick( int a_st );
-    void set_quanized_rec( bool a_qr );
-    bool get_quanidez_rec( );
+    void get_quantized_rec( bool a_qr );
+    bool get_quantized_rec( );
 
     void set_thru (bool);
     bool get_thru ();

@@ -179,10 +179,12 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_submenu_record.append(m_menu_record_recording);
 
     m_menu_record_quantized.set_label("Quantized record");
+    m_menu_record_quantized.set_active(m_sequence->get_quantized_rec());
     m_menu_record_quantized.signal_toggled().connect([&]{menu_callback(EDIT_MENU_RECORD_QUANTIZED);});
     m_submenu_record.append(m_menu_record_quantized);
 
     m_menu_record_through.set_label("Pass events to ouput");
+    m_menu_record_through.set_active(m_sequence->get_thru());
     m_menu_record_through.signal_toggled().connect([&]{menu_callback(EDIT_MENU_RECORD_THRU);});
     m_submenu_record.append(m_menu_record_through);
 
@@ -518,7 +520,7 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             m_sequence->set_recording(!m_menu_record_state);
             break;
         case EDIT_MENU_RECORD_QUANTIZED:
-            m_sequence->set_quanized_rec(m_menu_record_quantized.get_active());
+            m_sequence->get_quantized_rec(m_menu_record_quantized.get_active());
             break;
         case EDIT_MENU_RECORD_THRU:
             m_sequence->set_thru(m_menu_record_through.get_active());
