@@ -10,7 +10,9 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_pianokeys(p, seq),
     m_eventroll(p, seq),
     m_pianoroll(p, seq, &m_pianokeys),
-    m_dataroll(p, seq)
+    m_dataroll(p, seq),
+    m_midibus(-1),
+    m_midichannel(-1)
 {
 
     Glib::RefPtr<Gtk::CssProvider> css_provider = Gtk::CssProvider::create();
@@ -29,14 +31,14 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_edit_undo.set_label("_Undo");
     m_menu_edit_undo.set_use_underline(true);
     m_menu_edit_undo.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'z', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-    m_menu_edit_undo.signal_activate().connect([this]{menu_callback(EDIT_MENU_UNDO);});
+    m_menu_edit_undo.signal_activate().connect([&]{menu_callback(EDIT_MENU_UNDO);});
     m_submenu_edit.append(m_menu_edit_undo);
 
     m_menu_edit_redo.set_label("_Redo");
     m_menu_edit_redo.set_use_underline(true);
     m_menu_edit_redo.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'y', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_edit_redo.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'z', Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
-    m_menu_edit_redo.signal_activate().connect([this]{menu_callback(EDIT_MENU_REDO);});
+    m_menu_edit_redo.signal_activate().connect([&]{menu_callback(EDIT_MENU_REDO);});
     m_submenu_edit.append(m_menu_edit_redo);
 
     m_submenu_edit.append(m_menu_separator0);
@@ -44,20 +46,26 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_edit_cut.set_label("_Cut");
     m_menu_edit_cut.set_use_underline(true);
     m_menu_edit_cut.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'x', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-    m_menu_edit_cut.signal_activate().connect([this]{menu_callback(EDIT_MENU_CUT);});
+    m_menu_edit_cut.signal_activate().connect([&]{menu_callback(EDIT_MENU_CUT);});
     m_submenu_edit.append(m_menu_edit_cut);
 
     m_menu_edit_copy.set_label("_Copy");
     m_menu_edit_copy.set_use_underline(true);
     m_menu_edit_copy.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'c', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-    m_menu_edit_copy.signal_activate().connect([this]{menu_callback(EDIT_MENU_COPY);});
+    m_menu_edit_copy.signal_activate().connect([&]{menu_callback(EDIT_MENU_COPY);});
     m_submenu_edit.append(m_menu_edit_copy);
 
     m_menu_edit_paste.set_label("_Paste");
     m_menu_edit_paste.set_use_underline(true);
     m_menu_edit_paste.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'v', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-    m_menu_edit_paste.signal_activate().connect([this]{menu_callback(EDIT_MENU_PASTE);});
+    m_menu_edit_paste.signal_activate().connect([&]{menu_callback(EDIT_MENU_PASTE);});
     m_submenu_edit.append(m_menu_edit_paste);
+
+    m_menu_edit_delete.set_label("Delete");
+    m_menu_edit_delete.set_use_underline(true);
+    m_menu_edit_delete.Gtk::Widget::add_accelerator("activate", get_accel_group(), GDK_KEY_Delete, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_delete.signal_activate().connect([&]{menu_callback(EDIT_MENU_DELETE);});
+    m_submenu_edit.append(m_menu_edit_delete);
 
     m_submenu_edit.append(m_menu_separator1);
 
@@ -69,32 +77,94 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_edit_selectall.set_label("Select _All");
     m_menu_edit_selectall.set_use_underline(true);
     m_menu_edit_selectall.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'a', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-    m_menu_edit_selectall.signal_activate().connect([this]{menu_callback(EDIT_MENU_SELECTALL);});
+    m_menu_edit_selectall.signal_activate().connect([&]{menu_callback(EDIT_MENU_SELECTALL);});
     m_submenu_select.append(m_menu_edit_selectall);
 
     m_menu_edit_unselect.set_label("_Unselect All");
     m_menu_edit_unselect.set_use_underline(true);
     m_menu_edit_unselect.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'a', Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
-    m_menu_edit_unselect.signal_activate().connect([this]{menu_callback(EDIT_MENU_UNSELECT);});
+    m_menu_edit_unselect.signal_activate().connect([&]{menu_callback(EDIT_MENU_UNSELECT);});
     m_submenu_select.append(m_menu_edit_unselect);
 
 
-    m_menu_edit_delete.set_label("Delete");
-    m_menu_edit_delete.set_use_underline(true);
-    m_menu_edit_delete.Gtk::Widget::add_accelerator("activate", get_accel_group(), GDK_KEY_Delete, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
-    m_menu_edit_delete.signal_activate().connect([this]{menu_callback(EDIT_MENU_DELETE);});
-    m_submenu_edit.append(m_menu_edit_delete);
+    m_menu_edit_transpose.set_label("_Transpose Selection");
+    m_menu_edit_transpose.set_use_underline(true);
+    m_submenu_edit.append(m_menu_edit_transpose);
+    m_menu_edit_transpose.set_submenu(m_submenu_transpose);
 
+    m_menu_edit_transpose_octup.set_label("+1 octave");
+    m_menu_edit_transpose_octup.Gtk::Widget::add_accelerator("activate", get_accel_group(), GDK_KEY_Up, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_transpose_octup.signal_activate().connect([&]{menu_callback(EDIT_MENU_TRANSPOSE, 12);});
+    m_submenu_transpose.append(m_menu_edit_transpose_octup);
 
+    m_menu_edit_transpose_up.set_label("+1 semitone");
+    m_menu_edit_transpose_up.Gtk::Widget::add_accelerator("activate", get_accel_group(), GDK_KEY_Up, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_transpose_up.signal_activate().connect([&]{menu_callback(EDIT_MENU_TRANSPOSE, 1);});
+    m_submenu_transpose.append(m_menu_edit_transpose_up);
+
+    m_menu_edit_transpose_down.set_label("-1 semitone");
+    m_menu_edit_transpose_down.Gtk::Widget::add_accelerator("activate", get_accel_group(), GDK_KEY_Down, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_transpose_down.signal_activate().connect([&]{menu_callback(EDIT_MENU_TRANSPOSE, -1);});
+    m_submenu_transpose.append(m_menu_edit_transpose_down);
+
+    m_menu_edit_transpose_octdown.set_label("-1 octave");
+    m_menu_edit_transpose_octdown.Gtk::Widget::add_accelerator("activate", get_accel_group(), GDK_KEY_Down, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_transpose_octdown.signal_activate().connect([&]{menu_callback(EDIT_MENU_TRANSPOSE, -12);});
+    m_submenu_transpose.append(m_menu_edit_transpose_octdown);
+
+    m_menu_edit_move.set_label("_Move Selection");
+    m_menu_edit_move.set_use_underline(true);
+    m_submenu_edit.append(m_menu_edit_move);
+    m_menu_edit_move.set_submenu(m_submenu_move);
+
+    m_menu_edit_quantize.set_label("Quantize");
+    m_menu_edit_quantize.signal_activate().connect([&]{menu_callback(EDIT_MENU_QUANTIZE);});
+    m_submenu_move.append(m_menu_edit_quantize);
+
+    m_menu_edit_moveleft.set_label("Left");
+    m_menu_edit_moveleft.Gtk::Widget::add_accelerator("activate", get_accel_group(), GDK_KEY_Left, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_moveleft.signal_activate().connect([&]{menu_callback(EDIT_MENU_MOVE, -m_pianoroll.m_snap);});
+    m_submenu_move.append(m_menu_edit_moveleft);
+
+    m_menu_edit_movefineleft.set_label("Left (fine)");
+    m_menu_edit_movefineleft.Gtk::Widget::add_accelerator("activate", get_accel_group(), GDK_KEY_Left, Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_movefineleft.signal_activate().connect([&]{menu_callback(EDIT_MENU_MOVE, -1);});
+    m_submenu_move.append(m_menu_edit_movefineleft);
+
+    m_menu_edit_moveright.set_label("Right");
+    m_menu_edit_moveright.Gtk::Widget::add_accelerator("activate", get_accel_group(), GDK_KEY_Right, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_moveright.signal_activate().connect([&]{menu_callback(EDIT_MENU_MOVE, m_pianoroll.m_snap);});
+    m_submenu_move.append(m_menu_edit_moveright);
+
+    m_menu_edit_movefineright.set_label("Right (fine)");
+    m_menu_edit_movefineright.Gtk::Widget::add_accelerator("activate", get_accel_group(), GDK_KEY_Right, Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_movefineright.signal_activate().connect([&]{menu_callback(EDIT_MENU_MOVE, 1);});
+    m_submenu_move.append(m_menu_edit_movefineright);
+
+    m_menu_edit_pattern.set_label("_Pattern");
+    m_menu_edit_pattern.set_use_underline(true);
+    m_submenu_edit.append(m_menu_edit_pattern);
+    m_menu_edit_pattern.set_submenu(m_submenu_pattern);
+
+    m_menu_edit_expand.set_label("Expand (x2)");
+    m_menu_edit_expand.signal_activate().connect([&]{menu_callback(EDIT_MENU_MULTIPLY, 2);});
+    m_submenu_pattern.append(m_menu_edit_expand);
+
+    m_menu_edit_compress.set_label("Compress (/2)");
+    m_menu_edit_compress.signal_activate().connect([&]{menu_callback(EDIT_MENU_MULTIPLY, 0.5);});
+    m_submenu_pattern.append(m_menu_edit_compress);
+
+    m_menu_edit_reverse.set_label("Reverse");
+    m_menu_edit_reverse.signal_activate().connect([&]{menu_callback(EDIT_MENU_REVERSE);});
+    m_submenu_pattern.append(m_menu_edit_reverse);
 
     m_submenu_edit.append(m_menu_separator2);
 
     m_menu_edit_close.set_label("_Close");
     m_menu_edit_close.set_use_underline(true);
     m_menu_edit_close.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'w', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-    m_menu_edit_close.signal_activate().connect([this]{menu_callback(EDIT_MENU_CLOSE);});
+    m_menu_edit_close.signal_activate().connect([&]{menu_callback(EDIT_MENU_CLOSE);});
     m_submenu_edit.append(m_menu_edit_close);
-
 
     // toolbar
     m_toolbar.set_size_request(0, 55);
@@ -102,7 +172,8 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar.get_style_context()->add_provider(css_provider, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
     m_toolbar.set_spacing(c_toolbar_spacing);
 
-    m_toolbar_name.set_name("seq_name");
+    m_toolbar_name.set_name("seqname");
+    m_toolbar_name.set_width_chars(16);
     m_toolbar_name.set_alignment(0);
     m_toolbar_name.signal_activate().connect([&]{clear_focus();});
     m_toolbar_name.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
@@ -111,8 +182,9 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
         return false;
     });
     m_toolbar_name.set_text(m_sequence->get_name());
-    m_toolbar.pack_start(m_toolbar_name);
+    m_toolbar.pack_start(m_toolbar_name, false, false);
 
+    m_toolbar_bpm.set_name("bpm");
     m_toolbar_bpm.set_alignment(0.5);
     m_toolbar_bpm.set_width_chars(2);
     m_toolbar_bpm.signal_activate().connect([&]{clear_focus();});
@@ -132,6 +204,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar_slash.set_label("/");
     m_toolbar.pack_start(m_toolbar_slash, false, false);
 
+    m_toolbar_bw.set_name("bw");
     m_toolbar_bw.set_alignment(0.5);
     m_toolbar_bw.set_width_chars(2);
     m_toolbar_bw.signal_activate().connect([&]{clear_focus();});
@@ -141,7 +214,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
         if (bw > 0) m_bw = bw;
         m_sequence->set_bw(m_bw);
         m_sequence->set_length(m_measures * m_bpm * ((c_ppqn * 4) / m_bw));
-        m_toolbar_bpm.set_text(to_string(m_bw));
+        m_toolbar_bw.set_text(to_string(m_bw));
         return false;
     });
     m_bw = m_sequence->get_bw();
@@ -151,6 +224,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar_times.set_label("x");
     m_toolbar.pack_start(m_toolbar_times, false, false);
 
+    m_toolbar_measures.set_name("measures");
     m_toolbar_measures.set_alignment(0.5);
     m_toolbar_measures.set_width_chars(2);
     m_toolbar_measures.signal_activate().connect([&]{clear_focus();});
@@ -168,6 +242,61 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar_measures.set_text(to_string(m_measures));
     m_toolbar.pack_start(m_toolbar_measures, false, false);
 
+
+    m_toolbar_snap_label.set_label("Snap");
+    m_toolbar_snap_label.set_sensitive(false);
+    m_toolbar_snap_label.get_style_context()->add_class("nomargin");
+    m_toolbar_length_label.set_label("Note");
+    m_toolbar_length_label.set_sensitive(false);
+    m_toolbar_length_label.get_style_context()->add_class("nomargin");
+    m_toolbar_snap.append("1");
+    m_toolbar_length.append("1");
+    char s[13];
+    for (int i = 1; i < 8; i++) {
+        snprintf(s, sizeof(s), "1/%d", int(pow(2, i)));
+        m_toolbar_snap.append(s);
+        m_toolbar_length.append(s);
+    }
+    for (int i = 0; i < 7; i++) {
+        snprintf(s, sizeof(s), "1/%d", int(3 * pow(2, i)));
+        m_toolbar_snap.append(s);
+        m_toolbar_length.append(s);
+    }
+    m_toolbar_snap.signal_changed().connect([&]{
+        int ticks = divs_to_ticks[m_toolbar_snap.get_active_text()];
+        m_pianoroll.set_snap(ticks);
+        m_eventroll.set_snap(ticks);
+    });
+    m_toolbar_length.signal_changed().connect([&]{
+        int ticks = divs_to_ticks[m_toolbar_length.get_active_text()];
+        m_pianoroll.set_note_length(ticks);
+    });
+    m_toolbar_snap.set_active(ticks_to_divs[m_pianoroll.get_snap()]);
+    m_toolbar_length.set_active(ticks_to_divs[m_pianoroll.get_note_length()]);
+    m_toolbar_snap.set_focus_on_click(false);
+    m_toolbar_length.set_focus_on_click(false);
+
+    m_toolbar.pack_start(m_toolbar_snap_label, false, false);
+    m_toolbar.pack_start(m_toolbar_snap, false, false);
+    m_toolbar.pack_start(m_toolbar_length_label, false, false);
+    m_toolbar.pack_start(m_toolbar_length, false, false);
+
+
+
+    m_toolbar_bus_label.set_label("Output");
+    m_toolbar_bus_label.set_sensitive(false);
+    m_toolbar_bus_label.get_style_context()->add_class("nomargin");
+    m_toolbar_bus.set_can_focus(false);
+    m_toolbar_bus.set_editable(false);
+    m_toolbar_bus.get_style_context()->add_class("nomargin");
+    m_toolbar_bus_dropdown.set_sensitive(true);
+    m_toolbar_bus_dropdown.set_direction(Gtk::ARROW_DOWN);
+    create_midibus_menu();
+    update_midibus_name();
+
+    m_toolbar.pack_end(m_toolbar_bus_dropdown, false, false);
+    m_toolbar.pack_end(m_toolbar_bus, false, false);
+    m_toolbar.pack_end(m_toolbar_bus_label, false, false);
 
 
     // layout
@@ -212,6 +341,8 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_hscrollbar.get_adjustment()->configure(0, 0, m_sequence->get_length(), 1, 1, 1);
 
 
+    signal_key_press_event().connect(mem_fun(*this, &EditWindow::on_key_press), false);
+
     // timer callback (50 fps)
     Glib::signal_timeout().connect(mem_fun(*this, &EditWindow::timer_callback), 20);
 
@@ -234,6 +365,53 @@ EditWindow::~EditWindow()
 {
 }
 
+
+bool
+EditWindow::on_key_press(GdkEventKey* event)
+{
+    if (get_focus() != NULL) {
+        string focus = get_focus()->get_name();
+        if (event->keyval == GDK_KEY_space && focus == "seqname") return false;
+        if ((event->keyval == GDK_KEY_Left || event->keyval == GDK_KEY_Right) &&
+            (focus == "seqname" || focus == "bpm" || focus == "bw" || focus == "measures"))
+        {
+            return false;
+        }
+    }
+    switch (event->keyval) {
+        case GDK_KEY_Escape:
+            m_perform->stop_playing();
+            clear_focus();
+            break;
+        case GDK_KEY_space:
+            m_perform->start_playing();
+            clear_focus();
+            break;
+        case GDK_KEY_Up:
+            if (event->state & GDK_CONTROL_MASK) m_sequence->transpose_notes(12, 0);
+            else m_sequence->transpose_notes(1, 0);
+            return true;
+        case GDK_KEY_Down:
+            if (event->state & GDK_CONTROL_MASK) m_sequence->transpose_notes(-12, 0);
+            else m_sequence->transpose_notes(-1, 0);
+            return true;
+        case GDK_KEY_Left:
+            if (event->state & GDK_SHIFT_MASK) m_sequence->shift_notes(-1);
+            else m_sequence->shift_notes(-m_pianoroll.m_snap);
+            return true;
+        case GDK_KEY_Right:
+            if (event->state & GDK_SHIFT_MASK) m_sequence->shift_notes(1);
+            else m_sequence->shift_notes(m_pianoroll.m_snap);
+            return true;
+        default:
+            return false;
+    }
+
+
+    return false;
+}
+
+
 bool
 EditWindow::on_delete_event(GdkEventAny *event)
 {
@@ -248,6 +426,12 @@ EditWindow::on_delete_event(GdkEventAny *event)
 
 void
 EditWindow::menu_callback(edit_menu_action action)
+{
+    menu_callback(action, 0);
+}
+
+void
+EditWindow::menu_callback(edit_menu_action action, double data1)
 {
     switch (action) {
         case EDIT_MENU_UNDO:
@@ -287,6 +471,22 @@ EditWindow::menu_callback(edit_menu_action action)
         case EDIT_MENU_UNSELECT:
             m_sequence->unselect();
             break;
+        case EDIT_MENU_TRANSPOSE:
+            m_sequence->transpose_notes(data1, 0);
+            break;
+        case EDIT_MENU_QUANTIZE:
+            m_sequence->quantize_events(EVENT_NOTE_ON, 0, m_pianoroll.m_snap, 1, true);
+            // TODO: event roll case
+            break;
+        case EDIT_MENU_MOVE:
+            m_sequence->shift_notes(data1);
+            break;
+        case EDIT_MENU_MULTIPLY:
+            m_sequence->multiply_pattern(data1);
+            break;
+        case EDIT_MENU_REVERSE:
+            m_sequence->reverse_pattern();
+            break;
         case EDIT_MENU_CLOSE:
             close();
             break;
@@ -300,6 +500,8 @@ EditWindow::timer_callback()
         close();
         return false;
     }
+
+    update_midibus_name();
 
     auto adj = m_hscrollbar.get_adjustment();
     adj->set_lower(0);
@@ -375,4 +577,73 @@ EditWindow::clear_focus()
     m_pianokeys_scroller.set_can_focus(true);
     m_pianokeys_scroller.grab_focus();
     m_pianokeys_scroller.set_can_focus(false);
+}
+
+
+void
+EditWindow::update_midibus_name()
+{
+
+    if (m_sequence->get_midi_bus() != m_midibus || m_sequence->get_midi_channel() != m_midichannel)
+    {
+        m_midibus = m_sequence->get_midi_bus();
+        m_midichannel = m_sequence->get_midi_channel();
+
+        mastermidibus *mmb =  m_perform->get_master_midi_bus();
+        string bus = mmb->get_midi_out_bus_name(m_midibus);
+
+        string channel = "[" + to_string(m_midichannel + 1) + "]";
+        int instrument = global_user_midi_bus_definitions[m_midibus].instrument[m_midichannel];
+        if (instrument >= 0 && instrument < c_maxBuses)
+        {
+            channel = channel + " " + global_user_instrument_definitions[instrument].instrument;
+        }
+
+        m_toolbar_bus.set_text(bus + " - " + channel);
+
+    }
+
+}
+
+void EditWindow::create_midibus_menu()
+{
+
+    m_toolbar_bus_menu.set_valign(Gtk::ALIGN_START);
+    m_toolbar_bus_menu.set_halign(Gtk::ALIGN_END);
+
+    char b[16];
+
+    mastermidibus *masterbus = m_perform->get_master_midi_bus();
+    for ( int i=0; i< masterbus->get_num_out_buses(); i++ ){
+        Menu *menu_channels = new Menu();
+
+        MenuItem * menu_item_bus = new MenuItem(masterbus->get_midi_out_bus_name(i));
+        menu_item_bus->set_submenu(*menu_channels);
+        m_toolbar_bus_menu.append(*menu_item_bus);
+
+
+        for( int j=0; j<16; j++ ){
+            snprintf(b, sizeof(b), "%d", j + 1);
+            std::string name = string(b);
+            int instrument = global_user_midi_bus_definitions[i].instrument[j];
+            if ( instrument >= 0 && instrument < c_maxBuses )
+            {
+                name = name + (string(" (") +
+                        global_user_instrument_definitions[instrument].instrument +
+                        string(")") );
+            }
+
+            MenuItem * menu_item_channel = new MenuItem(name);
+            menu_item_channel->signal_activate().connect([&,i,j]{
+                m_sequence->set_midi_bus(i);
+                m_sequence->set_midi_channel(j);
+            });
+            menu_channels->append(*menu_item_channel);
+        }
+
+    }
+
+    m_toolbar_bus_menu.show_all();
+    m_toolbar_bus_dropdown.set_popup(m_toolbar_bus_menu);
+
 }

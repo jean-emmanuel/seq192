@@ -75,7 +75,9 @@ class PianoRoll : public DrawingArea {
 
         int  get_zoom() {return m_zoom;};
         void set_zoom(int zoom);
+        int  get_snap() {return m_snap;};
         void set_snap(int snap);
+        int get_note_length() {return m_note_length;};
         void set_note_length(int note_length);
         void set_adding(bool adding);
         void start_paste();

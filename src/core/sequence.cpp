@@ -1923,7 +1923,7 @@ sequence::stream_event(  event *a_ev  )
         if (a_ev->is_note_off()) {
             select_note_events( a_ev->get_timestamp(), a_ev->get_note(),
             a_ev->get_timestamp(), a_ev->get_note(), e_select);
-            quanize_events( EVENT_NOTE_ON, 0, m_snap_tick, 1 , true );
+            quantize_events( EVENT_NOTE_ON, 0, m_snap_tick, 1 , true );
 	}
     }
     /* update view */
@@ -2767,7 +2767,7 @@ sequence::shift_notes( int a_ticks )
 
 /* if a note event then the status is EVENT_NOTE_ON */
 void
-sequence::quanize_events( unsigned char a_status, unsigned char a_cc,
+sequence::quantize_events( unsigned char a_status, unsigned char a_cc,
                           long a_snap_tick,  int a_divide, bool a_linked )
 {
     if(!mark_selected())
@@ -2891,6 +2891,8 @@ sequence::multiply_pattern( float a_multiplier )
 {
     long orig_length = get_length();
     long new_length = orig_length * a_multiplier;
+
+    push_undo();
 
     if(new_length > orig_length)
     {

@@ -7,6 +7,7 @@ const Gdk::RGBA c_color_background = Gdk::RGBA("#21252b");
 const Gdk::RGBA c_color_foreground = Gdk::RGBA("#42454A");
 const Gdk::RGBA c_color_raised = Gdk::RGBA("#55575c");
 const Gdk::RGBA c_color_text = Gdk::RGBA("#cccccc");
+const Gdk::RGBA c_color_text_hilight = Gdk::RGBA("#eeeeee");
 
 const Gdk::RGBA c_color_primary = Gdk::RGBA("rgb(117, 170, 229)");
 const Gdk::RGBA c_color_secondary = Gdk::RGBA("rgb(229, 170, 117)");
@@ -16,26 +17,30 @@ struct color { double r; double g; double b; };
 
 // Main window
 const std::string c_mainwindow_css = "\
-window * {box-shadow: none; border: 0; border-radius: 0; text-shadow: none;}\
+window * {box-shadow: none; border: 0; border-radius: 0; text-shadow: none; color: inherit;}\
 window {background: " + c_color_background.to_string() + "; color: " + c_color_text.to_string() + "}\
 window menu {background: " + c_color_foreground.to_string() + "; border: 1px solid " + c_color_background.to_string() + "; padding: 1px;}\
 window menubar {background: " + c_color_foreground.to_string() + "; border-bottom: 1px solid " + c_color_background.to_string() + "}\
-window menuitem:hover {background: " + c_color_primary.to_string() + ";}\
+window menuitem:hover {background: " + c_color_primary.to_string() + "; color: " + c_color_text_hilight.to_string() + "}\
 window separator {background: " + c_color_background.to_string() + "; opacity: 0.5;}\
 window scrollbar {background: " + c_color_background.to_string() + "; min-width: 12px; min-height: 12px;}\
 window scrollbar slider {background: " + c_color_raised.to_string() + "; min-width: 10px; min-height: 10px;}\
 window scrollbar slider:active {background: " + c_color_primary.to_string() + ";}\
 .toolbar {background: " + c_color_foreground.to_string() + ";padding:10px; border-bottom: 1px solid " + c_color_background.to_string() + "}\
-window button {background: " + c_color_raised.to_string() + "; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); font-size: 16px;}\
+window button {background: " + c_color_raised.to_string() + "; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);}\
 window button.on {color: " + c_color_primary.to_string() + ";}\
-window button:hover, spinbutton button:hover {opacity: 0.8}\
-window button:active, spinbutton button:active {opacity: 0.6}\
-window entry {background: rgba(0, 0, 0, 0.2); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); color: inherit}\
+window button:hover {opacity: 0.8}\
+window button:active {opacity: 0.6}\
+window entry {background: rgba(0, 0, 0, 0.15); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); color: inherit}\
+window entry:focus {background: rgba(0, 0, 0, 0.2);}\
 window spinbutton entry {box-shadow: none}\
 window spinbutton {box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); color: inherit;}\
 window spinbutton button {box-shadow:none;}\
 window spinbutton button:last-child {margin-left:1px;}\
 window overshoot, undershoot {background: none;}\
+window :disabled {opacity: 0.75}\
+window .nomargin {margin-right: -9px;}\
+combobox {min-width: 0;}\
 ";
 
 // toolbar
