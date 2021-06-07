@@ -314,6 +314,8 @@ bool
 EventRoll::on_scroll_event(GdkEventScroll* event)
 {
 
+    if (!(event->state & GDK_CONTROL_MASK)) event->state = GDK_SHIFT_MASK;
+
     if (signal_scroll.emit(event)) return true;
 
     return false;
@@ -533,7 +535,6 @@ EventRoll::on_button_release_event(GdkEventButton* event)
             m_sequence->move_selected_notes(delta_tick, 0);
         }
 
-        set_adding(m_adding);
     }
 
     if (event->button == 3)

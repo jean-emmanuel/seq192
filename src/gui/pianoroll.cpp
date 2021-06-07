@@ -170,7 +170,7 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
             if (tick_f < tick_s)
             {
-                cr->rectangle(0, note_y, tick_f / m_zoom - 2, note_height);
+                cr->rectangle(0 - m_hscroll / m_zoom, note_y, tick_f / m_zoom - 2, note_height);
             }
 
             cr->fill();

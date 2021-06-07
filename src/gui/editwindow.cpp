@@ -351,6 +351,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_pianokeys.set_size_request(-1, c_key_height * c_num_keys);
     m_pianokeys_scroller.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_EXTERNAL);
     m_pianokeys_scroller.add(m_pianokeys);
+    m_pianokeys_scroller.get_style_context()->add_class("editwindow-pianokeys");
     m_grid.attach(m_pianokeys_scroller, 0, 1);
 
     m_pianoroll_scroller.set_hexpand(true);
@@ -363,6 +364,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
 
     m_vscrollbar.set_orientation(ORIENTATION_VERTICAL);
     m_vscrollbar.set_adjustment(m_pianokeys_scroller.get_vadjustment());
+    m_vscrollbar.get_style_context()->add_class("editwindow-vscrollbar");
     m_grid.attach(m_vscrollbar, 2, 1);
 
     m_eventroll.set_size_request(-1, c_eventroll_height + 1);
@@ -372,6 +374,16 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_grid.attach(m_dataroll, 1, 3);
 
     m_grid.attach(m_hscrollbar, 1, 4);
+
+
+    m_dummy1.get_style_context()->add_class("editwindow-filler");
+    m_dummy2.get_style_context()->add_class("editwindow-filler");
+    // m_dummy1.set_label("EVENTS");
+    m_dummy1.set_alignment(1);
+    m_grid.attach(m_dummy1, 0, 2);
+    m_grid.attach(m_dummy2, 2, 2);
+
+
 
     int height = c_key_height * c_num_keys;
     m_pianokeys_scroller.get_vadjustment()->configure((height - 500) / 2.0, 0.0, height, c_key_height, c_key_height * 12, 1);

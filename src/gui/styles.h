@@ -31,36 +31,6 @@ const Gdk::RGBA c_color_secondary = Gdk::RGBA("rgb(229, 170, 117)");
 
 struct color { double r; double g; double b; };
 
-// Main window
-const std::string c_mainwindow_css = "\
-window * {box-shadow: none; border: 0; border-radius: 0; text-shadow: none; color: inherit; background: transparent;}\
-window {background: " + c_color_background.to_string() + "; color: " + c_color_text.to_string() + "}\
-window menu {background: " + c_color_foreground.to_string() + "; border: 1px solid " + c_color_background.to_string() + "; padding: 1px;}\
-window menubar {background: " + c_color_foreground.to_string() + "; border-bottom: 1px solid " + c_color_background.to_string() + "}\
-window menuitem:hover {background: " + c_color_primary.to_string() + "; color: " + c_color_text_hilight.to_string() + "}\
-window separator {background: " + c_color_background.to_string() + "; opacity: 0.5;}\
-window scrollbar {background: " + c_color_background.to_string() + "; min-width: 12px; min-height: 12px;}\
-window scrollbar slider {background: " + c_color_raised.to_string() + "; min-width: 10px; min-height: 10px;}\
-window scrollbar slider:active {background: " + c_color_primary.to_string() + ";}\
-.toolbar {background: " + c_color_foreground.to_string() + ";padding:10px; border-bottom: 1px solid " + c_color_background.to_string() + "}\
-window button {background: " + c_color_raised.to_string() + "; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);}\
-window button.on {color: " + c_color_primary.to_string() + ";}\
-window button:hover {opacity: 0.8}\
-window button:active {opacity: 0.6}\
-window entry {background: rgba(0, 0, 0, 0.15); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); color: inherit}\
-window entry:focus {background: rgba(0, 0, 0, 0.2);}\
-window spinbutton entry {box-shadow: none}\
-window spinbutton {box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); color: inherit;}\
-window spinbutton button {box-shadow:none;}\
-window spinbutton button:last-child {margin-left:1px;}\
-window overshoot, undershoot {background: none;}\
-window :disabled {opacity: 0.75}\
-window .nomargin {margin-right: -9px;}\
-combobox {min-width: 0;}\
-.recording {background: rgba(255, 0, 0, 0.5); box-shadow: inset 0 0 0 2px " + c_color_foreground.to_string() + "; border-radius: 5px}\
-selection {background: " + c_color_primary.to_string() + "; color: " + c_color_text_hilight.to_string() + "}\
-";
-
 // toolbar
 const int c_toolbar_spacing = 10;
 
@@ -124,5 +94,38 @@ const double c_alpha_grid_separator = 0.3;
 
 // EventData
 const int c_dataroll_height =  150;
+
+// Main window
+const std::string c_mainwindow_css = "\
+window * {box-shadow: none; border: 0; border-radius: 0; text-shadow: none; color: inherit; background: transparent;}\
+window {background: " + c_color_background.to_string() + "; color: " + c_color_text.to_string() + "}\
+window menu {background: " + c_color_foreground.to_string() + "; border: 1px solid " + c_color_background.to_string() + "; padding: 1px;}\
+window menubar {background: " + c_color_foreground.to_string() + "; border-bottom: 1px solid " + c_color_background.to_string() + "}\
+window menuitem:hover {background: " + c_color_primary.to_string() + "; color: " + c_color_text_hilight.to_string() + "}\
+window separator {background: " + c_color_background.to_string() + "; opacity: 0.5;}\
+window scrollbar {background: " + c_color_background.to_string() + "; min-width: 12px; min-height: 12px;}\
+window scrollbar slider {background: " + c_color_raised.to_string() + "; min-width: 10px; min-height: 10px;}\
+window scrollbar slider:active {background: " + c_color_primary.to_string() + ";}\
+.toolbar {background: " + c_color_foreground.to_string() + ";padding:10px; border-bottom: 1px solid " + c_color_background.to_string() + "}\
+window button {background: " + c_color_raised.to_string() + "; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);}\
+window button.on {color: " + c_color_primary.to_string() + ";}\
+window button:hover {opacity: 0.8}\
+window button:active {opacity: 0.6}\
+window entry {background: rgba(0, 0, 0, 0.15); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); color: inherit}\
+window entry:focus {background: rgba(0, 0, 0, 0.2);}\
+window spinbutton entry {box-shadow: none}\
+window spinbutton {box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); color: inherit;}\
+window spinbutton button {box-shadow:none;}\
+window spinbutton button:last-child {margin-left:1px;}\
+window overshoot, undershoot {background: none;}\
+window :disabled {opacity: 0.75}\
+window .nomargin {margin-right: -9px;}\
+combobox {min-width: 0;}\
+.recording {background: rgba(255, 0, 0, 0.5); box-shadow: inset 0 0 0 2px " + c_color_foreground.to_string() + "; border-radius: 5px}\
+selection {background: " + c_color_primary.to_string() + "; color: " + c_color_text_hilight.to_string() + "}\
+.editwindow-vscrollbar, .editwindow-pianokeys {box-shadow: 0 -1px 0 0,  0 1px 0 0; color: rgba(" + to_string(int(c_color_grid.r*255)) + "," + to_string(int(c_color_grid.g*255)) + "," + to_string(int(c_color_grid.b*255)) + "," + to_string(c_alpha_grid_separator) +")}\
+.editwindow-vscrollbar {padding-top: 2px; padding-bottom: 2px}\
+.editwindow-filler {font-size: 8pt; font-weight: bold; padding-top: 2px; padding-right: 4px; border-bottom: 1px solid rgba(" + to_string(int(c_color_grid.r*255)) + "," + to_string(int(c_color_grid.g*255)) + "," + to_string(int(c_color_grid.b*255)) + "," + to_string(c_alpha_grid_separator) +")}\
+";
 
 #endif
