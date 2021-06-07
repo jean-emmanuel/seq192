@@ -156,6 +156,7 @@ class EditWindow : public Window {
         ComboBoxText        m_toolbar_snap;
         Button              m_toolbar_length_label;
         ComboBoxText        m_toolbar_length;
+        ToggleButton        m_toolbar_playing;
         Button              m_toolbar_bus_label;
         Entry               m_toolbar_bus;
         MenuButton          m_toolbar_bus_dropdown;

@@ -319,6 +319,12 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar.pack_start(m_toolbar_length_label, false, false);
     m_toolbar.pack_start(m_toolbar_length, false, false);
 
+    m_toolbar_playing.set_label("Playing");
+    m_toolbar_playing.signal_clicked().connect([&]{
+        m_sequence->set_playing(m_toolbar_playing.get_active());
+    });
+    m_toolbar.pack_start(m_toolbar_playing, false, false);
+
 
 
     m_toolbar_bus_label.set_label("Output");
@@ -572,6 +578,11 @@ EditWindow::timer_callback()
         } else {
             m_menu_record.get_style_context()->remove_class("recording");
         }
+    }
+
+    bool playing = m_sequence->get_playing();
+    if (m_toolbar_playing.get_active() != playing) {
+        m_toolbar_playing.set_active(playing);
     }
 
     update_midibus_name();
