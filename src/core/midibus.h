@@ -200,9 +200,9 @@ class mastermidibus
     int poll_for_midi( );
     bool is_more_input( );
     bool get_midi_event( event *a_in );
-    void set_sequence_input( bool a_state, sequence *a_seq );
+    void set_sequence_input( sequence *a_seq );
 
-    bool is_dumping( ) { return m_dumping_input; }
+    bool is_dumping( ) { return m_seq != NULL; }
     sequence* get_sequence( ) { return m_seq; }
     void sysex( event *a_event );
 

@@ -9,6 +9,7 @@
 #include "styles.h"
 #include "mainwindow.h"
 #include "sequencebutton.h"
+#include "timeroll.h"
 #include "pianoroll.h"
 #include "eventroll.h"
 #include "pianokeys.h"
@@ -56,6 +57,7 @@ class EditWindow : public Window {
         // components
         PianoKeys           m_pianokeys;
         EventRoll           m_eventroll;
+        TimeRoll            m_timeroll;
         PianoRoll           m_pianoroll;
         DataRoll            m_dataroll;
 
@@ -118,7 +120,7 @@ class EditWindow : public Window {
 
         MenuItem            m_menu_record;
         Menu                m_submenu_record;
-        CheckMenuItem       m_menu_record_recording;
+        MenuItem            m_menu_record_recording;
         CheckMenuItem       m_menu_record_quantized;
         CheckMenuItem       m_menu_record_through;
         bool                m_menu_record_state;

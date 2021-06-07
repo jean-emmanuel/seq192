@@ -31,6 +31,8 @@ PianoKeys::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     const int height = allocation.get_height();
 
 
+
+
     double key_y;
     int i, key;
     int octave;
@@ -87,7 +89,6 @@ PianoKeys::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     cr->move_to(width - 0.5, 0);
     cr->line_to(width - 0.5, height);
     cr->stroke();
-
 
     return true;
 }

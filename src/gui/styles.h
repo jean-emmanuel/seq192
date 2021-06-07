@@ -7,7 +7,7 @@ const Gdk::RGBA c_color_background = Gdk::RGBA("#21252b");
 const Gdk::RGBA c_color_foreground = Gdk::RGBA("#42454A");
 const Gdk::RGBA c_color_raised = Gdk::RGBA("#55575c");
 const Gdk::RGBA c_color_text = Gdk::RGBA("#cccccc");
-const Gdk::RGBA c_color_text_hilight = Gdk::RGBA("#eeeeee");
+const Gdk::RGBA c_color_text_hilight = Gdk::RGBA("#ffffff");
 
 const Gdk::RGBA c_color_primary = Gdk::RGBA("rgb(117, 170, 229)");
 const Gdk::RGBA c_color_secondary = Gdk::RGBA("rgb(229, 170, 117)");
@@ -42,6 +42,7 @@ window :disabled {opacity: 0.75}\
 window .nomargin {margin-right: -9px;}\
 combobox {min-width: 0;}\
 .recording {background: rgba(255, 0, 0, 0.5); box-shadow: inset 0 0 0 2px " + c_color_foreground.to_string() + "; border-radius: 5px}\
+selection {background: " + c_color_primary.to_string() + "; color: " + c_color_text_hilight.to_string() + "}\
 ";
 
 // toolbar
@@ -69,7 +70,6 @@ const color c_sequence_marker_on = {c_color_primary.get_red(), c_color_primary.g
 
 
 
-
 // PianoKeys
 const int c_key_height = 20;
 const int c_keys_height = c_key_height * c_num_keys;
@@ -78,6 +78,10 @@ const color c_key_white = {c_color_text.get_red(), c_color_text.get_green(), c_c
 const color c_key_black = {c_color_background.get_red(), c_color_background.get_green(), c_color_background.get_blue()};
 const int c_key_fontsize = 8;
 const int c_key_padding = 4;
+
+// TimeRoll
+
+const int c_timeroll_height = c_key_height;
 
 // PianoRoll
 const int c_default_zoom = 2;

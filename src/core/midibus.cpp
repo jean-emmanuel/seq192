@@ -582,7 +582,7 @@ mastermidibus::init( )
             m_num_poll_descriptors,
             POLLIN);
 
-    set_sequence_input( false, NULL );
+    set_sequence_input( NULL );
 
     /* sizes */
     snd_seq_set_output_buffer_size(m_alsa_seq, c_midibus_output_size );
@@ -841,12 +841,13 @@ mastermidibus::get_midi_event( event *a_in )
 }
 
 void
-mastermidibus::set_sequence_input( bool a_state, sequence *a_seq )
+mastermidibus::set_sequence_input( sequence *a_seq )
 {
     lock();
 
+	if (m_seq != NULL) m_seq->set_recording(false);
+
     m_seq = a_seq;
-    m_dumping_input = a_state;
 
     unlock();
 }

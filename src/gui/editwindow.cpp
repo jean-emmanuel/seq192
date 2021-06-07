@@ -9,6 +9,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_seqnum(seqnum),
     m_pianokeys(p, seq),
     m_eventroll(p, seq),
+    m_timeroll(p, seq),
     m_pianoroll(p, seq, &m_pianokeys),
     m_dataroll(p, seq),
     m_midibus(-1),
@@ -174,14 +175,15 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_record_recording.set_label("Enable recording");
     m_menu_record_recording.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'r', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_record_recording.signal_activate().connect([&]{menu_callback(EDIT_MENU_RECORD);});
+    m_menu_record_state = false;
     m_submenu_record.append(m_menu_record_recording);
 
     m_menu_record_quantized.set_label("Quantized record");
-    m_menu_record_quantized.signal_activate().connect([&]{menu_callback(EDIT_MENU_RECORD_QUANTIZED);});
+    m_menu_record_quantized.signal_toggled().connect([&]{menu_callback(EDIT_MENU_RECORD_QUANTIZED);});
     m_submenu_record.append(m_menu_record_quantized);
 
     m_menu_record_through.set_label("Pass events to ouput");
-    m_menu_record_through.signal_activate().connect([&]{menu_callback(EDIT_MENU_RECORD_THRU);});
+    m_menu_record_through.signal_toggled().connect([&]{menu_callback(EDIT_MENU_RECORD_THRU);});
     m_submenu_record.append(m_menu_record_through);
 
     // toolbar
@@ -322,16 +324,16 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_vbox.pack_start(m_toolbar, false, false);
     m_vbox.pack_end(m_grid, true, true);
 
-    m_grid.insert_row(0);
-    m_grid.insert_row(0);
-    m_grid.insert_column(0);
-    m_grid.insert_column(0);
-    m_grid.insert_column(0);
+
+    m_timeroll.set_size_request(-1, c_timeroll_height);
+    m_grid.attach(m_timeroll, 1, 0);
+
+
     m_pianokeys_scroller.set_size_request(c_keys_width, -1);
     m_pianokeys.set_size_request(-1, c_key_height * c_num_keys);
     m_pianokeys_scroller.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_EXTERNAL);
     m_pianokeys_scroller.add(m_pianokeys);
-    m_grid.attach(m_pianokeys_scroller, 0, 0);
+    m_grid.attach(m_pianokeys_scroller, 0, 1);
 
     m_pianoroll_scroller.set_hexpand(true);
     m_pianoroll_scroller.set_vexpand(true);
@@ -339,19 +341,19 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_pianoroll_scroller.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_EXTERNAL);
     m_pianoroll_scroller.set_vadjustment(m_pianokeys_scroller.get_vadjustment());
     m_pianoroll_scroller.add(m_pianoroll);
-    m_grid.attach(m_pianoroll_scroller, 1, 0);
+    m_grid.attach(m_pianoroll_scroller, 1, 1);
 
     m_vscrollbar.set_orientation(ORIENTATION_VERTICAL);
     m_vscrollbar.set_adjustment(m_pianokeys_scroller.get_vadjustment());
-    m_grid.attach(m_vscrollbar, 2, 0);
+    m_grid.attach(m_vscrollbar, 2, 1);
 
     m_eventroll.set_size_request(-1, c_eventroll_height + 1);
-    m_grid.attach(m_eventroll, 1, 1);
+    m_grid.attach(m_eventroll, 1, 2);
 
     m_dataroll.set_size_request(-1, c_dataroll_height + 1);
-    m_grid.attach(m_dataroll, 1, 2);
+    m_grid.attach(m_dataroll, 1, 3);
 
-    m_grid.attach(m_hscrollbar, 1, 3);
+    m_grid.attach(m_hscrollbar, 1, 4);
 
     int height = c_key_height * c_num_keys;
     m_pianokeys_scroller.get_vadjustment()->configure((height - 500) / 2.0, 0.0, height, c_key_height, c_key_height * 12, 1);
@@ -365,6 +367,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     Glib::signal_timeout().connect(mem_fun(*this, &EditWindow::timer_callback), 20);
 
     // zoom callback
+    m_timeroll.signal_scroll.connect(mem_fun(*this, &EditWindow::scroll_callback));
     m_pianoroll.signal_scroll.connect(mem_fun(*this, &EditWindow::scroll_callback));
     m_eventroll.signal_scroll.connect(mem_fun(*this, &EditWindow::scroll_callback));
     m_pianoroll.signal_focus.connect(mem_fun(*this, &EditWindow::focus_callback));
@@ -436,7 +439,7 @@ EditWindow::on_delete_event(GdkEventAny *event)
     if (m_perform->is_active(m_seqnum) && m_sequence->get_recording())
     {
         m_sequence->set_recording(false);
-        m_perform->get_master_midi_bus()->set_sequence_input(false, NULL);
+        m_perform->get_master_midi_bus()->set_sequence_input(NULL);
     }
     m_mainwindow->close_edit_window(m_seqnum);
     return false;
@@ -510,14 +513,14 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             break;
 
         case EDIT_MENU_RECORD:
-            m_perform->get_master_midi_bus()->set_sequence_input(true, m_sequence);
-            m_sequence->set_recording(m_menu_record_recording.get_active());
+            // m_menu_record_state = !m_menu_record_state;
+            m_perform->get_master_midi_bus()->set_sequence_input(m_menu_record_state ? NULL : m_sequence);
+            m_sequence->set_recording(!m_menu_record_state);
             break;
         case EDIT_MENU_RECORD_QUANTIZED:
             m_sequence->set_quanized_rec(m_menu_record_quantized.get_active());
             break;
         case EDIT_MENU_RECORD_THRU:
-            m_perform->get_master_midi_bus()->set_sequence_input(true, m_sequence);
             m_sequence->set_thru(m_menu_record_through.get_active());
             break;
     }
@@ -531,8 +534,9 @@ EditWindow::timer_callback()
         return false;
     }
 
-    if (m_menu_record_state != m_menu_record_recording.get_active()) {
-        m_menu_record_state = m_menu_record_recording.get_active();
+    bool rec = m_sequence->get_recording();
+    if (m_menu_record_state != rec) {
+        m_menu_record_state = rec;
         if (m_menu_record_state) {
             m_menu_record.get_style_context()->add_class("recording");
         } else {
@@ -550,9 +554,11 @@ EditWindow::timer_callback()
     adj->set_page_increment(c_ppqn * m_sequence->get_bpm() * 4.0 / m_sequence->get_bw() * m_pianoroll.get_zoom());
     if (adj->get_value() > adj->get_upper()) adj->set_value(adj->get_upper());
 
+    m_timeroll.set_hscroll(adj->get_value());
     m_eventroll.set_hscroll(adj->get_value());
     m_pianoroll.set_hscroll(adj->get_value());
 
+    m_timeroll.queue_draw();
     m_eventroll.queue_draw();
     m_pianoroll.queue_draw();
 
@@ -575,11 +581,13 @@ EditWindow::scroll_callback(GdkEventScroll* event)
         int zoom = m_pianoroll.get_zoom();
         if (event->direction == GDK_SCROLL_DOWN)
         {
+            m_timeroll.set_zoom(zoom * 2);
             m_eventroll.set_zoom(zoom * 2);
             m_pianoroll.set_zoom(zoom * 2);
         }
         else if (event->direction == GDK_SCROLL_UP)
         {
+            m_timeroll.set_zoom(zoom / 2);
             m_eventroll.set_zoom(zoom / 2);
             m_pianoroll.set_zoom(zoom / 2);
         }
