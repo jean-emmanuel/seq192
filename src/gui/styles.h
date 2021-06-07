@@ -17,7 +17,7 @@ struct color { double r; double g; double b; };
 
 // Main window
 const std::string c_mainwindow_css = "\
-window * {box-shadow: none; border: 0; border-radius: 0; text-shadow: none; color: inherit;}\
+window * {box-shadow: none; border: 0; border-radius: 0; text-shadow: none; color: inherit; background: transparent;}\
 window {background: " + c_color_background.to_string() + "; color: " + c_color_text.to_string() + "}\
 window menu {background: " + c_color_foreground.to_string() + "; border: 1px solid " + c_color_background.to_string() + "; padding: 1px;}\
 window menubar {background: " + c_color_foreground.to_string() + "; border-bottom: 1px solid " + c_color_background.to_string() + "}\
@@ -41,6 +41,7 @@ window overshoot, undershoot {background: none;}\
 window :disabled {opacity: 0.75}\
 window .nomargin {margin-right: -9px;}\
 combobox {min-width: 0;}\
+.recording {background: rgba(255, 0, 0, 0.5); box-shadow: inset 0 0 0 2px " + c_color_foreground.to_string() + "; border-radius: 5px}\
 ";
 
 // toolbar

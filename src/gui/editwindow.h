@@ -31,7 +31,11 @@ enum edit_menu_action
     EDIT_MENU_MOVE,
     EDIT_MENU_MULTIPLY,
     EDIT_MENU_REVERSE,
-    EDIT_MENU_CLOSE
+    EDIT_MENU_CLOSE,
+
+    EDIT_MENU_RECORD,
+    EDIT_MENU_RECORD_QUANTIZED,
+    EDIT_MENU_RECORD_THRU
 };
 
 class MainWindow;
@@ -111,6 +115,13 @@ class EditWindow : public Window {
         MenuItem            m_menu_edit_movefineright;
 
         MenuItem            m_menu_edit_quantize;
+
+        MenuItem            m_menu_record;
+        Menu                m_submenu_record;
+        CheckMenuItem       m_menu_record_recording;
+        CheckMenuItem       m_menu_record_quantized;
+        CheckMenuItem       m_menu_record_through;
+        bool                m_menu_record_state;
 
         SeparatorMenuItem   m_menu_separator0;
         SeparatorMenuItem   m_menu_separator1;

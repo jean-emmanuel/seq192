@@ -166,6 +166,24 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_edit_close.signal_activate().connect([&]{menu_callback(EDIT_MENU_CLOSE);});
     m_submenu_edit.append(m_menu_edit_close);
 
+    m_menu_record.set_label("_Record");
+    m_menu_record.set_use_underline(true);
+    m_menu_record.set_submenu(m_submenu_record);
+    m_menu.append(m_menu_record);
+
+    m_menu_record_recording.set_label("Enable recording");
+    m_menu_record_recording.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'r', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_record_recording.signal_activate().connect([&]{menu_callback(EDIT_MENU_RECORD);});
+    m_submenu_record.append(m_menu_record_recording);
+
+    m_menu_record_quantized.set_label("Quantized record");
+    m_menu_record_quantized.signal_activate().connect([&]{menu_callback(EDIT_MENU_RECORD_QUANTIZED);});
+    m_submenu_record.append(m_menu_record_quantized);
+
+    m_menu_record_through.set_label("Pass events to ouput");
+    m_menu_record_through.signal_activate().connect([&]{menu_callback(EDIT_MENU_RECORD_THRU);});
+    m_submenu_record.append(m_menu_record_through);
+
     // toolbar
     m_toolbar.set_size_request(0, 55);
     m_toolbar.get_style_context()->add_class("toolbar");
@@ -490,6 +508,18 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
         case EDIT_MENU_CLOSE:
             close();
             break;
+
+        case EDIT_MENU_RECORD:
+            m_perform->get_master_midi_bus()->set_sequence_input(true, m_sequence);
+            m_sequence->set_recording(m_menu_record_recording.get_active());
+            break;
+        case EDIT_MENU_RECORD_QUANTIZED:
+            m_sequence->set_quanized_rec(m_menu_record_quantized.get_active());
+            break;
+        case EDIT_MENU_RECORD_THRU:
+            m_perform->get_master_midi_bus()->set_sequence_input(true, m_sequence);
+            m_sequence->set_thru(m_menu_record_through.get_active());
+            break;
     }
 }
 
@@ -499,6 +529,15 @@ EditWindow::timer_callback()
     if (!m_perform->is_active(m_seqnum)) {
         close();
         return false;
+    }
+
+    if (m_menu_record_state != m_menu_record_recording.get_active()) {
+        m_menu_record_state = m_menu_record_recording.get_active();
+        if (m_menu_record_state) {
+            m_menu_record.get_style_context()->add_class("recording");
+        } else {
+            m_menu_record.get_style_context()->remove_class("recording");
+        }
     }
 
     update_midibus_name();

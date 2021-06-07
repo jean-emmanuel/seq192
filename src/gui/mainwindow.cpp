@@ -2,11 +2,11 @@
 #include "../core/globals.h"
 #include <time.h>
 
-#include "xpm/seq24.xpm"
+#include "xpm/seq192.xpm"
+#include "xpm/seq192_32.xpm"
 
 MainWindow::MainWindow(perform * p)
 {
-
     m_perform = p;
 
     m_drag_source = NULL;
@@ -148,7 +148,7 @@ MainWindow::MainWindow(perform * p)
     m_toolbar.pack_start(m_toolbar_sset, false, false);
     update_sset_name(m_perform->get_screenset());
 
-    m_toolbar_logo.set(Gdk::Pixbuf::create_from_xpm_data(seq24_xpm));
+    m_toolbar_logo.set(Gdk::Pixbuf::create_from_xpm_data(seq192_xpm));
     m_toolbar.pack_end(m_toolbar_logo, false, false);
 
 
@@ -185,6 +185,8 @@ MainWindow::MainWindow(perform * p)
 
     // timer callback (25 fps)
     Glib::signal_timeout().connect(mem_fun(*this, &MainWindow::timer_callback), 40);
+
+    set_icon(Gdk::Pixbuf::create_from_xpm_data(seq192_32_xpm));
 
     clear_focus();
     update_window_title();
