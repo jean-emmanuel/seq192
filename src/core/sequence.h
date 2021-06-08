@@ -254,7 +254,7 @@ class sequence
 
     int select_event_handle( long a_tick_s, long a_tick_f,
                         unsigned char a_status,
-                        unsigned char a_cc, int a_data_s);
+                        unsigned char a_cc, int a_data_s, int a_range);
 
     int get_num_selected_notes ();
     int get_num_selected_events (unsigned char a_status, unsigned char a_cc);

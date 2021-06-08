@@ -92,8 +92,17 @@ const int c_eventroll_height =  c_key_height;
 const int c_event_width =  4;
 const double c_alpha_grid_separator = 0.3;
 
-// EventData
+// DataRoll
 const int c_dataroll_height =  150;
+const int c_dataroll_padding =  4;
+const int c_data_handle_radius = 6;
+const int c_data_text_height = 35;
+const int c_data_y0 = c_dataroll_padding + c_data_handle_radius;
+const int c_data_y1 = c_dataroll_height - c_dataroll_padding - c_data_handle_radius - c_data_text_height;
+const int c_data_text_width = 6;
+const double c_alpha_handle = 0.25;
+const double c_alpha_bottom_line = 0.25;
+const color c_color_data_background = {c_color_background.get_red(), c_color_background.get_green(), c_color_background.get_blue()};
 
 // Main window
 const std::string c_mainwindow_css = "\

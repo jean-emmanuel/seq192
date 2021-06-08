@@ -32,6 +32,8 @@ class DataRoll : public DrawingArea {
 
         sigc::signal<bool(GdkEventScroll*)> signal_scroll;
 
+        void set_data_type( unsigned char a_status, unsigned char a_control  );
+
 
     protected:
 
@@ -53,9 +55,22 @@ class DataRoll : public DrawingArea {
         int                 m_zoom;
         void set_zoom(int zoom);
 
+        unsigned char m_status;
+        unsigned char m_cc;
 
-        void update_width();
+        int m_drop_x;
+        int m_drop_y;
+        int m_current_x;
+        int m_current_y;
+        bool m_dragging;
+        bool m_drag_handle;
 
+        void convert_x( int a_x, long *a_tick );
+        void xy_to_rect( int a_x1,  int a_y1, int a_x2,  int a_y2, int *a_x,  int *a_y, int *a_w,  int *a_h );
+
+        bool on_button_press_event(GdkEventButton* event);
+        bool on_button_release_event(GdkEventButton* event);
+        bool on_motion_notify_event(GdkEventMotion* event);
         bool on_scroll_event(GdkEventScroll* event);
 
 

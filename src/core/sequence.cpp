@@ -977,7 +977,7 @@ sequence::select_note_events( long a_tick_s, int a_note_h,
 int
 sequence::select_event_handle( long a_tick_s, long a_tick_f,
                          unsigned char a_status,
-                         unsigned char a_cc, int a_data_s)
+                         unsigned char a_cc, int a_data_s, int a_range)
 {
     /* use selected note ons if any */
     bool have_selection = false;
@@ -1004,7 +1004,7 @@ sequence::select_event_handle( long a_tick_s, long a_tick_f,
 
             if ( a_status == EVENT_CONTROL_CHANGE && d0 == a_cc )
             {
-                if(d1 <= (a_data_s + 2) && d1 >= (a_data_s - 2) )  // is it in range
+                if(d1 <= (a_data_s + a_range) && d1 >= (a_data_s - a_range) )  // is it in range
                 {
                     unselect();
                     (*i).select( );
@@ -1018,7 +1018,7 @@ sequence::select_event_handle( long a_tick_s, long a_tick_f,
                 if(a_status == EVENT_NOTE_ON || a_status == EVENT_NOTE_OFF
                    || a_status == EVENT_AFTERTOUCH || a_status == EVENT_PITCH_WHEEL )
                 {
-                    if(d1 <= (a_data_s + 2) && d1 >= (a_data_s - 2) ) // is it in range
+                    if(d1 <= (a_data_s + a_range) && d1 >= (a_data_s -a_range) ) // is it in range
                     {
                         if( have_selection)       // note on only
                         {
@@ -1063,7 +1063,7 @@ sequence::select_event_handle( long a_tick_s, long a_tick_f,
                 }
                 else
                 {
-                    if(d0 <= (a_data_s + 2) && d0 >= (a_data_s - 2) )  // is it in range
+                    if(d0 <= (a_data_s + a_range) && d0 >= (a_data_s - a_range) )  // is it in range
                     {
                         unselect();
                         (*i).select( );

@@ -437,6 +437,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_timeroll.signal_scroll.connect(mem_fun(*this, &EditWindow::scroll_callback));
     m_pianoroll.signal_scroll.connect(mem_fun(*this, &EditWindow::scroll_callback));
     m_eventroll.signal_scroll.connect(mem_fun(*this, &EditWindow::scroll_callback));
+    m_dataroll.signal_scroll.connect(mem_fun(*this, &EditWindow::scroll_callback));
     m_pianoroll.signal_focus.connect(mem_fun(*this, &EditWindow::focus_callback));
     m_eventroll.signal_focus.connect(mem_fun(*this, &EditWindow::focus_callback));
 
@@ -628,10 +629,12 @@ EditWindow::timer_callback()
     m_timeroll.set_hscroll(adj->get_value());
     m_eventroll.set_hscroll(adj->get_value());
     m_pianoroll.set_hscroll(adj->get_value());
+    m_dataroll.set_hscroll(adj->get_value());
 
     m_timeroll.queue_draw();
     m_eventroll.queue_draw();
     m_pianoroll.queue_draw();
+    m_dataroll.queue_draw();
 
     if (m_sequence->m_have_undo && !m_menu_edit_undo.get_sensitive()) m_menu_edit_undo.set_sensitive(true);
     else if (!m_sequence->m_have_undo && m_menu_edit_undo.get_sensitive()) m_menu_edit_undo.set_sensitive(false);
@@ -655,12 +658,14 @@ EditWindow::scroll_callback(GdkEventScroll* event)
             m_timeroll.set_zoom(zoom * 2);
             m_eventroll.set_zoom(zoom * 2);
             m_pianoroll.set_zoom(zoom * 2);
+            m_dataroll.set_zoom(zoom * 2);
         }
         else if (event->direction == GDK_SCROLL_UP)
         {
             m_timeroll.set_zoom(zoom / 2);
             m_eventroll.set_zoom(zoom / 2);
             m_pianoroll.set_zoom(zoom / 2);
+            m_dataroll.set_zoom(zoom / 2);
         }
         return true;
     }
