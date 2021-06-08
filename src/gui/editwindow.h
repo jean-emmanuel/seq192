@@ -105,6 +105,7 @@ class EditWindow : public Window {
         MenuItem            m_menu_edit_copy;
         MenuItem            m_menu_edit_paste;
         MenuItem            m_menu_edit_delete;
+        AccelLabel          m_menu_edit_delete_label;
         MenuItem            m_menu_edit_close;
 
         MenuItem            m_menu_edit_select;
@@ -129,7 +130,9 @@ class EditWindow : public Window {
         Menu                m_submenu_move;
         MenuItem            m_menu_edit_moveleft;
         MenuItem            m_menu_edit_moveright;
+        AccelLabel          m_menu_edit_movefineleft_label;
         MenuItem            m_menu_edit_movefineleft;
+        AccelLabel          m_menu_edit_movefineright_label;
         MenuItem            m_menu_edit_movefineright;
 
         MenuItem            m_menu_edit_quantize;

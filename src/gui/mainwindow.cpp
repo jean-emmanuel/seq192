@@ -50,25 +50,25 @@ MainWindow::MainWindow(perform * p)
 
     m_menu_file_new.set_label("_New");
     m_menu_file_new.set_use_underline(true);
-    m_menu_file_new.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'n', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_file_new.add_accelerator("activate", get_accel_group(), 'n', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_file_new.signal_activate().connect([this]{menu_callback(MAIN_MENU_NEW, 0, 0);});
     m_submenu_file.append(m_menu_file_new);
 
     m_menu_file_open.set_label("_Open");
     m_menu_file_open.set_use_underline(true);
-    m_menu_file_open.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'o', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_file_open.add_accelerator("activate", get_accel_group(), 'o', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_file_open.signal_activate().connect([this]{menu_callback(MAIN_MENU_OPEN, 0, 0);});
     m_submenu_file.append(m_menu_file_open);
 
     m_menu_file_save.set_label("_Save");
     m_menu_file_save.set_use_underline(true);
-    m_menu_file_save.Gtk::Widget::add_accelerator("activate", get_accel_group(), 's', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_file_save.add_accelerator("activate", get_accel_group(), 's', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_file_save.signal_activate().connect([this]{menu_callback(MAIN_MENU_SAVE, 0, 0);});
     m_submenu_file.append(m_menu_file_save);
 
     m_menu_file_saveas.set_label("Save _As");
     m_menu_file_saveas.set_use_underline(true);
-    m_menu_file_saveas.Gtk::Widget::add_accelerator("activate", get_accel_group(), 's', Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_file_saveas.add_accelerator("activate", get_accel_group(), 's', Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_file_saveas.signal_activate().connect([this]{menu_callback(MAIN_MENU_SAVEAS, 0, 0);});
     m_submenu_file.append(m_menu_file_saveas);
 
@@ -88,7 +88,7 @@ MainWindow::MainWindow(perform * p)
 
     m_menu_file_quit.set_label("_Quit");
     m_menu_file_quit.set_use_underline(true);
-    m_menu_file_quit.Gtk::Widget::add_accelerator("activate", get_accel_group(), 'q', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_file_quit.add_accelerator("activate", get_accel_group(), 'q', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_file_quit.signal_activate().connect([this]{menu_callback(MAIN_MENU_QUIT, 0, 0);});
     m_submenu_file.append(m_menu_file_quit);
 
