@@ -349,6 +349,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar.pack_start(m_toolbar_length, false, false);
 
     m_toolbar_playing.set_label("Playing");
+    m_toolbar_playing.get_style_context()->add_class("togglebutton");
     m_toolbar_playing.set_focus_on_click(false);
     m_toolbar_playing.signal_clicked().connect([&]{
         m_sequence->set_playing(m_toolbar_playing.get_active());

@@ -108,9 +108,9 @@ window scrollbar slider {background: " + c_color_raised.to_string() + "; min-wid
 window scrollbar slider:active {background: " + c_color_primary.to_string() + ";}\
 .toolbar {background: " + c_color_foreground.to_string() + ";padding:10px; border-bottom: 1px solid " + c_color_background.to_string() + "}\
 window button {background: " + c_color_raised.to_string() + "; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);}\
-window button.on {color: " + c_color_primary.to_string() + ";}\
 window button:hover {opacity: 0.8}\
 window button:active {opacity: 0.6}\
+.togglebutton:checked, window button.on {color: " + c_color_primary.to_string() + ";}\
 window entry {background: rgba(0, 0, 0, 0.15); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); color: inherit}\
 window entry:focus {background: rgba(0, 0, 0, 0.2);}\
 window spinbutton entry {box-shadow: none}\
@@ -121,7 +121,6 @@ window overshoot, undershoot {background: none;}\
 window :disabled {opacity: 0.75}\
 window .nomargin {margin-right: -9px;}\
 combobox {min-width: 0;}\
-button.toggle:checked {background: " + c_color_text.to_string() + "; color: " + c_color_background.to_string() + "}\
 .recording {background: rgba(255, 0, 0, 0.5); box-shadow: inset 0 0 0 2px " + c_color_foreground.to_string() + "; border-radius: 5px}\
 selection {background: " + c_color_primary.to_string() + "; color: " + c_color_text_hilight.to_string() + "}\
 .editwindow-vscrollbar, .editwindow-pianokeys {box-shadow: 0 -1px 0 0,  0 1px 0 0; color: rgba(" + to_string(int(c_color_grid.r*255)) + "," + to_string(int(c_color_grid.g*255)) + "," + to_string(int(c_color_grid.b*255)) + "," + to_string(c_alpha_grid_separator) +")}\
