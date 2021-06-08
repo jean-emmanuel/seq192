@@ -189,6 +189,29 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_edit_close.signal_activate().connect([&]{menu_callback(EDIT_MENU_CLOSE);});
     m_submenu_edit.append(m_menu_edit_close);
 
+    m_menu_transport.set_label("_Transport");
+    m_menu_transport.set_use_underline(true);
+    m_menu_transport.set_submenu(m_submenu_transport);
+    m_menu.append(m_menu_transport);
+
+    m_menu_transport_start_label.set_label("Start");
+    m_menu_transport_start_label.set_alignment(0);
+    m_menu_transport_start_label.set_accel(GDK_KEY_space, (Gdk::ModifierType)0);
+    m_menu_transport_start.add(m_menu_transport_start_label);
+    m_menu_transport_start.signal_activate().connect([&]{
+        m_perform->start_playing();
+        clear_focus();});
+    m_submenu_transport.append(m_menu_transport_start);
+
+    m_menu_transport_stop_label.set_label("Stop");
+    m_menu_transport_stop_label.set_alignment(0);
+    m_menu_transport_stop_label.set_accel(GDK_KEY_Escape, (Gdk::ModifierType)0);
+    m_menu_transport_stop.add(m_menu_transport_stop_label);
+    m_menu_transport_stop.signal_activate().connect([&]{
+        m_perform->stop_playing();
+        clear_focus();});
+    m_submenu_transport.append(m_menu_transport_stop);
+
     m_menu_record.set_label("_Record");
     m_menu_record.set_use_underline(true);
     m_menu_record.set_submenu(m_submenu_record);

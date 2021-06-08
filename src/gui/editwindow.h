@@ -148,6 +148,14 @@ class EditWindow : public Window {
         SeparatorMenuItem   m_menu_separator1;
         SeparatorMenuItem   m_menu_separator2;
 
+        MenuItem            m_menu_transport;
+        Menu                m_submenu_transport;
+        AccelLabel          m_menu_transport_start_label;
+        MenuItem            m_menu_transport_start;
+        AccelLabel          m_menu_transport_stop_label;
+        MenuItem            m_menu_transport_stop;
+
+
         // toolbar
         Entry               m_toolbar_name;
         Entry               m_toolbar_bpm;

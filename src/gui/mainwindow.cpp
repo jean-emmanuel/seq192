@@ -92,6 +92,29 @@ MainWindow::MainWindow(perform * p)
     m_menu_file_quit.signal_activate().connect([this]{menu_callback(MAIN_MENU_QUIT, 0, 0);});
     m_submenu_file.append(m_menu_file_quit);
 
+    m_menu_transport.set_label("_Transport");
+    m_menu_transport.set_use_underline(true);
+    m_menu_transport.set_submenu(m_submenu_transport);
+    m_menu.append(m_menu_transport);
+
+    m_menu_transport_start_label.set_label("Start");
+    m_menu_transport_start_label.set_alignment(0);
+    m_menu_transport_start_label.set_accel(GDK_KEY_space, (Gdk::ModifierType)0);
+    m_menu_transport_start.add(m_menu_transport_start_label);
+    m_menu_transport_start.signal_activate().connect([&]{
+        m_perform->start_playing();
+        clear_focus();});
+    m_submenu_transport.append(m_menu_transport_start);
+
+    m_menu_transport_stop_label.set_label("Stop");
+    m_menu_transport_stop_label.set_alignment(0);
+    m_menu_transport_stop_label.set_accel(GDK_KEY_Escape, (Gdk::ModifierType)0);
+    m_menu_transport_stop.add(m_menu_transport_stop_label);
+    m_menu_transport_stop.signal_activate().connect([&]{
+        m_perform->stop_playing();
+        clear_focus();});
+    m_submenu_transport.append(m_menu_transport_stop);
+
 
     // toolbar
     m_toolbar.set_size_request(0, 55);
@@ -222,6 +245,11 @@ MainWindow::on_key_press(GdkEventKey* event)
     if (get_focus() != NULL) {
         string focus = get_focus()->get_name();
         if (event->keyval == GDK_KEY_space && focus == "sset_name") return false;
+        if ((event->keyval == GDK_KEY_Up || event->keyval == GDK_KEY_Down) &&
+            (focus == "bpm" || focus == "sset"))
+        {
+            return false;
+        }
     }
     switch (event->keyval) {
         case GDK_KEY_Escape:
@@ -234,8 +262,6 @@ MainWindow::on_key_press(GdkEventKey* event)
             break;
         case GDK_KEY_Up:
         case GDK_KEY_Down:
-        case GDK_KEY_Left:
-        case GDK_KEY_Right:
             return true;
             break;
         default:
