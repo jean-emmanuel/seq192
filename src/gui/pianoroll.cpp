@@ -558,12 +558,12 @@ PianoRoll::on_motion_notify_event(GdkEventMotion* event)
         }
 
         if (m_growing && snap) {
-                int delta_x = m_current_x - m_drop_x;
-                int x1 = m_selected.x + m_selected.width + delta_x;
-                int x2 = x1;
-                snap_x(&x1);
-                m_current_x -= (x2 - x1);
-                m_current_x -= 1;
+            int delta_x = m_current_x - m_drop_x;
+            int x1 = m_selected.x + m_selected.width + delta_x;
+            int x2 = x1;
+            snap_x(&x1);
+            m_current_x -= (x2 - x1);
+            m_current_x -= 1;
         }
 
         return true;
