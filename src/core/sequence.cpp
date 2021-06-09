@@ -1633,6 +1633,8 @@ sequence::paste_selected( long a_tick, int a_note )
     list<event>::iterator i;
     int highest_note = 0;
 
+    push_undo();
+
     lock();
     list<event> clipboard = m_list_clipboard;
 

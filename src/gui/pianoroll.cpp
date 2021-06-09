@@ -432,7 +432,6 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
     {
         convert_xy(snapped_x, snapped_y, &tick_s, &note_h);
         m_paste = false;
-        m_sequence->push_undo();
         m_sequence->paste_selected(tick_s, note_h);
     }
 
@@ -640,7 +639,6 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
                (delta_y[0] = note[127], etc.,so we have to adjust */
             delta_note = delta_note - (c_num_keys-1);
 
-            m_sequence->push_undo();
             m_sequence->move_selected_notes(delta_tick, delta_note);
         }
 
@@ -661,8 +659,6 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
 
             /* convert deltas into screen corridinates */
             convert_xy(delta_x, delta_y, &delta_tick, &delta_note);
-
-            m_sequence->push_undo();
 
             if (event->state & GDK_SHIFT_MASK)
             {
