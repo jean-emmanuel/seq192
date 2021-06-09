@@ -92,9 +92,6 @@ class EditWindow : public Window {
         ScrolledWindow      m_pianoroll_scroller;
         Scrollbar           m_vscrollbar;
         Scrollbar           m_hscrollbar;
-        Label               m_dummy1;
-        Label               m_dummy2;
-        VBox                m_event_vbox;
         MenuButton          m_event_dropdown;
         Menu                m_event_menu;
 

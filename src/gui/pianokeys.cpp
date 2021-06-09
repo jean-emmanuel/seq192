@@ -83,11 +83,16 @@ PianoKeys::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
         cr->rectangle(0, key_y, width, c_key_height);
         cr->fill();
+
         cr->set_source_rgb(c_key_black.r, c_key_black.g, c_key_black.b);
-        cr->set_line_width(1.0);
-        cr->move_to(0, key_y + c_key_height - 0.5);
-        cr->line_to(width-1, key_y + c_key_height - 0.5);
-        cr->stroke();
+
+        if (i != 0)
+        {
+            cr->set_line_width(1.0);
+            cr->move_to(0, key_y + c_key_height - 0.5);
+            cr->line_to(width-1, key_y + c_key_height - 0.5);
+            cr->stroke();
+        }
 
         octave = i  / 12 - 1;
         if (key % 12 == 0) {

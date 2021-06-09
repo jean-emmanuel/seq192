@@ -170,12 +170,11 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
             note_x -= m_hscroll / m_zoom;
 
-            // printf("%i %i\n", note_x, note_width);
-            cr->rectangle(note_x + 2, note_y, note_width - 2, note_height);
+            cr->rectangle(note_x + 2, note_y, note_width - 2, note_height + (note == 0 ? 1 : 0));
 
             if (tick_f < tick_s)
             {
-                cr->rectangle(0 - m_hscroll / m_zoom, note_y, tick_f / m_zoom - 2, note_height);
+                cr->rectangle(0 - m_hscroll / m_zoom, note_y, tick_f / m_zoom - 2, note_height + (note == 0 ? 1 : 0));
             }
 
             cr->fill();
