@@ -249,7 +249,7 @@ class sequence
 
     /* select events in range, returns number
        selected */
-    int select_events (long a_tick_s, long a_tick_f,
+    int select_events (long a_tick_s, long a_tick_f, long a_event_width,
 		       unsigned char a_status, unsigned char a_cc, select_action_e a_action);
 
     int select_event_handle( long a_tick_s, long a_tick_f,

@@ -165,7 +165,7 @@ EventRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             cr->rectangle(x, y - 1, w, h + 1);
             cr->fill();
             cr->set_source_rgba(c_color_lasso.r, c_color_lasso.g, c_color_lasso.b, c_alpha_lasso_stroke);
-            cr->rectangle(x - 0.5, y -0.5, w, h );
+            cr->rectangle(x + 0.5, y -0.5, w, h );
             cr->stroke();
         }
 
@@ -179,7 +179,7 @@ EventRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     	x = m_selected.x + delta_x;
         x -= m_hscroll / m_zoom;
 
-        cr->rectangle(x - 0.5, y - 0.5, m_selected.width + 3, h);
+        cr->rectangle(x + 0.5, y - 0.5, c_event_width + 3, h);
         cr->stroke();
     }
 
@@ -332,16 +332,16 @@ EventRoll::on_button_press_event(GdkEventButton* event)
 
     signal_focus.emit((string)"eventroll");
 
-    int x,w,numsel;
+    int x,numsel;
 
     long tick_s;
-    long tick_f;
     long tick_w;
+    long tick_f;
 
-    convert_x(c_event_width, &tick_w);
+    convert_x(c_event_width + 4, &tick_w);
 
     /* set values for dragging */
-    m_drop_x = m_current_x = (int) event->x + m_hscroll / m_zoom;
+    m_drop_x = m_current_x = (int) event->x + m_hscroll / m_zoom - 1;
 
     if (m_paste){
 
@@ -361,13 +361,6 @@ EventRoll::on_button_press_event(GdkEventButton* event)
             /* turn x,y in to tick/note */
             convert_x(m_drop_x, &tick_s);
 
-            /* shift back a few ticks */
-            tick_f = tick_s + (m_zoom);
-            tick_s -= (tick_w);
-
-            if (tick_s < 0)
-                tick_s = 0;
-
             if (m_adding)
             {
                 m_painting = true;
@@ -377,7 +370,7 @@ EventRoll::on_button_press_event(GdkEventButton* event)
                 convert_x(m_drop_x, &tick_s);
                 /* add note, length = little less than snap */
 
-                if (!m_sequence->select_events(tick_s, tick_f, m_status, m_cc, sequence::e_would_select))
+                if (!m_sequence->select_events(tick_s, tick_s, tick_w, m_status, m_cc, sequence::e_would_select))
                 {
                     m_sequence->push_undo();
                     drop_event(tick_s);
@@ -386,14 +379,14 @@ EventRoll::on_button_press_event(GdkEventButton* event)
             }
             else /* selecting */
             {
-                if (!m_sequence->select_events(tick_s - 2, tick_f, m_status, m_cc, sequence::e_is_selected))
+                if (!m_sequence->select_events(tick_s, tick_s, tick_w, m_status, m_cc, sequence::e_is_selected))
                 {
                     if (!(event->state & GDK_CONTROL_MASK))
                     {
                         m_sequence->unselect();
                     }
 
-                    numsel = m_sequence->select_events(tick_s - 2, tick_f, m_status, m_cc, sequence::e_select_one);
+                    numsel = m_sequence->select_events(tick_s, tick_s, tick_w, m_status, m_cc, sequence::e_select_one);
 
                     /* if we didnt select anyhing (user clicked empty space)
                        unselect all notes, and start selecting */
@@ -409,31 +402,22 @@ EventRoll::on_button_press_event(GdkEventButton* event)
                     }
                 }
 
-                if (m_sequence->select_events(tick_s, tick_f,
-                            m_status, m_cc, sequence::e_is_selected))
+                if (m_sequence->select_events(tick_s, tick_s, tick_w, m_status, m_cc, sequence::e_is_selected))
                 {
 
                     m_moving_init = true;
                     int note;
 
                     /* get the box that selected elements are in */
-                    m_sequence->get_selected_box(&tick_s, &note,
-                            &tick_f, &note);
-
-                    tick_f += tick_w;
+                    m_sequence->get_selected_box(&tick_s, &note, &tick_f, &note);
 
                     /* convert box to X,Y values */
                     convert_t(tick_s, &x);
-                    convert_t(tick_f, &w);
-
-                    /* w is actually corrids now, so we have to change */
-                    w = w-x;
 
                     /* set the m_selected rectangle to hold the
                        x,y,w,h of our selected events */
 
                     m_selected.x = x;
-                    m_selected.width = w;
 
                     /* save offset that we get from the snap above */
                     int adjusted_selected_x = m_selected.x;
@@ -474,7 +458,7 @@ EventRoll::on_motion_notify_event(GdkEventMotion* event)
 
     if (m_selecting || m_moving || m_paste)
     {
-        m_current_x = (int) event->x  + m_hscroll / m_zoom;
+        m_current_x = (int) event->x  + m_hscroll / m_zoom - 1;
 
         if (m_moving || m_paste) snap_x(&m_current_x);
     }
@@ -482,7 +466,7 @@ EventRoll::on_motion_notify_event(GdkEventMotion* event)
 
     if (m_painting)
     {
-        m_current_x = (int) event->x   + m_hscroll / m_zoom;
+        m_current_x = (int) event->x   + m_hscroll / m_zoom - 1;
         snap_x(&m_current_x);
         convert_x(m_current_x, &tick);
         drop_event(tick);
@@ -505,7 +489,7 @@ EventRoll::on_button_release_event(GdkEventButton* event)
 
     int x,w;
 
-    m_current_x = (int) event->x + m_hscroll / m_zoom;
+    m_current_x = (int) event->x + m_hscroll / m_zoom - 1;
 
     if (m_moving) snap_x(&m_current_x);
 
@@ -523,7 +507,7 @@ EventRoll::on_button_release_event(GdkEventButton* event)
             convert_x(x,   &tick_s);
             convert_x(x+w, &tick_f);
 
-            m_sequence->select_events(tick_s, tick_f, m_status, m_cc, sequence::e_select);
+            m_sequence->select_events(tick_s, tick_f, 0, m_status, m_cc, sequence::e_select);
         }
 
         if (m_moving)

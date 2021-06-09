@@ -1102,7 +1102,9 @@ sequence::select_event_handle( long a_tick_s, long a_tick_f,
 /* select events in range, returns number
    selected */
 int
-sequence::select_events( long a_tick_s, long a_tick_f,
+sequence::select_events( long a_tick_s,
+             long a_tick_f,
+             long a_event_width,
 			 unsigned char a_status,
 			 unsigned char a_cc, select_action_e a_action)
 {
@@ -1113,9 +1115,11 @@ sequence::select_events( long a_tick_s, long a_tick_f,
 
     for ( i = m_list_event.begin(); i != m_list_event.end(); i++ ){
 
-        if( (*i).get_status()    == a_status &&
-                (*i).get_timestamp() >= a_tick_s &&
-                (*i).get_timestamp() <= a_tick_f ){
+        if ( (*i).get_status()== a_status &&
+             (((*i).get_timestamp() == a_tick_s) ||
+             (a_tick_s > (*i).get_timestamp() && a_tick_s - (*i).get_timestamp() < a_event_width) ||
+             (a_tick_s != a_tick_f && (*i).get_timestamp() >= a_tick_s && (*i).get_timestamp() <= a_tick_f)) )
+        {
 
             unsigned char d0,d1;
             (*i).get_data( &d0, &d1 );
