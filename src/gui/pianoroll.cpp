@@ -441,7 +441,7 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
 
         m_current_x = m_drop_x = norm_x;
 
-        convert_xy( m_drop_x, m_drop_y, &tick_s, &note_h );
+        convert_xy( m_drop_x - 2, m_drop_y, &tick_s, &note_h );
 
         if (m_adding)
         {
@@ -450,7 +450,7 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
 
             /* adding, snapped x */
             m_current_x = m_drop_x = snapped_x;
-            convert_xy(m_drop_x, m_drop_y, &tick_s, &note_h);
+            convert_xy(m_drop_x - (m_snap_active ? 0 : 2), m_drop_y, &tick_s, &note_h);
 
             // test if a note is already there
             // fake select, if so, no add
@@ -555,7 +555,7 @@ PianoRoll::on_motion_notify_event(GdkEventMotion* event)
     if (m_painting)
     {
         snap_x(&m_current_x);
-        convert_xy(m_current_x, m_current_y, &tick, &note);
+        convert_xy(m_current_x - (m_snap_active ? 0 : 2), m_current_y, &tick, &note);
 
         m_sequence->add_note(tick, m_note_length - 2, note, true);
         return true;
