@@ -105,7 +105,7 @@ DataRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             else cr->set_source_rgba(c_color_event.r, c_color_event.g, c_color_event.b, c_alpha_event);
 
             /* turn into screen corrids */
-            event_x = (tick - m_hscroll) / m_zoom + 4 + c_keys_width;
+            event_x = (tick - m_hscroll) / m_zoom + c_keys_width + c_event_width / 2 + 2;
 
             /* generate the value */
             event_height = d1;
@@ -147,7 +147,7 @@ DataRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
             if (selected) cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_event);
             else cr->set_source_rgba(c_color_event.r, c_color_event.g, c_color_event.b, c_alpha_event);
-            cr->move_to(event_x - text_width / 2 + 0.5, height - c_data_text_height - c_dataroll_padding);
+            cr->move_to(event_x - text_width / 2 - 0.5, height - c_data_text_height - c_dataroll_padding);
             t->show_in_cairo_context(cr);
 
         }
