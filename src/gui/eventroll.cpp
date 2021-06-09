@@ -27,6 +27,7 @@ EventRoll::EventRoll(perform * p, sequence * seq)
     m_hscroll = 0;
     m_zoom = c_default_zoom;
     m_snap = 192;
+    m_snap_active = true;
 
     m_status = EVENT_NOTE_ON;
 
@@ -84,6 +85,7 @@ EventRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     int ticks_per_m_line =  ticks_per_measure * measures_per_line;
     int start_tick = m_hscroll - (m_hscroll % ticks_per_step);
     int end_tick = m_sequence->get_length();
+    int last_snap = 0;
 
     for (int i=start_tick; i<=end_tick; i += ticks_per_step)
     {
@@ -99,13 +101,16 @@ EventRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         }
         else
         {
-            int i_snap = i - (i % m_snap);
-            if (i == i_snap){
+            if (i % m_snap <= last_snap) {
                 cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_snap);
+                base_line -= (i - m_snap * (i / m_snap)) / m_zoom;
             } else {
-                cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_off);
+                cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, 0);
+
             }
         }
+
+        last_snap = i % m_snap;
 
         cr->move_to(base_line - 0.5, 0);
         cr->line_to(base_line - 0.5, height);
@@ -233,11 +238,11 @@ EventRoll::snap_x(int *a_x)
     //snap = number pulses to snap to
     //m_zoom = number of pulses per pixel
     //so snap / m_zoom  = number pixels to snap to
-    int mod = (m_snap / m_zoom);
-    if (mod <= 0) mod = 1;
-
-    *a_x = *a_x - (*a_x % mod);
-
+    if (m_snap_active) {
+        int mod = (m_snap / m_zoom);
+        if (mod <= 0) mod = 1;
+        *a_x = *a_x - (*a_x % mod);
+    }
 }
 
 /* checks mins / maxes..  the fills in x,y

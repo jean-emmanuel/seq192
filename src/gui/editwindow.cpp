@@ -310,9 +310,16 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar.pack_start(m_toolbar_measures, false, false);
 
 
-    m_toolbar_snap_label.set_label("Snap");
-    m_toolbar_snap_label.set_sensitive(false);
-    m_toolbar_snap_label.get_style_context()->add_class("nomargin");
+    m_toolbar_snap_active.set_label("Snap");
+    m_toolbar_snap_active.get_style_context()->add_class("nomargin");
+    m_toolbar_snap_active.get_style_context()->add_class("togglebutton");
+    m_toolbar_snap_active.set_focus_on_click(false);
+    m_toolbar_snap_active.signal_clicked().connect([&]{
+        m_pianoroll.set_snap_active(m_toolbar_snap_active.get_active());
+        m_eventroll.set_snap_active(m_toolbar_snap_active.get_active());
+    });
+    m_toolbar_snap_active.set_active(true);
+    
     m_toolbar_length_label.set_label("Note");
     m_toolbar_length_label.set_sensitive(false);
     m_toolbar_length_label.get_style_context()->add_class("nomargin");
@@ -343,7 +350,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar_snap.set_focus_on_click(false);
     m_toolbar_length.set_focus_on_click(false);
 
-    m_toolbar.pack_start(m_toolbar_snap_label, false, false);
+    m_toolbar.pack_start(m_toolbar_snap_active, false, false);
     m_toolbar.pack_start(m_toolbar_snap, false, false);
     m_toolbar.pack_start(m_toolbar_length_label, false, false);
     m_toolbar.pack_start(m_toolbar_length, false, false);

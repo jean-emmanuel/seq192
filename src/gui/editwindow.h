@@ -163,7 +163,7 @@ class EditWindow : public Window {
         Entry               m_toolbar_bw;
         Label               m_toolbar_times;
         Entry               m_toolbar_measures;
-        Button              m_toolbar_snap_label;
+        ToggleButton        m_toolbar_snap_active;
         ComboBoxText        m_toolbar_snap;
         Button              m_toolbar_length_label;
         ComboBoxText        m_toolbar_length;

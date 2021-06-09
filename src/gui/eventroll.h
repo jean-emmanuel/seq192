@@ -55,6 +55,8 @@ class EventRoll : public DrawingArea {
         // zoom: ticks per pixel
         int                 m_zoom;
         int                 m_snap;
+        bool                m_snap_active;
+        void set_snap_active(bool a){m_snap_active = a;};
 
         /* what is the data window currently editing ? */
         unsigned char m_status;

@@ -61,6 +61,8 @@ class PianoRoll : public DrawingArea {
         int                 m_zoom;
         int                 m_note_length;
         int                 m_snap;
+        bool                m_snap_active;
+        void set_snap_active(bool a){m_snap_active = a;};
 
 
         // edit mode (right click pressed)
