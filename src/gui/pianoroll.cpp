@@ -82,7 +82,7 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
     int ticks_per_measure =  m_sequence->get_bpm() * (4 * c_ppqn) / m_sequence->get_bw();
     int ticks_per_beat =  (4 * c_ppqn) / m_sequence->get_bw();
-    int ticks_per_step = 6 * m_zoom;
+    int ticks_per_step = 3 * m_zoom;
     int ticks_per_m_line =  ticks_per_measure * measures_per_line;
     int start_tick = m_hscroll - (m_hscroll % ticks_per_step);
     int end_tick = m_sequence->get_length();
@@ -113,8 +113,8 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
         last_snap = i % m_snap;
 
-        cr->move_to(base_line - 0.5, 0);
-        cr->line_to(base_line - 0.5, height);
+        cr->move_to(base_line + 0.5, 0);
+        cr->line_to(base_line + 0.5, height);
         cr->stroke();
     }
 
@@ -171,7 +171,7 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             note_x -= m_hscroll / m_zoom;
 
             // printf("%i %i\n", note_x, note_width);
-            cr->rectangle(note_x + 1, note_y, note_width - 2, note_height);
+            cr->rectangle(note_x + 2, note_y, note_width - 2, note_height);
 
             if (tick_f < tick_s)
             {
@@ -200,7 +200,7 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                 cr->rectangle(x, y - 1, w, h + 1);
                 cr->fill();
                 cr->set_source_rgba(c_color_lasso.r, c_color_lasso.g, c_color_lasso.b, c_alpha_lasso_stroke);
-                cr->rectangle(x - 0.5, y - 0.5, w, h);
+                cr->rectangle(x + 0.5, y - 0.5, w, h);
                 cr->stroke();
             }
 
@@ -218,7 +218,7 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
             x -= m_hscroll / m_zoom;
 
-            cr->rectangle(x - 0.5, y - 0.5, m_selected.width + 1, m_selected.height);
+            cr->rectangle(x + 0.5, y - 0.5, m_selected.width + 1, m_selected.height);
             cr->stroke();
         }
 
@@ -234,7 +234,7 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
             x -= m_hscroll / m_zoom;
 
-            cr->rectangle(x - 0.5, y + 0.5, width + 1, m_selected.height);
+            cr->rectangle(x + 0.5, y + 0.5, width + 1, m_selected.height);
             cr->stroke();
 
         }
@@ -243,11 +243,14 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
     // progress marker
     long tick = (m_sequence->get_last_tick() - m_hscroll) / m_zoom;
-    cr->set_line_width(1.0);
-    cr->set_source_rgba(c_color_primary.get_red(), c_color_primary.get_green(), c_color_primary.get_blue(), 0.75);
-    cr->move_to(tick - 0.5, 0);
-    cr->line_to(tick - 0.5, height);
-    cr->stroke();
+    if (tick != 0)
+    {
+        cr->set_line_width(1.0);
+        cr->set_source_rgba(c_color_primary.get_red(), c_color_primary.get_green(), c_color_primary.get_blue(), 0.75);
+        cr->move_to(tick + 0.5, 0);
+        cr->line_to(tick + 0.5, height);
+        cr->stroke();
+    }
 
     return true;
 }

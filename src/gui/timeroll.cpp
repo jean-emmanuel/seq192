@@ -65,21 +65,20 @@ TimeRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     int measures_per_line = 1;
 
     int ticks_per_measure =  m_sequence->get_bpm() * (4 * c_ppqn) / m_sequence->get_bw();
-    int ticks_per_step = 6 * m_zoom;
     int ticks_per_m_line =  ticks_per_measure * measures_per_line;
-    int start_tick = m_hscroll - (m_hscroll % ticks_per_step);
+    int start_tick = max(m_hscroll - c_keys_width * m_zoom, 0);
     int end_tick = m_sequence->get_length();
     int m = ceil(1.0 * start_tick / ticks_per_measure);
 
-    for (int i=start_tick; i<=end_tick; i += ticks_per_step)
+    for (int i=start_tick; i<=end_tick; i++)
     {
-        int base_line = (i - m_hscroll) / m_zoom;
+        int base_line = (i - m_hscroll) / m_zoom + c_keys_width;
 
         if ( i % ticks_per_m_line == 0 )
         {
             cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_measure);
-            cr->move_to(base_line - 0.5, 0);
-            cr->line_to(base_line - 0.5, height);
+            cr->move_to(base_line + 0.5, 0);
+            cr->line_to(base_line + 0.5, height);
             cr->stroke();
 
             m++;

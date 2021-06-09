@@ -319,7 +319,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
         m_eventroll.set_snap_active(m_toolbar_snap_active.get_active());
     });
     m_toolbar_snap_active.set_active(true);
-    
+
     m_toolbar_length_label.set_label("Note");
     m_toolbar_length_label.set_sensitive(false);
     m_toolbar_length_label.get_style_context()->add_class("nomargin");
@@ -388,7 +388,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
 
 
     m_timeroll.set_size_request(-1, c_timeroll_height);
-    m_grid.attach(m_timeroll, 1, 0);
+    m_grid.attach(m_timeroll, 0, 0, 3, 1);
 
 
     m_pianokeys_scroller.set_size_request(c_keys_width, -1);
@@ -412,20 +412,20 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_grid.attach(m_vscrollbar, 2, 1);
 
     m_eventroll.set_size_request(-1, c_eventroll_height + 1);
-    m_grid.attach(m_eventroll, 1, 2);
+    m_grid.attach(m_eventroll, 1, 2, 2, 1);
 
     m_dataroll.set_size_request(-1, c_dataroll_height + 1);
-    m_grid.attach(m_dataroll, 1, 3);
+    m_grid.attach(m_dataroll, 0, 3, 3, 1);
 
     m_grid.attach(m_hscrollbar, 1, 4);
 
-
-    m_dummy1.get_style_context()->add_class("editwindow-filler");
-    m_dummy2.get_style_context()->add_class("editwindow-filler");
-    // m_dummy1.set_label("EVENTS");
-    m_dummy1.set_alignment(1);
-    m_grid.attach(m_dummy1, 0, 2);
-    m_grid.attach(m_dummy2, 2, 2);
+    //
+    // m_dummy1.get_style_context()->add_class("editwindow-filler");
+    // m_dummy2.get_style_context()->add_class("editwindow-filler");
+    // // m_dummy1.set_label("EVENTS");
+    // m_dummy1.set_alignment(1);
+    // m_grid.attach(m_dummy1, 0, 2);
+    // m_grid.attach(m_dummy2, 2, 2);
 
 
 
@@ -627,7 +627,7 @@ EditWindow::timer_callback()
 
     auto adj = m_hscrollbar.get_adjustment();
     adj->set_lower(0);
-    adj->set_upper(m_sequence->get_length());
+    adj->set_upper(m_sequence->get_length() + 192);
     adj->set_page_size(m_pianoroll.get_width() * m_pianoroll.get_zoom());
     adj->set_step_increment(c_ppqn / 4 * m_pianoroll.get_zoom());
     adj->set_page_increment(c_ppqn * m_sequence->get_bpm() * 4.0 / m_sequence->get_bw() * m_pianoroll.get_zoom());
@@ -776,5 +776,13 @@ void EditWindow::create_midibus_menu()
 
     m_toolbar_bus_menu.show_all();
     m_toolbar_bus_dropdown.set_popup(m_toolbar_bus_menu);
+
+}
+
+
+void EditWindow::create_event_menu()
+{
+
+
 
 }

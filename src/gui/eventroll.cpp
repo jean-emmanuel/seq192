@@ -72,7 +72,7 @@ EventRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     cr->line_to(width, 0.5);
     cr->stroke();
     cr->move_to(0, height - 0.5);
-    cr->line_to(width, height -0.5);
+    cr->line_to(width, height - 0.5);
     cr->stroke();
 
     // Vertical lines
@@ -81,7 +81,7 @@ EventRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
     int ticks_per_measure =  m_sequence->get_bpm() * (4 * c_ppqn) / m_sequence->get_bw();
     int ticks_per_beat =  (4 * c_ppqn) / m_sequence->get_bw();
-    int ticks_per_step = 6 * m_zoom;
+    int ticks_per_step = 3 * m_zoom;
     int ticks_per_m_line =  ticks_per_measure * measures_per_line;
     int start_tick = m_hscroll - (m_hscroll % ticks_per_step);
     int end_tick = m_sequence->get_length();
@@ -112,8 +112,8 @@ EventRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
         last_snap = i % m_snap;
 
-        cr->move_to(base_line - 0.5, 0);
-        cr->line_to(base_line - 0.5, height);
+        cr->move_to(base_line + 0.5, 0);
+        cr->line_to(base_line + 0.5, height);
         cr->stroke();
     }
 
@@ -131,7 +131,7 @@ EventRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         {
 
             /* turn into screen corrids */
-            x = (tick - m_hscroll) / m_zoom + 1;
+            x = (tick - m_hscroll) / m_zoom + 2;
 
            if (selected)
            {

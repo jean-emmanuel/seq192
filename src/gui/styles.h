@@ -132,7 +132,6 @@ window .nomargin {margin-right: -9px;}\
 combobox {min-width: 0;}\
 .recording {background: rgba(255, 0, 0, 0.5); box-shadow: inset 0 0 0 2px " + c_color_foreground.to_string() + "; border-radius: 5px}\
 selection {background: " + c_color_primary.to_string() + "; color: " + c_color_text_hilight.to_string() + "}\
-.editwindow-vscrollbar, .editwindow-pianokeys {box-shadow: 0 -1px 0 0,  0 1px 0 0; color: rgba(" + to_string(int(c_color_grid.r*255)) + "," + to_string(int(c_color_grid.g*255)) + "," + to_string(int(c_color_grid.b*255)) + "," + to_string(c_alpha_grid_separator) +")}\
 .editwindow-vscrollbar {padding-top: 2px; padding-bottom: 2px}\
 .editwindow-filler {font-size: 8pt; font-weight: bold; padding-top: 2px; padding-right: 4px; border-bottom: 1px solid rgba(" + to_string(int(c_color_grid.r*255)) + "," + to_string(int(c_color_grid.g*255)) + "," + to_string(int(c_color_grid.b*255)) + "," + to_string(c_alpha_grid_separator) +")}\
 ";

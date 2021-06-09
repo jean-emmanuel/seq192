@@ -89,7 +89,7 @@ DataRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         if (num_selected_events > 0) selection_type = UNSELECTED_EVENTS;
     }
 
-    int start_tick = m_hscroll;
+    int start_tick = m_hscroll - c_keys_width * m_zoom;
     int end_tick = width * m_zoom + m_hscroll;
 
     SECOND_PASS_NOTE_ON: // yes this is a goto... yikes!!!!
@@ -105,7 +105,7 @@ DataRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             else cr->set_source_rgba(c_color_event.r, c_color_event.g, c_color_event.b, c_alpha_event);
 
             /* turn into screen corrids */
-            event_x = (tick - m_hscroll) / m_zoom + 3;
+            event_x = (tick - m_hscroll) / m_zoom + 4 + c_keys_width;
 
             /* generate the value */
             event_height = d1;
@@ -147,7 +147,7 @@ DataRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
             if (selected) cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_event);
             else cr->set_source_rgba(c_color_event.r, c_color_event.g, c_color_event.b, c_alpha_event);
-            cr->move_to(event_x - text_width / 2 - 0.5, height - c_data_text_height - c_dataroll_padding);
+            cr->move_to(event_x - text_width / 2 + 0.5, height - c_data_text_height - c_dataroll_padding);
             t->show_in_cairo_context(cr);
 
         }
@@ -162,8 +162,8 @@ DataRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
     cr->set_source_rgba(c_color_event.r, c_color_event.g, c_color_event.b, c_alpha_bottom_line);
     cr->set_line_width(1.0);
-    cr->move_to(0, c_data_y1 - 0.5);
-    cr->line_to(width, c_data_y1 - 0.5);
+    cr->move_to(0, c_data_y1 + 0.5);
+    cr->line_to(width, c_data_y1 + 0.5);
     cr->stroke();
 
     if (m_dragging)
@@ -199,7 +199,7 @@ DataRoll::set_zoom(int zoom)
 void
 DataRoll::convert_x(int a_x, long *a_tick)
 {
-    *a_tick = a_x * m_zoom;
+    *a_tick = (a_x - c_keys_width - (2 + c_event_width / 2)) * m_zoom;
 }
 
 
@@ -233,7 +233,7 @@ DataRoll::on_button_press_event(GdkEventButton* event)
 {
 
     /* set values for line */
-    m_current_x = m_drop_x = (int) event->x + m_hscroll / m_zoom - 3;
+    m_current_x = m_drop_x = (int) event->x + m_hscroll / m_zoom + 0;
     m_current_y = m_drop_y = (int) 1.0 * (event->y - c_data_y0) / (c_data_y1 - c_data_y0) * 127;
 
     /* if they select the handle */

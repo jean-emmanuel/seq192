@@ -94,6 +94,9 @@ class EditWindow : public Window {
         Scrollbar           m_hscrollbar;
         Label               m_dummy1;
         Label               m_dummy2;
+        VBox                m_event_vbox;
+        MenuButton          m_event_dropdown;
+        Menu                m_event_menu;
 
         // menu
         MenuBar             m_menu;
@@ -183,6 +186,7 @@ class EditWindow : public Window {
 
         void update_midibus_name();
         void create_midibus_menu();
+        void create_event_menu();
 
         void menu_callback(edit_menu_action action);
         void menu_callback(edit_menu_action action, double data1);
