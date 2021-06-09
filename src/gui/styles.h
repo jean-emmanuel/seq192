@@ -71,7 +71,7 @@ const int c_timeroll_height = c_key_height;
 
 // PianoRoll
 const int c_default_zoom = 2;
-const int c_disabled_snap = c_ppqn / 16 / 3;
+const int c_disabled_snap = c_min_note_length;
 const int c_min_zoom = 1;
 const int c_max_zoom = 32;
 const color c_color_grid = {1.0, 1.0, 1.0};

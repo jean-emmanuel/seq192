@@ -513,6 +513,13 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
 
                     convert_tn_box_to_rect(tick_s, tick_f, note_h, note_l, &m_selected.x, &m_selected.y, &m_selected.width, &m_selected.height);
 
+                    /* save offset that we get from the snap above */
+                    int adjusted_selected_x = m_selected.x;
+                    snap_x(&adjusted_selected_x );
+                    m_move_snap_offset_x = m_selected.x - adjusted_selected_x;
+
+                    m_current_x = m_drop_x = snapped_x;
+
                 }
             }
         }
@@ -549,6 +556,16 @@ PianoRoll::on_motion_notify_event(GdkEventMotion* event)
         if (m_moving || m_paste){
             if (snap) snap_x(&m_current_x);
         }
+
+        if (m_growing && snap) {
+                int delta_x = m_current_x - m_drop_x;
+                int x1 = m_selected.x + m_selected.width + delta_x;
+                int x2 = x1;
+                snap_x(&x1);
+                m_current_x -= (x2 - x1);
+                m_current_x -= 1;
+        }
+
         return true;
 
     }
@@ -634,8 +651,17 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
 
         if (m_growing){
 
+            if (snap) {
+                int x1 = m_selected.x + m_selected.width + delta_x;
+                int x2 = x1;
+                snap_x(&x1);
+                delta_x -= (x2 - x1);
+                delta_x -= 1;
+            }
+
             /* convert deltas into screen corridinates */
             convert_xy(delta_x, delta_y, &delta_tick, &delta_note);
+
             m_sequence->push_undo();
 
             if (event->state & GDK_SHIFT_MASK)
