@@ -179,7 +179,7 @@ EventRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     	x = m_selected.x + delta_x;
         x -= m_hscroll / m_zoom;
 
-        cr->rectangle(x + 0.5, y - 0.5, c_event_width + 3, h);
+        cr->rectangle(x + 0.5, y - 0.5, m_selected.width - 1, h);
         cr->stroke();
     }
 
@@ -331,7 +331,8 @@ EventRoll::on_button_press_event(GdkEventButton* event)
 
     signal_focus.emit((string)"eventroll");
 
-    int x,numsel;
+    bool snap = !(event->state & GDK_MOD1_MASK);
+    int x,w,numsel;
 
     long tick_s;
     long tick_w;
@@ -344,7 +345,7 @@ EventRoll::on_button_press_event(GdkEventButton* event)
 
     if (m_paste){
 
-        snap_x(&m_current_x);
+        if (snap) snap_x(&m_current_x);
         convert_x(m_current_x, &tick_s);
         m_paste = false;
         m_sequence->push_undo();
@@ -364,7 +365,7 @@ EventRoll::on_button_press_event(GdkEventButton* event)
             {
                 m_painting = true;
 
-                snap_x(&m_drop_x);
+                if (snap) snap_x(&m_drop_x);
                 /* turn x,y in to tick/note */
                 convert_x(m_drop_x, &tick_s);
                 /* add note, length = little less than snap */
@@ -410,13 +411,22 @@ EventRoll::on_button_press_event(GdkEventButton* event)
                     /* get the box that selected elements are in */
                     m_sequence->get_selected_box(&tick_s, &note, &tick_f, &note);
 
+                    tick_f += tick_w;
+
                     /* convert box to X,Y values */
                     convert_t(tick_s, &x);
+                    /* convert box to X,Y values */
+                    convert_t(tick_s, &x);
+                    convert_t(tick_f, &w);
+
+                    /* w is actually corrids now, so we have to change */
+                    w = w-x;
 
                     /* set the m_selected rectangle to hold the
                        x,y,w,h of our selected events */
 
                     m_selected.x = x;
+                    m_selected.width = w;
 
                     /* save offset that we get from the snap above */
                     int adjusted_selected_x = m_selected.x;
@@ -429,6 +439,7 @@ EventRoll::on_button_press_event(GdkEventButton* event)
                     snap_x(&m_drop_x);
 
                 }
+
             }
 
         }
@@ -447,6 +458,7 @@ bool
 EventRoll::on_motion_notify_event(GdkEventMotion* event)
 {
 
+    bool snap = !(event->state & GDK_MOD1_MASK);
     long tick = 0;
 
     if (m_moving_init)
@@ -459,14 +471,14 @@ EventRoll::on_motion_notify_event(GdkEventMotion* event)
     {
         m_current_x = (int) event->x  + m_hscroll / m_zoom - 1;
 
-        if (m_moving || m_paste) snap_x(&m_current_x);
+        if (snap && (m_moving || m_paste)) snap_x(&m_current_x);
     }
 
 
     if (m_painting)
     {
         m_current_x = (int) event->x   + m_hscroll / m_zoom - 1;
-        snap_x(&m_current_x);
+        if (snap) snap_x(&m_current_x);
         convert_x(m_current_x, &tick);
         drop_event(tick);
     }
@@ -483,6 +495,7 @@ bool
 EventRoll::on_button_release_event(GdkEventButton* event)
 {
 
+    bool snap = !(event->state & GDK_MOD1_MASK);
     long tick_s;
     long tick_f;
 
@@ -490,7 +503,7 @@ EventRoll::on_button_release_event(GdkEventButton* event)
 
     m_current_x = (int) event->x + m_hscroll / m_zoom - 1;
 
-    if (m_moving) snap_x(&m_current_x);
+    if (snap && m_moving) snap_x(&m_current_x);
 
     int delta_x = m_current_x - m_drop_x;
 
@@ -513,7 +526,7 @@ EventRoll::on_button_release_event(GdkEventButton* event)
         {
 
             /* adjust for snap */
-            delta_x -= m_move_snap_offset_x;
+            if (snap) delta_x -= m_move_snap_offset_x;
 
             /* convert deltas into screen corridinates */
             convert_x(delta_x, &delta_tick);
