@@ -433,10 +433,12 @@ EventRoll::on_button_press_event(GdkEventButton* event)
                     snap_x(&adjusted_selected_x);
                     m_move_snap_offset_x = (m_selected.x - adjusted_selected_x);
 
-                    /* align selection for drawing */
-                    snap_x(&m_selected.x);
-                    snap_x(&m_current_x);
-                    snap_x(&m_drop_x);
+                    if (snap) {
+                        /* align selection for drawing */
+                        snap_x(&m_selected.x);
+                        snap_x(&m_current_x);
+                        snap_x(&m_drop_x);
+                    }
 
                 }
 
