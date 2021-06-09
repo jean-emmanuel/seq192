@@ -348,11 +348,10 @@ PianoRoll::snap_x(int *x)
     //snap = number pulses to snap to
     //m_zoom = number of pulses per pixel
     //so snap / m_zoom  = number pixels to snap to
-    if (m_snap_active) {
-        int mod = (m_snap / m_zoom);
-        if (mod <= 0) mod = 1;
-        *x = *x - (*x % mod);
-    }
+    int snap = m_snap_active ? m_snap : c_disabled_snap;
+    int mod = (snap / m_zoom);
+    if (mod <= 0) mod = 1;
+    *x = *x - (*x % mod);
 }
 
 
@@ -458,7 +457,7 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
             {
                 /* add note, length = little less than snap */
                 m_sequence->push_undo();
-                m_sequence->add_note(tick_s, m_note_length - 2, note_h, true);
+                m_sequence->add_note(tick_s, m_note_length - 1, note_h, true);
             }
         }
         else
