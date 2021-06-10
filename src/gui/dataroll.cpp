@@ -90,7 +90,8 @@ DataRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     }
 
     int start_tick = m_hscroll - c_keys_width * m_zoom;
-    int end_tick = width * m_zoom + m_hscroll;
+    int end_tick = start_tick + width * m_zoom;
+    if (m_sequence->get_length() < end_tick) end_tick = m_sequence->get_length();
 
     SECOND_PASS_NOTE_ON: // yes this is a goto... yikes!!!!
 

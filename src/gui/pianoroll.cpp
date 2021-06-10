@@ -85,7 +85,8 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     int ticks_per_step = 3 * m_zoom;
     int ticks_per_m_line =  ticks_per_measure * measures_per_line;
     int start_tick = m_hscroll - (m_hscroll % ticks_per_step);
-    int end_tick = m_sequence->get_length();
+    int end_tick = start_tick + width * m_zoom;
+    if (m_sequence->get_length() < end_tick) end_tick = m_sequence->get_length();
     int last_snap = 0;
 
     for (int i=start_tick; i<=end_tick; i += ticks_per_step)
