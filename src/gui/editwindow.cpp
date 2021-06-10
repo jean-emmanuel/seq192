@@ -790,6 +790,7 @@ void EditWindow::create_midibus_menu()
             menu_item_channel->signal_activate().connect([&,i,j]{
                 m_sequence->set_midi_bus(i);
                 m_sequence->set_midi_channel(j);
+                set_data_type(m_status, m_cc); // update event dropdown tooltip
             });
             menu_channels->append(*menu_item_channel);
         }
@@ -808,9 +809,6 @@ EditWindow::create_event_menu()
 
     m_event_menu.set_valign(Gtk::ALIGN_START);
     m_event_menu.set_halign(Gtk::ALIGN_START);
-
-    int midi_bus = m_sequence->get_midi_bus();
-    int midi_ch = m_sequence->get_midi_channel();
 
     m_menu_item_noteon.set_label("Note On");
     m_menu_item_noteon.signal_toggled().connect([&]{set_data_type(EVENT_NOTE_ON, 0);});
@@ -841,19 +839,9 @@ EditWindow::create_event_menu()
     m_menu_item_control.set_submenu(m_submenu_control);
 
     for (int i=0; i<128; i++) {
-
-        string ccname = c_controller_names[i];
-        int instrument = global_user_midi_bus_definitions[midi_bus].instrument[midi_ch];
-        if (instrument > -1 && instrument < c_max_instruments)
-        {
-            if (global_user_instrument_definitions[instrument].controllers_active[i])
-                ccname = global_user_instrument_definitions[instrument].controllers[i];
-        }
-
-        m_menu_items_control[i] = new CheckMenuItem(ccname);
+        m_menu_items_control[i] = new CheckMenuItem();
         m_menu_items_control[i]->signal_toggled().connect([&, i]{set_data_type(EVENT_CONTROL_CHANGE, i);});
         m_submenu_control.append(*m_menu_items_control[i]);
-
     }
 
     m_event_menu.show_all();
@@ -880,9 +868,20 @@ EditWindow::update_event_menu()
     m_menu_item_pitch.get_style_context()->remove_class("checked");
     m_menu_item_pressure.get_style_context()->remove_class("checked");
 
+    int midi_bus = m_sequence->get_midi_bus();
+    int midi_ch = m_sequence->get_midi_channel();
     for (int i=0; i<128; i++) {
         m_menu_items_control[i]->set_active(false);
         m_menu_items_control[i]->get_style_context()->remove_class("checked");
+
+        string ccname = c_controller_names[i];
+        int instrument = global_user_midi_bus_definitions[midi_bus].instrument[midi_ch];
+        if (instrument > -1 && instrument < c_max_instruments)
+        {
+            if (global_user_instrument_definitions[instrument].controllers_active[i])
+                ccname = global_user_instrument_definitions[instrument].controllers[i];
+        }
+        m_menu_items_control[i]->set_label(ccname);
     }
 
     unsigned char status, cc;
@@ -924,6 +923,8 @@ EditWindow::set_data_type(unsigned char status, unsigned char control)
     m_eventroll.set_data_type(status, control);
     m_dataroll.set_data_type(status, control);
 
+    m_event_dropdown.set_tooltip_text("");
+
     string label;
     switch (status) {
         case EVENT_NOTE_OFF:
@@ -936,8 +937,20 @@ EditWindow::set_data_type(unsigned char status, unsigned char control)
             label = "Aftertouch";
             break;
         case EVENT_CONTROL_CHANGE:
+        {
             label = "CC " + to_string(control);
+            int midi_bus = m_sequence->get_midi_bus();
+            int midi_ch = m_sequence->get_midi_channel();
+            string ccname = c_controller_names[control];
+            int instrument = global_user_midi_bus_definitions[midi_bus].instrument[midi_ch];
+            if (instrument > -1 && instrument < c_max_instruments)
+            {
+                if (global_user_instrument_definitions[instrument].controllers_active[control])
+                    ccname = global_user_instrument_definitions[instrument].controllers[control];
+            }
+            m_event_dropdown.set_tooltip_text(ccname);
             break;
+        }
         case EVENT_PITCH_WHEEL:
             label = "Pitch Wheel";
             break;
