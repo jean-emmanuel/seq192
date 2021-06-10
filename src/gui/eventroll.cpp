@@ -529,7 +529,7 @@ EventRoll::on_button_release_event(GdkEventButton* event)
         {
 
             /* adjust for snap */
-            if (snap) delta_x -= m_move_snap_offset_x;
+            delta_x -= m_move_snap_offset_x;
 
             /* convert deltas into screen corridinates */
             convert_x(delta_x, &delta_tick);

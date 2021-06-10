@@ -631,7 +631,7 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
         if (m_moving)
         {
             /* adjust for snap */
-            if (snap) delta_x -= m_move_snap_offset_x;
+            delta_x -= m_move_snap_offset_x;
 
             /* convert deltas into screen corridinates */
             convert_xy(delta_x, delta_y, &delta_tick, &delta_note);
