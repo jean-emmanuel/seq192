@@ -12,5 +12,6 @@ MIDI sequencer based on seq24 with less features and more swag.
 
 **More swag**
 - Interface rewritten with GTK3
-- 192 patterns per set
 - OSC controls
+- almost 192 patterns per set
+
