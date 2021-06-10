@@ -24,12 +24,15 @@ PianoKeys::PianoKeys(perform * p, sequence * seq)
     m_sequence = seq;
 
     m_hint_key = -1;
+    m_keying = false;
 
     // draw callback
     signal_draw().connect(sigc::mem_fun(*this, &PianoKeys::on_draw));
 
-    add_events(Gdk::POINTER_MOTION_MASK |
-               Gdk::LEAVE_NOTIFY_MASK
+    add_events(Gdk::BUTTON_PRESS_MASK |
+        	   Gdk::BUTTON_RELEASE_MASK |
+        	   Gdk::LEAVE_NOTIFY_MASK |
+        	   Gdk::POINTER_MOTION_MASK
     );
 }
 
@@ -124,38 +127,57 @@ PianoKeys::hint_key(int key)
 }
 
 bool
+PianoKeys::on_button_press_event(GdkEventButton *event)
+{
+	if (event->button == 1) {
+        Gtk::Allocation allocation = get_allocation();
+        const int height = allocation.get_height();
+        int note = (height - event->y) / c_key_height;
+	    m_keying = true;
+        m_sequence->play_note_on(note);
+	    m_keying_note = note;
+	}
+    return true;
+}
+
+
+bool
 PianoKeys::on_motion_notify_event(GdkEventMotion* event)
 {
 
     Gtk::Allocation allocation = get_allocation();
     const int height = allocation.get_height();
 
-    hint_key((height - event->y) / c_key_height);
+    int note = (height - event->y) / c_key_height;
 
-    // int y, note;
-    //
-    // y = (int) a_p0->y + m_scroll_offset_y;
-    // convert_y( y,&note );
-    //
-    // set_hint_key( note );
-    //
-    // if ( m_keying ){
-    //
-    //     if ( note != m_keying_note ){
-    //
-	//     m_seq->play_note_off( m_keying_note );
-	//     m_seq->play_note_on(  note );
-	//     m_keying_note = note;
-    //
-	// }
-    // }
+    hint_key(note);
+
+    if (m_keying && note != m_keying_note) {
+	    m_sequence->play_note_off(m_keying_note);
+	    m_sequence->play_note_on(note);
+	    m_keying_note = note;
+    }
 
     return false;
+}
+
+bool
+PianoKeys::on_button_release_event(GdkEventButton *event)
+{
+	if (event->button == 1 && m_keying) {
+	    m_keying = false;
+        m_sequence->play_note_off(m_keying_note);
+	}
+    return true;
 }
 
 bool
 PianoKeys::on_leave_notify_event(GdkEventCrossing* event)
 {
     hint_key(-1);
+    if (m_keying) {
+        m_keying = false;
+        m_sequence->play_note_off(m_keying_note);
+    }
     return true;
 }

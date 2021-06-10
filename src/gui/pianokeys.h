@@ -45,6 +45,12 @@ class PianoKeys : public DrawingArea {
         int                 m_hint_key;
         void hint_key(int y);
 
+        bool                m_keying;
+        int                 m_keying_note;
+
+
+        bool on_button_press_event(GdkEventButton* event);
+        bool on_button_release_event(GdkEventButton* event);
         bool on_motion_notify_event(GdkEventMotion* event);
         bool on_leave_notify_event(GdkEventCrossing* event);
 
