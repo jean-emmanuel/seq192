@@ -18,8 +18,8 @@
 #include "../core/globals.h"
 #include <time.h>
 
-#include "xpm/seq192.xpm"
-#include "xpm/seq192_32.xpm"
+#include "../xpm/seq192.xpm"
+#include "../xpm/seq192_32.xpm"
 
 MainWindow::MainWindow(perform * p)
 {
@@ -498,10 +498,10 @@ MainWindow::update_window_title()
     std::string title;
 
     if (global_filename == "")
-        title = ( PACKAGE ) + string( " - [unnamed]" );
+        title = ( c_package_name ) + string( " - [unnamed]" );
     else
         title =
-            ( PACKAGE )
+            ( c_package_name )
             + string( " - [" )
             + Glib::filename_to_utf8(global_filename)
             + string( "]" );

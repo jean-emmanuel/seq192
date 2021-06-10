@@ -17,17 +17,15 @@
 #ifndef SEQ192_GLOBALS
 #define SEQ192_GLOBALS
 
-#include "config.h"
-
 #include <string>
-#include <gtkmm/main.h>
-#include <gtkmm/drawingarea.h>
-//For keys
-#include <gtkmm/accelkey.h>
+#include <gtkmm.h>
 
 
 
 using namespace std;
+
+
+const string c_package_name = "seq192";
 
 /* 182 per screen */
 const int c_mainwnd_rows = 13; //ORL

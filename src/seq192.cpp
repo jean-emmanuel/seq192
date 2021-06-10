@@ -17,8 +17,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "config.h"
-
 #include "core/midifile.h"
 #include "core/optionsfile.h"
 #include "core/perform.h"

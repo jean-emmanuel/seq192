@@ -324,7 +324,7 @@ void perform::init_jack()
             // register as a jack client
             // only to retreive transport state changes and time
 
-            m_jack_client = jack_client_open(PACKAGE, JackNullOption, NULL );
+            m_jack_client = jack_client_open("seq192", JackNullOption, NULL );
 
             if (m_jack_client == 0)
             {

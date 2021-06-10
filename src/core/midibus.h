@@ -21,8 +21,6 @@
 class mastermidibus;
 class midibus;
 
-#include "config.h"
-
 #include <alsa/asoundlib.h>
 #include <alsa/seq_midi_event.h>
 
