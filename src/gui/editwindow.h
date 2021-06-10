@@ -41,6 +41,7 @@ enum edit_menu_action
     EDIT_MENU_COPY,
     EDIT_MENU_PASTE,
     EDIT_MENU_DELETE,
+    EDIT_MENU_INVERT,
     EDIT_MENU_SELECTALL,
     EDIT_MENU_UNSELECT,
     EDIT_MENU_TRANSPOSE,
@@ -110,6 +111,7 @@ class EditWindow : public Window {
         MenuItem            m_menu_edit_select;
         Menu                m_submenu_select;
         MenuItem            m_menu_edit_selectall;
+        MenuItem            m_menu_edit_invert;
         MenuItem            m_menu_edit_unselect;
 
         MenuItem            m_menu_edit_transpose;
@@ -190,6 +192,9 @@ class EditWindow : public Window {
 
         int                 m_midibus;
         int                 m_midichannel;
+
+        unsigned char m_status;
+        unsigned char m_cc;
 
         void update_midibus_name();
         void create_midibus_menu();

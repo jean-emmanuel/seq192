@@ -377,7 +377,7 @@ class sequence
 			 long a_snap_tick, int a_divide, bool a_linked =
 			 false);
     void transpose_notes (int a_steps, int a_scale);
-    void shift_notes (int a_ticks);  // move selected notes later/earlier in time
+    void shift_events (int a_ticks);  // move selected events later/earlier in time
     void multiply_pattern( float a_multiplier );
     void reverse_pattern();
     void calulate_reverse(event &a_e);

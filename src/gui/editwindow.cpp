@@ -94,6 +94,12 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_submenu_edit.append(m_menu_edit_select);
     m_menu_edit_select.set_submenu(m_submenu_select);
 
+    m_menu_edit_invert.set_label("_Invert Selection");
+    m_menu_edit_invert.set_use_underline(true);
+    m_menu_edit_invert.add_accelerator("activate", get_accel_group(), 'i', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_invert.signal_activate().connect([&]{menu_callback(EDIT_MENU_INVERT);});
+    m_submenu_select.append(m_menu_edit_invert);
+
     m_menu_edit_selectall.set_label("Select _All");
     m_menu_edit_selectall.set_use_underline(true);
     m_menu_edit_selectall.add_accelerator("activate", get_accel_group(), 'a', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
@@ -559,8 +565,21 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
                 m_sequence->remove_marked();
             }
             break;
+        case EDIT_MENU_INVERT:
+            if (m_focus == "eventroll") {
+                m_sequence->select_events(m_status, m_cc, true);
+            } else {
+                m_sequence->select_events(EVENT_NOTE_ON, 0, true);
+                m_sequence->select_events(EVENT_NOTE_OFF, 0, true);
+            }
+            break;
         case EDIT_MENU_SELECTALL:
-            m_sequence->select_all();
+            if (m_focus == "eventroll") {
+                m_sequence->select_events(m_status, m_cc);
+            } else {
+                m_sequence->select_events(EVENT_NOTE_ON, 0);
+                m_sequence->select_events(EVENT_NOTE_OFF, 0);
+            }
             break;
         case EDIT_MENU_UNSELECT:
             m_sequence->unselect();
@@ -569,11 +588,14 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             m_sequence->transpose_notes(data1, 0);
             break;
         case EDIT_MENU_QUANTIZE:
-            m_sequence->quantize_events(EVENT_NOTE_ON, 0, m_pianoroll.m_snap, 1, true);
-            // TODO: event roll case
+            if (m_focus == "eventroll") {
+                m_sequence->quantize_events(m_status, m_cc, m_pianoroll.m_snap, 1);
+            } else {
+                m_sequence->quantize_events(EVENT_NOTE_ON, 0, m_pianoroll.m_snap, 1, true);
+            }
             break;
         case EDIT_MENU_MOVE:
-            m_sequence->shift_notes(data1);
+            m_sequence->shift_events(data1);
             break;
         case EDIT_MENU_MULTIPLY:
             m_sequence->multiply_pattern(data1);
@@ -895,6 +917,9 @@ EditWindow::update_event_menu()
 void
 EditWindow::set_data_type(unsigned char status, unsigned char control)
 {
+    m_status = status;
+    m_cc = control;
+
     m_eventroll.set_data_type(status, control);
     m_dataroll.set_data_type(status, control);
 

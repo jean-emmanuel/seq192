@@ -2716,7 +2716,7 @@ sequence::transpose_notes( int a_steps, int a_scale )
 }
 
 void
-sequence::shift_notes( int a_ticks )
+sequence::shift_events( int a_ticks )
 {
     if(!mark_selected())
         return;
@@ -2733,9 +2733,7 @@ sequence::shift_notes( int a_ticks )
     for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
     {
         /* is it being moved ? */
-        if ( ((*i).get_status() ==  EVENT_NOTE_ON ||
-                (*i).get_status() ==  EVENT_NOTE_OFF) &&
-                (*i).is_marked() )
+        if ( (*i).is_marked() )
         {
             e = (*i);
             e.unmark();
