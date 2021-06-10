@@ -32,7 +32,7 @@ class DataRoll : public DrawingArea {
 
         sigc::signal<bool(GdkEventScroll*)> signal_scroll;
 
-        void set_data_type( unsigned char a_status, unsigned char a_control  );
+        void set_data_type(unsigned char a_status, unsigned char a_control);
 
 
     protected:

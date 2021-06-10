@@ -558,3 +558,10 @@ EventRoll::on_button_release_event(GdkEventButton* event)
 
     return true;
 }
+
+void
+EventRoll::set_data_type(unsigned char status, unsigned char control = 0)
+{
+    m_status = status;
+    m_cc = control;
+}

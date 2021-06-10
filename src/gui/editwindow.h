@@ -93,7 +93,6 @@ class EditWindow : public Window {
         Scrollbar           m_vscrollbar;
         Scrollbar           m_hscrollbar;
         MenuButton          m_event_dropdown;
-        Menu                m_event_menu;
 
         // menu
         MenuBar             m_menu;
@@ -155,6 +154,17 @@ class EditWindow : public Window {
         AccelLabel          m_menu_transport_stop_label;
         MenuItem            m_menu_transport_stop;
 
+        // event menu
+        Menu                m_event_menu;
+        CheckMenuItem       m_menu_item_noteon;
+        CheckMenuItem       m_menu_item_noteoff;
+        CheckMenuItem       m_menu_item_aftertouch;
+        CheckMenuItem       m_menu_item_program;
+        CheckMenuItem       m_menu_item_pitch;
+        CheckMenuItem       m_menu_item_pressure;
+        MenuItem            m_menu_item_control;
+        Menu                m_submenu_control;
+        CheckMenuItem       *m_menu_items_control[128];
 
         // toolbar
         Entry               m_toolbar_name;
@@ -184,6 +194,9 @@ class EditWindow : public Window {
         void update_midibus_name();
         void create_midibus_menu();
         void create_event_menu();
+        void update_event_menu();
+
+        void set_data_type(unsigned char status, unsigned char control = 0);
 
         void menu_callback(edit_menu_action action);
         void menu_callback(edit_menu_action action, double data1);

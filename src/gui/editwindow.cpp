@@ -17,6 +17,7 @@
 #include "editwindow.h"
 #include "pianoroll.h"
 #include "../core/globals.h"
+#include "../core/controllers.h"
 
 EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) :
     m_perform(p),
@@ -373,8 +374,6 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar_bus.get_style_context()->add_class("nomargin");
     m_toolbar_bus_dropdown.set_sensitive(true);
     m_toolbar_bus_dropdown.set_direction(Gtk::ARROW_DOWN);
-    create_midibus_menu();
-    update_midibus_name();
 
     m_toolbar.pack_end(m_toolbar_bus_dropdown, false, false);
     m_toolbar.pack_end(m_toolbar_bus, false, false);
@@ -431,6 +430,9 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
 
     m_hscrollbar.get_adjustment()->configure(0, 0, m_sequence->get_length(), 1, 1, 1);
 
+    create_midibus_menu();
+    update_midibus_name();
+    create_event_menu();
 
     signal_key_press_event().connect(mem_fun(*this, &EditWindow::on_key_press), false);
 
@@ -777,9 +779,149 @@ void EditWindow::create_midibus_menu()
 }
 
 
-void EditWindow::create_event_menu()
+void
+EditWindow::create_event_menu()
 {
 
+    m_event_menu.set_valign(Gtk::ALIGN_START);
+    m_event_menu.set_halign(Gtk::ALIGN_START);
 
+    int midi_bus = m_sequence->get_midi_bus();
+    int midi_ch = m_sequence->get_midi_channel();
 
+    m_menu_item_noteon.set_label("Note On");
+    m_menu_item_noteon.signal_toggled().connect([&]{set_data_type(EVENT_NOTE_ON, 0);});
+    m_event_menu.append(m_menu_item_noteon);
+
+    m_menu_item_noteoff.set_label("Note Off");
+    m_menu_item_noteoff.signal_toggled().connect([&]{set_data_type(EVENT_NOTE_OFF, 0);});
+    m_event_menu.append(m_menu_item_noteoff);
+
+    m_menu_item_aftertouch.set_label("Aftertouch");
+    m_menu_item_aftertouch.signal_toggled().connect([&]{set_data_type(EVENT_AFTERTOUCH, 0);});
+    m_event_menu.append(m_menu_item_aftertouch);
+
+    m_menu_item_program.set_label("Program Change");
+    m_menu_item_program.signal_toggled().connect([&]{set_data_type(EVENT_PROGRAM_CHANGE, 0);});
+    m_event_menu.append(m_menu_item_program);
+
+    m_menu_item_pressure.set_label("Channel Pressure");
+    m_menu_item_pressure.signal_toggled().connect([&]{set_data_type(EVENT_CHANNEL_PRESSURE, 0);});
+    m_event_menu.append(m_menu_item_pressure);
+
+    m_menu_item_pitch.set_label("Pitch Wheel");
+    m_menu_item_pitch.signal_toggled().connect([&]{set_data_type(EVENT_PITCH_WHEEL, 0);});
+    m_event_menu.append(m_menu_item_pitch);
+
+    m_menu_item_control.set_label("Control Change");
+    m_event_menu.append(m_menu_item_control);
+    m_menu_item_control.set_submenu(m_submenu_control);
+
+    for (int i=0; i<128; i++) {
+
+        string ccname = c_controller_names[i];
+        int instrument = global_user_midi_bus_definitions[midi_bus].instrument[midi_ch];
+        if (instrument > -1 && instrument < c_max_instruments)
+        {
+            if (global_user_instrument_definitions[instrument].controllers_active[i])
+                ccname = global_user_instrument_definitions[instrument].controllers[i];
+        }
+
+        m_menu_items_control[i] = new CheckMenuItem(ccname);
+        m_menu_items_control[i]->signal_toggled().connect([&, i]{set_data_type(EVENT_CONTROL_CHANGE, i);});
+        m_submenu_control.append(*m_menu_items_control[i]);
+
+    }
+
+    m_event_menu.show_all();
+    m_event_dropdown.set_popup(m_event_menu);
+    m_event_dropdown.signal_clicked().connect([&]{update_event_menu();});
+
+}
+
+void
+EditWindow::update_event_menu()
+{
+
+    m_menu_item_noteon.set_active(false);
+    m_menu_item_noteoff.set_active(false);
+    m_menu_item_aftertouch.set_active(false);
+    m_menu_item_program.set_active(false);
+    m_menu_item_pitch.set_active(false);
+    m_menu_item_pressure.set_active(false);
+
+    m_menu_item_noteon.get_style_context()->remove_class("checked");
+    m_menu_item_noteoff.get_style_context()->remove_class("checked");
+    m_menu_item_aftertouch.get_style_context()->remove_class("checked");
+    m_menu_item_program.get_style_context()->remove_class("checked");
+    m_menu_item_pitch.get_style_context()->remove_class("checked");
+    m_menu_item_pressure.get_style_context()->remove_class("checked");
+
+    for (int i=0; i<128; i++) {
+        m_menu_items_control[i]->set_active(false);
+        m_menu_items_control[i]->get_style_context()->remove_class("checked");
+    }
+
+    unsigned char status, cc;
+    m_sequence->reset_draw_marker();
+    while (m_sequence->get_next_event( &status, &cc ) == true)
+    {
+        switch (status) {
+            case EVENT_NOTE_OFF:
+                m_menu_item_noteoff.get_style_context()->add_class("checked");
+                break;
+            case EVENT_NOTE_ON:
+                m_menu_item_noteon.get_style_context()->add_class("checked");
+                break;
+            case EVENT_AFTERTOUCH:
+                m_menu_item_aftertouch.get_style_context()->add_class("checked");
+                break;
+            case EVENT_CONTROL_CHANGE:
+                m_menu_items_control[cc]->get_style_context()->add_class("checked");
+                break;
+            case EVENT_PITCH_WHEEL:
+                m_menu_item_pitch.get_style_context()->add_class("checked");
+                break;
+            case EVENT_PROGRAM_CHANGE:
+                m_menu_item_program.get_style_context()->add_class("checked");
+                break;
+            case EVENT_CHANNEL_PRESSURE:
+                m_menu_item_pressure.get_style_context()->add_class("checked");
+                break;
+        }
+    }
+}
+
+void
+EditWindow::set_data_type(unsigned char status, unsigned char control)
+{
+    m_eventroll.set_data_type(status, control);
+    m_dataroll.set_data_type(status, control);
+
+    string label;
+    switch (status) {
+        case EVENT_NOTE_OFF:
+            label = "Note Off";
+            break;
+        case EVENT_NOTE_ON:
+            label = "Note On";
+            break;
+        case EVENT_AFTERTOUCH:
+            label = "Aftertouch";
+            break;
+        case EVENT_CONTROL_CHANGE:
+            label = "CC " + to_string(control);
+            break;
+        case EVENT_PITCH_WHEEL:
+            label = "Pitch Wheel";
+            break;
+        case EVENT_PROGRAM_CHANGE:
+            label = "Program";
+            break;
+        case EVENT_CHANNEL_PRESSURE:
+            label = "Pressure";
+            break;
+    }
+
+    m_event_dropdown.set_label(label);
 }

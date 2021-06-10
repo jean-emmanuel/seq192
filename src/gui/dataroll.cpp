@@ -359,3 +359,11 @@ DataRoll::on_scroll_event(GdkEventScroll* event)
 
     return false;
 }
+
+
+void
+DataRoll::set_data_type(unsigned char status, unsigned char control = 0)
+{
+    m_status = status;
+    m_cc = control;
+}
