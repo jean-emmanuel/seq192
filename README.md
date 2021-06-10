@@ -15,3 +15,20 @@ MIDI sequencer based on seq24 with less features and more swag.
 - OSC controls
 - almost 192 patterns per set
 
+## Build
+
+**Dependencies** (as debian packages)
+```
+libjack-jackd2-dev liblo-dev libgtkmm-3.0-dev
+```
+
+**Build**
+```
+make clean && make -j8
+```
+
+**Run**
+
+```
+./src/seq192
+```
