@@ -19,7 +19,7 @@ MIDI sequencer based on seq24 with less features and more swag.
 
 **Dependencies** (as debian packages)
 ```
-libjack-jackd2-dev liblo-dev libgtkmm-3.0-dev
+libjack-jackd2-dev liblo-dev libgtkmm-3.0-dev libasound2-dev
 ```
 
 **Build**
