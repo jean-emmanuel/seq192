@@ -456,7 +456,8 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     // add_events(Gdk::SCROLL_MASK);
 
     clear_focus();
-    resize(800, 600);
+    set_position(Gtk::WIN_POS_CENTER);
+    resize(1024, 600);
     show_all();
 
 

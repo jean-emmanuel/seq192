@@ -229,7 +229,8 @@ MainWindow::MainWindow(perform * p)
 
     clear_focus();
     update_window_title();
-    resize(800, 600);
+    set_position(Gtk::WIN_POS_CENTER);
+    resize(1024, 600);
     show_all();
 
 }
