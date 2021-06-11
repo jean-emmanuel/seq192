@@ -25,6 +25,8 @@ SequenceButton::SequenceButton(perform * p, MainWindow * m, int seqpos)
     m_click = false;
     m_drag_start = false;
 
+    set_last_sequence_number();
+
     Gtk::Allocation allocation = get_allocation();
     m_surface = Cairo::ImageSurface::create(
         Cairo::Format::FORMAT_ARGB32,
