@@ -275,6 +275,8 @@ void
 PianoRoll::set_snap_bypass(bool bypass)
 {
     m_snap_bypass = bypass;
+    m_current_x = m_last_x;
+    update_selection();
 }
 
 void
@@ -567,25 +569,7 @@ PianoRoll::on_motion_notify_event(GdkEventMotion* event)
 
     if (m_selecting || m_moving || m_growing || m_paste){
 
-        if (m_moving || m_paste){
-            snap_x(&m_current_x);
-            snap_x(&m_drop_x);
-            int delta_x = m_current_x - m_drop_x;
-            int delta_y = m_current_y - m_drop_y;
-            m_edition.x1 = m_selection.x1 + delta_x;
-            m_edition.y1 = m_selection.y1 + delta_y;
-            snap_x(&m_edition.x1);
-            snap_y(&m_edition.y1);
-        }
-
-        if (m_growing) {
-            int delta_x = m_current_x - m_drop_x;
-            int x2 = m_edition.x2;
-            m_edition.x2 = m_selection.x2 + delta_x;
-            snap_x(&m_edition.x2, true);
-            m_edition.x2 = m_edition.x2 -1;
-            if (m_edition.x2 <= m_selection.x1 && m_snap_active && !m_snap_bypass) m_edition.x2 = x2;
-        }
+        update_selection();
 
         return true;
 
@@ -694,6 +678,33 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
     m_sequence->unpaint_all();
 
     return true;
+}
+
+
+void
+PianoRoll::update_selection()
+{
+
+    if (m_moving || m_paste){
+        snap_x(&m_current_x);
+        snap_x(&m_drop_x);
+        int delta_x = m_current_x - m_drop_x;
+        int delta_y = m_current_y - m_drop_y;
+        m_edition.x1 = m_selection.x1 + delta_x;
+        m_edition.y1 = m_selection.y1 + delta_y;
+        snap_x(&m_edition.x1);
+        snap_y(&m_edition.y1);
+    }
+
+    if (m_growing) {
+        int delta_x = m_current_x - m_drop_x;
+        int x2 = m_edition.x2;
+        m_edition.x2 = m_selection.x2 + delta_x;
+        snap_x(&m_edition.x2, true);
+        m_edition.x2 = m_edition.x2 -1;
+        if (m_edition.x2 <= m_selection.x1 && m_snap_active && !m_snap_bypass) m_edition.x2 = x2;
+    }
+
 }
 
 bool

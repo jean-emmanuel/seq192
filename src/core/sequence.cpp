@@ -1260,7 +1260,7 @@ sequence::move_selected_notes( long a_delta_tick, int a_delta_note )
                     timestamp = m_length + timestamp;
                 }
 
-                // This doesn't seem rigtht 
+                // This doesn't seem rigtht
                 // if ((timestamp==0) && !noteon)  // trim if equal
                 // {
                 //     timestamp = m_length-2;
@@ -2916,7 +2916,7 @@ sequence::reverse_pattern()
 {
 
     push_undo();
-    
+
     lock();
     event e1,e2;
 

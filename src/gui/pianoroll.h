@@ -110,6 +110,7 @@ class PianoRoll : public DrawingArea {
         void set_note_length(int note_length);
         void set_adding(bool adding);
         void start_paste();
+        void update_selection();
 
         // coords to notes & ticks
         void convert_xy( int a_x, int a_y, long *ticks, int *note);
