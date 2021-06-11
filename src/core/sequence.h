@@ -201,6 +201,7 @@ class sequence
     bool is_dirty_edit ();
 
     void set_dirty_main();
+    void set_dirty_edit();
     void set_dirty();
 
     /* midi channel */

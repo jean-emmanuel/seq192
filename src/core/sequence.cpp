@@ -606,6 +606,8 @@ sequence::remove_marked()
     reset_draw_marker();
 
     unlock();
+
+    set_dirty();
 }
 
 
@@ -971,6 +973,8 @@ sequence::select_note_events( long a_tick_s, int a_note_h,
         }
     }
 
+    set_dirty_edit();
+
     unlock();
 
     return ret;
@@ -1208,6 +1212,8 @@ sequence::unselect()
     for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
 	(*i).unselect();
 
+    set_dirty_edit();
+
     unlock();
 }
 
@@ -1279,6 +1285,8 @@ sequence::move_selected_notes( long a_delta_tick, int a_delta_note )
             }
         }
     }
+
+    set_dirty();
 
     remove_marked();
     verify_and_link();
@@ -1943,6 +1951,13 @@ sequence::set_dirty_main()
 {
     //printf( "set_dirtymp\n" );
     m_dirty_main = true;
+}
+
+void
+sequence::set_dirty_edit()
+{
+    //printf( "set_dirtymp\n" );
+    m_dirty_edit = true;
 }
 
 
@@ -2644,6 +2659,8 @@ sequence::select_events( unsigned char a_status, unsigned char a_cc, bool a_inve
     }
 
     unlock();
+
+    set_dirty();
 }
 
 
@@ -2689,6 +2706,8 @@ sequence::transpose_notes( int a_steps )
 
     verify_and_link();
     unlock();
+
+    set_dirty();
 }
 
 void

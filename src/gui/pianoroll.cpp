@@ -42,6 +42,14 @@ PianoRoll::PianoRoll(perform * p, sequence * seq, PianoKeys * pianokeys)
     m_is_drag_pasting_start = false;
     m_justselected_one = false;
 
+    Gtk::Allocation allocation = get_allocation();
+    m_surface = Cairo::ImageSurface::create(
+        Cairo::Format::FORMAT_ARGB32,
+        allocation.get_width(),
+        allocation.get_height()
+    );
+    draw_background();
+
     add_events( Gdk::POINTER_MOTION_MASK |
                 Gdk::BUTTON_PRESS_MASK |
                 Gdk::BUTTON_RELEASE_MASK |
@@ -58,12 +66,18 @@ PianoRoll::~PianoRoll()
 }
 
 
-bool
-PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+void
+PianoRoll::draw_background()
 {
+    Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
     Gtk::Allocation allocation = get_allocation();
     const int width = allocation.get_width();
     const int height = allocation.get_height();
+
+    cr->set_operator(Cairo::OPERATOR_CLEAR);
+    cr->rectangle(0, 0, width, height);
+    cr->paint_with_alpha(1.0);
+    cr->set_operator(Cairo::OPERATOR_OVER);
 
     // Horizontal lines
 
@@ -182,6 +196,37 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         }
     }
 
+}
+
+bool
+PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+{
+    Gtk::Allocation allocation = get_allocation();
+    const int width = allocation.get_width();
+    const int height = allocation.get_height();
+    bool newsurface = false;
+
+    // resize handler
+    if (width != m_surface->get_width() || height != m_surface->get_height()){
+        m_surface = Cairo::ImageSurface::create(
+            Cairo::Format::FORMAT_ARGB32,
+            allocation.get_width(),
+            allocation.get_height()
+        );
+        newsurface = true;
+        draw_background();
+    }
+
+    if (!newsurface && m_sequence->is_dirty_edit()) {
+        draw_background();
+    }
+
+    // draw background
+    cr->set_source(m_surface, 0.0, 0.0);
+    cr->paint();
+
+    cr->set_line_width(1.0);
+
     // mouse edition
     if (m_selecting || m_moving || m_paste ||  m_growing)
     {
@@ -261,8 +306,10 @@ PianoRoll::set_zoom(int zoom)
 {
     if (zoom < c_min_zoom) zoom = c_min_zoom;
     else if (zoom > c_max_zoom) zoom = c_max_zoom;
-    m_zoom = zoom;
-    queue_draw();
+    if (zoom != m_zoom) {
+        m_zoom = zoom;
+        draw_background();
+    }
 }
 
 void
@@ -716,4 +763,12 @@ PianoRoll::on_scroll_event(GdkEventScroll* event)
     m_pianokeys->hint_key(-1);
 
     return false;
+}
+
+void
+PianoRoll::set_hscroll(int s) {
+    if (s != m_hscroll) {
+        m_hscroll = s;
+        draw_background();
+    }
 }

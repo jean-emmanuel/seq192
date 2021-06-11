@@ -58,10 +58,11 @@ class PianoRoll : public DrawingArea {
         PianoKeys          *m_pianokeys;
 
         Cairo::RefPtr<Cairo::ImageSurface> m_surface;
+        void draw_background();
 
         // hscroll
         int                 m_hscroll;
-        void set_hscroll(int s){m_hscroll = s;};
+        void set_hscroll(int s);
 
         // zoom: ticks per pixel
         int                 m_zoom;
