@@ -74,34 +74,17 @@ main (int argc, char *argv[])
     /* the main performance object */
     perform * p = new perform();
 
-    /* all GTK applications must have a gtk_main(). Control ends here
-       and waits for an event to occur (like a key press or mouse event). */
-    // Gtk::Main kit(argc, argv);
-    //
-    // p_font_renderer = new font();
-
-
     if ( getenv( HOME ) != NULL ){
 
         Glib::ustring home( getenv( HOME ));
         last_used_dir = home;
         Glib::ustring total_file = home + SLASH + config_filename;
-        printf( "Reading [%s]\n", total_file.c_str());
 
         optionsfile options( total_file );
 
-        if ( !options.parse( p ) ){
-            printf( "Error Reading [%s]\n", total_file.c_str());
-        }
-
         total_file = home + SLASH + user_filename;
-        printf( "Reading [%s]\n", total_file.c_str());
 
         userfile user( total_file );
-
-        if ( !user.parse( p ) ){
-            printf( "Error Reading [%s]\n", total_file.c_str());
-        }
 
     } else {
 
@@ -177,21 +160,12 @@ main (int argc, char *argv[])
     MainWindow window(p);
     int status = application->run(window);
 
-    // mainwnd seq192_window( p );
-    //
-    // kit.run(seq192_window);
-
     if ( getenv( HOME ) != NULL ){
 
         string home( getenv( HOME ));
         Glib::ustring total_file = home + SLASH + config_filename;
-        printf( "Writing [%s]\n", total_file.c_str());
 
         optionsfile options( total_file );
-
-        if ( !options.write( p ) ){
-            printf( "Error writing [%s]\n", total_file.c_str());
-        }
 
     } else {
 
