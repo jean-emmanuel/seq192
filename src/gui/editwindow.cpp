@@ -421,7 +421,8 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_dataroll.set_size_request(-1, c_dataroll_height + 1);
     m_grid.attach(m_dataroll, 0, 3, 3, 1);
 
-    m_grid.attach(m_hscrollbar, 1, 4);
+    m_hscrollbar.get_style_context()->add_class("editwindow-hscrollbar");
+    m_grid.attach(m_hscrollbar, 0, 4, 3, 1);
 
     m_event_dropdown.set_label("Note On");
     m_event_dropdown.set_sensitive(true);
