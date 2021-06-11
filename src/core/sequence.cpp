@@ -2645,7 +2645,7 @@ sequence::select_events( unsigned char a_status, unsigned char a_cc, bool a_inve
 
 
 void
-sequence::transpose_notes( int a_steps, int a_scale )
+sequence::transpose_notes( int a_steps )
 {
     if(!mark_selected())
         return;
@@ -2659,18 +2659,6 @@ sequence::transpose_notes( int a_steps, int a_scale )
 
     list<event>::iterator i;
 
-    const int *transpose_table = NULL;
-
-    if ( a_steps < 0 )
-    {
-        transpose_table = &c_scales_transpose_dn[a_scale][0];
-        a_steps *= -1;
-    }
-    else
-    {
-        transpose_table = &c_scales_transpose_up[a_scale][0];
-    }
-
     for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
     {
         /* is it being moved ? */
@@ -2682,22 +2670,7 @@ sequence::transpose_notes( int a_steps, int a_scale )
             e = (*i);
             e.unmark();
 
-            int  note = e.get_note();
-
-            bool off_scale = false;
-            if (  transpose_table[note % 12] == 0 )
-            {
-                off_scale = true;
-                note -= 1;
-            }
-
-            for( int x=0; x<a_steps; ++x )
-                note += transpose_table[note % 12];
-
-            if ( off_scale )
-                note += 1;
-
-            e.set_note( note );
+            e.set_note( e.get_note() + a_steps );
 
             transposed_events.push_front(e);
         }

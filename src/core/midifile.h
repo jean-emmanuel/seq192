@@ -28,7 +28,7 @@ class midifile
  private:
 
     int m_pos;
-    Glib::ustring m_name;
+    string m_name;
 
     /* holds our data */
     unsigned char *m_d;
@@ -44,7 +44,7 @@ class midifile
 
  public:
 
-    midifile(const Glib::ustring&);
+    midifile(const string&);
 
     ~midifile();
 

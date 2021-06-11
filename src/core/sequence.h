@@ -376,7 +376,7 @@ class sequence
     void quantize_events (unsigned char a_status, unsigned char a_cc,
 			 long a_snap_tick, int a_divide, bool a_linked =
 			 false);
-    void transpose_notes (int a_steps, int a_scale);
+    void transpose_notes (int a_steps);
     void shift_events (int a_ticks);  // move selected events later/earlier in time
     void multiply_pattern( float a_multiplier );
     void reverse_pattern();

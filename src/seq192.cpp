@@ -25,28 +25,26 @@
 #include "gui/mainwindow.h"
 #include <gtkmm.h>
 
-using namespace Glib;
-using namespace Gtk;
-
 /* struct for command parsing */
 static struct
 option long_options[] = {
 
     {"file",     required_argument, 0, 'f'},
     {"help",     0, 0, 'h'},
-    {"jack-transport",0, 0, 'j'},
     {"osc-port", 1,0,'p'},
+    {"jack-transport",0, 0, 'j'},
+    {"no-gui",0, 0, 'n'},
     {0, 0, 0, 0}
 
 };
 
-Glib::ustring global_filename = "";
-Glib::ustring last_used_dir ="/";
-std::string config_filename = ".seq192rc";
-std::string user_filename = ".seq192usr";
+string global_filename = "";
+string last_used_dir ="/";
+string config_filename = ".seq192rc";
+string user_filename = ".seq192usr";
 
+bool global_no_gui = false;
 bool global_with_jack_transport = false;
-interaction_method_e global_interactionmethod = e_seq192_interaction;
 
 char* global_oscport;
 
@@ -59,65 +57,61 @@ user_instrument_definition global_user_instrument_definitions[c_max_instruments]
 int
 main (int argc, char *argv[])
 {
-    for ( int i=0; i<c_maxBuses; i++ )
+    for (int i=0; i<c_maxBuses; i++)
     {
-        for ( int j=0; j<16; j++ )
+        for (int j=0; j<16; j++)
             global_user_midi_bus_definitions[i].instrument[j] = -1;
     }
 
-    for ( int i=0; i<c_max_instruments; i++ )
+    for (int i=0; i<c_max_instruments; i++)
     {
-        for ( int j=0; j<128; j++ )
+        for (int j=0; j<128; j++)
             global_user_instrument_definitions[i].controllers_active[j] = false;
     }
 
     /* the main performance object */
     perform * p = new perform();
 
-    if ( getenv( HOME ) != NULL ){
-
-        Glib::ustring home( getenv( HOME ));
+    if (getenv(HOME) != NULL) {
+        string home(getenv(HOME));
         last_used_dir = home;
-        Glib::ustring total_file = home + SLASH + config_filename;
+        string total_file = home + SLASH + config_filename;
 
-        optionsfile options( total_file );
+        optionsfile options(total_file);
 
         total_file = home + SLASH + user_filename;
 
-        userfile user( total_file );
-
-    } else {
-
-        printf( "Error calling getenv( \"%s\" )\n", HOME );
+        userfile user(total_file);
     }
 
 
 
     /* parse parameters */
     int c;
-    while (1){
+    while (1) {
 
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "p:f:hj", long_options, &option_index);
+        c = getopt_long (argc, argv, "p:f:hjn", long_options, &option_index);
 
         /* Detect the end of the options. */
         if (c == -1)
             break;
 
-        switch (c){
+        switch (c) {
 
             case '?':
             case 'h':
 
-                printf( "usage: seq192 [options]\n\n" );
-                printf( "options:\n" );
-                printf( "  -h, --help : show this message\n" );
-                printf( "  -f, --file <filename> : load midi file on startup\n" );
-                printf( "  -p, --osc-port <port> : osc input port (udp port number or unix socket path)\n" );
-                printf( "  -j, --jack-transport : sync to jack transport\n" );
-                printf( "\n\n" );
+                printf("usage: seq192 [options]\n\n");
+                printf("options:\n");
+                printf("  -h, --help : show this message\n");
+                printf("  -f, --file <filename> : load midi file on startup\n");
+                printf("  -p, --osc-port <port> : osc input port (udp port number or unix socket path)\n");
+                printf("  -j, --jack-transport : sync to jack transport\n");
+                printf("  -n, --no-gui : headless mode\n");
+                printf("\n\n");
 
                 return 0;
                 break;
@@ -126,8 +120,12 @@ main (int argc, char *argv[])
                 global_with_jack_transport = true;
                 break;
 
+            case 'n':
+                global_no_gui = true;
+                break;
+
             case 'f':
-                global_filename = Glib::ustring(optarg);
+                global_filename = string(optarg);
                break;
 
             case 'p':
@@ -150,26 +148,25 @@ main (int argc, char *argv[])
     if (global_filename != "") {
         /* import that midi file */
         midifile *f = new midifile(global_filename);
-        f->parse( p, 0 );
+        f->parse(p, 0);
         delete f;
     }
 
-    MainWindow yrdy();
-
-    auto application = Application::create();
-    MainWindow window(p);
-    int status = application->run(window);
-
-    if ( getenv( HOME ) != NULL ){
-
-        string home( getenv( HOME ));
-        Glib::ustring total_file = home + SLASH + config_filename;
-
-        optionsfile options( total_file );
-
+    int status = 0;
+    if (global_no_gui) {
+        while (true) {
+            usleep(1000);
+        }
     } else {
+        auto application = Gtk::Application::create();
+        MainWindow window(p);
+        status = application->run(window);
+    }
 
-        printf( "Error calling getenv( \"%s\" )\n", HOME );
+    if (getenv(HOME) != NULL) {
+        string home(getenv(HOME));
+        string total_file = home + SLASH + config_filename;
+        optionsfile options(total_file);
     }
 
     delete p;

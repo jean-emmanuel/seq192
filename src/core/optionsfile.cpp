@@ -18,9 +18,9 @@
 
 #include "optionsfile.h"
 
-extern Glib::ustring last_used_dir;
+extern string last_used_dir;
 
-optionsfile::optionsfile(const Glib::ustring& a_name) :
+optionsfile::optionsfile(const string& a_name) :
     configfile( a_name )
 {
 }

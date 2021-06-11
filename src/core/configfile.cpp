@@ -17,7 +17,7 @@
 #include "configfile.h"
 #include <iostream>
 
-configfile::configfile(const Glib::ustring& a_name)
+configfile::configfile(const string& a_name)
 {
     m_name = a_name;
     m_pos = 0;

@@ -28,7 +28,7 @@ class optionsfile : public configfile
 
  public:
 
-    optionsfile(const Glib::ustring& a_name);
+    optionsfile(const string& a_name);
     ~optionsfile( );
 
     bool parse( perform *a_perf );

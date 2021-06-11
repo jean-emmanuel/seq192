@@ -99,7 +99,7 @@ PianoKeys::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
         octave = i  / 12 - 1;
         if (key % 12 == 0) {
-            std::string key_name = (std::string) c_key_text[key % 12] + std::to_string(octave);
+            std::string key_name = "C" + std::to_string(octave);
             auto name = create_pango_layout(key_name);
             name->set_font_description(font);
             name->get_pixel_size(text_width, text_height);

@@ -20,10 +20,7 @@
 #include <string>
 #include <gtkmm.h>
 
-
-
 using namespace std;
-
 
 const string c_package_name = "seq192";
 
@@ -128,31 +125,13 @@ const unsigned long c_mutegroups = 0x24240009; // not sure why we went to 10 abo
 const unsigned long c_resume = 0x24240011;
 
 
-const char c_font_6_12[] = "-*-fixed-medium-r-*--12-*-*-*-*-*-*";
-const char c_font_8_13[] = "-*-fixed-medium-r-*--13-*-*-*-*-*-*";
-const char c_font_5_7[]  = "-*-fixed-medium-r-*--8-*-*-*-*-*-*";
-
-
-/* used in menu to tell setState what to do */
-const int c_adding = 0;
-const int c_normal = 1;
-const int c_paste  = 2;
-
-/* redraw when recording ms */
-const int c_redraw_ms = 40;
-
-/* consts for perform editor */
-const int c_names_x = 6 * 24;
-const int c_names_y = 22;
-const int c_perf_scale_x = 32; /*ticks per pixel */
-
 extern bool global_with_jack_transport;
 extern char* global_oscport;
 
 extern bool global_is_modified;
 
-extern Glib::ustring global_filename;
-extern Glib::ustring last_used_dir;
+extern string global_filename;
+extern string last_used_dir;
 extern bool is_pattern_playing;
 
 const int c_max_instruments = 64;
@@ -172,156 +151,6 @@ struct user_instrument_definition
 
 extern user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];
 extern user_instrument_definition global_user_instrument_definitions[c_max_instruments];
-
-/* scales */
-enum c_music_scales {
-  c_scale_off,
-  c_scale_major,
-  c_scale_minor,
-  c_scale_size
-
-};
-
-
-const bool c_scales_policy[c_scale_size][12] =
-{
-    /* off = chromatic */
-    { true,true,true,true,true,true,true,true,true,true,true,true},
-
-    /* major */
-    { true,false,true,false,true,true,false,true,false,true,false,true},
-
-    /* minor */
-    { true,false,true,true,false,true,false,true,true,false,true,false},
-
-};
-
-const int c_scales_transpose_up[c_scale_size][12] =
-{
-    /* off = chromatic */
-    { 1,1,1,1,1,1,1,1,1,1,1,1},
-    /* major */
-    { 2,0,2,0,1,2,0,2,0,2,0,1},
-    /* minor */
-    { 2,0,1,2,0,2,0,1,2,0,2,0},
-
-};
-
-
-
-
-const int c_scales_transpose_dn[c_scale_size][12] =
-{
-    /* off = chromatic */
-    { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
-    /* major */
-    { -1,0,-2,0,-2,-1,0,-2,0,-2,0,-2},
-    /* minor */
-    { -2,0,-2,-1,0,-2,0,-2,-1,0,-2,0},
-
-};
-
-const int c_scales_symbol[c_scale_size][12] =
-{
-    /* off = chromatic */
-    { 32,32,32,32,32,32,32,32,32,32,32,32},
-
-    /* major */
-    { 32,32,32,32,32,32,32,32,32,32,32,32},
-
-    /* minor */
-    { 32,32,32,32,32,32,32,32,129,128,129,128},
-
-};
-
-// up 128
-// down 129
-
-
-const char c_scales_text[c_scale_size][6] =
-{
-    "Off",
-    "Major",
-    "Minor"
-};
-
-const char c_key_text[][3] =
-{
-    "C",
-    "C#",
-    "D",
-    "D#",
-    "E",
-    "F",
-    "F#",
-    "G",
-    "G#",
-    "A",
-    "A#",
-    "B"
-};
-
-const char c_interval_text[][3] =
-{
-    "P1",
-    "m2",
-    "M2",
-    "m3",
-    "M3",
-    "P4",
-    "TT",
-    "P5",
-    "m6",
-    "M6",
-    "m7",
-    "M7",
-    "P8",
-    "m9",
-    "M9",
-    ""
-};
-
-const char c_chord_text[][5] =
-{
-    "I",
-    "II",
-    "III",
-    "IV",
-    "V",
-    "VI",
-    "VII",
-    "VIII"
-};
-
-enum mouse_action_e
-{
-    e_action_select,
-    e_action_draw,
-    e_action_grow
-};
-
-enum interaction_method_e
-{
-    e_seq192_interaction,
-    e_fruity_interaction,
-    e_number_of_interactions // keep this one last...
-};
-
-const char* const c_interaction_method_names[] =
-{
-    "seq192",
-    "fruity",
-    NULL
-};
-
-const char* const c_interaction_method_descs[] =
-{
-    "original seq192 method",
-    "similar to a certain fruity sequencer we like",
-    NULL
-};
-
-extern interaction_method_e global_interactionmethod;
 
 enum file_type_e
 {

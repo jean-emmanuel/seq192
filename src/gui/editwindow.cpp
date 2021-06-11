@@ -586,7 +586,7 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             m_sequence->unselect();
             break;
         case EDIT_MENU_TRANSPOSE:
-            m_sequence->transpose_notes(data1, 0);
+            m_sequence->transpose_notes(data1);
             break;
         case EDIT_MENU_QUANTIZE:
             if (m_focus == "eventroll") {
