@@ -113,6 +113,7 @@ sequence::pop_undo()
         m_list_undo.pop();
         verify_and_link();
         unselect();
+        set_dirty_main();
     }
 
     unlock();
@@ -132,6 +133,7 @@ sequence::pop_redo()
         m_list_redo.pop();
         verify_and_link();
         unselect();
+        set_dirty_main();
     }
 
     unlock();
