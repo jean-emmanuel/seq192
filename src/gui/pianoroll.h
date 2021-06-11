@@ -30,6 +30,12 @@ class rect
     int x, y, height, width;
 };
 
+class coords
+{
+ public:
+    int x1, y1, x2, y2;
+};
+
 class PianoRoll : public DrawingArea {
 
     public:
@@ -82,6 +88,8 @@ class PianoRoll : public DrawingArea {
         int m_move_snap_offset_x;
 
         rect         m_selected;
+        coords       m_selection;
+        coords       m_edition;
 
         // where the dragging started
         int m_drop_x;
@@ -111,11 +119,12 @@ class PianoRoll : public DrawingArea {
         // apply y snap
         void snap_y(int *y);
         // apply x snap
-        void snap_x(int *x);
+        void snap_x(int *x, bool grow);
 
         void xy_to_rect(int x1,  int y1, int x2,  int y2, int *x,  int *y, int *w,  int *h );
 
         void convert_tn_box_to_rect(long tick_s, long tick_f, int note_h, int note_l, int *x, int *y, int *w, int *h );
+        void convert_tn_box_to_coords(long tick_s, long tick_f, int note_h, int note_l, int *x1, int *y1,  int *x2, int *y2 );
 
         bool on_motion_notify_event(GdkEventMotion* event);
         bool on_leave_notify_event(GdkEventCrossing* event);

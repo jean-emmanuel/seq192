@@ -205,36 +205,37 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             }
 
         }
-        if (m_moving || m_paste)
-        {
 
-            int delta_x = m_current_x - m_drop_x;
-            int delta_y = m_current_y - m_drop_y;
+        if (m_moving || m_paste){
 
-            x = m_selected.x + delta_x;
-            y = m_selected.y + delta_y;
-
-            snap_y(&y);
-
-            x -= m_hscroll / m_zoom;
-
-            cr->rectangle(x + 0.5, y - 0.5, m_selected.width + 1, m_selected.height);
-            cr->stroke();
-        }
-
-        if (m_growing){
-
-            int delta_x = m_current_x - m_drop_x;
-            int width = delta_x + m_selected.width;
+            int width = m_selection.x2 - m_selection.x1;
+            int height = m_selection.y2 - m_selection.y1 + c_key_height;
 
             if (width < 1) width = 1;
 
-            x = m_selected.x;
-            y = m_selected.y;
+            x = m_edition.x1;
+            y = m_edition.y1;
 
             x -= m_hscroll / m_zoom;
 
-            cr->rectangle(x + 0.5, y + 0.5, width + 1, m_selected.height);
+            cr->rectangle(x + 0.5, y + 0.5, width + 1, height);
+            cr->stroke();
+
+        }
+
+        if (m_growing) {
+
+            int width = m_edition.x2 - m_edition.x1;
+            int height = m_selection.y2 - m_selection.y1 + c_key_height;
+
+            if (width < 1) width = 1;
+
+            x = m_edition.x1;
+            y = m_edition.y1;
+
+            x -= m_hscroll / m_zoom;
+
+            cr->rectangle(x + 0.5, y + 0.5, width + 1, height);
             cr->stroke();
 
         }
@@ -274,18 +275,6 @@ void
 PianoRoll::set_snap_bypass(bool bypass)
 {
     m_snap_bypass = bypass;
-    m_current_x = m_last_x;
-    if (m_moving || m_paste){
-        snap_x(&m_current_x);
-    }
-    if (m_growing) {
-        int delta_x = m_current_x - m_drop_x;
-        int x1 = m_selected.x + m_selected.width + delta_x;
-        int x2 = x1;
-        snap_x(&x1);
-        m_current_x -= (x2 - x1);
-        m_current_x -= 1;
-    }
 }
 
 void
@@ -340,6 +329,15 @@ PianoRoll::xy_to_rect(int x1,  int y1, int x2,  int y2,  int *x,  int *y,  int *
 
 
 void
+PianoRoll::convert_tn_box_to_coords(long tick_s, long tick_f, int note_h, int note_l, int *x1, int *y1,  int *x2, int *y2 )
+{
+    /* convert box to X,Y values */
+    convert_tn(tick_s, note_h, x1, y1);
+    convert_tn(tick_f, note_l, x2, y2);
+}
+
+
+void
 PianoRoll::convert_tn_box_to_rect(long tick_s, long tick_f, int note_h, int note_l, int *x, int *y,  int *w, int *h )
 {
     int x1, y1, x2, y2;
@@ -357,12 +355,12 @@ PianoRoll::convert_tn_box_to_rect(long tick_s, long tick_f, int note_h, int note
 void
 PianoRoll::snap_y(int *y)
 {
-    *y = *y - (*y % c_key_height);
+    *y = *y - (*y % c_key_height) - 1;
 }
 
 /* performs a 'snap' on x */
 void
-PianoRoll::snap_x(int *x)
+PianoRoll::snap_x(int *x, bool grow=false)
 {
     //snap = number pulses to snap to
     //m_zoom = number of pulses per pixel
@@ -370,7 +368,13 @@ PianoRoll::snap_x(int *x)
     int snap = m_snap_active && !m_snap_bypass ? m_snap : c_disabled_snap;
     int mod = (snap / m_zoom);
     if (mod <= 0) mod = 1;
-    *x = *x - (*x % mod);
+    int offset = *x % mod;
+    if (grow) {
+        if (offset > (mod / 2)) *x = *x + mod - offset;
+        else *x = *x - offset;
+    } else {
+        *x = *x - offset;
+    }
 }
 
 
@@ -507,17 +511,8 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
                     /* get the box that selected elements are in */
                     m_sequence->get_selected_box(&tick_s, &note_h, &tick_f, &note_l);
 
-                    convert_tn_box_to_rect(tick_s, tick_f, note_h, note_l, &m_selected.x, &m_selected.y, &m_selected.width, &m_selected.height );
-
-                    /* save offset that we get from the snap above */
-                    int adjusted_selected_x = m_selected.x;
-                    snap_x(&adjusted_selected_x );
-                    m_move_snap_offset_x = m_selected.x - adjusted_selected_x;
-
-                    /* align selection for drawing */
-                    snap_x(&m_selected.x);
-
-                    m_current_x = m_drop_x = snapped_x;
+                    convert_tn_box_to_coords(tick_s, tick_f, note_h, note_l, &m_selection.x1, &m_selection.y1, &m_selection.x2, &m_selection.y2);
+                    convert_tn_box_to_coords(tick_s, tick_f, note_h, note_l, &m_edition.x1, &m_edition.y1, &m_edition.x2, &m_edition.y2);
                 }
                 // middle mouse button, or left-ctrl click (for 2button mice)
                 else if (event->button == 2 || (event->button == 1 && (event->state & GDK_CONTROL_MASK)))
@@ -528,14 +523,8 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
                     // get the box that selected elements are in
                     m_sequence->get_selected_box(&tick_s, &note_h, &tick_f, &note_l);
 
-                    convert_tn_box_to_rect(tick_s, tick_f, note_h, note_l, &m_selected.x, &m_selected.y, &m_selected.width, &m_selected.height);
-
-                    /* save offset that we get from the snap above */
-                    int adjusted_selected_x = m_selected.x;
-                    snap_x(&adjusted_selected_x );
-                    m_move_snap_offset_x = m_selected.x - adjusted_selected_x;
-
-                    m_current_x = m_drop_x = snapped_x;
+                    convert_tn_box_to_coords(tick_s, tick_f, note_h, note_l, &m_selection.x1, &m_selection.y1, &m_selection.x2, &m_selection.y2);
+                    convert_tn_box_to_coords(tick_s, tick_f, note_h, note_l, &m_edition.x1, &m_edition.y1, &m_edition.x2, &m_edition.y2);
 
                 }
             }
@@ -571,15 +560,22 @@ PianoRoll::on_motion_notify_event(GdkEventMotion* event)
 
         if (m_moving || m_paste){
             snap_x(&m_current_x);
+            snap_x(&m_drop_x);
+            int delta_x = m_current_x - m_drop_x;
+            int delta_y = m_current_y - m_drop_y;
+            m_edition.x1 = m_selection.x1 + delta_x;
+            m_edition.y1 = m_selection.y1 + delta_y;
+            snap_x(&m_edition.x1);
+            snap_y(&m_edition.y1);
         }
 
         if (m_growing) {
             int delta_x = m_current_x - m_drop_x;
-            int x1 = m_selected.x + m_selected.width + delta_x;
-            int x2 = x1;
-            snap_x(&x1);
-            m_current_x -= (x2 - x1);
-            m_current_x -= 1;
+            int x2 = m_edition.x2;
+            m_edition.x2 = m_selection.x2 + delta_x;
+            snap_x(&m_edition.x2, true);
+            m_edition.x2 = m_edition.x2 -1;
+            if (m_edition.x2 <= m_selection.x1 && m_snap_active && !m_snap_bypass) m_edition.x2 = x2;
         }
 
         return true;
@@ -624,7 +620,6 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
 
     if (m_moving) snap_x(&m_current_x);
 
-    int delta_x = m_current_x - m_drop_x;
     int delta_y = m_current_y - m_drop_y;
 
     long delta_tick;
@@ -645,8 +640,7 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
 
         if (m_moving)
         {
-            /* adjust for snap */
-            delta_x -= m_move_snap_offset_x;
+            int delta_x = m_edition.x1 - m_selection.x1;
 
             /* convert deltas into screen corridinates */
             convert_xy(delta_x, delta_y, &delta_tick, &delta_note);
@@ -665,11 +659,7 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
 
         if (m_growing){
 
-            int x1 = m_selected.x + m_selected.width + delta_x;
-            int x2 = x1;
-            snap_x(&x1);
-            delta_x -= (x2 - x1);
-            delta_x -= 1;
+            int delta_x = m_edition.x2 - m_selection.x2;
 
             /* convert deltas into screen corridinates */
             convert_xy(delta_x, delta_y, &delta_tick, &delta_note);
