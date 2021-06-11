@@ -578,7 +578,7 @@ mastermidibus::init( )
             m_num_poll_descriptors,
             POLLIN);
 
-    set_sequence_input( NULL );
+    m_seq = NULL;
 
     /* sizes */
     snd_seq_set_output_buffer_size(m_alsa_seq, c_midibus_output_size );
