@@ -221,8 +221,8 @@ class perform
         {"/screenset",          SEQ_SSET},
         {"/panic",              SEQ_PANIC},
         {"/sequence",           SEQ_SSEQ},
-        {"/sequence_and_play",  SEQ_SSEQ_AND_PLAY},
-        {"/sequence_queued",    SEQ_SSEQ_QUEUED},
+        {"/sequence/trig",      SEQ_SSEQ_AND_PLAY},
+        {"/sequence/queue",     SEQ_SSEQ_QUEUED},
         {"/status",             SEQ_STATUS},
         {"/status/extended",    SEQ_STATUS_EXT}
     };
