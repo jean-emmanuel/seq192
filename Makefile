@@ -7,12 +7,16 @@ PROG = src/seq192
 
 all: $(PROG)
 
+bold := $(shell tput bold)
+sgr0 := $(shell tput sgr0)
+
 $(PROG): $(OBJ)
-	$(info Linking)
+	@printf '\n$(bold)Linking$(sgr0)\n'
 	$(CXX) -o $@ $^ $(LDFLAGS)
+	@printf '\n'
 
 %.o: %.cpp
-	$(info Compilation from $^ to $@)
+	@printf '\n$(bold)Compilation from $^ to $@ $(sgr0)\n'
 	$(CXX) $(CXXFLAGS) -c -o $@ $^
 
 clean:
