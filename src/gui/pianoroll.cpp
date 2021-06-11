@@ -386,6 +386,8 @@ PianoRoll::start_paste()
      int note_h;
      int note_l;
 
+     m_current_y += 1;
+
      snap_x(&m_current_x);
      snap_y(&m_current_y);
 
@@ -397,11 +399,18 @@ PianoRoll::start_paste()
      /* get the box that selected elements are in */
      m_sequence->get_clipboard_box(&tick_s, &note_h,  &tick_f, &note_l);
 
-     convert_tn_box_to_rect(tick_s, tick_f, note_h, note_l, &m_selected.x, &m_selected.y, &m_selected.width,  &m_selected.height);
+     convert_tn_box_to_coords(tick_s, tick_f, note_h, note_l, &m_selection.x1, &m_selection.y1, &m_selection.x2, &m_selection.y2);
+     convert_tn_box_to_coords(tick_s, tick_f, note_h, note_l, &m_edition.x1, &m_edition.y1, &m_edition.x2, &m_edition.y2);
 
-     /* adjust for clipboard being shifted to tick 0 */
-     m_selected.x += m_drop_x;
-     m_selected.y += (m_drop_y - m_selected.y);
+     int width = m_edition.x2 - m_edition.x1;
+     int height = m_edition.y2 - m_edition.y1;
+
+     m_edition.x1 = m_current_x;
+     m_edition.y1 = m_current_y ;
+     m_selection.x1 = m_current_x;
+     m_selection.x2 = m_current_x + width;
+     m_selection.y1 = m_current_y;
+     m_selection.y2 = m_current_y + height;
 }
 
 
