@@ -78,10 +78,12 @@ main (int argc, char *argv[])
         string total_file = home + SLASH + config_filename;
 
         optionsfile options(total_file);
+        options.parse(p);
 
         total_file = home + SLASH + user_filename;
 
         userfile user(total_file);
+        user.parse(p);
     }
 
 
