@@ -1258,10 +1258,11 @@ sequence::move_selected_notes( long a_delta_tick, int a_delta_note )
                     timestamp = m_length + timestamp;
                 }
 
-                if ((timestamp==0) && !noteon)  // trim if equal
-                {
-                    timestamp = m_length-2;
-                }
+                // This doesn't seem rigtht 
+                // if ((timestamp==0) && !noteon)  // trim if equal
+                // {
+                //     timestamp = m_length-2;
+                // }
 
                 if ((timestamp==m_length) && noteon)    // wrap note ON to beginning
                 {
