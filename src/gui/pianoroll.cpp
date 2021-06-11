@@ -458,7 +458,7 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
             {
                 /* add note, length = little less than snap */
                 m_sequence->push_undo();
-                m_sequence->add_note(tick_s, m_note_length - 1, note_h, true);
+                m_sequence->add_note(tick_s, m_note_length - c_note_off_margin, note_h, true);
             }
         }
         else
@@ -575,7 +575,7 @@ PianoRoll::on_motion_notify_event(GdkEventMotion* event)
         if (snap) snap_x(&m_current_x);
         convert_xy(m_current_x, m_current_y, &tick, &note);
 
-        m_sequence->add_note(tick, m_note_length - 2, note, true);
+        m_sequence->add_note(tick, m_note_length - c_note_off_margin, note, true);
         return true;
     }
 

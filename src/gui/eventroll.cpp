@@ -229,7 +229,7 @@ EventRoll::convert_t(long a_ticks, int *a_x)
 void
 EventRoll::snap_y(int *a_y)
 {
-    *a_y = *a_y - (*a_y % c_key_y);
+    *a_y = *a_y - (*a_y % c_key_height);
 }
 
 /* performs a 'snap' on x */

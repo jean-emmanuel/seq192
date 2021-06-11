@@ -2911,6 +2911,9 @@ sequence::multiply_pattern( float a_multiplier )
 void
 sequence::reverse_pattern()
 {
+
+    push_undo();
+    
     lock();
     event e1,e2;
 

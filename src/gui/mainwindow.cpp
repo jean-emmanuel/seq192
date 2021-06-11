@@ -199,11 +199,12 @@ MainWindow::MainWindow(perform * p)
         for (int j = 0; j < c_mainwnd_cols; j++) {
             int n = i + j * c_mainwnd_rows;
             m_sequences[n] = new SequenceButton(m_perform, this, n);
+            m_sequences[n]->set_size_request(100,60);
             m_sequences[n]->set_can_focus(false);
             m_sequence_grid.attach(*m_sequences[n], j, i);
         }
     }
-    m_sequence_grid.set_size_request(c_mainwid_x, c_mainwid_y);
+    // m_sequence_grid.set_size_request(c_mainwid_x, c_mainwid_y);
     m_sequence_grid.set_column_homogeneous(true);
     m_sequence_grid.set_row_homogeneous(true);
     m_sequence_grid.set_column_spacing(c_grid_spacing);

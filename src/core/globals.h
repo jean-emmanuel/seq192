@@ -50,62 +50,11 @@ const double c_bpm_maximum               = 600.0;
 
 const int c_maxBuses = 32;
 
-const int c_note_off_margin = 2;  // # ticks to shave off end of painted notes
-
-/* for the seqarea class */
-const int c_text_x = 6;
-const int c_text_y = 12;
-const int c_seqarea_x = c_text_x * 15;
-const int c_seqarea_y =  c_text_y * 5;
-
-const int c_mainwid_border = 0;
-const int c_mainwid_spacing = 2;
-
-const int c_control_height = 0;
-
-
-const int c_mainwid_x = ((c_seqarea_x + c_mainwid_spacing )
-			 * c_mainwnd_cols - c_mainwid_spacing
-			 +  c_mainwid_border * 2 );
-const int c_mainwid_y = ((c_seqarea_y  + c_mainwid_spacing )
-			 * c_mainwnd_rows
-			 +  c_mainwid_border * 2
-			 +  c_control_height );
-
-
-
-/* data entry area (velocity, aftertouch, etc ) */
-const int c_dataarea_y = 128;
-/* width of 'bar' */
-const int c_data_x = 2;
-/* size of handle */
-const int c_data_handle_x = 8;
-const int c_data_handle_y = 4;
-
-/* keyboard */
-const float c_key_size_factor = 1.5;
-const int c_key_x = 16 * c_key_size_factor;
-const int c_key_y = 8 * c_key_size_factor;
-const int c_num_keys = 128;
-const int c_keyarea_y = c_key_y * c_num_keys + 1;
-const int c_keyarea_x = 36 * c_key_size_factor;
-const int c_keyoffset_x = c_keyarea_x - c_key_x;
-
-
-/* paino roll */
-const int c_rollarea_y = c_keyarea_y;
-
-/* events bar */
-const int c_eventarea_y = 16;
-const int c_eventevent_y = 10;
-const int c_eventevent_x = 5;
-
-/* time scale window on top */
-const int c_timearea_y = 18;
-
 /* sequences */
+const int c_note_off_margin = 1;  // # ticks to shave off end of painted notes
+const int c_num_keys = 128;
 const int c_midi_notes = 256;
-const std::string c_dummy( "Untitled" );
+const string c_dummy( "Untitled" );
 
 /* maximum size of sequence, default size */
 const int c_maxbeats     = 0xFFFF;   /* max number of beats in a sequence */
@@ -144,9 +93,9 @@ struct user_midi_bus_definition
 
 struct user_instrument_definition
 {
-    std::string instrument;
+    string instrument;
     bool controllers_active[128];
-    std::string controllers[128];
+    string controllers[128];
 };
 
 extern user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];
