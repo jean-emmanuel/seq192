@@ -441,6 +441,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     create_event_menu();
 
     signal_key_press_event().connect(mem_fun(*this, &EditWindow::on_key_press), false);
+    signal_key_release_event().connect(mem_fun(*this, &EditWindow::on_key_release), false);
 
     // timer callback (50 fps)
     Glib::signal_timeout().connect(mem_fun(*this, &EditWindow::timer_callback), 20);
@@ -504,10 +505,28 @@ EditWindow::on_key_press(GdkEventKey* event)
         case GDK_KEY_Delete:
             menu_callback(EDIT_MENU_DELETE);
             return true;
+        case GDK_KEY_Alt_L:
+            m_pianoroll.set_snap_bypass(true);
+            m_eventroll.set_snap_bypass(true);
         default:
             return false;
     }
 
+
+    return false;
+}
+
+
+bool
+EditWindow::on_key_release(GdkEventKey* event)
+{
+    switch (event->keyval) {
+        case GDK_KEY_Alt_L:
+            m_pianoroll.set_snap_bypass(false);
+            m_eventroll.set_snap_bypass(false);
+        default:
+            return false;
+    }
 
     return false;
 }

@@ -28,6 +28,7 @@ PianoRoll::PianoRoll(perform * p, sequence * seq, PianoKeys * pianokeys)
     m_zoom = c_default_zoom;
     m_snap = 192;
     m_snap_active = true;
+    m_snap_bypass = false;
     m_note_length = 192;
 
     m_adding = false;
@@ -49,7 +50,6 @@ PianoRoll::PianoRoll(perform * p, sequence * seq, PianoKeys * pianokeys)
                 Gdk::LEAVE_NOTIFY_MASK |
                 Gdk::SCROLL_MASK
     );
-
 
 }
 
@@ -271,6 +271,24 @@ PianoRoll::set_snap(int snap)
 }
 
 void
+PianoRoll::set_snap_bypass(bool bypass)
+{
+    m_snap_bypass = bypass;
+    m_current_x = m_last_x;
+    if (m_moving || m_paste){
+        snap_x(&m_current_x);
+    }
+    if (m_growing) {
+        int delta_x = m_current_x - m_drop_x;
+        int x1 = m_selected.x + m_selected.width + delta_x;
+        int x2 = x1;
+        snap_x(&x1);
+        m_current_x -= (x2 - x1);
+        m_current_x -= 1;
+    }
+}
+
+void
 PianoRoll::set_note_length(int note_length)
 {
     m_note_length = note_length;
@@ -349,7 +367,7 @@ PianoRoll::snap_x(int *x)
     //snap = number pulses to snap to
     //m_zoom = number of pulses per pixel
     //so snap / m_zoom  = number pixels to snap to
-    int snap = m_snap_active ? m_snap : c_disabled_snap;
+    int snap = m_snap_active && !m_snap_bypass ? m_snap : c_disabled_snap;
     int mod = (snap / m_zoom);
     if (mod <= 0) mod = 1;
     *x = *x - (*x % mod);
@@ -409,7 +427,6 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
 
     signal_focus.emit((string)"pianoroll");
 
-    bool snap = !(event->state & GDK_MOD1_MASK);
     int numsel;
     long tick_s;
     long tick_f;
@@ -420,7 +437,7 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
     snapped_x = norm_x = (int) (event->x + m_hscroll / m_zoom) - 1;
     snapped_y = norm_y = (int) event->y;
 
-    if (snap) snap_x( &snapped_x );
+    snap_x( &snapped_x );
     snap_y( &snapped_y );
 
     m_current_y = m_drop_y = snapped_y;
@@ -449,7 +466,7 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
             m_painting = true;
 
             /* adding, snapped x */
-            if (snap) m_current_x = m_drop_x = snapped_x;
+            m_current_x = m_drop_x = snapped_x;
             convert_xy(m_drop_x, m_drop_y, &tick_s, &note_h);
 
             // test if a note is already there
@@ -498,7 +515,7 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
                     m_move_snap_offset_x = m_selected.x - adjusted_selected_x;
 
                     /* align selection for drawing */
-                    if (snap) snap_x(&m_selected.x);
+                    snap_x(&m_selected.x);
 
                     m_current_x = m_drop_x = snapped_x;
                 }
@@ -533,10 +550,9 @@ bool
 PianoRoll::on_motion_notify_event(GdkEventMotion* event)
 {
 
-    m_current_x = (int) (event->x + m_hscroll / m_zoom) - 1;
+    m_current_x = m_last_x = (int) (event->x + m_hscroll / m_zoom) - 1;
     m_current_y = (int) event->y;
 
-    bool snap = !(event->state & GDK_MOD1_MASK);
     int note;
     long tick;
 
@@ -554,10 +570,10 @@ PianoRoll::on_motion_notify_event(GdkEventMotion* event)
     if (m_selecting || m_moving || m_growing || m_paste){
 
         if (m_moving || m_paste){
-            if (snap) snap_x(&m_current_x);
+            snap_x(&m_current_x);
         }
 
-        if (m_growing && snap) {
+        if (m_growing) {
             int delta_x = m_current_x - m_drop_x;
             int x1 = m_selected.x + m_selected.width + delta_x;
             int x2 = x1;
@@ -572,7 +588,7 @@ PianoRoll::on_motion_notify_event(GdkEventMotion* event)
 
     if (m_painting)
     {
-        if (snap) snap_x(&m_current_x);
+        snap_x(&m_current_x);
         convert_xy(m_current_x, m_current_y, &tick, &note);
 
         m_sequence->add_note(tick, m_note_length - c_note_off_margin, note, true);
@@ -595,7 +611,6 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
         set_adding(false);
     }
 
-    bool snap = !(event->state & GDK_MOD1_MASK);
     long tick_s;
     long tick_f;
     int note_h;
@@ -607,7 +622,7 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
 
     snap_y (&m_current_y);
 
-    if (snap && m_moving) snap_x(&m_current_x);
+    if (m_moving) snap_x(&m_current_x);
 
     int delta_x = m_current_x - m_drop_x;
     int delta_y = m_current_y - m_drop_y;
@@ -631,7 +646,7 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
         if (m_moving)
         {
             /* adjust for snap */
-            if (snap) delta_x -= m_move_snap_offset_x;
+            delta_x -= m_move_snap_offset_x;
 
             /* convert deltas into screen corridinates */
             convert_xy(delta_x, delta_y, &delta_tick, &delta_note);
@@ -650,13 +665,11 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
 
         if (m_growing){
 
-            if (snap) {
-                int x1 = m_selected.x + m_selected.width + delta_x;
-                int x2 = x1;
-                snap_x(&x1);
-                delta_x -= (x2 - x1);
-                delta_x -= 1;
-            }
+            int x1 = m_selected.x + m_selected.width + delta_x;
+            int x2 = x1;
+            snap_x(&x1);
+            delta_x -= (x2 - x1);
+            delta_x -= 1;
 
             /* convert deltas into screen corridinates */
             convert_xy(delta_x, delta_y, &delta_tick, &delta_note);

@@ -214,6 +214,7 @@ class EditWindow : public Window {
         void clear_focus();
 
         bool on_key_press(GdkEventKey* event);
+        bool on_key_release(GdkEventKey* event);
         bool on_delete_event(GdkEventAny *event);
 
 

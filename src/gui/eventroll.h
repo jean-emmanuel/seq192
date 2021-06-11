@@ -58,7 +58,7 @@ class EventRoll : public DrawingArea {
         int                 m_zoom;
         int                 m_snap;
         bool                m_snap_active;
-        void set_snap_active(bool a){m_snap_active = a;};
+        bool                m_snap_bypass;
 
         /* what is the data window currently editing ? */
         unsigned char m_status;
@@ -89,9 +89,12 @@ class EventRoll : public DrawingArea {
         int m_move_delta_y;
         int m_current_x;
         int m_current_y;
+        int m_last_x;
 
         void set_zoom(int zoom);
         void set_snap(int snap);
+        void set_snap_active(bool a){m_snap_active = a;};
+        void set_snap_bypass(bool bypass);
 
         void set_adding(bool adding);
 

@@ -62,7 +62,7 @@ class PianoRoll : public DrawingArea {
         int                 m_note_length;
         int                 m_snap;
         bool                m_snap_active;
-        void set_snap_active(bool a){m_snap_active = a;};
+        bool                m_snap_bypass;
 
 
         // edit mode (right click pressed)
@@ -90,11 +90,14 @@ class PianoRoll : public DrawingArea {
         int m_move_delta_y;
         int m_current_x;
         int m_current_y;
+        int m_last_x;
 
         int  get_zoom() {return m_zoom;};
         void set_zoom(int zoom);
         int  get_snap() {return m_snap;};
         void set_snap(int snap);
+        void set_snap_active(bool a){m_snap_active = a;};
+        void set_snap_bypass(bool bypass);
         int get_note_length() {return m_note_length;};
         void set_note_length(int note_length);
         void set_adding(bool adding);
@@ -106,20 +109,13 @@ class PianoRoll : public DrawingArea {
         void convert_tn( long a_ticks, int a_note, int *x, int *y);
 
         // apply y snap
-        void snap_y( int *y );
+        void snap_y(int *y);
         // apply x snap
-        void snap_x( int *x );
+        void snap_x(int *x);
 
-        void xy_to_rect( int x1,  int y1,
-                         int x2,  int y2,
-                         int *x,  int *y,
-                         int *w,  int *h );
+        void xy_to_rect(int x1,  int y1, int x2,  int y2, int *x,  int *y, int *w,  int *h );
 
-        void convert_tn_box_to_rect( long tick_s, long tick_f,
-                                     int note_h, int note_l,
-                                     int *x, int *y,
-                                     int *w, int *h );
-
+        void convert_tn_box_to_rect(long tick_s, long tick_f, int note_h, int note_l, int *x, int *y, int *w, int *h );
 
         bool on_motion_notify_event(GdkEventMotion* event);
         bool on_leave_notify_event(GdkEventCrossing* event);
