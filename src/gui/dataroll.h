@@ -33,6 +33,7 @@ class DataRoll : public DrawingArea {
         sigc::signal<bool(GdkEventScroll*)> signal_scroll;
 
         void set_data_type(unsigned char a_status, unsigned char a_control);
+        void queue_draw_background();
 
 
     protected:
@@ -46,6 +47,7 @@ class DataRoll : public DrawingArea {
         sequence           *m_sequence;
 
         Cairo::RefPtr<Cairo::ImageSurface> m_surface;
+        bool                m_draw_background_queued;
         void draw_background();
 
         // hscroll

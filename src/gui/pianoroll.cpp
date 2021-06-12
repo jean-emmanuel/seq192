@@ -42,13 +42,15 @@ PianoRoll::PianoRoll(perform * p, sequence * seq, PianoKeys * pianokeys)
     m_is_drag_pasting_start = false;
     m_justselected_one = false;
 
+    m_draw_background_queued = false;
+
     Gtk::Allocation allocation = get_allocation();
     m_surface = Cairo::ImageSurface::create(
         Cairo::Format::FORMAT_ARGB32,
         allocation.get_width(),
         allocation.get_height()
     );
-    draw_background();
+    queue_draw_background();
 
     add_events( Gdk::POINTER_MOTION_MASK |
                 Gdk::BUTTON_PRESS_MASK |
@@ -65,10 +67,18 @@ PianoRoll::~PianoRoll()
 {
 }
 
+void
+PianoRoll::queue_draw_background()
+{
+    m_draw_background_queued = true;
+}
 
 void
 PianoRoll::draw_background()
 {
+
+    m_draw_background_queued = false;
+
     Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
     Gtk::Allocation allocation = get_allocation();
     const int width = allocation.get_width();
@@ -212,8 +222,10 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             allocation.get_width(),
             allocation.get_height()
         );
-        draw_background();
+        queue_draw_background();
     }
+
+    if (m_draw_background_queued) draw_background();
 
     // draw background
     cr->set_source(m_surface, 0.0, 0.0);
@@ -302,7 +314,7 @@ PianoRoll::set_zoom(int zoom)
     else if (zoom > c_max_zoom) zoom = c_max_zoom;
     if (zoom != m_zoom) {
         m_zoom = zoom;
-        draw_background();
+        queue_draw_background();
     }
 }
 
@@ -763,6 +775,6 @@ void
 PianoRoll::set_hscroll(int s) {
     if (s != m_hscroll) {
         m_hscroll = s;
-        draw_background();
+        queue_draw_background();
     }
 }

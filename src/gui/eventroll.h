@@ -36,12 +36,12 @@ class EventRoll : public DrawingArea {
         sigc::signal<void(string name)> signal_focus;
 
         void set_data_type(unsigned char a_status, unsigned char a_control);
+        void queue_draw_background();
 
 
     protected:
 
         bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
-        void draw_background();
 
     private:
 
@@ -49,6 +49,8 @@ class EventRoll : public DrawingArea {
         sequence           *m_sequence;
 
         Cairo::RefPtr<Cairo::ImageSurface> m_surface;
+        bool                m_draw_background_queued;
+        void draw_background();
 
         // hscroll
         int                 m_hscroll;

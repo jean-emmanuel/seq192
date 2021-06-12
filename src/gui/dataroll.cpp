@@ -32,13 +32,15 @@ DataRoll::DataRoll(perform * p, sequence * seq)
 
     m_status = EVENT_NOTE_ON;
 
+    m_draw_background_queued = false;
+
     Gtk::Allocation allocation = get_allocation();
     m_surface = Cairo::ImageSurface::create(
         Cairo::Format::FORMAT_ARGB32,
         allocation.get_width(),
         allocation.get_height()
     );
-    draw_background();
+    queue_draw_background();
 
     add_events(Gdk::BUTTON_PRESS_MASK |
 		       Gdk::BUTTON_RELEASE_MASK |
@@ -52,10 +54,18 @@ DataRoll::~DataRoll()
 {
 }
 
+void
+DataRoll::queue_draw_background()
+{
+    m_draw_background_queued = true;
+}
 
 void
 DataRoll::draw_background()
 {
+
+    m_draw_background_queued = false;
+
     Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
     Gtk::Allocation allocation = get_allocation();
     const int width = allocation.get_width();
@@ -188,8 +198,10 @@ DataRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             allocation.get_width(),
             allocation.get_height()
         );
-        draw_background();
+        queue_draw_background();
     }
+
+    if (m_draw_background_queued) draw_background();
 
     // draw background
     cr->set_source(m_surface, 0.0, 0.0);
@@ -227,7 +239,7 @@ DataRoll::set_zoom(int zoom)
     if (zoom < c_min_zoom) zoom = c_min_zoom;
     else if (zoom > c_max_zoom) zoom = c_max_zoom;
     m_zoom = zoom;
-    draw_background();
+    queue_draw_background();
 }
 
 /* takes screen corrdinates, give us notes and ticks */
@@ -298,7 +310,7 @@ DataRoll::on_motion_notify_event(GdkEventMotion* event)
         if (m_current_y > 127 ) m_current_y = 127;
 
         m_sequence->adjust_data_handle(m_status, 127 - m_current_y);
-        draw_background();
+        queue_draw_background();
     }
 
     if (m_dragging)
@@ -330,7 +342,7 @@ DataRoll::on_motion_notify_event(GdkEventMotion* event)
         convert_x(adj_x_max, &tick_f);
 
         m_sequence->change_event_data_range(tick_s, tick_f, m_status, m_cc, 127 - adj_y_min, 127 - adj_y_max );
-        draw_background();
+        queue_draw_background();
     }
 
     return false;
@@ -400,7 +412,7 @@ void
 DataRoll::set_hscroll(int s) {
     if (s != m_hscroll) {
         m_hscroll = s;
-        draw_background();
+        queue_draw_background();
     }
 }
 
@@ -409,5 +421,5 @@ DataRoll::set_data_type(unsigned char status, unsigned char control = 0)
 {
     m_status = status;
     m_cc = control;
-    draw_background();
+    queue_draw_background();
 }
