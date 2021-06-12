@@ -34,9 +34,6 @@ SequenceButton::SequenceButton(perform * p, MainWindow * m, int seqpos)
         allocation.get_height()
     );
 
-    // draw callback
-    signal_draw().connect(sigc::mem_fun(*this, &SequenceButton::on_draw));
-
     add_events( Gdk::BUTTON_PRESS_MASK |
         Gdk::BUTTON_RELEASE_MASK |
         Gdk::ENTER_NOTIFY_MASK |
