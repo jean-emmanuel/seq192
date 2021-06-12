@@ -43,6 +43,14 @@ options:
 
 ```
 
+## Jack transport
+
+When `--jack-transport`, seq192 will
+- follow start / stop commands from other clients
+- send start / stop commands to other clients
+- use the transport master's bpm
+- **not** attempt to reposition within a sequence
+
 
 ## OSC commands
 
