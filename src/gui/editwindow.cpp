@@ -456,13 +456,14 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_pianoroll.signal_focus.connect(mem_fun(*this, &EditWindow::focus_callback));
     m_eventroll.signal_focus.connect(mem_fun(*this, &EditWindow::focus_callback));
 
+    signal_size_allocate().connect([&](Gdk::Rectangle){update_hscrollbar_visibility();});
+
     // add_events(Gdk::SCROLL_MASK);
 
     clear_focus();
     set_position(Gtk::WIN_POS_CENTER);
     resize(1024, 600);
     show_all();
-
 
 }
 
@@ -716,7 +717,9 @@ EditWindow::scroll_callback(GdkEventScroll* event)
             m_eventroll.set_zoom(zoom / 2);
             m_pianoroll.set_zoom(zoom / 2);
             m_dataroll.set_zoom(zoom / 2);
+
         }
+        update_hscrollbar_visibility();
         return true;
     }
     else if ((event->state & modifiers) == GDK_SHIFT_MASK)
@@ -984,4 +987,12 @@ EditWindow::set_data_type(unsigned char status, unsigned char control)
     }
 
     m_event_dropdown.set_label(label);
+}
+
+
+void
+EditWindow::update_hscrollbar_visibility() {
+    auto adj = m_hscrollbar.get_adjustment();
+    if (m_pianoroll.get_width() * m_pianoroll.get_zoom() >= adj->get_upper()) m_hscrollbar.get_style_context()->remove_class("show");
+    else m_hscrollbar.get_style_context()->add_class("show");
 }

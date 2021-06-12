@@ -134,7 +134,8 @@ combobox {min-width: 0;}\
 .recording {background: rgba(255, 0, 0, 0.5); box-shadow: inset 0 0 0 2px " + c_color_foreground.to_string() + "; border-radius: 5px}\
 selection {background: " + c_color_primary.to_string() + "; color: " + c_color_text_hilight.to_string() + "}\
 .editwindow-vscrollbar {padding-top: 2px; padding-bottom: 2px}\
-.editwindow-hscrollbar {padding-top: 2px}\
+.editwindow-hscrollbar {padding-top: 2px; opacity: 0; transition: none}\
+.editwindow-hscrollbar.show {opacity: 1;}\
 .editwindow-eventbutton {font-size: " + to_string(c_key_fontsize) + "pt; font-weight: bold; box-shadow: none; padding-right: " + to_string(c_key_padding) + "px; min-height: 0; border-top: 1px solid " + c_color_background.to_string() + "; border-right: 1px solid " + c_color_background.to_string() + "}\
 window check {background:transparent; -gtk-icon-source: none; border: 1px solid " + c_color_text.to_string() + "; background-clip: content-box; min-height: 12px;  min-width: 12px;}\
 window check:hover {border-color: " + c_color_text_hilight.to_string() + "}\

@@ -211,6 +211,8 @@ class EditWindow : public Window {
         bool scroll_callback(GdkEventScroll* event);
         void focus_callback(string name);
 
+        void update_hscrollbar_visibility();
+
         void clear_focus();
 
         bool on_key_press(GdkEventKey* event);
