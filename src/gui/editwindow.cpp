@@ -670,11 +670,11 @@ EditWindow::timer_callback()
 
     auto adj = m_hscrollbar.get_adjustment();
     adj->set_lower(0);
-    adj->set_upper(m_sequence->get_length() + 192);
+    adj->set_upper(m_sequence->get_length() + c_ppqn);
     adj->set_page_size(m_pianoroll.get_width() * m_pianoroll.get_zoom());
     adj->set_step_increment(c_ppqn / 4 * m_pianoroll.get_zoom());
     adj->set_page_increment(c_ppqn * m_sequence->get_bpm() * 4.0 / m_sequence->get_bw() * m_pianoroll.get_zoom());
-    if (adj->get_value() > adj->get_upper()) adj->set_value(adj->get_upper());
+    if (adj->get_value() + m_pianoroll.get_width() * m_pianoroll.get_zoom() > adj->get_upper()) adj->set_value(adj->get_upper());
 
     m_timeroll.set_hscroll(adj->get_value());
     m_eventroll.set_hscroll(adj->get_value());
