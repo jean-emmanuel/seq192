@@ -355,6 +355,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
         m_pianoroll.set_snap(ticks);
         m_pianoroll.queue_draw_background();
         m_eventroll.set_snap(ticks);
+        m_eventroll.queue_draw_background();
     });
     m_toolbar_length.signal_changed().connect([&]{
         int ticks = divs_to_ticks[m_toolbar_length.get_active_text()];
