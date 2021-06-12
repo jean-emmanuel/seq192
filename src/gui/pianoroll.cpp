@@ -26,10 +26,10 @@ PianoRoll::PianoRoll(perform * p, sequence * seq, PianoKeys * pianokeys)
 
     m_hscroll = 0;
     m_zoom = c_default_zoom;
-    m_snap = 192;
+    m_snap = c_default_snap;
     m_snap_active = true;
     m_snap_bypass = false;
-    m_note_length = 192;
+    m_note_length = c_default_snap;
 
     m_adding = false;
     m_selecting = false;
