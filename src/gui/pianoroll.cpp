@@ -204,7 +204,6 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     Gtk::Allocation allocation = get_allocation();
     const int width = allocation.get_width();
     const int height = allocation.get_height();
-    bool newsurface = false;
 
     // resize handler
     if (width != m_surface->get_width() || height != m_surface->get_height()){
@@ -213,11 +212,6 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             allocation.get_width(),
             allocation.get_height()
         );
-        newsurface = true;
-        draw_background();
-    }
-
-    if (!newsurface && m_sequence->is_dirty_edit()) {
         draw_background();
     }
 

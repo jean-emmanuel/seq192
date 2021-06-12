@@ -32,8 +32,13 @@ DataRoll::DataRoll(perform * p, sequence * seq)
 
     m_status = EVENT_NOTE_ON;
 
-    // draw callback
-    signal_draw().connect(sigc::mem_fun(*this, &DataRoll::on_draw));
+    Gtk::Allocation allocation = get_allocation();
+    m_surface = Cairo::ImageSurface::create(
+        Cairo::Format::FORMAT_ARGB32,
+        allocation.get_width(),
+        allocation.get_height()
+    );
+    draw_background();
 
     add_events(Gdk::BUTTON_PRESS_MASK |
 		       Gdk::BUTTON_RELEASE_MASK |
@@ -48,12 +53,18 @@ DataRoll::~DataRoll()
 }
 
 
-bool
-DataRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+void
+DataRoll::draw_background()
 {
+    Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
     Gtk::Allocation allocation = get_allocation();
     const int width = allocation.get_width();
     const int height = allocation.get_height();
+
+    cr->set_operator(Cairo::OPERATOR_CLEAR);
+    cr->rectangle(-1, -1, width + 2, height + 2);
+    cr->paint_with_alpha(1.0);
+    cr->set_operator(Cairo::OPERATOR_OVER);
 
     Pango::FontDescription font;
     int text_width;
@@ -161,6 +172,29 @@ DataRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         goto SECOND_PASS_NOTE_ON; // this is NOT spaghetti code... it's very clear what is going on!!!
     }
 
+}
+
+bool
+DataRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+{
+    Gtk::Allocation allocation = get_allocation();
+    const int width = allocation.get_width();
+    const int height = allocation.get_height();
+
+    // resize handler
+    if (width != m_surface->get_width() || height != m_surface->get_height()){
+        m_surface = Cairo::ImageSurface::create(
+            Cairo::Format::FORMAT_ARGB32,
+            allocation.get_width(),
+            allocation.get_height()
+        );
+        draw_background();
+    }
+
+    // draw background
+    cr->set_source(m_surface, 0.0, 0.0);
+    cr->paint();
+
     cr->set_source_rgba(c_color_event.r, c_color_event.g, c_color_event.b, c_alpha_bottom_line);
     cr->set_line_width(1.0);
     cr->move_to(0, c_data_y1 + 0.5);
@@ -193,7 +227,7 @@ DataRoll::set_zoom(int zoom)
     if (zoom < c_min_zoom) zoom = c_min_zoom;
     else if (zoom > c_max_zoom) zoom = c_max_zoom;
     m_zoom = zoom;
-    queue_draw();
+    draw_background();
 }
 
 /* takes screen corrdinates, give us notes and ticks */
@@ -264,6 +298,7 @@ DataRoll::on_motion_notify_event(GdkEventMotion* event)
         if (m_current_y > 127 ) m_current_y = 127;
 
         m_sequence->adjust_data_handle(m_status, 127 - m_current_y);
+        draw_background();
     }
 
     if (m_dragging)
@@ -295,7 +330,7 @@ DataRoll::on_motion_notify_event(GdkEventMotion* event)
         convert_x(adj_x_max, &tick_f);
 
         m_sequence->change_event_data_range(tick_s, tick_f, m_status, m_cc, 127 - adj_y_min, 127 - adj_y_max );
-
+        draw_background();
     }
 
     return false;
@@ -361,6 +396,13 @@ DataRoll::on_scroll_event(GdkEventScroll* event)
     return false;
 }
 
+void
+DataRoll::set_hscroll(int s) {
+    if (s != m_hscroll) {
+        m_hscroll = s;
+        draw_background();
+    }
+}
 
 void
 DataRoll::set_data_type(unsigned char status, unsigned char control = 0)
