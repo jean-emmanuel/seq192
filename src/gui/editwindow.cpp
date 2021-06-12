@@ -247,6 +247,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar.set_spacing(c_toolbar_spacing);
 
     m_toolbar_name.set_name("seqname");
+    m_toolbar_name.set_tooltip_text("Sequence name");
     m_toolbar_name.set_width_chars(16);
     m_toolbar_name.set_alignment(0);
     m_toolbar_name.signal_activate().connect([&]{clear_focus();});
@@ -259,6 +260,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar.pack_start(m_toolbar_name, false, false);
 
     m_toolbar_bpm.set_name("bpm");
+    m_toolbar_bpm.set_tooltip_text("Beats per measure");
     m_toolbar_bpm.set_alignment(0.5);
     m_toolbar_bpm.set_width_chars(2);
     m_toolbar_bpm.signal_activate().connect([&]{clear_focus();});
@@ -279,6 +281,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar.pack_start(m_toolbar_slash, false, false);
 
     m_toolbar_bw.set_name("bw");
+    m_toolbar_bw.set_tooltip_text("Beat unit");
     m_toolbar_bw.set_alignment(0.5);
     m_toolbar_bw.set_width_chars(2);
     m_toolbar_bw.signal_activate().connect([&]{clear_focus();});
@@ -299,6 +302,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar.pack_start(m_toolbar_times, false, false);
 
     m_toolbar_measures.set_name("measures");
+    m_toolbar_measures.set_tooltip_text("Number of measures");
     m_toolbar_measures.set_alignment(0.5);
     m_toolbar_measures.set_width_chars(2);
     m_toolbar_measures.signal_activate().connect([&]{clear_focus();});
@@ -318,6 +322,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
 
 
     m_toolbar_snap_active.set_label("Snap");
+    m_toolbar_snap_active.set_tooltip_text("Snap to grid");
     m_toolbar_snap_active.get_style_context()->add_class("nomargin");
     m_toolbar_snap_active.get_style_context()->add_class("togglebutton");
     m_toolbar_snap_active.set_focus_on_click(false);
@@ -330,7 +335,9 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar_length_label.set_label("Note");
     m_toolbar_length_label.set_sensitive(false);
     m_toolbar_length_label.get_style_context()->add_class("nomargin");
+    m_toolbar_snap.set_tooltip_text("Grid size");
     m_toolbar_snap.append("1");
+    m_toolbar_length.set_tooltip_text("Note size");
     m_toolbar_length.append("1");
     char s[13];
     for (int i = 1; i < 8; i++) {
@@ -457,6 +464,11 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_eventroll.signal_focus.connect(mem_fun(*this, &EditWindow::focus_callback));
 
     signal_size_allocate().connect([&](Gdk::Rectangle){update_hscrollbar_visibility();});
+    signal_focus_out_event().connect([&](GdkEventFocus *e)->bool{on_focus_out();return false;});
+    m_submenu_edit.signal_popped_up().connect([&](const Gdk::Rectangle*, const Gdk::Rectangle*, bool, bool){on_focus_out();});
+    m_submenu_transport.signal_popped_up().connect([&](const Gdk::Rectangle*, const Gdk::Rectangle*, bool, bool){on_focus_out();});
+    m_submenu_record.signal_popped_up().connect([&](const Gdk::Rectangle*, const Gdk::Rectangle*, bool, bool){on_focus_out();});
+
 
     // add_events(Gdk::SCROLL_MASK);
 
@@ -511,6 +523,7 @@ EditWindow::on_key_press(GdkEventKey* event)
         case GDK_KEY_Alt_L:
             m_pianoroll.set_snap_bypass(true);
             m_eventroll.set_snap_bypass(true);
+            m_toolbar_snap_active.get_style_context()->add_class("bypass");
         default:
             return false;
     }
@@ -527,11 +540,20 @@ EditWindow::on_key_release(GdkEventKey* event)
         case GDK_KEY_Alt_L:
             m_pianoroll.set_snap_bypass(false);
             m_eventroll.set_snap_bypass(false);
+            m_toolbar_snap_active.get_style_context()->remove_class("bypass");
         default:
             return false;
     }
 
     return false;
+}
+
+void
+EditWindow::on_focus_out()
+{
+    m_pianoroll.set_snap_bypass(false);
+    m_eventroll.set_snap_bypass(false);
+    m_toolbar_snap_active.get_style_context()->remove_class("bypass");
 }
 
 

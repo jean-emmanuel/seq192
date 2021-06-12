@@ -125,6 +125,7 @@ MainWindow::MainWindow(perform * p)
     m_toolbar_panic.set_size_request(36, 0);
     m_toolbar_panic.set_can_focus(false);
     m_toolbar_panic.set_label("◭");
+    m_toolbar_panic.set_tooltip_text("Disable all sequences");
     m_toolbar_panic.get_style_context()->add_class("panic");
     m_toolbar_panic.signal_clicked().connect([&]{m_perform->panic();clear_focus();});
     m_toolbar.pack_start(m_toolbar_panic, false, false);
@@ -132,6 +133,7 @@ MainWindow::MainWindow(perform * p)
     m_toolbar_stop.set_size_request(36, 0);
     m_toolbar_stop.set_can_focus(false);
     m_toolbar_stop.set_label("◼");
+    m_toolbar_stop.set_tooltip_text("Stop transport");
     m_toolbar_stop.get_style_context()->add_class("stop");
     m_toolbar_stop.signal_clicked().connect([&]{
         m_perform->stop_playing();
@@ -142,6 +144,7 @@ MainWindow::MainWindow(perform * p)
     m_toolbar_play.set_size_request(36, 0);
     m_toolbar_play.set_can_focus(false);
     m_toolbar_play.set_label("▶");
+    m_toolbar_play.set_tooltip_text("Start transport");
     m_toolbar_play.get_style_context()->add_class("play");
     m_toolbar_play.signal_clicked().connect([&]{
         m_perform->start_playing();
@@ -151,6 +154,7 @@ MainWindow::MainWindow(perform * p)
 
     m_toolbar_bpm_adj = Gtk::Adjustment::create(m_perform->get_bpm(), c_bpm_minimum, c_bpm_maximum, 1, 10, 1);
     m_toolbar_bpm.set_name("bpm");
+    m_toolbar_bpm.set_tooltip_text("Beats per minute");
     m_toolbar_bpm.set_width_chars(6);
     m_toolbar_bpm.set_digits(2);
     m_toolbar_bpm.set_numeric(true);
@@ -163,6 +167,7 @@ MainWindow::MainWindow(perform * p)
     m_toolbar.pack_start(m_toolbar_bpm, false, false);
 
     m_toolbar_sset_name.set_name("sset_name");
+    m_toolbar_sset_name.set_tooltip_text("Screen set name");
     m_toolbar_sset_name.set_alignment(0.5);
     m_toolbar_sset_name.signal_activate().connect([&]{clear_focus();});
     m_toolbar_sset_name.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
@@ -174,6 +179,7 @@ MainWindow::MainWindow(perform * p)
 
     m_toolbar_sset_adj = Gtk::Adjustment::create(0, 0, c_max_sets, 1, 1, 1);
     m_toolbar_sset.set_name("sset");
+    m_toolbar_sset.set_tooltip_text("Screen set number");
     m_toolbar_sset.set_width_chars(2);
     m_toolbar_sset.set_numeric(true);
     m_toolbar_sset.set_alignment(0.5);

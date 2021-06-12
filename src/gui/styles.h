@@ -121,6 +121,7 @@ window button {background: " + c_color_raised.to_string() + "; box-shadow: 0 0 0
 window button:hover {opacity: 0.8}\
 window button:active {opacity: 0.6}\
 .togglebutton:checked, window button.on {color: " + c_color_primary.to_string() + ";}\
+.togglebutton.bypass:checked, window button.on.bypass {color: " + c_color_text.to_string() + ";}\
 window entry {background: rgba(0, 0, 0, 0.15); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); color: inherit}\
 window entry:focus {background: rgba(0, 0, 0, 0.2);}\
 window spinbutton entry {box-shadow: none}\
