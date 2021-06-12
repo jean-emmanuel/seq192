@@ -409,4 +409,5 @@ DataRoll::set_data_type(unsigned char status, unsigned char control = 0)
 {
     m_status = status;
     m_cc = control;
+    draw_background();
 }

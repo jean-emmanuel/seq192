@@ -41,7 +41,7 @@ class EventRoll : public DrawingArea {
     protected:
 
         bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
-
+        void draw_background();
 
     private:
 
@@ -52,7 +52,7 @@ class EventRoll : public DrawingArea {
 
         // hscroll
         int                 m_hscroll;
-        void set_hscroll(int s){m_hscroll = s;};
+        void set_hscroll(int s);
 
         // zoom: ticks per pixel
         int                 m_zoom;

@@ -683,8 +683,9 @@ EditWindow::timer_callback()
     m_dataroll.set_hscroll(adj->get_value());
 
     if (m_sequence->is_dirty_edit()) {
-        m_dataroll.draw_background();
         m_pianoroll.draw_background();
+        m_eventroll.draw_background();
+        m_dataroll.draw_background();
     }
 
     m_timeroll.queue_draw();

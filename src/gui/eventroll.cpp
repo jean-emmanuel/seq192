@@ -43,6 +43,14 @@ EventRoll::EventRoll(perform * p, sequence * seq)
     m_is_drag_pasting_start = false;
     m_justselected_one = false;
 
+    Gtk::Allocation allocation = get_allocation();
+    m_surface = Cairo::ImageSurface::create(
+        Cairo::Format::FORMAT_ARGB32,
+        allocation.get_width(),
+        allocation.get_height()
+    );
+    draw_background();
+
     add_events(Gdk::POINTER_MOTION_MASK |
                 Gdk::BUTTON_PRESS_MASK |
                 Gdk::BUTTON_RELEASE_MASK |
@@ -57,13 +65,18 @@ EventRoll::~EventRoll()
 {
 }
 
-
-bool
-EventRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+void
+EventRoll::draw_background()
 {
+    Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
     Gtk::Allocation allocation = get_allocation();
     const int width = allocation.get_width();
     const int height = allocation.get_height();
+
+    cr->set_operator(Cairo::OPERATOR_CLEAR);
+    cr->rectangle(0, 0, width, height);
+    cr->paint_with_alpha(1.0);
+    cr->set_operator(Cairo::OPERATOR_OVER);
 
     // Horizontal lines
 
@@ -148,8 +161,33 @@ EventRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
            cr->fill();
         }
     }
+}
+
+bool
+EventRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+{
+    Gtk::Allocation allocation = get_allocation();
+    const int width = allocation.get_width();
+    const int height = allocation.get_height();
+
+    // resize handler
+    if (width != m_surface->get_width() || height != m_surface->get_height()){
+        m_surface = Cairo::ImageSurface::create(
+            Cairo::Format::FORMAT_ARGB32,
+            allocation.get_width(),
+            allocation.get_height()
+        );
+        draw_background();
+    }
+
+    // draw background
+    cr->set_source(m_surface, 0.0, 0.0);
+    cr->paint();
+
+    cr->set_line_width(1.0);
 
     // mouse edition
+    int x;
     int w;
     int y = 1;
     int h = c_eventroll_height;
@@ -195,7 +233,7 @@ EventRoll::set_zoom(int zoom)
     if (zoom < c_min_zoom) zoom = c_min_zoom;
     else if (zoom > c_max_zoom) zoom = c_max_zoom;
     m_zoom = zoom;
-    queue_draw();
+    draw_background();
 }
 
 void
@@ -320,19 +358,6 @@ EventRoll::start_paste()
 
      /* adjust for clipboard being shifted to tick 0 */
      m_selected.x  += m_drop_x;
-}
-
-
-
-bool
-EventRoll::on_scroll_event(GdkEventScroll* event)
-{
-
-    if (!(event->state & GDK_CONTROL_MASK)) event->state = GDK_SHIFT_MASK;
-
-    if (signal_scroll.emit(event)) return true;
-
-    return false;
 }
 
 bool
@@ -564,9 +589,29 @@ EventRoll::on_button_release_event(GdkEventButton* event)
     return true;
 }
 
+bool
+EventRoll::on_scroll_event(GdkEventScroll* event)
+{
+
+    if (!(event->state & GDK_CONTROL_MASK)) event->state = GDK_SHIFT_MASK;
+
+    if (signal_scroll.emit(event)) return true;
+
+    return false;
+}
+
+void
+EventRoll::set_hscroll(int s) {
+    if (s != m_hscroll) {
+        m_hscroll = s;
+        draw_background();
+    }
+}
+
 void
 EventRoll::set_data_type(unsigned char status, unsigned char control = 0)
 {
     m_status = status;
     m_cc = control;
+    draw_background();
 }

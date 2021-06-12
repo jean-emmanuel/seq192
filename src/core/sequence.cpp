@@ -1181,9 +1181,12 @@ sequence::select_events( long a_tick_s,
             }
         }
     }
-        unlock();
 
-        return ret;
+    set_dirty_edit();
+
+    unlock();
+
+    return ret;
 }
 
 
@@ -2660,7 +2663,7 @@ sequence::select_events( unsigned char a_status, unsigned char a_cc, bool a_inve
 
     unlock();
 
-    set_dirty();
+    set_dirty_edit();
 }
 
 
