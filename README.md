@@ -46,13 +46,15 @@ options:
 ## Jack transport
 
 When `--jack-transport`, seq192 will
+
 - follow start / stop commands from other clients
 - send start / stop commands to other clients
 - use the transport master's bpm
-- **not** attempt to reposition within a sequence
-
+- **not** attempt to reposition within sequences
 
 ## OSC commands
+
+When `--osc-port` is set, seq192 will be controllable with the following OSC commands
 
 #### /play
 Start playback or restart if already playing
