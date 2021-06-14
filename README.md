@@ -6,7 +6,7 @@ MIDI sequencer based on seq24 with less features and more swag.
 
 **Less features**
 - No song editor
-- No keyboard controls  
+- No keyboard controls
 - No midi controls
 - Linux only
 
@@ -45,11 +45,12 @@ options:
 
 ## Jack transport
 
-When `--jack-transport`, seq192 will
+When `--jack-transport` is set, seq192 will
 
 - follow start / stop commands from other clients
 - send start / stop commands to other clients
 - use the transport master's bpm
+- set its position to 0 whenever the transport stops or restarts
 - **not** attempt to reposition within sequences
 
 ## OSC commands
