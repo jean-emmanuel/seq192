@@ -79,9 +79,7 @@ perform::panic()
     for (int i = 0; i < c_max_sequence; i++) {
         if (is_active(i)) {
             m_seqs[i]->set_playing(false);
-            if (m_seqs[i]->get_queued()) {
-                m_seqs[i]->toggle_queued();
-            }
+            m_seqs[i]->off_queued();
         }
     }
 }
