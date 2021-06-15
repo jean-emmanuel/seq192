@@ -240,6 +240,17 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_record_through.signal_toggled().connect([&]{menu_callback(EDIT_MENU_RECORD_THRU);});
     m_submenu_record.append(m_menu_record_through);
 
+    m_menu_options.set_label("_Options");
+    m_menu_options.set_use_underline(true);
+    m_menu_options.set_submenu(m_submenu_options);
+    m_menu.append(m_menu_options);
+
+    m_menu_options_resume.set_label("Resume notes when enabling");
+    m_menu_options_resume.set_active(m_sequence->get_resume());
+    m_menu_options_resume.signal_activate().connect([&]{menu_callback(EDIT_MENU_RESUME);});
+    m_submenu_options.append(m_menu_options_resume);
+
+
     // toolbar
     m_toolbar.set_size_request(0, 55);
     m_toolbar.get_style_context()->add_class("toolbar");
@@ -663,6 +674,10 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             break;
         case EDIT_MENU_RECORD_THRU:
             m_sequence->set_thru(m_menu_record_through.get_active());
+            break;
+
+        case EDIT_MENU_RESUME:
+            m_sequence->set_resume(m_menu_options_resume.get_active());
             break;
     }
 }

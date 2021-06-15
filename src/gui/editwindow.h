@@ -53,7 +53,9 @@ enum edit_menu_action
 
     EDIT_MENU_RECORD,
     EDIT_MENU_RECORD_QUANTIZED,
-    EDIT_MENU_RECORD_THRU
+    EDIT_MENU_RECORD_THRU,
+
+    EDIT_MENU_RESUME
 };
 
 class MainWindow;
@@ -155,6 +157,10 @@ class EditWindow : public Window {
         MenuItem            m_menu_transport_start;
         AccelLabel          m_menu_transport_stop_label;
         MenuItem            m_menu_transport_stop;
+
+        MenuItem            m_menu_options;
+        Menu                m_submenu_options;
+        CheckMenuItem       m_menu_options_resume;
 
         // event menu
         Menu                m_event_menu;
