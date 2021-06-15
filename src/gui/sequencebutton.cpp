@@ -90,21 +90,35 @@ SequenceButton::draw_background()
         cr->rectangle(0, 0, width, height);
         cr->fill();
 
-        // name
-        color = seq->get_playing() ? c_sequence_text_on : c_sequence_text;
-        cr->set_source_rgb(color.r, color.g, color.b);
+        // font
         Pango::FontDescription font;
         int text_width;
         int text_height;
-
         font.set_family(c_font);
         font.set_size(c_sequence_fontsize * Pango::SCALE);
         font.set_weight(Pango::WEIGHT_NORMAL);
 
+        // queued ?
+        bool queued = get_sequence()->get_queued();
+        int queued_width = 0;
+        if (queued)
+        {
+            color = seq->get_playing() ? c_sequence_text_on : c_sequence_text;
+            cr->set_source_rgb(color.r, color.g, color.b);
+            auto queued = create_pango_layout("⌛");
+            queued->set_font_description(font);
+            queued->get_pixel_size(queued_width, text_height);
+            cr->move_to(width - c_sequence_padding - queued_width, c_sequence_padding);
+            queued->show_in_cairo_context(cr);
+        }
+
+        // name
+        color = seq->get_playing() ? c_sequence_text_on : c_sequence_text;
+        cr->set_source_rgb(color.r, color.g, color.b);
         auto name = create_pango_layout(seq->get_name());
         name->set_font_description(font);
         name->get_pixel_size(text_width, text_height);
-        name->set_width((width - c_sequence_padding * 2) * Pango::SCALE);
+        name->set_width((width - c_sequence_padding * 2 - queued_width) * Pango::SCALE);
         name->set_ellipsize(Pango::ELLIPSIZE_END);
         cr->move_to(c_sequence_padding, c_sequence_padding);
         name->show_in_cairo_context(cr);
@@ -125,8 +139,6 @@ SequenceButton::draw_background()
         timesig->set_ellipsize(Pango::ELLIPSIZE_END);
         cr->move_to(c_sequence_padding, c_sequence_padding + text_height);
         timesig->show_in_cairo_context(cr);
-
-
 
         // events
         cr->set_source_rgba(color.r, color.g, color.b, 0.1);
