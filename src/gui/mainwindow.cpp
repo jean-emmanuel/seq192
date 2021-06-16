@@ -283,17 +283,6 @@ bool
 MainWindow::timer_callback()
 {
 
-    // play button state
-    bool playing = m_perform->is_running();
-    if (playing != m_toolbar_play_state) {
-        m_toolbar_play_state = playing;
-        if (playing) {
-            m_toolbar_play.get_style_context()->add_class("on");
-        } else {
-            m_toolbar_play.get_style_context()->remove_class("on");
-        }
-    }
-
     // screenset name
     int sset = m_perform->get_screenset();
     if (m_toolbar_sset.get_value() != sset) {
@@ -316,8 +305,19 @@ MainWindow::timer_callback()
             m_sequences[i]->draw_background();
             m_sequences[i]->queue_draw();
         }
-        else if (m_perform->is_active(seqnum)) {
+        else if (m_perform->is_active(seqnum) && m_toolbar_play_state) {
             m_sequences[i]->queue_draw();
+        }
+    }
+
+    // play button state
+    bool playing = m_perform->is_running();
+    if (playing != m_toolbar_play_state) {
+        m_toolbar_play_state = playing;
+        if (playing) {
+            m_toolbar_play.get_style_context()->add_class("on");
+        } else {
+            m_toolbar_play.get_style_context()->remove_class("on");
         }
     }
 
@@ -582,6 +582,7 @@ MainWindow::set_drag_destination(SequenceButton *s)
         if (m_editwindows[seqnum_src] != NULL) m_editwindows[seqnum_src]->close();
         m_perform->move_sequence(seqnum_src, seqnum_dest);
         m_drag_source->queue_draw();
+        m_drag_destination->queue_draw();
         m_drag_source = NULL;
         m_drag_destination = NULL;
     }

@@ -24,6 +24,7 @@ SequenceButton::SequenceButton(perform * p, MainWindow * m, int seqpos)
     m_seqpos = seqpos;
     m_click = false;
     m_drag_start = false;
+    m_last_seqnum = -1;
 
     set_last_sequence_number();
 
@@ -377,6 +378,7 @@ SequenceButton::menu_callback(context_menu_action action, int data1, int data2)
     switch (action) {
         case MENU_NEW:
             m_perform->new_sequence(get_sequence_number());
+            queue_draw();
             // no break -> edit
         case MENU_EDIT:
             m_mainwindow->open_edit_window(get_sequence_number(), get_sequence());
@@ -393,6 +395,7 @@ SequenceButton::menu_callback(context_menu_action action, int data1, int data2)
             break;
         case MENU_PASTE:
             m_perform->paste_sequence(get_sequence_number());
+            queue_draw();
             break;
         case MENU_MIDI_BUS:
             sequence * seq = get_sequence();
