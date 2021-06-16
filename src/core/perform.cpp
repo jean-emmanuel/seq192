@@ -919,16 +919,6 @@ void perform::output_func()
 
         while( m_running ){
 
-            // bpm
-            double bpm;
-            if (m_jack_running && m_jack_bpm > 0.1) {
-                // jack transport
-                bpm = m_jack_bpm;
-            } else {
-                // or file
-                bpm = m_master_bus.get_bpm();
-            }
-
             // delta time
             if (m_jack_running) {
                 // jack
@@ -937,6 +927,16 @@ void perform::output_func()
                 // or system
                 clock_gettime(CLOCK_REALTIME, &system_time);
                 delta_time = ((system_time.tv_sec * 1000000) + (system_time.tv_nsec / 1000)) - last_time;
+            }
+
+            // bpm
+            double bpm;
+            if (m_jack_running && m_jack_bpm > 0.1) {
+                // jack transport
+                bpm = m_jack_bpm;
+            } else {
+                // or file
+                bpm = m_master_bus.get_bpm();
             }
 
             // delta time to ticks
