@@ -30,7 +30,9 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_pianoroll(p, seq, &m_pianokeys),
     m_dataroll(p, seq),
     m_midibus(-1),
-    m_midichannel(-1)
+    m_midichannel(-1),
+    m_status(EVENT_NOTE_ON),
+    m_cc(0)
 {
 
     Glib::RefPtr<Gtk::CssProvider> css_provider = Gtk::CssProvider::create();
