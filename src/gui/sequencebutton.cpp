@@ -282,6 +282,7 @@ SequenceButton::on_button_release_event(GdkEventButton* event)
 
         if (event->button == 1 && seq != NULL) {
             seq->toggle_playing();
+            queue_draw();
         }
 
         else if (event->button == 3) {
