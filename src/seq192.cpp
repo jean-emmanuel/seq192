@@ -16,6 +16,7 @@
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <filesystem>
 
 #include "core/midifile.h"
 #include "core/optionsfile.h"
@@ -78,21 +79,25 @@ main (int argc, char *argv[])
     /* the main performance object */
     perform * p = new perform();
 
-    if (getenv(HOME) != NULL) {
-        string home(getenv(HOME));
-        last_used_dir = home;
-        string total_file = home + SLASH + config_filename;
+    string config_path = getenv("XDG_CONFIG_HOME") == NULL ? string(getenv("HOME")) + "/.config" : getenv("XDG_CONFIG_HOME");
+    config_path += "/" + c_package_name;
+    mkdir(config_path.c_str(), 0777);
 
-        optionsfile options(total_file);
-        options.parse(p);
+    // read usr file
+    string file_path = config_path + "/" + user_filename;
+    userfile user(file_path);
+    user.parse(p);
 
-        total_file = home + SLASH + user_filename;
-
-        userfile user(total_file);
-        user.parse(p);
+    // read/touch rc file
+    file_path = config_path + "/" + config_filename;
+    std::ifstream infile(file_path);
+    if (!infile.good()) {
+        std::fstream fs;
+        fs.open(file_path, std::ios::out);
+        fs.close();
     }
-
-
+    optionsfile options(file_path);
+    options.parse(p);
 
     /* parse parameters */
     int c;
@@ -171,11 +176,8 @@ main (int argc, char *argv[])
         status = application->run(window);
     }
 
-    if (getenv(HOME) != NULL) {
-        string home(getenv(HOME));
-        string total_file = home + SLASH + config_filename;
-        optionsfile options(total_file);
-    }
+    // write rc file
+    options.write(p);
 
     delete p;
 

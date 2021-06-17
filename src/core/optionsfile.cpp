@@ -47,8 +47,8 @@ optionsfile::parse( perform *a_perf )
     /* last used dir */
     line_after( &file, "[last-used-dir]" );
     //FIXME: check for a valid path is missing
-    if (m_line[0] == '/')
-        last_used_dir.assign(m_line);
+    if (m_line[0] == '/') last_used_dir.assign(m_line);
+    else last_used_dir.assign(getenv("HOME"));
 
     file.close();
 
@@ -61,7 +61,7 @@ optionsfile::write( perform *a_perf  )
 {
     /* open binary file */
 
-    ofstream file ( m_name.c_str(), ios::out | ios::trunc  );
+    ofstream file ( m_name.c_str(),  std::ios::in | std::ios::out );
 
     if( ! file.is_open() )
         return false;
