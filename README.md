@@ -141,3 +141,40 @@ Send sequencer's status as json, including sequences informations
 - queued: sequence's queued state
 - playing: sequence's playing state
 - timesPlayed: number of times the sequence played since last enabled
+
+## Configuration / Control map / Key map
+
+Config files are located in `$XDG_CONFIG_HOME/seq192/` (`~/.config/seq192/` by default).
+
+**`~/.config/seq192/config.json` example:**
+
+```json
+{
+    "buses": {
+        "0": {
+            "name": "Sampler",
+            "channels": {
+                "0": {
+                    "name": "Drums",
+                    "notes": {
+                        "64": "Kick",
+                        "65": "Snare",
+                        "66": "Hihat"
+                    },
+                    "controls": {
+                        "1": "Custom cc name ",
+                        "2": "Etc"
+                    }
+                }
+            }
+        },
+        "1": {
+            "name": "Bass synth",
+            "channels":{
+                "0": {"name": "Trap bass"},
+                "1": {"name": "Wobble"}
+            }
+        }
+    }
+}
+```

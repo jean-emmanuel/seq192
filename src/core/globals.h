@@ -83,7 +83,7 @@ extern string global_filename;
 extern string last_used_dir;
 extern bool is_pattern_playing;
 
-const int c_max_instruments = 64;
+const int c_max_instruments = 256;
 
 struct user_midi_bus_definition
 {

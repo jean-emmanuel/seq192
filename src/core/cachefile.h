@@ -14,25 +14,31 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef SEQ192_OPTIONSFILE
-#define SEQ192_OPTIONSFILE
+#ifndef SEQ192_CACHEFILE
+#define SEQ192_CACHEFILE
 
-#include "perform.h"
-#include "configfile.h"
 #include <fstream>
 #include <string>
 #include <list>
 
-class optionsfile : public configfile
+using namespace std;
+
+class CacheFile
 {
 
- public:
 
-    optionsfile(const string& a_name);
-    ~optionsfile( );
+    public:
 
-    bool parse( perform *a_perf );
-    bool write( perform *a_perf );
+        CacheFile(const std::string& a_name);
+        ~CacheFile();
+
+        bool parse();
+        bool write();
+
+    private:
+
+        std::string m_name;
+
 
 };
 

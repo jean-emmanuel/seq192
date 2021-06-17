@@ -14,45 +14,103 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "configfile.h"
 #include <iostream>
+#include <nlohmann/json.hpp>
 
-configfile::configfile(const string& a_name)
+#include "configfile.h"
+#include "globals.h"
+
+using json = nlohmann::json;
+
+extern string last_used_dir;
+
+ConfigFile::ConfigFile(const std::string& a_name) :
+    m_name(a_name)
 {
-    m_name = a_name;
-    m_pos = 0;
 }
 
-configfile::~configfile( )
+ConfigFile::~ConfigFile()
 {
-
 }
 
-
-
-void
-configfile::next_data_line( ifstream *a_file)
+bool
+ConfigFile::parse()
 {
-    a_file->getline( m_line, sizeof(m_line) );
-    while (( m_line[0] == '#' || m_line[0] == ' ' || m_line[0] == 0 ) &&
-           !a_file->eof() )
-    {
-        a_file->getline( m_line, sizeof(m_line) );
+
+    /* open binary file */
+    ifstream file (m_name.c_str());
+
+    if (!file.is_open()) return false;
+
+    json j;
+
+    try {
+        file >> j;
+    } catch (json::exception& ex) {
+        cerr << "Failed to load " + m_name + ":\n";
+        cerr << ex.what();
+        cerr << "\n";
+        return false;
     }
-}
 
-void
-configfile::line_after( ifstream *a_file, string a_tag)
-{
-    /* run to start */
-    a_file->clear();
-    a_file->seekg( 0, ios::beg );
-
-    a_file->getline( m_line, sizeof(m_line) );
-    while ( strncmp( m_line, a_tag.c_str(), a_tag.length()) != 0  &&
-            !a_file->eof() )
+    auto buses = j["buses"];
+    if (buses.is_object())
     {
-        a_file->getline( m_line, sizeof(m_line) );
+        for (json::iterator it = buses.begin(); it != buses.end(); ++it) {
+
+            int bus_number = stoi(it.key());
+            auto bus_data = it.value();
+
+            auto bus_name = bus_data["name"];
+            if (bus_name.is_string()) {
+                global_user_midi_bus_definitions[bus_number].alias = bus_name;
+            }
+
+            auto channels = bus_data["channels"];
+            if (channels.is_object()) {
+
+                for (json::iterator it = channels.begin(); it != channels.end(); ++it) {
+
+                    int channel_number = stoi(it.key());
+                    auto channel_data = it.value();
+
+                    int instrument_number = channel_number + bus_number * 16;
+                    global_user_midi_bus_definitions[bus_number].instrument[channel_number] = instrument_number;
+
+                    auto channel_name = channel_data["name"];
+                    if (channel_name.is_string()) {
+                        global_user_instrument_definitions[instrument_number].instrument = channel_name;
+                    }
+
+                    auto controls = channel_data["controls"];
+                    if (controls.is_object()) {
+                        for (json::iterator it = controls.begin(); it != controls.end(); ++it) {
+                            int cc_number = stoi(it.key());
+                            auto cc_data = it.value();
+                            global_user_instrument_definitions[instrument_number].controllers[cc_number] = cc_data;
+                            global_user_instrument_definitions[instrument_number].controllers_active[cc_number] = true;
+                        }
+                    }
+
+                    auto notes = channel_data["notes"];
+                    if (notes.is_object()) {
+                        global_user_midi_bus_definitions[bus_number].keymap[channel_number] = instrument_number;
+                        for (json::iterator it = notes.begin(); it != notes.end(); ++it) {
+                            int note_number = stoi(it.key());
+                            auto note_data = it.value();
+                            global_user_keymap_definitions[instrument_number].keys[note_number] = note_data;
+                            global_user_keymap_definitions[instrument_number].keys_active[note_number] = true;
+                        }
+                    }
+
+                }
+
+            }
+
+        }
     }
-    next_data_line( a_file );
+
+    file.close();
+
+    return true;
 }

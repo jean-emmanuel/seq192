@@ -72,7 +72,7 @@ midibus::midibus( int a_localclient,
 
 
 	char name[60];
-    if ( global_user_midi_bus_definitions[m_id - 1].alias.length() > 0 )
+    if ( m_id > 0 && global_user_midi_bus_definitions[m_id - 1].alias.length() > 0 )
     {
         snprintf(name, 59, "%s",
                 global_user_midi_bus_definitions[m_id - 1].alias.c_str());

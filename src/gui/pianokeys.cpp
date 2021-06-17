@@ -51,6 +51,8 @@ PianoKeys::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
     int midi_bus = m_sequence->get_midi_bus();
     int midi_ch = m_sequence->get_midi_channel();
+    int keymap = global_user_midi_bus_definitions[midi_bus].keymap[midi_ch];
+
 
     double key_y;
     int i, key;
@@ -111,19 +113,19 @@ PianoKeys::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             cr->set_source_rgb(c_key_black.r, c_key_black.g, c_key_black.b);
         }
 
-        int keymap = global_user_midi_bus_definitions[midi_bus].keymap[midi_ch];
-        if (keymap > -1 && keymap < c_max_instruments)
+        if (keymap > -1)
         {
+            string key_name = to_string(i) + " ";
             if (global_user_keymap_definitions[keymap].keys_active[i]) {
-                string key_name = global_user_keymap_definitions[keymap].keys[i];
-                auto name = create_pango_layout(key_name);
-                name->set_font_description(font);
-                name->set_width((width - 2 * c_key_padding) * Pango::SCALE);
-                name->set_ellipsize(Pango::ELLIPSIZE_END);
-                name->get_pixel_size(text_width, text_height);
-                cr->move_to(c_key_padding, key_y + c_key_height / 2 - text_height / 2);
-                name->show_in_cairo_context(cr);
+                key_name += global_user_keymap_definitions[keymap].keys[i];
             }
+            auto name = create_pango_layout(key_name);
+            name->set_font_description(font);
+            name->set_width((width - 2 * c_key_padding) * Pango::SCALE);
+            name->set_ellipsize(Pango::ELLIPSIZE_END);
+            name->get_pixel_size(text_width, text_height);
+            cr->move_to(c_key_padding, key_y + c_key_height / 2 - text_height / 2);
+            name->show_in_cairo_context(cr);
         } else {
             octave = i  / 12 - 1;
             if (key % 12 == 0) {

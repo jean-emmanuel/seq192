@@ -17,38 +17,27 @@
 #ifndef SEQ192_CONFIGFILE
 #define SEQ192_CONFIGFILE
 
-#include "perform.h"
 #include <fstream>
 #include <string>
 #include <list>
 
-class configfile
+using namespace std;
+
+class ConfigFile
 {
 
- protected:
 
-    int m_pos;
-    string m_name;
+    public:
 
-    /* holds our data */
-    unsigned char *m_d;
+        ConfigFile(const string& a_name);
+        ~ConfigFile();
 
-    list<unsigned char> m_l;
+        bool parse();
 
-    char m_line[1024];
+    private:
 
-    bool m_done;
+        string m_name;
 
-    void next_data_line( ifstream *a_file);
-    void line_after( ifstream *a_file, string a_tag);
-
- public:
-
-    configfile(const string& a_name);
-    virtual ~configfile();
-
-    virtual bool parse( perform *a_perf ) = 0;
-    virtual bool write( perform *a_perf ) = 0;
 
 };
 

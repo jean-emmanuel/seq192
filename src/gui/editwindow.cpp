@@ -861,6 +861,7 @@ void EditWindow::create_midibus_menu()
                 m_sequence->set_midi_bus(i);
                 m_sequence->set_midi_channel(j);
                 set_data_type(m_status, m_cc); // update event dropdown tooltip
+                m_pianokeys.queue_draw();
             });
             menu_channels->append(*menu_item_channel);
         }
@@ -944,12 +945,14 @@ EditWindow::update_event_menu()
         m_menu_items_control[i]->set_active(false);
         m_menu_items_control[i]->get_style_context()->remove_class("checked");
 
-        string ccname = c_controller_names[i];
+        string ccname = to_string(i);
         int instrument = global_user_midi_bus_definitions[midi_bus].instrument[midi_ch];
         if (instrument > -1 && instrument < c_max_instruments)
         {
             if (global_user_instrument_definitions[instrument].controllers_active[i])
-                ccname = global_user_instrument_definitions[instrument].controllers[i];
+                ccname = to_string(i) + " " + global_user_instrument_definitions[instrument].controllers[i];
+        } else {
+            ccname = c_controller_names[i];
         }
         m_menu_items_control[i]->set_label(ccname);
     }

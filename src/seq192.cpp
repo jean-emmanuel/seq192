@@ -19,9 +19,9 @@
 #include <filesystem>
 
 #include "core/midifile.h"
-#include "core/optionsfile.h"
+#include "core/configfile.h"
+#include "core/cachefile.h"
 #include "core/perform.h"
-#include "core/userfile.h"
 
 #include "gui/mainwindow.h"
 #include <gtkmm.h>
@@ -40,9 +40,7 @@ option long_options[] = {
 };
 
 string global_filename = "";
-string last_used_dir ="/";
-string config_filename = ".seq192rc";
-string user_filename = ".seq192usr";
+string last_used_dir = getenv("HOME");
 
 bool global_no_gui = false;
 bool global_with_jack_transport = false;
@@ -79,25 +77,27 @@ main (int argc, char *argv[])
     /* the main performance object */
     perform * p = new perform();
 
+    // read config file
     string config_path = getenv("XDG_CONFIG_HOME") == NULL ? string(getenv("HOME")) + "/.config" : getenv("XDG_CONFIG_HOME");
     config_path += "/" + c_package_name;
     mkdir(config_path.c_str(), 0777);
+    string file_path = config_path + "/config.json";
+    ConfigFile config(file_path);
+    config.parse();
 
-    // read usr file
-    string file_path = config_path + "/" + user_filename;
-    userfile user(file_path);
-    user.parse(p);
-
-    // read/touch rc file
-    file_path = config_path + "/" + config_filename;
+    // read/touch cache file
+    string cache_path = getenv("XDG_CACHE_HOME") == NULL ? string(getenv("HOME")) + "/.cache" : getenv("XDG_CACHE_HOME");
+    cache_path += "/" + c_package_name;
+    mkdir(cache_path.c_str(), 0777);
+    file_path = cache_path + "/cache.json";
     std::ifstream infile(file_path);
     if (!infile.good()) {
         std::fstream fs;
         fs.open(file_path, std::ios::out);
         fs.close();
     }
-    optionsfile options(file_path);
-    options.parse(p);
+    CacheFile cache(file_path);
+    cache.parse();
 
     /* parse parameters */
     int c;
@@ -176,8 +176,8 @@ main (int argc, char *argv[])
         status = application->run(window);
     }
 
-    // write rc file
-    options.write(p);
+    // write cache file
+    cache.write();
 
     delete p;
 
