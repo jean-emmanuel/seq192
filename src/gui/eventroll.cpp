@@ -85,7 +85,7 @@ EventRoll::draw_background()
     const int height = allocation.get_height();
 
     cr->set_operator(Cairo::OPERATOR_CLEAR);
-    cr->rectangle(0, 0, width, height);
+    cr->rectangle(0, -1, width + 1, height + 2);
     cr->paint_with_alpha(1.0);
     cr->set_operator(Cairo::OPERATOR_OVER);
 
