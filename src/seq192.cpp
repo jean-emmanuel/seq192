@@ -52,16 +52,15 @@ user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];
 user_instrument_definition global_user_instrument_definitions[c_max_instruments];
 user_keymap_definition     global_user_keymap_definitions[c_max_instruments];
 
-#define HOME "HOME"
-#define SLASH "/"
-
 int
 main (int argc, char *argv[])
 {
     for (int i=0; i<c_maxBuses; i++)
     {
-        for (int j=0; j<16; j++)
+        for (int j=0; j<16; j++) {
             global_user_midi_bus_definitions[i].instrument[j] = -1;
+            global_user_midi_bus_definitions[i].keymap[j] = -1;
+        }
     }
 
     for (int i=0; i<c_max_instruments; i++)
