@@ -67,8 +67,7 @@ optionsfile::write( perform *a_perf  )
         return false;
 
     file << "#\n";
-    file << "# Seq 24 Init File\n";
-    file << "#\n\n\n";
+    file << "# seq192 Init File\n";
 
     file << "\n\n\n[last-used-dir]\n\n"
          << "# Last used directory.\n"
