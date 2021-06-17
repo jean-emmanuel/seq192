@@ -49,8 +49,8 @@ PianoKeys::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     const int width = allocation.get_width();
     const int height = allocation.get_height();
 
-
-
+    int midi_bus = m_sequence->get_midi_bus();
+    int midi_ch = m_sequence->get_midi_channel();
 
     double key_y;
     int i, key;
@@ -97,15 +97,45 @@ PianoKeys::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             cr->stroke();
         }
 
-        octave = i  / 12 - 1;
-        if (key % 12 == 0) {
-            std::string key_name = "C" + std::to_string(octave);
-            auto name = create_pango_layout(key_name);
-            name->set_font_description(font);
-            name->get_pixel_size(text_width, text_height);
-            cr->move_to(width - text_width - c_key_padding, key_y + c_key_height / 2 - text_height / 2);
-            name->show_in_cairo_context(cr);
+        // key names
+        if (key == 1 ||
+                 key == 3 ||
+                 key == 6 ||
+                 key == 8 ||
+                 key == 10)
+        {
+            cr->set_source_rgb(c_key_white.r, c_key_white.g, c_key_white.b);
         }
+        else
+        {
+            cr->set_source_rgb(c_key_black.r, c_key_black.g, c_key_black.b);
+        }
+
+        int keymap = global_user_midi_bus_definitions[midi_bus].keymap[midi_ch];
+        if (keymap > -1 && keymap < c_max_instruments)
+        {
+            if (global_user_keymap_definitions[keymap].keys_active[i]) {
+                string key_name = global_user_keymap_definitions[keymap].keys[i];
+                auto name = create_pango_layout(key_name);
+                name->set_font_description(font);
+                name->set_width((width - 2 * c_key_padding) * Pango::SCALE);
+                name->set_ellipsize(Pango::ELLIPSIZE_END);
+                name->get_pixel_size(text_width, text_height);
+                cr->move_to(c_key_padding, key_y + c_key_height / 2 - text_height / 2);
+                name->show_in_cairo_context(cr);
+            }
+        } else {
+            octave = i  / 12 - 1;
+            if (key % 12 == 0) {
+                std::string key_name = "C" + std::to_string(octave);
+                auto name = create_pango_layout(key_name);
+                name->set_font_description(font);
+                name->get_pixel_size(text_width, text_height);
+                cr->move_to(width - text_width - c_key_padding, key_y + c_key_height / 2 - text_height / 2);
+                name->show_in_cairo_context(cr);
+            }
+        }
+
 
     }
 

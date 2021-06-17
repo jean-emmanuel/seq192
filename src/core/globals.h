@@ -89,6 +89,7 @@ struct user_midi_bus_definition
 {
     std::string alias;
     int instrument[16];
+    int keymap[16];
 };
 
 struct user_instrument_definition
@@ -98,8 +99,17 @@ struct user_instrument_definition
     string controllers[128];
 };
 
+struct user_keymap_definition
+{
+    string keymap;
+    bool keys_active[128];
+    string keys[128];
+};
+
+
 extern user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];
 extern user_instrument_definition global_user_instrument_definitions[c_max_instruments];
+extern user_keymap_definition     global_user_keymap_definitions[c_max_instruments];
 
 enum file_type_e
 {

@@ -50,6 +50,7 @@ char* global_oscport;
 
 user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];
 user_instrument_definition global_user_instrument_definitions[c_max_instruments];
+user_keymap_definition     global_user_keymap_definitions[c_max_instruments];
 
 #define HOME "HOME"
 #define SLASH "/"
@@ -67,6 +68,12 @@ main (int argc, char *argv[])
     {
         for (int j=0; j<128; j++)
             global_user_instrument_definitions[i].controllers_active[j] = false;
+    }
+
+    for (int i=0; i<c_max_instruments; i++)
+    {
+        for (int j=0; j<128; j++)
+            global_user_keymap_definitions[i].keys_active[j] = false;
     }
 
     /* the main performance object */

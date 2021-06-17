@@ -55,15 +55,18 @@ userfile::parse( perform *a_perf )
         next_data_line( &file );
         int instruments=0;
         int instrument;
+        int keymap;
         int channel;
 
         sscanf( m_line, "%d", &instruments );
         for ( int j=0; j<instruments; j++ )
         {
+            keymap = -1;
             next_data_line( &file );
-            sscanf( m_line, "%d %d", &channel, &instrument );
+            sscanf( m_line, "%d %d %d", &channel, &instrument, &keymap );
             global_user_midi_bus_definitions[i].instrument[channel] = instrument;
-            // printf( "%d %d\n", channel, instrument );
+            global_user_midi_bus_definitions[i].keymap[channel] = keymap;
+            // printf( "%d %d %d\n", channel, instrument, keymap );
         }
     }
 
@@ -93,6 +96,35 @@ userfile::parse( perform *a_perf )
             global_user_instrument_definitions[i].controllers[cc] = string(cc_name);
             global_user_instrument_definitions[i].controllers_active[cc] = true;
             // printf( "[%d] %s\n", cc, cc_name );
+        }
+    }
+
+    line_after( &file, "[user-keymap-definitions]" );
+    int keymaps = 0;
+    sscanf( m_line, "%d", &keymaps );
+    char keymap_num[4];
+
+    for ( int i=0; i<keymaps; i++ )
+    {
+        snprintf(keymap_num, sizeof(keymap_num), "%d", i);
+        line_after( &file, "[user-keymap-" + string(keymap_num) + "]");
+        global_user_keymap_definitions[i].keymap = m_line;
+        // printf( "%d %s\n", i, m_line );
+        next_data_line( &file );
+        int keys=0;
+        int key=0;
+
+        char key_name[1024];
+
+        sscanf( m_line, "%d", &keys );
+        for ( int j=0; j<keys; j++ )
+        {
+            next_data_line( &file );
+            sscanf( m_line, "%d", &key );
+            sscanf( m_line, "%[^\n]", key_name );
+            global_user_keymap_definitions[i].keys[key] = string(key_name);
+            global_user_keymap_definitions[i].keys_active[key] = true;
+            // printf( "[%d] %s\n", key, key_name );
         }
     }
 
