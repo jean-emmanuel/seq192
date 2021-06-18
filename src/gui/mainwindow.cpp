@@ -294,6 +294,12 @@ bool
 MainWindow::timer_callback()
 {
 
+    if (!global_is_running) {
+        // SIGINT: ignore unsave modifications and quit
+        global_is_modified = false;
+        close();
+    }
+
     // screenset name
     int sset = m_perform->get_screenset();
     if (m_toolbar_sset.get_value() != sset) {

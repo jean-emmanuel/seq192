@@ -81,6 +81,7 @@ extern bool global_with_jack_transport;
 extern char* global_oscport;
 
 extern bool global_is_modified;
+extern bool global_is_running;
 
 extern string global_filename;
 extern string last_used_dir;

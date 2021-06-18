@@ -16,7 +16,7 @@
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <filesystem>
+#include <signal.h>
 
 #include "core/midifile.h"
 #include "core/configfile.h"
@@ -45,6 +45,8 @@ string last_used_dir = getenv("HOME");
 bool global_no_gui = false;
 bool global_with_jack_transport = false;
 
+bool global_is_running = true;
+
 char* global_oscport;
 
 user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];
@@ -54,6 +56,7 @@ user_keymap_definition     global_user_keymap_definitions[c_max_instruments];
 int
 main (int argc, char *argv[])
 {
+
     for (int i=0; i<c_maxBuses; i++)
     {
         for (int j=0; j<16; j++) {
@@ -165,9 +168,11 @@ main (int argc, char *argv[])
         delete f;
     }
 
+    signal(SIGINT, [](int param){global_is_running = false;});
+
     int status = 0;
     if (global_no_gui) {
-        while (true) {
+        while (global_is_running) {
             usleep(1000);
         }
     } else {
