@@ -55,6 +55,7 @@ enum edit_menu_action
     EDIT_MENU_RECORD_QUANTIZED,
     EDIT_MENU_RECORD_THRU,
 
+    EDIT_MENU_PLAY,
     EDIT_MENU_RESUME
 };
 
@@ -158,9 +159,11 @@ class EditWindow : public Window {
         AccelLabel          m_menu_transport_stop_label;
         MenuItem            m_menu_transport_stop;
 
-        MenuItem            m_menu_options;
-        Menu                m_submenu_options;
-        CheckMenuItem       m_menu_options_resume;
+        MenuItem            m_menu_playback;
+        Menu                m_submenu_playback;
+        MenuItem            m_menu_playback_playing;
+        bool                m_menu_playing_state;
+        CheckMenuItem       m_menu_playback_resume;
 
         // event menu
         Menu                m_event_menu;
@@ -185,7 +188,6 @@ class EditWindow : public Window {
         ComboBoxText        m_toolbar_snap;
         Button              m_toolbar_length_label;
         ComboBoxText        m_toolbar_length;
-        ToggleButton        m_toolbar_playing;
         Button              m_toolbar_bus_label;
         Entry               m_toolbar_bus;
         MenuButton          m_toolbar_bus_dropdown;

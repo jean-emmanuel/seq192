@@ -243,15 +243,21 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_record_through.signal_toggled().connect([&]{menu_callback(EDIT_MENU_RECORD_THRU);});
     m_submenu_record.append(m_menu_record_through);
 
-    m_menu_options.set_label("_Options");
-    m_menu_options.set_use_underline(true);
-    m_menu_options.set_submenu(m_submenu_options);
-    m_menu.append(m_menu_options);
+    m_menu_playback.set_label("_Playback");
+    m_menu_playback.set_use_underline(true);
+    m_menu_playback.set_submenu(m_submenu_playback);
+    m_menu.append(m_menu_playback);
 
-    m_menu_options_resume.set_label("Resume notes when enabling");
-    m_menu_options_resume.set_active(m_sequence->get_resume());
-    m_menu_options_resume.signal_activate().connect([&]{menu_callback(EDIT_MENU_RESUME);});
-    m_submenu_options.append(m_menu_options_resume);
+    m_menu_playback_playing.set_label("Toggle playback");
+    m_menu_playback_playing.add_accelerator("activate", get_accel_group(), 'e', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_playback_playing.signal_activate().connect([&]{menu_callback(EDIT_MENU_PLAY);});
+    m_menu_playing_state = false;
+    m_submenu_playback.append(m_menu_playback_playing);
+
+    m_menu_playback_resume.set_label("Resume notes when enabling");
+    m_menu_playback_resume.set_active(m_sequence->get_resume());
+    m_menu_playback_resume.signal_activate().connect([&]{menu_callback(EDIT_MENU_RESUME);});
+    m_submenu_playback.append(m_menu_playback_resume);
 
 
     // toolbar
@@ -272,7 +278,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
         return false;
     });
     m_toolbar_name.set_text(m_sequence->get_name());
-    m_toolbar.pack_start(m_toolbar_name, false, false);
+    m_toolbar.pack_start(m_toolbar_name, true, true);
 
     m_toolbar_bpm.set_name("bpm");
     m_toolbar_bpm.set_tooltip_text("Beats per measure");
@@ -386,16 +392,6 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar.pack_start(m_toolbar_length_label, false, false);
     m_toolbar.pack_start(m_toolbar_length, false, false);
 
-    m_toolbar_playing.set_label("Playing");
-    m_toolbar_playing.get_style_context()->add_class("togglebutton");
-    m_toolbar_playing.set_focus_on_click(false);
-    m_toolbar_playing.signal_clicked().connect([&]{
-        m_sequence->set_playing(m_toolbar_playing.get_active());
-    });
-    m_toolbar.pack_start(m_toolbar_playing, false, false);
-
-
-
     m_toolbar_bus_label.set_label("Output");
     m_toolbar_bus_label.set_sensitive(false);
     m_toolbar_bus_label.get_style_context()->add_class("nomargin");
@@ -406,7 +402,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar_bus_dropdown.set_direction(Gtk::ARROW_DOWN);
 
     m_toolbar.pack_end(m_toolbar_bus_dropdown, false, false);
-    m_toolbar.pack_end(m_toolbar_bus, false, false);
+    m_toolbar.pack_end(m_toolbar_bus, true, true);
     m_toolbar.pack_end(m_toolbar_bus_label, false, false);
 
 
@@ -681,8 +677,11 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             m_sequence->set_thru(m_menu_record_through.get_active());
             break;
 
+        case EDIT_MENU_PLAY:
+            m_sequence->set_playing(!m_menu_playing_state);
+            break;
         case EDIT_MENU_RESUME:
-            m_sequence->set_resume(m_menu_options_resume.get_active());
+            m_sequence->set_resume(m_menu_playback_resume.get_active());
             break;
     }
 }
@@ -706,8 +705,13 @@ EditWindow::timer_callback()
     }
 
     bool playing = m_sequence->get_playing();
-    if (m_toolbar_playing.get_active() != playing) {
-        m_toolbar_playing.set_active(playing);
+    if (m_menu_playing_state != playing) {
+        m_menu_playing_state = playing;
+        if (m_menu_playing_state) {
+            m_menu_playback.get_style_context()->add_class("playing");
+        } else {
+            m_menu_playback.get_style_context()->remove_class("playing");
+        }
     }
 
     update_midibus_name();

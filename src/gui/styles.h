@@ -133,7 +133,9 @@ window overshoot, undershoot {background: none;}\
 window :disabled {opacity: 0.75}\
 window .nomargin {margin-right: -9px;}\
 combobox {min-width: 0;}\
-.recording {background: rgba(255, 0, 0, 0.5); box-shadow: inset 0 0 0 2px " + c_color_foreground.to_string() + "; border-radius: 5px}\
+menuitem {margin-left:1px;}\
+.recording {box-shadow: 0 -2px 0 0 rgba(255, 0, 0, 0.5) inset;}\
+.playing {box-shadow: 0 -2px 0 0 rgba(255, 255, 255, 0.5) inset;}\
 selection {background: " + c_color_primary.to_string() + "; color: " + c_color_text_hilight.to_string() + "}\
 .editwindow-vscrollbar {padding-top: 2px; padding-bottom: 2px}\
 .editwindow-hscrollbar {padding-top: 2px; opacity: 0; transition: none}\
