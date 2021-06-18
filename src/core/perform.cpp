@@ -897,11 +897,13 @@ void perform::output_func()
         // loop timeout: 2ms
         struct timespec ts = {
             .tv_sec = 0,
-            .tv_nsec = 2000000
+            .tv_nsec = 1000000 * c_thread_trigger_ms
         };
 
+        long long now_time;
         long long last_time;
         long long delta_time;
+        long long exec_time;
 
         if (m_jack_running) {
             last_time = jack_get_time();
@@ -913,20 +915,16 @@ void perform::output_func()
         int ppqn = m_master_bus.get_ppqn();
         long current_tick = 0;
 
-        // stats
-        // long x = 0;
-        // long long t = 0;
-
         while( m_running ){
 
             // delta time
             if (m_jack_running) {
                 // jack
-                delta_time = jack_get_time() - last_time;
+                now_time = jack_get_time();
             } else {
                 // or system
                 clock_gettime(CLOCK_REALTIME, &system_time);
-                delta_time = ((system_time.tv_sec * 1000000) + (system_time.tv_nsec / 1000)) - last_time;
+                now_time = ((system_time.tv_sec * 1000000) + (system_time.tv_nsec / 1000));
             }
 
             // bpm
@@ -939,14 +937,13 @@ void perform::output_func()
                 bpm = m_master_bus.get_bpm();
             }
 
+            // delta time
+            delta_time = now_time - last_time;
+
             // delta time to ticks
             double tick_duration = 1000000 * 60. / bpm / ppqn;
             int ticks = (int)(delta_time / tick_duration);
             current_tick += ticks;
-
-            // stats
-            // x++;
-            // t+=delta_time;
 
             // increment time
             last_time += ticks * tick_duration;
@@ -954,11 +951,21 @@ void perform::output_func()
             // play sequences at current tick
             play(current_tick);
 
+            // exec time
+            if (m_jack_running) {
+                // jack
+                exec_time = jack_get_time();
+            } else {
+                // or system
+                clock_gettime(CLOCK_REALTIME, &system_time);
+                exec_time = ((system_time.tv_sec * 1000000) + (system_time.tv_nsec / 1000));
+            }
+
+            // adjust sleep time
+            ts.tv_nsec = 1000000 * c_thread_trigger_ms - (exec_time - now_time) * 1000;
+
             nanosleep(&ts, NULL);
         }
-
-        // stats
-        // printf("average time: %lli\n", t / x);
 
         m_tick = 0;
         m_master_bus.flush();
