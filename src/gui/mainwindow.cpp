@@ -519,15 +519,11 @@ MainWindow::update_window_title()
     std::string title;
 
     if (global_filename == "")
-        title = ( PACKAGE ) + string( " - [unnamed]" );
+        title = string(PACKAGE) + " - Untitled";
     else
-        title =
-            ( PACKAGE )
-            + string( " - [" )
-            + Glib::filename_to_utf8(global_filename)
-            + string( "]" );
+        title = string(PACKAGE) + " - " + global_filename;
 
-    set_title ( title.c_str());
+    set_title(title.c_str());
 }
 
 
@@ -553,7 +549,7 @@ MainWindow::unsaved_changes()
         Glib::ustring query_str;
 
         if (global_filename == "")
-            query_str = "'Unnamed' has changes, do you want to save them ?";
+            query_str = "'Untitled' has changes, do you want to save them ?";
         else
             query_str = "'" + global_filename + "' has changes, do you want to save them ?";
 

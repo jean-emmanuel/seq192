@@ -17,6 +17,7 @@
 #include "editwindow.h"
 #include "pianoroll.h"
 #include "../core/globals.h"
+#include "../package.h"
 #include "../core/controllers.h"
 
 EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) :
@@ -267,6 +268,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar_name.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
         string s = m_toolbar_name.get_text();
         m_sequence->set_name(s);
+        update_window_title();
         return false;
     });
     m_toolbar_name.set_text(m_sequence->get_name());
@@ -487,6 +489,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     // add_events(Gdk::SCROLL_MASK);
 
     clear_focus();
+    update_window_title();
     set_position(Gtk::WIN_POS_CENTER);
     resize(1024, 600);
     show_all();
@@ -1039,4 +1042,11 @@ EditWindow::update_hscrollbar_visibility() {
     auto adj = m_hscrollbar.get_adjustment();
     if (m_pianoroll.get_width() * m_pianoroll.get_zoom() >= adj->get_upper()) m_hscrollbar.get_style_context()->remove_class("show");
     else m_hscrollbar.get_style_context()->add_class("show");
+}
+
+void
+EditWindow::update_window_title()
+{
+    std::string title = string(PACKAGE) + " - " + m_toolbar_name.get_text();
+    set_title(title.c_str());
 }

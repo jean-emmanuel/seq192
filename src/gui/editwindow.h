@@ -218,6 +218,7 @@ class EditWindow : public Window {
         void focus_callback(string name);
 
         void update_hscrollbar_visibility();
+        void update_window_title();
 
         void clear_focus();
 
