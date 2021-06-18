@@ -815,14 +815,14 @@ EditWindow::update_midibus_name()
         mastermidibus *mmb =  m_perform->get_master_midi_bus();
         string bus = mmb->get_midi_out_bus_name(m_midibus);
 
-        string channel = "[" + to_string(m_midichannel + 1) + "]";
+        string channel = to_string(m_midichannel + 1);
         int instrument = global_user_midi_bus_definitions[m_midibus].instrument[m_midichannel];
         if (instrument >= 0 && instrument < c_maxBuses)
         {
             channel = channel + " " + global_user_instrument_definitions[instrument].instrument;
         }
 
-        m_toolbar_bus.set_text(bus + " - " + channel);
+        m_toolbar_bus.set_text(bus + " / " + channel);
 
     }
 
@@ -834,8 +834,6 @@ void EditWindow::create_midibus_menu()
     m_toolbar_bus_menu.set_valign(Gtk::ALIGN_START);
     m_toolbar_bus_menu.set_halign(Gtk::ALIGN_END);
 
-    char b[16];
-
     mastermidibus *masterbus = m_perform->get_master_midi_bus();
     for ( int i=0; i< masterbus->get_num_out_buses(); i++ ){
         Menu *menu_channels = new Menu();
@@ -846,14 +844,11 @@ void EditWindow::create_midibus_menu()
 
 
         for( int j=0; j<16; j++ ){
-            snprintf(b, sizeof(b), "%d", j + 1);
-            std::string name = string(b);
+            std::string name = to_string(j + 1);
             int instrument = global_user_midi_bus_definitions[i].instrument[j];
             if ( instrument >= 0 && instrument < c_maxBuses )
             {
-                name = name + (string(" (") +
-                        global_user_instrument_definitions[instrument].instrument +
-                        string(")") );
+                name = name + " " + global_user_instrument_definitions[instrument].instrument;
             }
 
             MenuItem * menu_item_channel = new MenuItem(name);
