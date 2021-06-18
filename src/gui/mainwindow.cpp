@@ -127,7 +127,18 @@ MainWindow::MainWindow(perform * p)
     m_toolbar_panic.set_label("◭");
     m_toolbar_panic.set_tooltip_text("Disable all sequences");
     m_toolbar_panic.get_style_context()->add_class("panic");
-    m_toolbar_panic.signal_clicked().connect([&]{m_perform->panic();clear_focus();});
+    m_toolbar_panic.signal_clicked().connect([&]{
+        m_perform->panic();
+        clear_focus();
+        if (!m_perform->is_running()) {
+            for (int i = 0; i < c_seqs_in_set; i++) {
+                int seqnum = i + m_perform->get_screenset() * c_seqs_in_set;
+                if (m_perform->is_active(seqnum)) {
+                    m_sequences[i]->queue_draw();
+                }
+            }
+        }
+    });
     m_toolbar.pack_start(m_toolbar_panic, false, false);
 
     m_toolbar_stop.set_size_request(36, 0);
