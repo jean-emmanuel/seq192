@@ -177,7 +177,10 @@ main (int argc, char *argv[])
         delete f;
     }
 
-    signal(SIGINT, [](int param){global_is_running = false;});
+    if (global_oscport != 0 && strstr(global_oscport, "osc.unix://")) {
+        // liblo needs a gracefull ctrl+c handler to release unix socket
+        signal(SIGINT, [](int param){global_is_running = false;});
+    }
 
     int status = 0;
     if (global_no_gui) {
