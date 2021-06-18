@@ -177,7 +177,7 @@ main (int argc, char *argv[])
         delete f;
     }
 
-    if (global_oscport != 0 && strstr(global_oscport, "osc.unix://")) {
+    if (global_oscport != 0 && strstr(global_oscport, "/")) {
         // liblo needs a gracefull ctrl+c handler to release unix socket
         signal(SIGINT, [](int param){global_is_running = false;});
     }
