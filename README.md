@@ -88,11 +88,11 @@ Same as /sequence and (re)start playback
 
 #### /status <string: address>
 Send sequencer's status as json, without sequences informations
-- address: osc.udp://ip:port ; if omitted the response will be sent to the sender
+- address: `osc.udp://ip:port` or `osc.unix///path/to/socket` ; if omitted the response will be sent to the sender
 
 #### /status/extended <string: address>
 Send sequencer's status as json, including sequences informations
-- address: osc.udp://ip:port ; if omitted the response will be sent to the sender
+- address: `osc.udp://ip:port` or `osc.unix///path/to/socket` ; if omitted the response will be sent to the sender
 
 
 ## OSC status formatting
