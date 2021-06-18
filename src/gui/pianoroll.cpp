@@ -560,9 +560,10 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
                 numsel = m_sequence->select_note_events(tick_s,note_h,tick_s,note_h, sequence::e_select_one);
 
                 /* none selected, start selection box */
-                if (numsel == 0)
+                if (numsel == 0 && event->button == 1)
                 {
-                    if (event->button == 1) m_selecting = true;
+                    m_drop_y = (int) event->y;
+                    m_selecting = true;
                 }
             }
             if (m_sequence->select_note_events(tick_s, note_h, tick_s, note_h, sequence::e_is_selected))
