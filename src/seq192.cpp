@@ -18,6 +18,8 @@
 #include <stdlib.h>
 #include <signal.h>
 
+#include "package.h"
+
 #include "core/midifile.h"
 #include "core/configfile.h"
 #include "core/cachefile.h"
@@ -35,6 +37,7 @@ option long_options[] = {
     {"osc-port", 1,0,'p'},
     {"jack-transport",0, 0, 'j'},
     {"no-gui",0, 0, 'n'},
+    {"version",0, 0, 'v'},
     {0, 0, 0, 0}
 
 };
@@ -82,7 +85,7 @@ main (int argc, char *argv[])
 
     // read config file
     string config_path = getenv("XDG_CONFIG_HOME") == NULL ? string(getenv("HOME")) + "/.config" : getenv("XDG_CONFIG_HOME");
-    config_path += "/" + c_package_name;
+    config_path += string("/") + PACKAGE;
     mkdir(config_path.c_str(), 0777);
     string file_path = config_path + "/config.json";
     ConfigFile config(file_path);
@@ -90,7 +93,7 @@ main (int argc, char *argv[])
 
     // read/touch cache file
     string cache_path = getenv("XDG_CACHE_HOME") == NULL ? string(getenv("HOME")) + "/.cache" : getenv("XDG_CACHE_HOME");
-    cache_path += "/" + c_package_name;
+    cache_path += string("/") + PACKAGE;
     mkdir(cache_path.c_str(), 0777);
     file_path = cache_path + "/cache.json";
     std::ifstream infile(file_path);
@@ -109,7 +112,7 @@ main (int argc, char *argv[])
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "p:f:hjn", long_options, &option_index);
+        c = getopt_long (argc, argv, "p:f:hjnv", long_options, &option_index);
 
         /* Detect the end of the options. */
         if (c == -1)
@@ -122,11 +125,12 @@ main (int argc, char *argv[])
 
                 printf("usage: seq192 [options]\n\n");
                 printf("options:\n");
-                printf("  -h, --help : show this message\n");
-                printf("  -f, --file <filename> : load midi file on startup\n");
-                printf("  -p, --osc-port <port> : osc input port (udp port number or unix socket path)\n");
-                printf("  -j, --jack-transport : sync to jack transport\n");
-                printf("  -n, --no-gui : headless mode\n");
+                printf("  -h, --help             show this message\n");
+                printf("  -f, --file <filename>  load midi file on startup\n");
+                printf("  -p, --osc-port <port>  osc input port (udp port number or unix socket path)\n");
+                printf("  -j, --jack-transport   sync to jack transport\n");
+                printf("  -n, --no-gui           headless mode\n");
+                printf("  -v, --version          show version\n");
                 printf("\n\n");
 
                 return 0;
@@ -146,6 +150,11 @@ main (int argc, char *argv[])
 
             case 'p':
                 global_oscport = optarg;
+                break;
+
+            case 'v':
+                printf("%s %s\n", PACKAGE, VERSION);
+                return EXIT_SUCCESS;
                 break;
 
             default:

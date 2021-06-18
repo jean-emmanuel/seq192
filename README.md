@@ -35,12 +35,12 @@ make clean && make -j8
 usage: ./src/seq192 [options]
 
 options:
-  -h, --help : show this message
-  -f, --file <filename> : load midi file on startup
-  -p, --osc-port <port> : osc input port (udp port number or unix socket path)
-  -j, --jack-transport : sync to jack transport
-  -n, --no-gui : headless mode
-
+  -h, --help             show this message
+  -f, --file <filename>  load midi file on startup
+  -p, --osc-port <port>  osc input port (udp port number or unix socket path)
+  -j, --jack-transport   sync to jack transport
+  -n, --no-gui           headless mode
+  -v, --version          show version
 ```
 
 ## Jack transport

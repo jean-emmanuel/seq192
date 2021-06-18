@@ -24,9 +24,6 @@ using namespace std;
 
 const int c_thread_trigger_ms = 2;
 
-
-const string c_package_name = "seq192";
-
 /* 182 per screen */
 const int c_mainwnd_rows = 13; //ORL
 const int c_mainwnd_cols = 14; //ORL

@@ -16,6 +16,7 @@
 
 #include "mainwindow.h"
 #include "../core/globals.h"
+#include "../package.h"
 #include <time.h>
 
 #include "../xpm/seq192.xpm"
@@ -522,10 +523,10 @@ MainWindow::update_window_title()
     std::string title;
 
     if (global_filename == "")
-        title = ( c_package_name ) + string( " - [unnamed]" );
+        title = ( PACKAGE ) + string( " - [unnamed]" );
     else
         title =
-            ( c_package_name )
+            ( PACKAGE )
             + string( " - [" )
             + Glib::filename_to_utf8(global_filename)
             + string( "]" );
