@@ -131,14 +131,6 @@ MainWindow::MainWindow(perform * p)
     m_toolbar_panic.signal_clicked().connect([&]{
         m_perform->panic();
         clear_focus();
-        if (!m_perform->is_running()) {
-            for (int i = 0; i < c_seqs_in_set; i++) {
-                int seqnum = i + m_perform->get_screenset() * c_seqs_in_set;
-                if (m_perform->is_active(seqnum)) {
-                    m_sequences[i]->queue_draw();
-                }
-            }
-        }
     });
     m_toolbar.pack_start(m_toolbar_panic, false, false);
 
@@ -323,8 +315,12 @@ MainWindow::timer_callback()
             m_sequences[i]->draw_background();
             m_sequences[i]->queue_draw();
         }
-        else if (m_perform->is_active(seqnum) && m_toolbar_play_state) {
-            m_sequences[i]->queue_draw();
+        else if (m_perform->is_active(seqnum)) {
+            if (m_toolbar_play_state) m_sequences[i]->queue_draw();
+            else if (m_sequences[i]->get_sequence()->is_dirty_main()) {
+                m_sequences[i]->draw_background();
+                m_sequences[i]->queue_draw();
+            }
         }
     }
 

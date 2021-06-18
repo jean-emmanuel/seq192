@@ -46,6 +46,7 @@ class SequenceButton : public DrawingArea {
         SequenceButton(perform * p, MainWindow * m, int seqpos);
         ~SequenceButton();
 
+        sequence * get_sequence();
         int get_sequence_number();
         int get_last_sequence_number();
         void set_last_sequence_number();
@@ -69,7 +70,6 @@ class SequenceButton : public DrawingArea {
         bool m_drag_start;
         Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
-        sequence * get_sequence();
         void menu_callback(context_menu_action action, int data1, int data2);
 
         int m_rect_x;
