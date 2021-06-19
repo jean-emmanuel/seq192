@@ -56,7 +56,7 @@ perform::start_playing()
     inner_stop();
 
     if (!m_jack_running) {
-        usleep(1000);
+        usleep(1000 * c_thread_trigger_ms);
     }
 
     position_jack();
