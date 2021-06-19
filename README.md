@@ -15,6 +15,8 @@ MIDI sequencer based on seq24 with less features and more swag.
 - OSC controls
 - almost 192 patterns per set
 
+Seq192 answers a very specific need: having a live MIDI sequencer that can be controlled programmatically and sync with other applications using jack transport.
+
 ## Build
 
 **Dependencies** (as debian packages)
