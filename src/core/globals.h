@@ -18,7 +18,6 @@
 #define SEQ192_GLOBALS
 
 #include <string>
-#include <gtkmm.h>
 
 using namespace std;
 
