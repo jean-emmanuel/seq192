@@ -128,11 +128,12 @@ SequenceButton::draw_background()
         cr->set_source_rgba(color.r, color.g, color.b, 0.6);
         char str[20];
         sprintf( str,
-            "%d-%d %ld/%ld",
+            "%ld/%ld → %d:%d ",
+            seq->get_bpm(), seq->get_bw(),
             seq->get_midi_bus()+1,
-            seq->get_midi_channel()+1,
-            seq->get_bpm(), seq->get_bw()
+            seq->get_midi_channel()+1
         );
+
         auto timesig = create_pango_layout(str);
         timesig->set_font_description(font);
         timesig->get_pixel_size(text_width, text_height);

@@ -830,7 +830,7 @@ EditWindow::update_midibus_name()
             channel = channel + " " + global_user_instrument_definitions[instrument].instrument;
         }
 
-        m_toolbar_bus.set_text(bus + " / " + channel);
+        m_toolbar_bus.set_text(bus + ": " + channel);
 
     }
 
