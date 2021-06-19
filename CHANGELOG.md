@@ -1,41 +1,16 @@
 # Changelog
 
-## 0.12.0
+## 1.0.0-alpha
 
-- sequence: (seq32) trigger undo/redo
-- sequence: (seq32) trigger value handle undo/redo
-- sequence: (seq32) nudge notes with keyboard arrows
-- sequence: (seq32) pitch/time menu actions
-- sequence: (seq32) lfo editor
-- sequence: redo on ctrl+y and ctrl+shift+z
-- sequence: unselect on ctrl+shift+a
-- sequence: fix start/stop keyboard shortcuts
-- main: (seq32) global is_modified flag (warning when quitting with unsaved changes)
-- main: remove option panel
-- midi: remove midi controls, midi clock and sysex passing
-- midi: always use alsa ports
-- build: drop windows support
-- build: drop old gtkmm version
-- build: require jack
-- misc: remove cli options except --jack-transport and --osc-port
-- misc: remove lash support
-- userfile: apply user bus/channel/control definitions
-- sequence: display user channel definition
-- main: (seq32) export single sequence
-- main: export single screenset
-- sequence: add "resume" mode (resumes note when enabling sequence)
-
-## 0.11.0
-
-- main: removed song editor
-- main:keyboard shortcuts disabled
-- main:scrollable main window
-- engine: osc controls (see OSC.md)
-- sequence: bigger keys in pianoroll
-- main: slightly bigger font for small texts
-- sequence: prevent name entry from grabbing focus
-
-## 0.10.0
-
-- starting playback when already playing restarts playback
-- allow entering arbitrary numbers of beats in sequence editor
+- removed song editor
+- interface rewritten with GTK3
+- removed MIDI controls
+- removed keyboard controls
+- added OSC controls
+- dropped support for systems other than GNU/Linux
+- removed non-ALSA MIDI support
+- starting transport while already playing resets position to 0
+- added screenset export
+- imported a bunch of features from seq32
+- refactored config file system using JSON
+- added resume playback mode to sequences
