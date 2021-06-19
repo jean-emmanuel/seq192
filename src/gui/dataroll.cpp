@@ -402,8 +402,14 @@ DataRoll::on_scroll_event(GdkEventScroll* event)
 
     if (signal_scroll.emit(event)) return true;
 
-    if (event->direction == GDK_SCROLL_UP) m_sequence->increment_selected(m_status, m_cc);
-    if (event->direction == GDK_SCROLL_DOWN) m_sequence->decrement_selected(m_status, m_cc);
+    if (event->direction == GDK_SCROLL_UP) {
+        m_sequence->increment_selected(m_status, m_cc);
+        queue_draw_background();
+    }
+    if (event->direction == GDK_SCROLL_DOWN) {
+        m_sequence->decrement_selected(m_status, m_cc);
+        queue_draw_background();
+    }
 
     return false;
 }
