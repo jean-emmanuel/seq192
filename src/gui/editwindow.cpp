@@ -579,6 +579,7 @@ EditWindow::on_delete_event(GdkEventAny *event)
         m_perform->get_master_midi_bus()->set_sequence_input(NULL);
     }
     m_mainwindow->close_edit_window(m_seqnum);
+    delete this;
     return false;
 }
 
