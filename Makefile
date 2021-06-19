@@ -4,16 +4,17 @@ LDFLAGS = $(shell pkg-config --libs liblo jack alsa gtkmm-3.0)
 SOURCES = $(wildcard src/core/*.cpp) $(wildcard src/gui/*.cpp) src/seq192.cpp
 OBJ = $(SOURCES:.cpp=.o)
 DEPENDS := $(SOURCES:.cpp=.d)
-PROG = src/seq192
+BIN = seq192
+PREFIX = /usr/local
 
-.PHONY: all clean
+.PHONY: all clean install uninstall
 
-all: $(PROG)
+all: src/$(BIN)
 
 bold := $(shell tput bold)
 sgr0 := $(shell tput sgr0)
 
-$(PROG): $(OBJ)
+src/$(BIN): $(OBJ)
 	@printf '\n$(bold)Linking$(sgr0)\n'
 	$(CXX) -o $@ $^ $(LDFLAGS)
 	@printf '\n'
@@ -25,4 +26,11 @@ $(PROG): $(OBJ)
 -include $(DEPENDS)
 
 clean:
-	@rm -f $(OBJ) $(DEPENDS) $(PROG)
+	@rm -f $(OBJ) $(DEPENDS) src/$(BIN)
+
+install: src/$(BIN)
+	mkdir -p $(DESTDIR)$(PREFIX)/bin
+	cp $< $(DESTDIR)$(PREFIX)/bin/$(BIN)
+
+uninstall:
+	rm -f $(DESTDIR)$(PREFIX)/bin/$(BIN)
