@@ -32,7 +32,7 @@ install: src/$(BIN)
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
 	cp $< $(DESTDIR)$(PREFIX)/bin/$(BIN)
 	cp src/xpm/seq192_32.xpm $(DESTDIR)/usr/share/pixmaps/seq192.xpm
-	cp desktop/seq192.desktop /usr/share/applications/seq192.desktop
+	cp desktop/seq192.desktop $(DESTDIR)/usr/share/applications/seq192.desktop
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/$(BIN)
