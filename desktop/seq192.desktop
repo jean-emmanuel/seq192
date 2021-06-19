@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=seq192
+Comment=MIDI sequencer based on seq24
+Icon=seq192
+Exec=seq192
+TryExec=seq192
+Terminal=false
+Type=Application
+Categories=Audio;Sequencer;AudioVideo;

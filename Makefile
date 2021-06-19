@@ -31,6 +31,10 @@ clean:
 install: src/$(BIN)
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
 	cp $< $(DESTDIR)$(PREFIX)/bin/$(BIN)
+	cp src/xpm/seq192_32.xpm $(DESTDIR)/usr/share/pixmaps/seq192.xpm
+	cp desktop/seq192.desktop /usr/share/applications/seq192.desktop
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/$(BIN)
+	rm -f $(DESTDIR)/usr/share/pixmaps/seq192.xpm
+	rm -f $(DESTDIR)/usr/share/applications/seq192.desktop

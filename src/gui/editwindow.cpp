@@ -20,6 +20,8 @@
 #include "../package.h"
 #include "../core/controllers.h"
 
+#include "../xpm/seq192_32.xpm"
+
 EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) :
     m_perform(p),
     m_sequence(seq),
@@ -482,7 +484,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_submenu_record.signal_popped_up().connect([&](const Gdk::Rectangle*, const Gdk::Rectangle*, bool, bool){on_focus_out();});
 
 
-    // add_events(Gdk::SCROLL_MASK);
+    set_icon(Gdk::Pixbuf::create_from_xpm_data(seq192_32_xpm));
 
     clear_focus();
     update_window_title();
