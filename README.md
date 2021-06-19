@@ -35,12 +35,13 @@ make clean && make -j8
 usage: ./src/seq192 [options]
 
 options:
-  -h, --help             show this message
-  -f, --file <filename>  load midi file on startup
-  -p, --osc-port <port>  osc input port (udp port number or unix socket path)
-  -j, --jack-transport   sync to jack transport
-  -n, --no-gui           headless mode
-  -v, --version          show version
+  -h, --help              show this message
+  -f, --file <filename>   load midi file on startup
+  -c, --config <filename> load config file on startup
+  -p, --osc-port <port>   osc input port (udp port number or unix socket path)
+  -j, --jack-transport    sync to jack transport
+  -n, --no-gui            headless mode
+  -v, --version           show version
 ```
 
 ## Jack transport
@@ -144,9 +145,16 @@ Send sequencer's status as json, including sequences informations
 
 ## Configuration / Control map / Key map
 
-Config files are located in `$XDG_CONFIG_HOME/seq192/` (`~/.config/seq192/` by default).
+The config file allows customizing the following aspects of seq192:
 
-**`~/.config/seq192/config.json` example:**
+- MIDI bus names
+- MIDI channel names per bus
+- Note names in the piano roll (per channel)
+- Control names in the event dropdown (per channel)
+
+It's located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.config/seq192/config.json` by default), but can be loaded from any location using `--config`.
+
+**Example:**
 
 ```json
 {
