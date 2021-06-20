@@ -283,6 +283,10 @@ combobox {
     min-width: 0;
 }
 
+combobox window arrow {
+    background: @color_fg;
+}
+
 check {
     background: transparent;
     -gtk-icon-source: none;
