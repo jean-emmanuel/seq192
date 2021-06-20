@@ -209,6 +209,16 @@ overshoot, undershoot {
     border-bottom: 1px solid @color_bg
 }
 
+#sset .down, #sset .up {
+-gtk-icon-transform: scale(0);
+background: -gtk-icontheme("pan-start-symbolic") center no-repeat, @color_raised;
+background-size: 20px;
+}
+
+#sset .up {
+background-image: -gtk-icontheme("pan-end-symbolic");
+}
+
 /* widgets */
 
 button {
