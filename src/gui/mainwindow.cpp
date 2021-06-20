@@ -553,7 +553,7 @@ MainWindow::unsaved_changes()
         else
             query_str = "'" + global_filename + "' has changes, do you want to save them ?";
 
-        MessageDialog dialog(*this, query_str, false, Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_NONE, true);
+        MessageDialog dialog(*this, query_str, false, Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_NONE, false);
 
         dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_YES);
         dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);

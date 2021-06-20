@@ -108,32 +108,32 @@ const color c_color_data_background = {c_color_background.get_red(), c_color_bac
 
 // Main window
 const std::string c_mainwindow_css = "\
-window * {box-shadow: none; border: 0; border-radius: 0; text-shadow: none; color: inherit; background: transparent;}\
+*:not(decoration), window * {box-shadow: none; border: 0; border-radius: 0; text-shadow: none; color: inherit;}\
 window {background: " + c_color_background.to_string() + "; color: " + c_color_text.to_string() + "}\
-window menu {background: " + c_color_foreground.to_string() + "; border: 1px solid " + c_color_background.to_string() + "; padding: 1px;}\
-window menubar {background: " + c_color_foreground.to_string() + "; border-bottom: 1px solid " + c_color_background.to_string() + "}\
-window menuitem:hover {background: " + c_color_primary.to_string() + "; color: " + c_color_text_hilight.to_string() + "}\
-window separator {background: " + c_color_background.to_string() + "; opacity: 0.5;}\
-window scrollbar {background: " + c_color_background.to_string() + "; min-width: 12px; min-height: 12px;}\
-window scrollbar slider {background: " + c_color_raised.to_string() + "; min-width: 10px; min-height: 10px;}\
-window scrollbar slider:active {background: " + c_color_primary.to_string() + ";}\
+menu {background: " + c_color_foreground.to_string() + "; border: 1px solid " + c_color_background.to_string() + "; padding: 1px;}\
+menubar {background: " + c_color_foreground.to_string() + "; border-bottom: 1px solid " + c_color_background.to_string() + "}\
+menuitem:hover {background: " + c_color_primary.to_string() + "; color: " + c_color_text_hilight.to_string() + "}\
+separator {background: " + c_color_background.to_string() + "; opacity: 0.5;}\
+scrollbar {background: " + c_color_background.to_string() + "; min-width: 12px; min-height: 12px;}\
+scrollbar slider {background: " + c_color_raised.to_string() + "; min-width: 10px; min-height: 10px;}\
+scrollbar slider:active {background: " + c_color_primary.to_string() + ";}\
 .toolbar {background: " + c_color_foreground.to_string() + ";padding:10px; border-bottom: 1px solid " + c_color_background.to_string() + "}\
-window button {background: " + c_color_raised.to_string() + "; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);}\
-window button:hover {opacity: 0.8}\
-window button:active {opacity: 0.6}\
-.togglebutton:checked, window button.on {color: " + c_color_primary.to_string() + ";}\
-.togglebutton.bypass:checked, window button.on.bypass {color: " + c_color_text.to_string() + ";}\
-window entry {background: rgba(0, 0, 0, 0.15); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); color: inherit}\
-window entry:focus {background: rgba(0, 0, 0, 0.2);}\
-window spinbutton entry {box-shadow: none}\
-window spinbutton {box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); color: inherit;}\
-window spinbutton button {box-shadow:none;}\
-window spinbutton button:last-child {margin-left:1px;}\
-window overshoot, undershoot {background: none;}\
-window :disabled {opacity: 0.75}\
-window .nomargin {margin-right: -9px;}\
+button {background: " + c_color_raised.to_string() + "; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);}\
+button:hover {opacity: 0.8}\
+button:active {opacity: 0.6}\
+.togglebutton:checked, button.on {color: " + c_color_primary.to_string() + ";}\
+.togglebutton.bypass:checked, button.on.bypass {color: " + c_color_text.to_string() + ";}\
+entry {background: rgba(0, 0, 0, 0.15); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); color: inherit}\
+entry:focus {background: rgba(0, 0, 0, 0.2);}\
+spinbutton entry {box-shadow: none}\
+spinbutton {box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); color: inherit; background:transparent}\
+spinbutton button {box-shadow:none;}\
+spinbutton button:last-child {margin-left:1px;}\
+overshoot, undershoot {background: none;}\
+:disabled {opacity: 0.75}\
+.nomargin {margin-right: -9px;}\
 combobox {min-width: 0;}\
-window menubar menuitem {margin-left:1px;}\
+menubar menuitem {margin-left:1px;}\
 .recording {box-shadow: 0 -2px 0 0 rgba(255, 0, 0, 0.5) inset;}\
 .playing {box-shadow: 0 -2px 0 0 rgba(255, 255, 255, 0.5) inset;}\
 selection {background: " + c_color_primary.to_string() + "; color: " + c_color_text_hilight.to_string() + "}\
@@ -141,10 +141,23 @@ selection {background: " + c_color_primary.to_string() + "; color: " + c_color_t
 .editwindow-hscrollbar {padding-top: 2px; opacity: 0; transition: none}\
 .editwindow-hscrollbar.show {opacity: 1;}\
 .editwindow-eventbutton {font-size: " + to_string(c_key_fontsize) + "pt; font-weight: bold; box-shadow: none; padding-right: " + to_string(c_key_padding) + "px; min-height: 0; border-top: 1px solid " + c_color_background.to_string() + "; border-right: 1px solid " + c_color_background.to_string() + "}\
-window check {background:transparent; -gtk-icon-source: none; border: 1px solid " + c_color_text.to_string() + "; background-clip: content-box; min-height: 12px;  min-width: 12px;}\
-window check:hover {border-color: " + c_color_text_hilight.to_string() + "}\
-window check:checked, .checked check {background: " + c_color_text.to_string() + "; box-shadow: inset 0 0 0 1px; color: " + c_color_foreground.to_string() + "}\
-window check:checked:hover, .checked check:hover {background: " + c_color_text_hilight.to_string() + ";color: " + c_color_primary.to_string() + "}\
+check {background:transparent; -gtk-icon-source: none; border: 1px solid " + c_color_text.to_string() + "; background-clip: content-box; min-height: 12px;  min-width: 12px;}\
+check:hover {border-color: " + c_color_text_hilight.to_string() + "}\
+check:checked, .checked check {background: " + c_color_text.to_string() + "; box-shadow: inset 0 0 0 1px; color: " + c_color_foreground.to_string() + "}\
+check:checked:hover, .checked check:hover {background: " + c_color_text_hilight.to_string() + ";color: " + c_color_primary.to_string() + "}\
+popover, tooltip {background: " + c_color_foreground.to_string() + "; border: 1px solid " + c_color_background.to_string() + "}\
+dialog {background: " + c_color_background.to_string() + "; color: " + c_color_text.to_string() + ";}\
+messagedialog {box-shadow: 0 0 0 1px " + c_color_background.to_string() + "}\
+messagedialog {background: " + c_color_foreground.to_string() + "; color: " + c_color_text.to_string() + ";}\
+dialog headerbar {background: " + c_color_foreground.to_string() + "; border-bottom: 1px solid " + c_color_background.to_string() + "; padding: 0 10px;}\
+dialog toolbar {background: " + c_color_foreground.to_string() + ";}\
+dialog treeview.view, dialog #pathbarbox > stack, dialog placesview list, filechooser box paned box box stack {background: " + c_color_foreground.to_string() + "}\
+dialog actionbar > revealer > box, #pathbarbox {background: " + c_color_foreground.to_string() + "}\
+dialog actionbar > revealer > box {border-top: 1px solid "  + c_color_background.to_string() + " }\
+dialog #pathbarbox {border-bottom: 1px solid "  + c_color_background.to_string() + " }\
+dialog scrollbar {padding-top: 2px; padding-bottom: 2px}\
+dialog placessidebar {background: " + c_color_background.to_string() + "}\
+dialog :selected, dialog treeview :selected, dialog :active, dialog modelbutton:hover {background: " + c_color_primary.to_string() + "; color: " + c_color_text_hilight.to_string() + "; opacity: 1;}\
 ";
 
 #endif
