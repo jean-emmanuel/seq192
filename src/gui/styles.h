@@ -377,7 +377,7 @@ dialog placessidebar {
 
 dialog :selected,
 dialog treeview :selected,
-dialog :active,
+dialog placessidebar :active,
 dialog modelbutton:hover {
     background: @color_primary;
     color: @color_text_hilight;
