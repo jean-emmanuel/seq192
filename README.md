@@ -46,6 +46,22 @@ options:
   -v, --version           show version
 ```
 
+**Install**
+
+```bash
+sudo make install
+```
+
+Append `PREFIX=/usr` to override the default installation path (`/usr/local`)
+
+**Uninstall**
+
+```bash
+sudo make uninstall
+```
+
+Append `PREFIX=/usr` to override the default uninstallation path (`/usr/local`) 
+
 ## Jack transport
 
 When `--jack-transport` is set, seq192 will

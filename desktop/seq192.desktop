@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=seq192
-Comment=MIDI sequencer based on seq24
+Comment=Live MIDI sequencer
 Icon=seq192
 Exec=seq192
 TryExec=seq192

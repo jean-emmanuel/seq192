@@ -103,8 +103,10 @@ main (int argc, char *argv[])
             case '?':
             case 'h':
 
-                printf("usage: seq192 [options]\n\n");
-                printf("options:\n");
+                printf("\n");
+                printf("seq192 - live MIDI sequencer\n\n");
+                printf("Usage: seq192 [options]\n\n");
+                printf("Options:\n");
                 printf("  -h, --help              show this message\n");
                 printf("  -f, --file <filename>   load midi file on startup\n");
                 printf("  -c, --config <filename> load config file on startup\n");
@@ -112,7 +114,7 @@ main (int argc, char *argv[])
                 printf("  -j, --jack-transport    sync to jack transport\n");
                 printf("  -n, --no-gui            headless mode\n");
                 printf("  -v, --version           show version\n");
-                printf("\n\n");
+                printf("\n");
 
                 return 0;
                 break;
