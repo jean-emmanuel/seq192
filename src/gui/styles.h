@@ -355,6 +355,10 @@ messagedialog {
     color: @color_text;
 }
 
+messagedialog button {
+    padding: 8px;
+}
+
 dialog headerbar {
     background: @color_fg;
     border-bottom: 1px solid @color_bg;
