@@ -347,6 +347,7 @@ check:checked:hover, .checked check:hover {
 dialog {
     background: @color_fg;
     color: @color_text;
+    box-shadow: 0 0 0 1px @color_bg;
 }
 
 messagedialog {
@@ -355,13 +356,18 @@ messagedialog {
     color: @color_text;
 }
 
+messagedialog .titlebar {
+    background: @color_fg;
+    box-shadow: 0 0 0 1px @color_bg, 0 1px 0 0 @color_fg;
+}
+
 messagedialog button {
     padding: 8px;
 }
 
 dialog headerbar {
     background: @color_fg;
-    border-bottom: 1px solid @color_bg;
+    box-shadow: 0 0 0 1px @color_bg;
     padding: 0 10px;
 }
 
