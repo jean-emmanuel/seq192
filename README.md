@@ -60,4 +60,4 @@ Append `PREFIX=/usr` to override the default uninstallation path (`/usr/local`)
 
 ## Documentation
 
-See [MANUAL.md](man/MANUAL.md) or run `man seq192` after installing.
+See [seq192.ammd.net](https://seq192.ammd.net/) or run `man seq192` after installing.
