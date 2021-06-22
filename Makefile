@@ -25,6 +25,10 @@ src/$(BIN): $(OBJ)
 
 -include $(DEPENDS)
 
+manual:
+	ronn man/MANUAL.md --manual='User manual' --roff
+	mv man/MANUAL.1 man/seq192.1
+
 clean:
 	@rm -f $(OBJ) $(DEPENDS) src/$(BIN)
 
@@ -35,9 +39,10 @@ install: src/$(BIN)
 	cp $< $(DESTDIR)$(PREFIX)/bin/$(BIN)
 	cp src/xpm/seq192_32.xpm $(DESTDIR)$(PREFIX)/share/pixmaps/seq192.xpm
 	cp desktop/seq192.desktop $(DESTDIR)$(PREFIX)/share/applications/seq192.desktop
-
+	cp man/seq192.1 $(DESTDIR)$(PREFIX)/share/man/man1/seq192.1
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/$(BIN)
 	rm -f $(DESTDIR)$(PREFIX)/share/pixmaps/seq192.xpm
 	rm -f $(DESTDIR)$(PREFIX)/share/applications/seq192.desktop
+	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/seq192.1

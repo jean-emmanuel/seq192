@@ -1,0 +1,197 @@
+.\" generated with Ronn-NG/v0.9.1
+.\" http://github.com/apjanke/ronn-ng/tree/0.9.1
+.TH "SEQ192" "1" "June 2021" "" "User manual"
+.SH "NAME"
+\fBseq192\fR \- live MIDI sequencer
+.SH "SYNOPSIS"
+\fBseq192\fR [OPTION\|\.\|\.\|\.]
+.SH "DESCRIPTION"
+seq192 is a MIDI sequencer for live situations that is meant to be be controlled with OSC message and sync with other applications using jack transport\.
+.SH "OPTIONS"
+.TP
+\fB\-h, \-\-help\fR
+Show available options
+.TP
+\fB\-f, \-\-file\fR \fIfile\fR
+Load midi file on startup
+.TP
+\fB\-c, \-\-config\fR \fIfile\fR
+Load config file on startup
+.TP
+\fB\-p, \-\-osc\-port\fR \fIport\fR
+OSC input port (udp port number or unix socket path)
+.TP
+\fB\-j, \-\-jack\-transport\fR
+Sync to jack transport
+.TP
+\fB\-n, \-\-no\-gui\fR
+Enable headless mode
+.TP
+\fB\-v, \-\-version\fR
+Show version and exit
+.SH "USER INTERFACE"
+\fITODO\fR
+.SH "JACK TRANSPORT"
+When \fB\-\-jack\-transport\fR is set, seq192 will
+.IP "" 4
+.nf
+\- follow start / stop commands from other clients
+\- send start / stop commands to other clients
+\- use the transport master's bpm
+\- set its position to 0 whenever the transport stops or restarts
+\- **not** attempt to reposition within sequences
+.fi
+.IP "" 0
+.SH "CONFIGURATION FILE"
+The configration file is located in \fB$XDG_CONFIG_HOME/seq192/config\.json\fR (\fB~/\.config/seq192/config\.json\fR by default), but can be loaded from any location using \fB\-\-config\fR\. It allows customizing the following aspects of seq192:
+.IP "" 4
+.nf
+\- MIDI bus names
+\- MIDI channel names per bus
+\- Note names in the piano roll (per channel)
+\- Control names in the event dropdown (per channel)
+.fi
+.IP "" 0
+.P
+\fBExample\fR
+.IP "" 4
+.nf
+{
+    "buses": {
+        "0": {
+            "name": "Sampler",
+            "channels": {
+                "0": {
+                    "name": "Drums",
+                    "notes": {
+                        "64": "Kick",
+                        "65": "Snare",
+                        "66": "Hihat"
+                    },
+                    "controls": {
+                        "1": "Custom cc name ",
+                        "2": "Etc"
+                    }
+                }
+            }
+        },
+        "1": {
+            "name": "Bass synth",
+            "channels":{
+                "0": {"name": "Trap bass"},
+                "1": {"name": "Wobble"}
+            }
+        }
+    }
+}
+.fi
+.IP "" 0
+.SH "OSC CONTROLS"
+.TP
+\fB/play\fR
+Start playback or restart if already playing
+.TP
+\fB/stop\fR
+Stop playback
+.TP
+\fB/screenset\fR <int: screen>
+Change active screen set
+.TP
+\fB/panic\fR
+Disable all sequences and cancel queued sequences
+.TP
+\fB/sequence\fR <string: mode> <int: column> <int: row>
+Set sequence(s) state
+.br
+\fImode\fR: "solo", "on", "off" or "toggle"
+.br
+\fIcolumn\fR: column number on screen set (zero indexed)
+.br
+\fIrow\fR: row number; if omitted, all rows are affected; multiple rows can be specified
+.TP
+\fB/sequence\fR <string: mode> <string: name>
+Set sequence(s) state
+.br
+\fIname\fR: sequence name or osc pattern (can match multiple sequence names); multiple names can be specified
+.TP
+\fB/sequence/queue\fR <string: mode> <int: column> <int: row>
+Same as /sequence but affected sequences will change state only on next cycle
+.TP
+\fB/sequence/trig\fR <string: mode> <int: column> <int: row>
+Same as /sequence and (re)start playback
+.TP
+\fB/status\fR <string: address>
+Send sequencer's status as json, without sequences informations
+.br
+\fIaddress\fR: \fIosc\.udp://ip:port\fR or \fIosc\.unix///path/to/socket\fR ; if omitted the response will be sent to the sender
+.TP
+\fB/status/extended\fR <string: address>
+Send sequencer's status as json, including sequences informations
+.br
+
+.SH "OSC STATUS"
+.nf
+{
+    "screenset": \fIint\fR,
+    "screensetName": "\fIstring\fR",
+    "playing": \fIint\fR,
+    "bpm": \fIint\fR,
+    "tick": \fIint\fR,
+    "sequences": [
+        {
+            "col": \fIint\fR,
+            "row": \fIint\fR,
+            "name": "\fIstring\fR",
+            "time": "\fIstring\fR",
+            "bars": \fIint\fR,
+            "ticks": \fIint\fR,
+            "queued": \fIint\fR,
+            "playing": \fIint\fR,
+            "timesPlayed": \fIint\fR
+        },
+        \|\.\|\.\|\.
+    ]
+}
+.fi
+.P
+\fBSequencer status\fR
+.IP "" 4
+.nf
+screenset: current screenset
+screensetName: current screenset's name
+playing: playback state
+bpm: current bpm
+tick: playback tick (192 ticks = 1 quarter note)
+.fi
+.IP "" 0
+.P
+\fBSequences statuses\fR (1 per active sequence in current screenset)
+.IP "" 4
+.nf
+col: column position
+row: row position
+name: sequence name
+time: sequence time signature (eg "4/4")
+bars: number of bars in sequence
+ticks: sequence length
+queued: sequence's queued state
+playing: sequence's playing state
+timesPlayed: number of times the sequence played since last enabled
+.fi
+.IP "" 0
+.SH "AUTHORS"
+seq192 is written by Jean\-Emmanuel Doucet and based on
+.TP
+seq24, written by
+Rob C\. Buse, Ivan Hernandez, Guido Scholz, Dana Olson, Jaakko Sipari, Peter Leigh, Anthony Green, Daniel Ellis, Sebastien Alaiwan, Kevin Meinert, Andrea delle Canne
+.TP
+seq32, written by
+Stazed
+.SH "COPYRIGHT"
+Copyright \(co 2021 Jean\-Emmanuel Doucet \fIjean\-emmanuel@ammd\.net\fR
+.P
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\.
+.P
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE\. See the GNU General Public License for more details\.
+.P
+You should have received a copy of the GNU General Public License along with this program\. If not, see \fIhttps://www\.gnu\.org/licenses/\fR\.

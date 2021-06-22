@@ -107,13 +107,13 @@ main (int argc, char *argv[])
                 printf("seq192 - live MIDI sequencer\n\n");
                 printf("Usage: seq192 [options]\n\n");
                 printf("Options:\n");
-                printf("  -h, --help              show this message\n");
+                printf("  -h, --help              show available options\n");
                 printf("  -f, --file <filename>   load midi file on startup\n");
                 printf("  -c, --config <filename> load config file on startup\n");
                 printf("  -p, --osc-port <port>   osc input port (udp port number or unix socket path)\n");
                 printf("  -j, --jack-transport    sync to jack transport\n");
-                printf("  -n, --no-gui            headless mode\n");
-                printf("  -v, --version           show version\n");
+                printf("  -n, --no-gui            enable headless mode\n");
+                printf("  -v, --version           show version and exit\n");
                 printf("\n");
 
                 return 0;
