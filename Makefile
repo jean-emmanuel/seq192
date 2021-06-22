@@ -29,6 +29,9 @@ manual:
 	ronn man/MANUAL.md --manual='User manual' --roff
 	mv man/MANUAL.1 man/seq192.1
 
+manual-html:
+	ronn man/MANUAL.md --manual='User manual' --html
+
 clean:
 	@rm -f $(OBJ) $(DEPENDS) src/$(BIN)
 
