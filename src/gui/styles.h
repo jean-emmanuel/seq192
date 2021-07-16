@@ -156,7 +156,7 @@ separator {
     opacity: 0.5;
 }
 
-menubar menuitem {
+menubar > menuitem {
     margin-left: 1px;
 }
 
