@@ -123,7 +123,7 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
 
 * `/status` <string: address>:
     Send sequencer's status as json, without sequences informations<br/>
-    _address_: *osc.udp://ip:port* or *osc.unix///path/to/socket* ; if omitted the response will be sent to the sender
+    _address_: *osc.udp://ip:port* or *osc.unix:///path/to/socket* ; if omitted the response will be sent to the sender
 
 * `/status/extended` <string: address>:
     Send sequencer's status as json, including sequences informations<br/>
