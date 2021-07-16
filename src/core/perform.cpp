@@ -125,8 +125,18 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
         case SEQ_STOP:
             self->stop_playing();
             break;
+        case SEQ_BPM:
+            if (argc > 0)
+            {
+                double bpm = 0;
+                if (types[0] == 'i') bpm = argv[0]->i;
+                else if (types[0] == 'f') bpm = argv[0]->f;
+                else break;
+                self->set_bpm(bpm);
+            }
+            break;
         case SEQ_SSET:
-            self->set_screenset((int) argv[0]->i);
+            if (argc > 0 && types[0] == 'i') self->set_screenset((int) argv[0]->i);
             break;
         case SEQ_PANIC:
             self->panic();

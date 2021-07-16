@@ -97,6 +97,9 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
 * `/stop`:
     Stop playback
 
+* `/bpm` <float_or_int: bpm>:
+    Set bpm
+
 * `/screenset` <int: screen>:
     Change active screen set
 

@@ -201,6 +201,7 @@ class perform
         OSC_ZERO = 0,
         SEQ_PLAY,
         SEQ_STOP,
+        SEQ_BPM,
         SEQ_SSET,
         SEQ_PANIC,
         SEQ_SSEQ,
@@ -218,6 +219,7 @@ class perform
     std::map<std::string, int> osc_commands = {
         {"/play",               SEQ_PLAY},
         {"/stop",               SEQ_STOP},
+        {"/bpm",                SEQ_BPM},
         {"/screenset",          SEQ_SSET},
         {"/panic",              SEQ_PANIC},
         {"/sequence",           SEQ_SSEQ},
