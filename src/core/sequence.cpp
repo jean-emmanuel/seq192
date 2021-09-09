@@ -2459,6 +2459,7 @@ sequence::set_recording( bool a_r )
 {
     lock();
     m_recording = a_r;
+    set_dirty_main();
     unlock();
 }
 

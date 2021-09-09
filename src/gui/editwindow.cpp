@@ -575,11 +575,6 @@ EditWindow::on_focus_out()
 bool
 EditWindow::on_delete_event(GdkEventAny *event)
 {
-    if (m_perform->is_active(m_seqnum) && m_sequence->get_recording())
-    {
-        m_sequence->set_recording(false);
-        m_perform->get_master_midi_bus()->set_sequence_input(NULL);
-    }
     m_mainwindow->close_edit_window(m_seqnum);
     delete this;
     return false;

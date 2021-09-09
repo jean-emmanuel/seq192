@@ -115,6 +115,9 @@ SequenceButton::draw_background()
 
         // name
         color = seq->get_playing() ? c_sequence_text_on : c_sequence_text;
+        if (get_sequence()->get_recording()) {
+            color = c_sequence_text_record;
+        }
         cr->set_source_rgb(color.r, color.g, color.b);
         auto name = create_pango_layout(seq->get_name());
         name->set_font_description(font);

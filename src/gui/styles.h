@@ -50,6 +50,7 @@ const color c_sequence_background_on = {c_color_text.get_red(), c_color_text.get
 
 const color c_sequence_text = {c_color_text.get_red(), c_color_text.get_green(), c_color_text.get_blue()};
 const color c_sequence_text_on = {c_color_background.get_red(), c_color_background.get_green(), c_color_background.get_blue()};
+const color c_sequence_text_record = {1.0, 0.0, 0.0};
 
 const color c_sequence_marker = {c_color_text.get_red(), c_color_text.get_green(), c_color_text.get_blue()};
 const color c_sequence_marker_on = {c_color_background.get_red(), c_color_background.get_green(), c_color_background.get_blue()};
