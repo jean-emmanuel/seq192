@@ -108,7 +108,7 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
 
 * `/sequence` <string: mode> <int: column> <int: row>:
     Set sequence(s) state<br/>
-    _mode_: "solo", "on", "off" or "toggle"<br/>
+    _mode_: "solo", "on", "off", "toggle", "record_on", "record_off"; only one sequence can be recording at a time; "record_off" mode doesn't require any argument<br/>
     _column_: column number on screen set (zero indexed)<br/>
     _row_: row number; if omitted, all rows are affected; multiple rows can be specified
 

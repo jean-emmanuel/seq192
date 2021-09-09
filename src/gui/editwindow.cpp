@@ -666,7 +666,6 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
         case EDIT_MENU_RECORD:
             // m_menu_record_state = !m_menu_record_state;
             m_perform->get_master_midi_bus()->set_sequence_input(m_menu_record_state ? NULL : m_sequence);
-            m_sequence->set_recording(!m_menu_record_state);
             break;
         case EDIT_MENU_RECORD_QUANTIZED:
             m_sequence->get_quantized_rec(m_menu_record_quantized.get_active());

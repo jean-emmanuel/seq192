@@ -2457,6 +2457,7 @@ sequence::get_playing( )
 void
 sequence::set_recording( bool a_r )
 {
+    // called by master_midi_bus
     lock();
     m_recording = a_r;
     set_dirty_main();

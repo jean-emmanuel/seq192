@@ -145,7 +145,7 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
         case SEQ_SSEQ_AND_PLAY:
         case SEQ_SSEQ_QUEUED:
         {
-            if (argc < 2 || types[0] != 's') return 0;
+            if (argc < 1 || types[0] != 's') return 0;
 
             // arg 0: mode
             int mode = self->osc_seq_modes[(std::string) &argv[0]->s];
@@ -154,8 +154,15 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
             for (int i = 0; i < c_mainwnd_rows * c_mainwnd_cols; i++) {
                 self->osc_selected_seqs[i] = 0;
             }
-            // int selected_seqs[c_mainwnd_rows * c_mainwnd_cols];
 
+            if (mode == SEQ_MODE_RECORD_OFF) {
+                self->get_master_midi_bus()->set_sequence_input(NULL);
+                return 0;
+            }
+
+            if (argc < 2) return 0;
+
+            // sequence selection
             if (types[1] == 'i') {
                 // arg 1: column number
 
@@ -242,6 +249,12 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                                     self->m_seqs[nseq]->toggle_playing();
                                 }
                                 break;
+                            case SEQ_MODE_RECORD_ON:
+                                self->get_master_midi_bus()->set_sequence_input(self->m_seqs[nseq]);
+                                // only one sequence can be armed for recording
+                                // ignore matching sequences after the first
+                                return 0;
+
                         }
                     }
                 }

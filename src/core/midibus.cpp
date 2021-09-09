@@ -839,6 +839,7 @@ mastermidibus::set_sequence_input( sequence *a_seq )
     lock();
 
 	if (m_seq != NULL) m_seq->set_recording(false);
+	if (a_seq != NULL) a_seq->set_recording(true);
 
     m_seq = a_seq;
 

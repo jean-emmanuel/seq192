@@ -213,7 +213,9 @@ class perform
         SEQ_MODE_SOLO,
         SEQ_MODE_ON,
         SEQ_MODE_OFF,
-        SEQ_MODE_TOGGLE
+        SEQ_MODE_TOGGLE,
+        SEQ_MODE_RECORD_ON,
+        SEQ_MODE_RECORD_OFF
     };
 
     std::map<std::string, int> osc_commands = {
@@ -233,7 +235,9 @@ class perform
         {"solo",                SEQ_MODE_SOLO},
         {"on",                  SEQ_MODE_ON},
         {"off",                 SEQ_MODE_OFF},
-        {"toggle",              SEQ_MODE_TOGGLE}
+        {"toggle",              SEQ_MODE_TOGGLE},
+        {"record_on",           SEQ_MODE_RECORD_ON},
+        {"record_off",          SEQ_MODE_RECORD_OFF}
     };
 
 
