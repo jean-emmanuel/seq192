@@ -1923,7 +1923,7 @@ sequence::stream_event(  event *a_ev  )
 
     a_ev->mod_timestamp( m_length );
 
-    if ( m_recording ){
+    if ( m_recording && a_ev->get_status() < EVENT_SYSEX ){
 
         add_event( a_ev );
         set_dirty();
