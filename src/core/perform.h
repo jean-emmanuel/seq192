@@ -209,6 +209,7 @@ class perform
         SEQ_SSEQ_QUEUED,
         SEQ_STATUS,
         SEQ_STATUS_EXT,
+        SEQ_CLEAR,              // Test clear notes in clip
 
         SEQ_MODE_SOLO,
         SEQ_MODE_ON,
@@ -237,7 +238,8 @@ class perform
         {"off",                 SEQ_MODE_OFF},
         {"toggle",              SEQ_MODE_TOGGLE},
         {"record_on",           SEQ_MODE_RECORD_ON},
-        {"record_off",          SEQ_MODE_RECORD_OFF}
+        {"record_off",          SEQ_MODE_RECORD_OFF},
+        {"clear",               SEQ_CLEAR}
     };
 
 
