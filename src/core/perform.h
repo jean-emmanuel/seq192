@@ -220,16 +220,16 @@ class perform
     };
 
     std::map<std::string, int> osc_commands = {
-        {"/play",                    SEQ_PLAY},
-        {"/stop",                    SEQ_STOP},
-        {"/bpm",                    SEQ_BPM},
-        {"/screenset",            SEQ_SSET},
-        {"/panic",                  SEQ_PANIC},
-        {"/sequence",               SEQ_SSEQ},
-        {"/sequence/trig",          SEQ_SSEQ_AND_PLAY},
+        {"/play",               SEQ_PLAY},
+        {"/stop",               SEQ_STOP},
+        {"/bpm",                SEQ_BPM},
+        {"/screenset",          SEQ_SSET},
+        {"/panic",              SEQ_PANIC},
+        {"/sequence",           SEQ_SSEQ},
+        {"/sequence/trig",      SEQ_SSEQ_AND_PLAY},
         {"/sequence/queue",     SEQ_SSEQ_QUEUED},
-        {"/status",                     SEQ_STATUS},
-        {"/status/extended",    SEQ_STATUS_EXT}  
+        {"/status",             SEQ_STATUS},
+        {"/status/extended",    SEQ_STATUS_EXT}
     };
 
     std::map<std::string, int> osc_seq_modes = {
@@ -239,7 +239,7 @@ class perform
         {"toggle",              SEQ_MODE_TOGGLE},
         {"record_on",           SEQ_MODE_RECORD_ON},
         {"record_off",          SEQ_MODE_RECORD_OFF},
-         {"clear",                      SEQ_CLEAR}                 // Test clear notes in clip
+        {"clear",               SEQ_CLEAR}
     };
 
 
