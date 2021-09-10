@@ -239,7 +239,7 @@ class perform
         {"toggle",              SEQ_MODE_TOGGLE},
         {"record_on",           SEQ_MODE_RECORD_ON},
         {"record_off",          SEQ_MODE_RECORD_OFF},
-         {"/clear",                      SEQ_CLEAR} // Test clear notes in clip
+         {"clear",                      SEQ_CLEAR}                 // Test clear notes in clip
     };
 
 

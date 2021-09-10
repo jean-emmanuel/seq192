@@ -165,6 +165,7 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
             // sequence selection
             if (types[1] == 'i') {
                 // arg 1: column number
+
                 int col = argv[1]->i;
                 if (col < 0 || col > c_mainwnd_cols) return 0;
 
@@ -248,16 +249,17 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                                     self->m_seqs[nseq]->toggle_playing();
                                 }
                                 break;
+                            case SEQ_CLEAR:
+                                    self->m_seqs[nseq]->select_all();
+                                    self->m_seqs[nseq]->mark_selected();
+                                    self->m_seqs[nseq]->remove_marked();
+                                return 0;    
                             case SEQ_MODE_RECORD_ON:
                                 self->get_master_midi_bus()->set_sequence_input(self->m_seqs[nseq]);
                                 // only one sequence can be armed for recording
                                 // ignore matching sequences after the first
                                 return 0;
-                              case SEQ_CLEAR:
-                                    self->m_seqs[nseq]->select_all();
-                                    self->m_seqs[nseq]->mark_selected();
-                                    self->m_seqs[nseq]->remove_marked();
-                                return 0;
+
                         }
                     }
                 }
@@ -279,7 +281,10 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
             }
             self->osc_status(address, path);
             break;
+
     }
+
+
     return 0;
 }
 
