@@ -1927,6 +1927,39 @@ sequence::stream_event(  event *a_ev  )
 
     if ( m_recording && a_ev->get_status() < EVENT_SYSEX ){
 
+        // fine quantization and overwrite for events other than notes
+        if (a_ev->get_status() == EVENT_AFTERTOUCH ||
+            a_ev->get_status() == EVENT_CONTROL_CHANGE ||
+            a_ev->get_status() == EVENT_PITCH_WHEEL ||
+            a_ev->get_status() == EVENT_PROGRAM_CHANGE ||
+            a_ev->get_status() == EVENT_CHANNEL_PRESSURE
+        ) {
+            long timestamp = a_ev->get_timestamp();
+            int a_snap_tick = c_ppqn / 192 * 4;
+            long timestamp_remander = (timestamp % a_snap_tick);
+            long timestamp_delta = 0;
+
+            if ( timestamp_remander < a_snap_tick / 2)
+            {
+                timestamp_delta = - (timestamp_remander);
+            }
+            else
+            {
+                timestamp_delta = (a_snap_tick - timestamp_remander);
+            }
+
+            if ((timestamp_delta + timestamp) >= m_length)
+            {
+                timestamp_delta = - a_ev->get_timestamp();
+            }
+
+            a_ev->set_timestamp( a_ev->get_timestamp() + timestamp_delta );
+
+            unsigned char d0,d1;
+            a_ev->get_data( &d0, &d1 );
+            select_events(a_ev->get_timestamp(),a_ev->get_timestamp(), 3, a_ev->get_status(), d0, e_remove_one);
+        }
+
         add_event( a_ev );
         set_dirty();
     }
@@ -1943,9 +1976,8 @@ sequence::stream_event(  event *a_ev  )
             select_note_events( a_ev->get_timestamp(), a_ev->get_note(),
             a_ev->get_timestamp(), a_ev->get_note(), e_select);
             quantize_events( EVENT_NOTE_ON, 0, m_snap_tick, 1 , true );
-	}
+    	}
     }
-    /* update view */
 
     unlock();
 }
