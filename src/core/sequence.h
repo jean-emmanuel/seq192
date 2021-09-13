@@ -43,6 +43,7 @@ class sequence
 
     /* holds the events */
     list < event > m_list_event;
+    list < event > m_list_event_draw;
     static list < event > m_list_clipboard;
 
     list < event > m_list_undo_hold; // seqdata
@@ -347,6 +348,7 @@ class sequence
 
     /* resets draw marker so calls to getNextnoteEvent
        will start from the first */
+    void reset_draw_list();
     void reset_draw_marker();
 
     /* each call seqdata( sequence *a_seq, int a_scale );fills the passed refrences with a

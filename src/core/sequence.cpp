@@ -217,8 +217,6 @@ sequence::add_event( const event *a_e )
     m_list_event.push_front( *a_e );
     m_list_event.sort( );
 
-    reset_draw_marker();
-
     set_dirty();
 
     unlock();
@@ -546,7 +544,7 @@ sequence::link_new( )
 
 // helper function, does not lock/unlock, unsafe to call without them
 // supply iterator from m_list_event...
-// lock();  remove();  reset_draw_marker(); unlock()
+// lock();  remove();  unlock()
 void
 sequence::remove(list<event>::iterator i)
 {
@@ -563,7 +561,7 @@ sequence::remove(list<event>::iterator i)
 
 // helper function, does not lock/unlock, unsafe to call without them
 // supply iterator from m_list_event...
-// lock();  remove();  reset_draw_marker(); unlock()
+// lock();  remove();  unlock()
 // finds e in m_list_event, removes the first iterator matching that.
 void
 sequence::remove( event* e )
@@ -603,8 +601,6 @@ sequence::remove_marked()
     }
     }
 
-    reset_draw_marker();
-
     unlock();
 
     set_dirty();
@@ -630,7 +626,6 @@ sequence::mark_selected()
         }
         ++i;
     }
-    reset_draw_marker();
 
     unlock();
 
@@ -914,7 +909,6 @@ sequence::select_note_events( long a_tick_s, int a_note_h,
                     {
                         remove( &(*i) );
                         remove( ev );
-                        reset_draw_marker();
                         ret++;
                         break;
                     }
@@ -964,7 +958,6 @@ sequence::select_note_events( long a_tick_s, int a_note_h,
                     if ( a_action == e_remove_one )
                     {
                          remove( &(*i) );
-                         reset_draw_marker();
                          ret++;
                          break;
                     }
@@ -1174,7 +1167,6 @@ sequence::select_events( long a_tick_s,
                 if ( a_action == e_remove_one )
                 {
                      remove( &(*i) );
-                     reset_draw_marker();
                      ret++;
                      break;
                 }
@@ -1675,8 +1667,6 @@ sequence::paste_selected( long a_tick, int a_note )
 
     verify_and_link();
 
-    reset_draw_marker();
-
     unlock();
 
 }
@@ -1961,7 +1951,6 @@ sequence::stream_event(  event *a_ev  )
         }
 
         add_event( a_ev );
-        set_dirty();
     }
 
     if ( m_thru )
@@ -2130,13 +2119,24 @@ sequence::intersectEvents( long posstart, long posend, long status, long& start 
     return false;
 }
 
+
+void
+sequence::reset_draw_list()
+{
+    lock();
+
+    m_list_event_draw = m_list_event;
+
+    unlock();
+}
+
 /* this refreshes the play marker to the LastTick */
 void
 sequence::reset_draw_marker()
 {
     lock();
 
-    m_iterator_draw = m_list_event.begin();
+    m_iterator_draw = m_list_event_draw.begin();
 
     unlock();
 }
@@ -2194,7 +2194,7 @@ sequence::get_next_note_event( long *a_tick_s,
     draw_type ret = DRAW_FIN;
     *a_tick_f = 0;
 
-    while (  m_iterator_draw  != m_list_event.end() )
+    while (  m_iterator_draw  != m_list_event_draw.end() )
     {
 	*a_tick_s   = (*m_iterator_draw).get_timestamp();
 	*a_note     = (*m_iterator_draw).get_note();
@@ -2241,7 +2241,7 @@ sequence::get_next_event( unsigned char *a_status,
 {
     unsigned char j;
 
-    while (  m_iterator_draw  != m_list_event.end() )
+    while (  m_iterator_draw  != m_list_event_draw.end() )
     {
         *a_status = (*m_iterator_draw).get_status();
         (*m_iterator_draw).get_data( a_cc, &j );
@@ -2262,7 +2262,7 @@ sequence::get_next_event( unsigned char a_status,
                           unsigned char *a_D1,
                           bool *a_selected, int type )
 {
-    while (  m_iterator_draw  != m_list_event.end() )
+    while (  m_iterator_draw  != m_list_event_draw.end() )
     {
         /* note on, so its linked */
         if( (*m_iterator_draw).get_status() == a_status )
@@ -2420,8 +2420,6 @@ sequence::set_length( long a_len )
     m_length = a_len;
 
     verify_and_link();
-
-    reset_draw_marker();
 
     /* start up and refresh */
     if ( was_playing )
