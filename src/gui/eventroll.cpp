@@ -241,7 +241,7 @@ EventRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
 
 void
-EventRoll::set_zoom(int zoom)
+EventRoll::set_zoom(double zoom)
 {
     if (zoom < c_min_zoom) zoom = c_min_zoom;
     else if (zoom > c_max_zoom) zoom = c_max_zoom;

@@ -754,7 +754,7 @@ EditWindow::scroll_callback(GdkEventScroll* event)
 
     if ((event->state & modifiers) == GDK_CONTROL_MASK)
     {
-        int zoom = m_pianoroll.get_zoom();
+        double zoom = m_pianoroll.get_zoom();
         if (event->direction == GDK_SCROLL_DOWN)
         {
             m_timeroll.set_zoom(zoom * 2);

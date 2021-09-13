@@ -157,6 +157,7 @@ PianoRoll::draw_background()
     int note_y;
     int note_height = c_key_height - 3;
 
+    m_sequence->reset_draw_list();
     m_sequence->reset_draw_marker();
 
     while ((dt = m_sequence->get_next_note_event( &tick_s, &tick_f, &note, &selected, &velocity )) != DRAW_FIN)
@@ -308,7 +309,7 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 }
 
 void
-PianoRoll::set_zoom(int zoom)
+PianoRoll::set_zoom(double zoom)
 {
     if (zoom < c_min_zoom) zoom = c_min_zoom;
     else if (zoom > c_max_zoom) zoom = c_max_zoom;

@@ -49,10 +49,10 @@ class TimeRoll : public DrawingArea {
         void set_hscroll(int s){m_hscroll = s;};
 
         // zoom: ticks per pixel
-        int                 m_zoom;
+        double              m_zoom;
 
 
-        void set_zoom(int zoom);
+        void set_zoom(double zoom);
 
         bool on_scroll_event(GdkEventScroll* event);
 

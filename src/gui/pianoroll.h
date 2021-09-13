@@ -62,13 +62,13 @@ class PianoRoll : public DrawingArea {
         Cairo::RefPtr<Cairo::ImageSurface> m_surface;
         bool                m_draw_background_queued;
         void draw_background();
-        
+
         // hscroll
         int                 m_hscroll;
         void set_hscroll(int s);
 
         // zoom: ticks per pixel
-        int                 m_zoom;
+        double              m_zoom;
         int                 m_note_length;
         int                 m_snap;
         bool                m_snap_active;
@@ -104,8 +104,8 @@ class PianoRoll : public DrawingArea {
         int m_current_y;
         int m_last_x;
 
-        int  get_zoom() {return m_zoom;};
-        void set_zoom(int zoom);
+        double get_zoom() {return m_zoom;};
+        void set_zoom(double zoom);
         int  get_snap() {return m_snap;};
         void set_snap(int snap);
         void set_snap_active(bool a){m_snap_active = a;};

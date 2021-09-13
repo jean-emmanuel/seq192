@@ -55,8 +55,8 @@ class DataRoll : public DrawingArea {
         void set_hscroll(int s);
 
         // zoom: ticks per pixel
-        int                 m_zoom;
-        void set_zoom(int zoom);
+        double              m_zoom;
+        void set_zoom(double zoom);
 
         unsigned char m_status;
         unsigned char m_cc;

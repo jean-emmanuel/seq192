@@ -57,7 +57,7 @@ class EventRoll : public DrawingArea {
         void set_hscroll(int s);
 
         // zoom: ticks per pixel
-        int                 m_zoom;
+        double              m_zoom;
         int                 m_snap;
         bool                m_snap_active;
         bool                m_snap_bypass;
@@ -93,7 +93,7 @@ class EventRoll : public DrawingArea {
         int m_current_y;
         int m_last_x;
 
-        void set_zoom(int zoom);
+        void set_zoom(double zoom);
         void set_snap(int snap);
         void set_snap_active(bool a){m_snap_active = a;};
         void set_snap_bypass(bool bypass);
