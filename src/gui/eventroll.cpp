@@ -149,7 +149,7 @@ EventRoll::draw_background()
     unsigned char d0,d1;
     bool selected;
 
-    m_sequence->reset_draw_marker();
+    m_sequence->reset_draw_list();
 
     while (m_sequence->get_next_event(m_status, m_cc, &tick, &d0, &d1, &selected) == true)
     {

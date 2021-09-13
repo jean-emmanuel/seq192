@@ -117,7 +117,7 @@ DataRoll::draw_background()
     SECOND_PASS_NOTE_ON: // yes this is a goto... yikes!!!!
 
     m_sequence->reset_draw_list();
-    m_sequence->reset_draw_marker();
+
     while (m_sequence->get_next_event(m_status, m_cc, &tick, &d0, &d1, &selected, selection_type) == true)
     {
         if (tick >= start_tick && tick <= end_tick)

@@ -158,7 +158,6 @@ PianoRoll::draw_background()
     int note_height = c_key_height - 3;
 
     m_sequence->reset_draw_list();
-    m_sequence->reset_draw_marker();
 
     while ((dt = m_sequence->get_next_note_event( &tick_s, &tick_f, &note, &selected, &velocity )) != DRAW_FIN)
     {

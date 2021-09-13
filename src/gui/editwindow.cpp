@@ -958,7 +958,7 @@ EditWindow::update_event_menu()
     }
 
     unsigned char status, cc;
-    m_sequence->reset_draw_marker();
+    m_sequence->reset_draw_list();
     while (m_sequence->get_next_event( &status, &cc ) == true)
     {
         switch (status) {

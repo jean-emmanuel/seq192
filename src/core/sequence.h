@@ -346,10 +346,8 @@ class sequence
     // Drawing functions
     //
 
-    /* resets draw marker so calls to getNextnoteEvent
-       will start from the first */
+    /* copy event list for thread-safe drawing */
     void reset_draw_list();
-    void reset_draw_marker();
 
     /* each call seqdata( sequence *a_seq, int a_scale );fills the passed refrences with a
        events elements, and returns true.  When it

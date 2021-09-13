@@ -2119,23 +2119,13 @@ sequence::intersectEvents( long posstart, long posend, long status, long& start 
     return false;
 }
 
-
+/* copy event list for thread-safe drawing */
 void
 sequence::reset_draw_list()
 {
     lock();
 
     m_list_event_draw = m_list_event;
-
-    unlock();
-}
-
-/* this refreshes the play marker to the LastTick */
-void
-sequence::reset_draw_marker()
-{
-    lock();
-
     m_iterator_draw = m_list_event_draw.begin();
 
     unlock();
