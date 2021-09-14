@@ -7,7 +7,7 @@ seq192(1) -- live MIDI sequencer
 
 ## DESCRIPTION
 
-seq192 is a MIDI sequencer for live situations that is meant to be be controlled with OSC messages and sync with other applications using jack transport.
+seq192 is a MIDI sequencer for live situations that is meant to be controlled with OSC messages and sync with other applications using jack transport.
 
 ## OPTIONS
 
