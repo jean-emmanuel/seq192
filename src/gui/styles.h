@@ -142,7 +142,7 @@ menu {
     padding: 1px;
 }
 
-menu window arrow {
+menu window arrow:not(.right) {
     background: @color_fg;
 }
 
