@@ -142,6 +142,10 @@ menu {
     padding: 1px;
 }
 
+menu window arrow {
+    background: @color_fg;
+}
+
 menubar {
     background: @color_fg;
     border-bottom: 1px solid @color_bg
