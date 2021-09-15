@@ -249,6 +249,9 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                                     self->m_seqs[nseq]->toggle_playing();
                                 }
                                 break;
+                            case SEQ_MODE_RECORD:
+                                self->get_master_midi_bus()->set_sequence_input(self->m_seqs[nseq]->get_recording() ? NULL : self->m_seqs[nseq]);
+                                return 0;
                             case SEQ_MODE_RECORD_ON:
                                 self->get_master_midi_bus()->set_sequence_input(self->m_seqs[nseq]);
                                 // only one sequence can be armed for recording

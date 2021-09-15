@@ -215,6 +215,7 @@ class perform
         SEQ_MODE_ON,
         SEQ_MODE_OFF,
         SEQ_MODE_TOGGLE,
+        SEQ_MODE_RECORD,
         SEQ_MODE_RECORD_ON,
         SEQ_MODE_RECORD_OFF
     };
@@ -237,6 +238,7 @@ class perform
         {"on",                  SEQ_MODE_ON},
         {"off",                 SEQ_MODE_OFF},
         {"toggle",              SEQ_MODE_TOGGLE},
+        {"record",              SEQ_MODE_RECORD},
         {"record_on",           SEQ_MODE_RECORD_ON},
         {"record_off",          SEQ_MODE_RECORD_OFF},
         {"clear",               SEQ_CLEAR}
