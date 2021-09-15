@@ -150,7 +150,8 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
             "ticks": <int>,
             "queued": <int>,
             "playing": <int>,
-            "timesPlayed": <int>
+            "timesPlayed": <int>,
+            "recording": <int>
         },
         ...
     ]
@@ -177,6 +178,7 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
     queued: sequence's queued state
     playing: sequence's playing state
     timesPlayed: number of times the sequence played since last enabled
+    recording: sequence's recording state
 
 
 ## AUTHORS
