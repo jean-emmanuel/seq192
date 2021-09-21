@@ -67,3 +67,7 @@ Append `PREFIX=/usr` to override the default uninstallation path (`/usr/local`)
 ## Documentation
 
 See [seq192.ammd.net](https://seq192.ammd.net/) or run `man seq192` after installing.
+
+## Web UI
+
+A web UI built with [Open Stage Control](https://openstagecontrol.ammd.net/) is available at https://github.com/jean-emmanuel/seq192-control
