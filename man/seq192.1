@@ -38,17 +38,17 @@ The main window consist in a toolbar and a sequence grid\.
 .IP "\[ci]" 4
 The \fBtoolbar\fR contains the following controls
 .IP
-Panic button: disable all sequences
+\fIPanic button\fR: disable all sequences
 .br
-Stop button: stop transport
+\fIStop button\fR: stop transport
 .br
-Play button: start or restart transport
+\fIPlay button\fR: start or restart transport
 .br
-Bpm entry: set beats per minute
+\fIBpm entry\fR: set beats per minute
 .br
-Screenset name entry: set name of current screenset
+\fIScreenset name entry\fR: set name of current screenset
 .br
-Screenset number entry: select current screenset
+\fIScreenset number entry\fR: select current screenset
 .br
 
 .IP "\[ci]" 4
@@ -61,31 +61,31 @@ The edit window consist in a menu, a toolbar, a pianoroll and an event editor\.
 .IP "\[ci]" 4
 The \fBtoolbar\fR contains the following controls
 .IP
-Sequence name entry: set name of sequence
+\fISequence name entry\fR: set name of sequence
 .br
-Sequence length entries: set number of beats per measure, beat unit and number of measures in sequence
+\fISequence length entries\fR: set number of beats per measure, beat unit and number of measures in sequence
 .br
-Snap button: toggle grid snapping\. Holding \fBalt\fR allows disabling snapping temporarily
+\fISnap button\fR: toggle grid snapping\. Holding \fBalt\fR allows disabling snapping temporarily
 .br
-Snap dropdown: set snapping grid size
+\fISnap dropdown\fR: set snapping grid size
 .br
-Note dropdown: set note size
+\fINote dropdown\fR: set note size
 .br
-Output dropdown: set sequence's MIDI port and channel
+\fIOutput dropdown\fR: set sequence's MIDI port and channel
 .br
 
 .IP "\[ci]" 4
 The \fBpianoroll\fR responds to the following interactions
 .IP
-Left click (piano area): send note to sequence's output
+\fILeft click (piano area)\fR: send note to sequence's output
 .br
-Left click: select note(s)
+\fILeft click\fR: select note(s)
 .br
-Left click drag: create a lasso selection or move selection
+\fILeft click drag\fR: create a lasso selection or move selection
 .br
-Middle click (or ctrl + left click) drag: change note(s) duration
+\fIMiddle click (or ctrl + left click) drag\fR: change note(s) duration
 .br
-Right click + left click: draw new notes
+\fIRight click + left click\fR: draw new notes
 .br
 
 .IP "\[ci]" 4
@@ -94,7 +94,7 @@ The \fBevent editor\fR allows editing the velocity of notes and adding MIDI even
 .P
 \fBImportant note\fR
 .P
-Undo/redo only works in the edit window, and with some limitations: only MIDI events are journalized, other changes (sequence name, sequence length, etc) can't be undone\.
+Undo/redo only works in the edit window, and with some limitations: only MIDI events are journalized, other changes (sequence name, sequence length, etc) can't be undone\. Reducing the length of a sequence may result in a loss of data\.
 .SH "JACK TRANSPORT"
 When \fB\-\-jack\-transport\fR is set, seq192 will
 .IP "" 4

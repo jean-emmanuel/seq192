@@ -42,12 +42,12 @@ The main window consist in a toolbar and a sequence grid.
 
 * The **toolbar** contains the following controls
 
-    Panic button: disable all sequences<br/>
-    Stop button: stop transport<br/>
-    Play button: start or restart transport<br/>
-    Bpm entry: set beats per minute<br/>
-    Screenset name entry: set name of current screenset<br/>
-    Screenset number entry: select current screenset<br/>
+    *Panic button*: disable all sequences<br/>
+    *Stop button*: stop transport<br/>
+    *Play button*: start or restart transport<br/>
+    *Bpm entry*: set beats per minute<br/>
+    *Screenset name entry*: set name of current screenset<br/>
+    *Screenset number entry*: select current screenset<br/>
 
 * The **sequence grid** is empty by default. Right-clicking in the grid allows creating a new sequence or editing an existing one. Sequences can be rearranged in the grid by dragging them. Left-clicking on a sequence toggles its playing state.
 
@@ -57,20 +57,20 @@ The edit window consist in a menu, a toolbar, a pianoroll and an event editor.
 
 * The **toolbar** contains the following controls
 
-    Sequence name entry: set name of sequence<br/>
-    Sequence length entries: set number of beats per measure, beat unit and number of measures in sequence<br/>
-    Snap button: toggle grid snapping. Holding `alt` allows disabling snapping temporarily<br/>
-    Snap dropdown: set snapping grid size<br/>
-    Note dropdown: set note size  <br/>
-    Output dropdown: set sequence's MIDI port and channel<br/>
+    *Sequence name entry*: set name of sequence<br/>
+    *Sequence length entries*: set number of beats per measure, beat unit and number of measures in sequence<br/>
+    *Snap button*: toggle grid snapping. Holding `alt` allows disabling snapping temporarily<br/>
+    *Snap dropdown*: set snapping grid size<br/>
+    *Note dropdown*: set note size  <br/>
+    *Output dropdown*: set sequence's MIDI port and channel<br/>
 
 * The **pianoroll** responds to the following interactions
 
-    Left click (piano area): send note to sequence's output<br/>
-    Left click: select note(s)<br/>
-    Left click drag: create a lasso selection or move selection<br/>
-    Middle click (or ctrl + left click) drag: change note(s) duration<br/>
-    Right click + left click: draw new notes<br/>
+    *Left click (piano area)*: send note to sequence's output<br/>
+    *Left click*: select note(s)<br/>
+    *Left click drag*: create a lasso selection or move selection<br/>
+    *Middle click (or ctrl + left click) drag*: change note(s) duration<br/>
+    *Right click + left click*: draw new notes<br/>
 
 * The **event editor** allows editing the velocity of notes and adding MIDI events like pitch wheel and control changes to the sequences The button on the left allows selecting which event should be shown on the timeline. The timeline work like in the piano roll, except events dont have a length. The bottom part is for editing the events' values: handles can be dragged individually, or one can draw a line with a drag-and-drop motion to draw a linear automation. Scrolling with the mousewheel on the event editor increments the values of all selected events.
 
