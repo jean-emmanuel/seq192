@@ -254,6 +254,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+## LINKS
+
+Sources: https://github.com/jean-emmanuel/seq192
+
 <style type='text/css' media='all'>
 /* style: toc */
 .man-navigation {display:block !important;position:fixed;top:0;left:113ex;height:100%;width:100%;padding:48px 0 0 0;border-left:1px solid #dbdbdb;background:#eee}
