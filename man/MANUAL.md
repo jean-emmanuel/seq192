@@ -256,7 +256,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ## LINKS
 
-Sources: https://github.com/jean-emmanuel/seq192
+Sources: <a href="https://github.com/jean-emmanuel/seq192">https://github.com/jean-emmanuel/seq192</a>
 
 <style type='text/css' media='all'>
 /* style: toc */
