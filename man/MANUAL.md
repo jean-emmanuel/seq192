@@ -72,7 +72,7 @@ The edit window consist in a menu, a toolbar, a pianoroll and an event editor.
     *Middle click (or ctrl + left click) drag*: change note(s) duration<br/>
     *Right click + left click*: draw new notes<br/>
 
-* The **event editor** allows editing the velocity of notes and adding MIDI events like pitch wheel and control changes to the sequences The button on the left allows selecting which event should be shown on the timeline. The timeline work like in the piano roll, except events dont have a length. The bottom part is for editing the events' values: handles can be dragged individually, or one can draw a line with a drag-and-drop motion to draw a linear automation. Scrolling with the mousewheel on the event editor increments the values of all selected events.
+* The **event editor** allows editing the velocity of notes and adding MIDI events like pitch wheel and control changes to the sequences The button on the left allows selecting which event should be shown on the timeline. The timeline works like in the piano roll, except events dont have a length. The bottom part is for editing the events' values: handles can be dragged individually, or one can draw a line with a drag-and-drop motion to create a linear automation. Scrolling with the mousewheel on the event editor increments the values of all selected events.
 
 **Important note**
 
