@@ -36,12 +36,6 @@ class perform;
 class perform
 {
  private:
-    //andy mute group
-    bool m_mute_group[c_gmute_tracks];
-    bool m_tracks_mute_state[c_seqs_in_set];
-    bool m_mode_group;
-    bool m_mode_group_learn;
-    int m_mute_group_selected;
 
     /* vector of sequences */
     sequence *m_seqs[c_max_sequence];
