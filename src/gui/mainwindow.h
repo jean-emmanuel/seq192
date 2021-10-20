@@ -46,12 +46,15 @@ class MainWindow : public Window {
 
     public:
 
-        MainWindow(perform * p);
+        MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app);
         ~MainWindow();
 
         // nsm
         void nsm_set_client(nsm_client_t *nsm);
         void nsm_save();
+
+        Glib::RefPtr<Gtk::Application> m_app;
+
 
     private:
 

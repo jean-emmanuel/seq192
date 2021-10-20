@@ -269,7 +269,7 @@ main (int argc, char *argv[])
         }
     } else {
         application = Gtk::Application::create();
-        MainWindow window(p);
+        MainWindow window(p, application);
 
         if (nsm) {
             // register callbacks

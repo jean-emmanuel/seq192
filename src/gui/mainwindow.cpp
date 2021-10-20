@@ -23,9 +23,10 @@
 #include "../xpm/seq192.xpm"
 #include "../xpm/seq192_32.xpm"
 
-MainWindow::MainWindow(perform * p)
+MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
 {
     m_perform = p;
+    m_app = app;
 
     m_nsm = 0;
     m_nsm_dirty = false;
@@ -352,6 +353,7 @@ MainWindow::timer_callback()
             }
             else
             {
+                m_app->hold();
                 close_all_edit_windows();
                 hide();
                 nsm_send_is_hidden(m_nsm);
