@@ -63,7 +63,7 @@ user_keymap_definition     global_user_keymap_definitions[c_max_instruments];
 Glib::RefPtr<Gtk::Application> application;
 
 // nsm
-bool global_nsm_gui = true;
+bool global_nsm_gui = false;
 nsm_client_t *nsm = 0;
 bool nsm_wait = true;
 string nsm_folder = "";
