@@ -7,3 +7,4 @@ TryExec=seq192
 Terminal=false
 Type=Application
 Categories=Audio;Sequencer;AudioVideo;
+X-NSM-Capable=true
