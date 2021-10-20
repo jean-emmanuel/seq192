@@ -278,6 +278,7 @@ main (int argc, char *argv[])
             nsm_set_hide_callback(nsm, nsm_hide_cb, 0);
             // set initial optional-gui state
             if (!global_nsm_gui) nsm_hide_cb(0);
+            else nsm_send_is_shown(nsm);
             // enable nsm in window
             window.nsm_set_client(nsm);
             // bind quit signal
