@@ -16,6 +16,7 @@
 
 #include "mainwindow.h"
 #include "../core/globals.h"
+#include "../lib/nsm.h"
 #include "../package.h"
 #include <time.h>
 
@@ -25,6 +26,10 @@
 MainWindow::MainWindow(perform * p)
 {
     m_perform = p;
+
+    m_nsm = 0;
+    m_nsm_dirty = false;
+    m_nsm_visible = true;
 
     m_drag_source = NULL;
     m_drag_destination = NULL;
@@ -335,6 +340,30 @@ MainWindow::timer_callback()
         }
     }
 
+    // nsm
+    if (m_nsm) {
+        nsm_check_nowait(m_nsm);
+        if (m_nsm_visible != global_nsm_gui) {
+            m_nsm_visible = global_nsm_gui;
+            if (m_nsm_visible)
+            {
+                show();
+                nsm_send_is_shown(m_nsm);
+            }
+            else
+            {
+                close_all_edit_windows();
+                hide();
+                nsm_send_is_hidden(m_nsm);
+            }
+        }
+        if (m_nsm_dirty != global_is_modified) {
+            m_nsm_dirty = global_is_modified;
+            if (m_nsm_dirty) nsm_send_is_dirty(m_nsm);
+            else nsm_send_is_clean(m_nsm);
+        }
+    }
+
     return true;
 }
 
@@ -506,7 +535,8 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
                 }
             break;
         case MAIN_MENU_QUIT:
-            close();
+            if (m_nsm) global_nsm_gui = false;
+            else close();
             break;
     }
 
@@ -531,6 +561,12 @@ MainWindow::update_window_title()
 bool
 MainWindow::on_delete_event(GdkEventAny *event)
 {
+    if (m_nsm) {
+        // nsm : hide gui instead of closing
+        global_nsm_gui = false;
+        return true;
+    }
+
     bool result = global_is_modified && !unsaved_changes();
 
     if (result) m_perform->stop_playing();
@@ -626,4 +662,20 @@ MainWindow::close_all_edit_windows()
 
         }
     }
+}
+
+void
+MainWindow::nsm_set_client(nsm_client_t *nsm)
+{
+    m_nsm = nsm;
+    m_menu_file_new.set_sensitive(false);
+    m_menu_file_open.set_sensitive(false);
+    m_menu_file_saveas.set_sensitive(false);
+    m_menu_file_quit.set_label("Hide");
+}
+
+void
+MainWindow::nsm_save()
+{
+    menu_callback(MAIN_MENU_SAVE, 0, 0);
 }

@@ -20,6 +20,7 @@
 #include <gtkmm.h>
 
 #include "../core/globals.h"
+#include "../lib/nsm.h"
 
 #include "styles.h"
 #include "sequencebutton.h"
@@ -47,6 +48,10 @@ class MainWindow : public Window {
 
         MainWindow(perform * p);
         ~MainWindow();
+
+        // nsm
+        void nsm_set_client(nsm_client_t *nsm);
+        void nsm_save();
 
     private:
 
@@ -122,6 +127,12 @@ class MainWindow : public Window {
         void clear_focus();
         bool on_key_press(GdkEventKey* event);
         bool on_delete_event(GdkEventAny *event);
+
+        // nsm
+        bool m_nsm_managed;
+        bool m_nsm_visible;
+        bool m_nsm_dirty;
+        nsm_client_t *m_nsm;
 
     friend class SequenceButton;
     friend class EditWindow;

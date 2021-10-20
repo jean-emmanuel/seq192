@@ -22,6 +22,7 @@
 using json = nlohmann::json;
 
 extern string last_used_dir;
+extern bool global_nsm_gui;
 
 CacheFile::CacheFile(const string& a_name) :
     m_name(a_name)
@@ -50,6 +51,7 @@ CacheFile::parse()
     }
 
     if (j["last_used_dir"].is_string()) last_used_dir.assign(j["last_used_dir"]);
+    if (j["nsm_optional_gui"].is_boolean()) global_nsm_gui = j["nsm_optional_gui"];
 
     file.close();
 
@@ -67,6 +69,7 @@ CacheFile::write()
     json j;
 
     j["last_used_dir"] = last_used_dir;
+    j["nsm_optional_gui"] = global_nsm_gui;
 
     file << j.dump(4) << std::endl;
 

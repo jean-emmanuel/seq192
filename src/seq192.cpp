@@ -20,6 +20,8 @@
 
 #include "package.h"
 
+#include "lib/nsm.h"
+
 #include "core/midifile.h"
 #include "core/configfile.h"
 #include "core/cachefile.h"
@@ -57,6 +59,41 @@ char* global_oscport;
 user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];
 user_instrument_definition global_user_instrument_definitions[c_max_instruments];
 user_keymap_definition     global_user_keymap_definitions[c_max_instruments];
+
+Glib::RefPtr<Gtk::Application> application;
+
+// nsm
+bool global_nsm_gui = true;
+nsm_client_t *nsm = 0;
+bool nsm_wait = true;
+string nsm_folder = "";
+int
+nsm_open_cb(const char *name, const char *display_name, const char *client_id, char **out_msg, void *userdata)
+{
+    nsm_wait = false;
+    nsm_folder = name;
+    mkdir(nsm_folder.c_str(), 0777);
+    return ERR_OK;
+}
+int
+nsm_save_cb(char **,  void *userdata)
+{
+    MainWindow *w = (MainWindow *) userdata;
+    w->nsm_save();
+    return ERR_OK;
+}
+void
+nsm_hide_cb(void *userdata)
+{
+    application->hold();
+    global_nsm_gui = false;
+}
+void
+nsm_show_cb(void *userdata)
+{
+    global_nsm_gui = true;
+}
+
 
 int
 main (int argc, char *argv[])
@@ -150,11 +187,35 @@ main (int argc, char *argv[])
 
     }
 
+    // nsm
+    const char *nsm_url = getenv( "NSM_URL" );
+    if (nsm_url) {
+        nsm = nsm_new();
+        nsm_set_open_callback(nsm, nsm_open_cb, 0);
+        if (nsm_init(nsm, nsm_url) == 0) {
+            nsm_send_announce(nsm, "seq192", ":optional-gui:dirty:", argv[0]);
+        }
+        int timeout = 0;
+        while (nsm_wait) {
+            nsm_check_wait(nsm, 500);
+            timeout += 1;
+            if (timeout > 200) exit(1);
+        }
+    }
+
     // read config file
     string config_path = getenv("XDG_CONFIG_HOME") == NULL ? string(getenv("HOME")) + "/.config" : getenv("XDG_CONFIG_HOME");
     config_path += string("/") + PACKAGE;
     mkdir(config_path.c_str(), 0777);
+    if (nsm) config_path = nsm_folder;
     string file_path = config_filename == "" ? (config_path + "/config.json") : config_filename;
+    std::ifstream infile(file_path);
+    if (!infile.good()) {
+        std::fstream fs;
+        fs.open(file_path, std::ios::out);
+        fs << "{}" << endl;
+        fs.close();
+    }
     ConfigFile config(file_path);
     config.parse();
 
@@ -162,11 +223,13 @@ main (int argc, char *argv[])
     string cache_path = getenv("XDG_CACHE_HOME") == NULL ? string(getenv("HOME")) + "/.cache" : getenv("XDG_CACHE_HOME");
     cache_path += string("/") + PACKAGE;
     mkdir(cache_path.c_str(), 0777);
+    if (nsm) cache_path = nsm_folder;
     file_path = cache_path + "/cache.json";
-    std::ifstream infile(file_path);
+    infile = std::ifstream(file_path);
     if (!infile.good()) {
         std::fstream fs;
         fs.open(file_path, std::ios::out);
+        fs << "{}" << endl;
         fs.close();
     }
     CacheFile cache(file_path);
@@ -178,8 +241,17 @@ main (int argc, char *argv[])
     p->launch_output_thread();
     p->init_jack();
 
+    if (nsm) {
+        global_filename = nsm_folder + "/session.midi";
+        // write session file if it doesn't exist
+        std::ifstream infile(global_filename);
+        if (!infile.good()) {
+            midifile f(global_filename);
+            f.write(p, -1, -1);
+        }
+    }
+
     if (global_filename != "") {
-        /* import that midi file */
         midifile *f = new midifile(global_filename);
         f->parse(p, 0);
         delete f;
@@ -196,8 +268,25 @@ main (int argc, char *argv[])
             usleep(1000);
         }
     } else {
-        auto application = Gtk::Application::create();
+        application = Gtk::Application::create();
         MainWindow window(p);
+
+        if (nsm) {
+            // register callbacks
+            nsm_set_save_callback(nsm, nsm_save_cb, (void*) &window);
+            nsm_set_show_callback(nsm, nsm_show_cb, 0);
+            nsm_set_hide_callback(nsm, nsm_hide_cb, 0);
+            // set initial optional-gui state
+            if (!global_nsm_gui) nsm_hide_cb(0);
+            // enable nsm in window
+            window.nsm_set_client(nsm);
+            // bind quit signal
+            signal(SIGTERM, [](int param){
+                global_is_running = false;
+                application->quit();
+            });
+        }
+
         status = application->run(window);
     }
 
@@ -205,6 +294,11 @@ main (int argc, char *argv[])
     cache.write();
 
     delete p;
+
+    if (nsm) {
+        nsm_free(nsm);
+        nsm = NULL;
+    }
 
     return status;
 }

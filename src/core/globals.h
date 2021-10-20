@@ -118,4 +118,6 @@ enum file_type_e
     E_MIDI_SEQ192_SCREENSET
 };
 
+extern bool global_nsm_gui;
+
 #endif
