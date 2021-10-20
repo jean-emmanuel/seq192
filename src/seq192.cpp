@@ -68,14 +68,6 @@ nsm_client_t *nsm = 0;
 bool nsm_wait = true;
 string nsm_folder = "";
 int
-nsm_open_cb(const char *name, const char *display_name, const char *client_id, char **out_msg, void *userdata)
-{
-    nsm_wait = false;
-    nsm_folder = name;
-    mkdir(nsm_folder.c_str(), 0777);
-    return ERR_OK;
-}
-int
 nsm_save_cb(char **,  void *userdata)
 {
     MainWindow *w = (MainWindow *) userdata;
@@ -92,6 +84,16 @@ void
 nsm_show_cb(void *userdata)
 {
     global_nsm_gui = true;
+}
+int
+nsm_open_cb(const char *name, const char *display_name, const char *client_id, char **out_msg, void *userdata)
+{
+    nsm_wait = false;
+    nsm_folder = name;
+    mkdir(nsm_folder.c_str(), 0777);
+    // make sure nsm server doesn't override cached visibility state
+    nsm_send_is_shown(nsm);
+    return ERR_OK;
 }
 
 
