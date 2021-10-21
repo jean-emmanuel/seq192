@@ -64,6 +64,7 @@ Glib::RefPtr<Gtk::Application> application;
 
 // nsm
 bool global_nsm_gui = false;
+bool nsm_opional_gui_support = true;
 nsm_client_t *nsm = 0;
 bool nsm_wait = true;
 string nsm_folder = "";
@@ -90,6 +91,8 @@ nsm_open_cb(const char *name, const char *display_name, const char *client_id, c
 {
     nsm_wait = false;
     nsm_folder = name;
+    // NSM API 1.1.0: check if server supports optional-gui
+    nsm_opional_gui_support = strstr(nsm_get_session_manager_features(nsm), "optional-gui");
     mkdir(nsm_folder.c_str(), 0777);
     // make sure nsm server doesn't override cached visibility state
     nsm_send_is_shown(nsm);
@@ -276,13 +279,17 @@ main (int argc, char *argv[])
         if (nsm) {
             // register callbacks
             nsm_set_save_callback(nsm, nsm_save_cb, (void*) &window);
-            nsm_set_show_callback(nsm, nsm_show_cb, 0);
-            nsm_set_hide_callback(nsm, nsm_hide_cb, 0);
-            // set initial optional-gui state
-            if (!global_nsm_gui) nsm_hide_cb(0);
-            else nsm_send_is_shown(nsm);
+            // setup optional-gui
+            if (nsm_opional_gui_support) {
+                nsm_set_show_callback(nsm, nsm_show_cb, 0);
+                nsm_set_hide_callback(nsm, nsm_hide_cb, 0);
+                if (!global_nsm_gui) nsm_hide_cb(0);
+                else nsm_send_is_shown(nsm);
+            } else {
+                global_nsm_gui = true;
+            }
             // enable nsm in window
-            window.nsm_set_client(nsm);
+            window.nsm_set_client(nsm, nsm_opional_gui_support);
             // bind quit signal
             signal(SIGTERM, [](int param){
                 global_is_running = false;

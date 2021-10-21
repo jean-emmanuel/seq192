@@ -344,7 +344,7 @@ MainWindow::timer_callback()
     // nsm
     if (m_nsm) {
         nsm_check_nowait(m_nsm);
-        if (m_nsm_visible != global_nsm_gui) {
+        if (m_nsm_optional_gui && m_nsm_visible != global_nsm_gui) {
             m_nsm_visible = global_nsm_gui;
             if (m_nsm_visible)
             {
@@ -537,7 +537,7 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
                 }
             break;
         case MAIN_MENU_QUIT:
-            if (m_nsm) global_nsm_gui = false;
+            if (m_nsm && m_nsm_optional_gui) global_nsm_gui = false;
             else close();
             break;
     }
@@ -563,7 +563,7 @@ MainWindow::update_window_title()
 bool
 MainWindow::on_delete_event(GdkEventAny *event)
 {
-    if (m_nsm) {
+    if (m_nsm && m_nsm_optional_gui) {
         // nsm : hide gui instead of closing
         global_nsm_gui = false;
         return true;
@@ -667,13 +667,14 @@ MainWindow::close_all_edit_windows()
 }
 
 void
-MainWindow::nsm_set_client(nsm_client_t *nsm)
+MainWindow::nsm_set_client(nsm_client_t *nsm, bool optional_gui)
 {
     m_nsm = nsm;
+    m_nsm_optional_gui = optional_gui;
     m_menu_file_new.set_sensitive(false);
     m_menu_file_open.set_sensitive(false);
     m_menu_file_saveas.set_sensitive(false);
-    m_menu_file_quit.set_label("Hide");
+    if (m_nsm_optional_gui) m_menu_file_quit.set_label("Hide");
 }
 
 void

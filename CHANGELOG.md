@@ -14,3 +14,4 @@
 - imported a bunch of features from seq32
 - refactored config file system using JSON
 - added resume playback mode to sequences
+- added NSM support (with "optional-gui" and "dirty" capabilities)

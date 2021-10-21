@@ -50,7 +50,7 @@ class MainWindow : public Window {
         ~MainWindow();
 
         // nsm
-        void nsm_set_client(nsm_client_t *nsm);
+        void nsm_set_client(nsm_client_t *nsm, bool optional_gui);
         void nsm_save();
 
         Glib::RefPtr<Gtk::Application> m_app;
@@ -132,7 +132,7 @@ class MainWindow : public Window {
         bool on_delete_event(GdkEventAny *event);
 
         // nsm
-        bool m_nsm_managed;
+        bool m_nsm_optional_gui;
         bool m_nsm_visible;
         bool m_nsm_dirty;
         nsm_client_t *m_nsm;
