@@ -56,6 +56,8 @@ bool global_is_running = true;
 
 char* global_oscport;
 
+string global_client_name = PACKAGE;
+
 user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];
 user_instrument_definition global_user_instrument_definitions[c_max_instruments];
 user_keymap_definition     global_user_keymap_definitions[c_max_instruments];
@@ -91,6 +93,7 @@ nsm_open_cb(const char *name, const char *display_name, const char *client_id, c
 {
     nsm_wait = false;
     nsm_folder = name;
+    global_client_name = client_id;
     // NSM API 1.1.0: check if server supports optional-gui
     nsm_opional_gui_support = strstr(nsm_get_session_manager_features(nsm), "optional-gui");
     mkdir(nsm_folder.c_str(), 0777);
@@ -198,7 +201,7 @@ main (int argc, char *argv[])
         nsm = nsm_new();
         nsm_set_open_callback(nsm, nsm_open_cb, 0);
         if (nsm_init(nsm, nsm_url) == 0) {
-            nsm_send_announce(nsm, "seq192", ":optional-gui:dirty:", argv[0]);
+            nsm_send_announce(nsm, PACKAGE, ":optional-gui:dirty:", argv[0]);
         }
         int timeout = 0;
         while (nsm_wait) {

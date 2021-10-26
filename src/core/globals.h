@@ -72,6 +72,7 @@ const unsigned long c_midictrl =   0x24240010;
 const unsigned long c_mutegroups = 0x24240009; // not sure why we went to 10 above, this might need a different value
 const unsigned long c_resume = 0x24240011;
 
+extern string global_client_name;
 
 extern bool global_with_jack_transport;
 extern char* global_oscport;
