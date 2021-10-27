@@ -127,9 +127,6 @@ main (int argc, char *argv[])
             global_user_keymap_definitions[i].keys_active[j] = false;
     }
 
-    /* the main performance object */
-    perform * p = new perform();
-
     /* parse parameters */
     int c;
     while (1) {
@@ -210,6 +207,9 @@ main (int argc, char *argv[])
             if (timeout > 200) exit(1);
         }
     }
+
+    /* the main performance object */
+    perform * p = new perform();
 
     // read config file
     string config_path = getenv("XDG_CONFIG_HOME") == NULL ? string(getenv("HOME")) + "/.config" : getenv("XDG_CONFIG_HOME");
