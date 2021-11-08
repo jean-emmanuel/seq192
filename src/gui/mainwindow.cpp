@@ -322,10 +322,11 @@ MainWindow::timer_callback()
             m_sequences[i]->queue_draw();
         }
         else if (m_perform->is_active(seqnum)) {
-            if (m_toolbar_play_state) m_sequences[i]->queue_draw();
-            else if (m_sequences[i]->get_sequence()->is_dirty_main()) {
+            if (m_sequences[i]->get_sequence()->is_dirty_main()) {
                 m_sequences[i]->draw_background();
                 m_sequences[i]->queue_draw();
+            } else if (m_toolbar_play_state) {
+                m_sequences[i]->queue_draw_area(m_sequences[i]->m_rect_x,m_sequences[i]->m_rect_y,m_sequences[i]->m_rect_w, m_sequences[i]->m_rect_h);
             }
         }
     }

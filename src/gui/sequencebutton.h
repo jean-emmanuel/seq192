@@ -77,6 +77,8 @@ class SequenceButton : public DrawingArea {
         int m_rect_w;
         int m_rect_h;
 
+    friend class MainWindow;
+
 };
 
 #endif
