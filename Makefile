@@ -39,6 +39,7 @@ install: src/$(BIN)
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
 	mkdir -p $(DESTDIR)$(PREFIX)/share/pixmaps
 	mkdir -p $(DESTDIR)$(PREFIX)/share/applications
+	mkdir -p $(DESTDIR)$(PREFIX)/share/man/man1
 	cp $< $(DESTDIR)$(PREFIX)/bin/$(BIN)
 	cp src/xpm/seq192_32.xpm $(DESTDIR)$(PREFIX)/share/pixmaps/seq192.xpm
 	cp desktop/seq192.desktop $(DESTDIR)$(PREFIX)/share/applications/seq192.desktop
