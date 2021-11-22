@@ -84,7 +84,6 @@ class perform
 
 
     jack_client_t *m_jack_client;
-    double m_jack_bpm;
     bool m_jack_running;
 
     void inner_start();

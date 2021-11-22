@@ -889,7 +889,9 @@ int jack_process_callback(jack_nframes_t nframes, void* arg)
     jack_position_t pos;
     jack_transport_state_t state = jack_transport_query( m_mainperf->m_jack_client, &pos );
 
-    m_mainperf->m_jack_bpm = pos.beats_per_minute;
+    if (pos.beats_per_minute > 0.1) {
+        m_mainperf->m_master_bus.set_bpm(pos.beats_per_minute);
+    }
 
     if (state == JackTransportRolling  )
     {
@@ -960,14 +962,7 @@ void perform::output_func()
             }
 
             // bpm
-            double bpm;
-            if (m_jack_running && m_jack_bpm > 0.1) {
-                // jack transport
-                bpm = m_jack_bpm;
-            } else {
-                // or file
-                bpm = m_master_bus.get_bpm();
-            }
+            double bpm = m_master_bus.get_bpm();
 
             // delta time
             delta_time = now_time - last_time;
