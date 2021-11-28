@@ -42,6 +42,8 @@ sequence::sequence( )
     m_snap_tick     = c_ppqn / 4;
     m_midi_channel  = 0;
 
+    m_alt_cc = -1;
+
     /* no notes are playing */
     for (int i=0; i< c_midi_notes; i++ )
         m_playing_notes[i] = 0;
@@ -3190,6 +3192,15 @@ sequence::fill_list( list<char> *a_list, int a_pos )
     a_list->push_front( 0x05 );
     addLongList( a_list, c_resume );
     a_list->push_front( m_resume );
+
+    /* meta */
+    addListVar( a_list, 0 );
+    a_list->push_front( 0xFF );
+    a_list->push_front( 0x7F );
+    a_list->push_front( 0x06 );
+    addLongList( a_list, c_alt_cc );
+    a_list->push_front( m_alt_cc );
+
 
     delta_time = m_length - prev_timestamp;
 

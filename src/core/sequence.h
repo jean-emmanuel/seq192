@@ -76,6 +76,9 @@ class sequence
     bool m_resume;
     bool m_resume_next;
 
+    /* metas */
+    int m_alt_cc;
+
     /* flag indicates that contents has changed from
        a recording */
     bool m_dirty_main;
@@ -195,6 +198,9 @@ class sequence
 
     void set_thru (bool);
     bool get_thru ();
+
+    void set_alt_cc(int cc){m_alt_cc=cc;};
+    int get_alt_cc(){return m_alt_cc;};
 
     /* singals that a redraw is needed from recording */
     /* resets flag on call */

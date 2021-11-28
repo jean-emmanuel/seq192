@@ -488,6 +488,8 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_submenu_record.signal_popped_up().connect([&](const Gdk::Rectangle*, const Gdk::Rectangle*, bool, bool){on_focus_out();});
 
 
+    if (m_sequence->get_alt_cc() != -1) set_data_type(EVENT_CONTROL_CHANGE, m_sequence->get_alt_cc(), true);
+
     set_icon(Gdk::Pixbuf::create_from_xpm_data(seq192_32_xpm));
 
     clear_focus();
@@ -923,7 +925,7 @@ EditWindow::create_event_menu()
     m_menu_item_alt_control.set_label("Alt Control Change");
     m_event_menu.append(m_menu_item_alt_control);
     m_menu_item_alt_control.set_submenu(m_submenu_alt_control);
-    
+
     m_menu_items_alt_control[0] = new CheckMenuItem();
     m_menu_items_alt_control[0]->set_label("None");
     m_menu_items_alt_control[0]->signal_toggled().connect([&]{
@@ -931,6 +933,7 @@ EditWindow::create_event_menu()
         set_data_type(m_status, m_cc);
         m_menu_item_alt_control.set_label("Alt Control Change");
         m_menu_item_toggle_alt_control.set_sensitive(false);
+        m_sequence->set_alt_cc(-1);
     });
     m_submenu_alt_control.append(*m_menu_items_alt_control[0]);
     for (int i=0; i<128; i++) {
@@ -1041,6 +1044,7 @@ EditWindow::set_data_type(unsigned char status, unsigned char control, bool alt)
         m_alt_control_view = true;
         m_menu_item_alt_control.set_label("Alt Control Change (" + to_string(control) + ")");
         m_menu_item_toggle_alt_control.set_sensitive(true);
+        m_sequence->set_alt_cc(control);
     } else {
         m_status = status;
         m_cc = control;
