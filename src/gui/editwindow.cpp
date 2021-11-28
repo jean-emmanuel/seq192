@@ -35,7 +35,10 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_midibus(-1),
     m_midichannel(-1),
     m_status(EVENT_NOTE_ON),
-    m_cc(0)
+    m_cc(0),
+    m_alt_status(0),
+    m_alt_cc(0),
+    m_alt_control_view(false)
 {
 
     Glib::RefPtr<Gtk::CssProvider> css_provider = Gtk::CssProvider::create();
@@ -911,9 +914,46 @@ EditWindow::create_event_menu()
 
     for (int i=0; i<128; i++) {
         m_menu_items_control[i] = new CheckMenuItem();
-        m_menu_items_control[i]->signal_toggled().connect([&, i]{set_data_type(EVENT_CONTROL_CHANGE, i);});
+        m_menu_items_control[i]->signal_toggled().connect([&, i]{
+            set_data_type(EVENT_CONTROL_CHANGE, i);
+        });
         m_submenu_control.append(*m_menu_items_control[i]);
     }
+
+    m_menu_item_alt_control.set_label("Alt Control Change");
+    m_event_menu.append(m_menu_item_alt_control);
+    m_menu_item_alt_control.set_submenu(m_submenu_alt_control);
+    
+    m_menu_items_alt_control[0] = new CheckMenuItem();
+    m_menu_items_alt_control[0]->set_label("None");
+    m_menu_items_alt_control[0]->signal_toggled().connect([&]{
+        set_data_type(0, 0, true);
+        set_data_type(m_status, m_cc);
+        m_menu_item_alt_control.set_label("Alt Control Change");
+        m_menu_item_toggle_alt_control.set_sensitive(false);
+    });
+    m_submenu_alt_control.append(*m_menu_items_alt_control[0]);
+    for (int i=0; i<128; i++) {
+        m_menu_items_alt_control[i+1] = new CheckMenuItem();
+        m_menu_items_alt_control[i+1]->signal_toggled().connect([&, i]{
+            set_data_type(EVENT_CONTROL_CHANGE, i, true);
+        });
+        m_submenu_alt_control.append(*m_menu_items_alt_control[i+1]);
+    }
+
+    m_menu_item_toggle_alt_control.set_label("Toggle Alt Control");
+    m_event_menu.append(m_menu_item_toggle_alt_control);
+    m_menu_item_toggle_alt_control.signal_activate().connect([&]{
+        if (m_alt_status != 0) {
+            if (m_alt_control_view) {
+                set_data_type(m_status, m_cc);
+            } else {
+                set_data_type(m_alt_status, m_alt_cc, true);
+            }
+        }
+    });
+    m_menu_item_toggle_alt_control.add_accelerator("activate", get_accel_group(), 't', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_item_toggle_alt_control.set_sensitive(false);
 
     m_event_menu.show_all();
     m_event_dropdown.set_popup(m_event_menu);
@@ -944,6 +984,8 @@ EditWindow::update_event_menu()
     for (int i=0; i<128; i++) {
         m_menu_items_control[i]->set_active(false);
         m_menu_items_control[i]->get_style_context()->remove_class("checked");
+        m_menu_items_alt_control[i+1]->set_active(false);
+        m_menu_items_alt_control[i+1]->get_style_context()->remove_class("checked");
 
         string ccname = to_string(i);
         int instrument = global_user_midi_bus_definitions[midi_bus].instrument[midi_ch];
@@ -955,6 +997,7 @@ EditWindow::update_event_menu()
             ccname = c_controller_names[i];
         }
         m_menu_items_control[i]->set_label(ccname);
+        m_menu_items_alt_control[i+1]->set_label(ccname);
     }
 
     unsigned char status, cc;
@@ -973,6 +1016,7 @@ EditWindow::update_event_menu()
                 break;
             case EVENT_CONTROL_CHANGE:
                 m_menu_items_control[cc]->get_style_context()->add_class("checked");
+                m_menu_items_alt_control[cc+1]->get_style_context()->add_class("checked");
                 break;
             case EVENT_PITCH_WHEEL:
                 m_menu_item_pitch.get_style_context()->add_class("checked");
@@ -988,13 +1032,23 @@ EditWindow::update_event_menu()
 }
 
 void
-EditWindow::set_data_type(unsigned char status, unsigned char control)
+EditWindow::set_data_type(unsigned char status, unsigned char control, bool alt)
 {
-    m_status = status;
-    m_cc = control;
+
+    if (alt) {
+        m_alt_status = status;
+        m_alt_cc = control;
+        m_alt_control_view = true;
+        m_menu_item_alt_control.set_label("Alt Control Change (" + to_string(control) + ")");
+        m_menu_item_toggle_alt_control.set_sensitive(true);
+    } else {
+        m_status = status;
+        m_cc = control;
+        m_alt_control_view = false;
+    }
 
     m_eventroll.set_data_type(status, control);
-    m_dataroll.set_data_type(status, control);
+    m_dataroll.set_data_type(status, control, alt);
 
     m_event_dropdown.set_tooltip_text("");
 

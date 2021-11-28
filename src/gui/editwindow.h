@@ -176,6 +176,10 @@ class EditWindow : public Window {
         MenuItem            m_menu_item_control;
         Menu                m_submenu_control;
         CheckMenuItem       *m_menu_items_control[128];
+        MenuItem            m_menu_item_alt_control;
+        Menu                m_submenu_alt_control;
+        CheckMenuItem       *m_menu_items_alt_control[129];
+        MenuItem            m_menu_item_toggle_alt_control;
 
         // toolbar
         Entry               m_toolbar_name;
@@ -204,12 +208,16 @@ class EditWindow : public Window {
         unsigned char m_status;
         unsigned char m_cc;
 
+        unsigned char m_alt_status;
+        unsigned char m_alt_cc;
+        bool m_alt_control_view;
+
         void update_midibus_name();
         void create_midibus_menu();
         void create_event_menu();
         void update_event_menu();
 
-        void set_data_type(unsigned char status, unsigned char control = 0);
+        void set_data_type(unsigned char status, unsigned char control = 0, bool alt=false);
 
         void menu_callback(edit_menu_action action);
         void menu_callback(edit_menu_action action, double data1);

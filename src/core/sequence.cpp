@@ -2121,11 +2121,11 @@ sequence::intersectEvents( long posstart, long posend, long status, long& start 
 
 /* copy event list for thread-safe drawing */
 void
-sequence::reset_draw_list()
+sequence::reset_draw_list(bool cache_events)
 {
     lock();
 
-    m_list_event_draw = m_list_event;
+    if (cache_events) m_list_event_draw = m_list_event;
     m_iterator_draw = m_list_event_draw.begin();
 
     unlock();

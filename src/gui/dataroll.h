@@ -32,7 +32,7 @@ class DataRoll : public DrawingArea {
 
         sigc::signal<bool(GdkEventScroll*)> signal_scroll;
 
-        void set_data_type(unsigned char a_status, unsigned char a_control);
+        void set_data_type(unsigned char a_status, unsigned char a_control, bool alt=false);
         void queue_draw_background();
 
 
@@ -61,12 +61,19 @@ class DataRoll : public DrawingArea {
         unsigned char m_status;
         unsigned char m_cc;
 
+        unsigned char m_alt_status;
+        unsigned char m_alt_cc;
+        bool m_alt_control_view;
+
         int m_drop_x;
         int m_drop_y;
         int m_current_x;
         int m_current_y;
         bool m_dragging;
         bool m_drag_handle;
+
+        unsigned char get_status();
+        unsigned char get_cc();
 
         void convert_x( int a_x, long *a_tick );
         void xy_to_rect( int a_x1,  int a_y1, int a_x2,  int a_y2, int *a_x,  int *a_y, int *a_w,  int *a_h );

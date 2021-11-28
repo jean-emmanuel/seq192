@@ -347,7 +347,7 @@ class sequence
     //
 
     /* copy event list for thread-safe drawing */
-    void reset_draw_list();
+    void reset_draw_list(bool cache_events = true);
 
     /* each call seqdata( sequence *a_seq, int a_scale );fills the passed refrences with a
        events elements, and returns true.  When it
