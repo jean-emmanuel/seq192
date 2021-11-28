@@ -27,6 +27,7 @@ const Gdk::RGBA c_color_text_hilight = Gdk::RGBA("#ffffff");
 
 const Gdk::RGBA c_color_primary = Gdk::RGBA("rgb(117, 170, 229)");
 const Gdk::RGBA c_color_secondary = Gdk::RGBA("rgb(229, 170, 117)");
+const Gdk::RGBA c_color_tertiary = Gdk::RGBA("rgb(154, 117, 229)");
 
 
 struct color { double r; double g; double b; };
@@ -84,7 +85,9 @@ const double c_alpha_grid_off = 0.01;
 const double c_alpha_grid_key = 0.1;
 const color c_color_event = {c_color_primary.get_red(), c_color_primary.get_green(), c_color_primary.get_blue()};
 const color c_color_event_selected = {c_color_secondary.get_red(), c_color_secondary.get_green(), c_color_secondary.get_blue()};
+const color c_color_event_alt = {c_color_tertiary.get_red(), c_color_tertiary.get_green(), c_color_tertiary.get_blue()};
 const double c_alpha_event = 0.75;
+const double c_alpha_event_alt = 0.5;
 
 const color c_color_lasso = {c_color_text.get_red(), c_color_text.get_green(), c_color_text.get_blue()};
 const double c_alpha_lasso_stroke = 0.8;

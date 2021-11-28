@@ -18,6 +18,7 @@
 
 #include "dataroll.h"
 #include "styles.h"
+#include "strings.h"
 
 DataRoll::DataRoll(perform * p, sequence * seq)
 {
@@ -124,7 +125,8 @@ DataRoll::draw_background()
 
         if (i == 0 && m_alt_status == 0) continue; // skip alt control view if not set
         m_sequence->reset_draw_list(false);
-        float alpha = i == 0 ? 0.5 : 1;
+        float alpha = i == 0 ? c_alpha_event_alt : 1;
+        color event_color = i == 0 ? c_color_event_alt : c_color_event;
         unsigned char status;
         unsigned char cc;
         if (m_alt_control_view) {
@@ -141,7 +143,7 @@ DataRoll::draw_background()
             {
 
                 if (selected) cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_event * alpha);
-                else cr->set_source_rgba(c_color_event.r, c_color_event.g, c_color_event.b, c_alpha_event * alpha);
+                else cr->set_source_rgba(event_color.r, event_color.g, event_color.b, c_alpha_event * alpha);
 
                 /* turn into screen corrids */
                 event_x = (tick - m_hscroll) / m_zoom + c_keys_width + c_event_width / 2 + 2;
@@ -167,7 +169,7 @@ DataRoll::draw_background()
                 cr->arc(event_x, y, 2, 0, 2 * G_PI);
                 cr->fill();
                 if (selected) cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_handle * alpha);
-                else cr->set_source_rgba(c_color_event.r, c_color_event.g, c_color_event.b, c_alpha_handle * alpha);
+                else cr->set_source_rgba(event_color.r, event_color.g, event_color.b, c_alpha_handle * alpha);
                 cr->arc(event_x, y, 6, 0, 2 * G_PI);
                 cr->fill();
 
@@ -185,7 +187,7 @@ DataRoll::draw_background()
                 cr->fill();
 
                 if (selected) cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_event * alpha);
-                else cr->set_source_rgba(c_color_event.r, c_color_event.g, c_color_event.b, c_alpha_event * alpha);
+                else cr->set_source_rgba(event_color.r, event_color.g, event_color.b, c_alpha_event * alpha);
                 cr->move_to(event_x - text_width / 2 - 0.5, height - c_data_text_height - c_dataroll_padding);
                 t->show_in_cairo_context(cr);
 
@@ -194,10 +196,25 @@ DataRoll::draw_background()
         }
     }
 
-    if(selection_type == UNSELECTED_EVENTS)
+    if (selection_type == UNSELECTED_EVENTS)
     {
         selection_type = num_selected_events;
         goto SECOND_PASS_NOTE_ON; // this is NOT spaghetti code... it's very clear what is going on!!!
+    }
+
+    if (m_alt_status != 0)
+    {
+        unsigned char status = m_alt_control_view ? m_status : m_alt_status;
+        string alt_string = status_strings[status];
+        if (status == EVENT_CONTROL_CHANGE) alt_string = "CC " + to_string(m_alt_control_view ? m_cc : m_alt_cc);
+        auto ti = create_pango_layout(alt_string);
+        ti->set_font_description(font);
+        ti->set_alignment(Pango::ALIGN_CENTER);
+        ti->get_pixel_size(text_width, text_height);
+
+        cr->set_source_rgba(c_color_event_alt.r, c_color_event_alt.g, c_color_event_alt.b, c_alpha_event_alt);
+        cr->move_to(c_keys_width -text_width, height - c_data_text_height - c_dataroll_padding);
+        ti->show_in_cairo_context(cr);
     }
 
 }
