@@ -73,6 +73,7 @@ class EditWindow : public Window {
         sequence           *m_sequence;
         MainWindow         *m_mainwindow;
         int                 m_seqnum;
+        int                 m_bg_seqnum;
 
         // components
         PianoKeys           m_pianokeys;
@@ -140,6 +141,12 @@ class EditWindow : public Window {
         MenuItem            m_menu_edit_movefineright;
 
         MenuItem            m_menu_edit_quantize;
+
+        MenuItem            m_menu_view;
+        Menu                m_submenu_view;
+        MenuItem            m_menu_view_bg_sequence;
+        Menu                m_submenu_bg_sequence;
+        CheckMenuItem      *m_menu_items_bgseq[c_seqs_in_set + 1];
 
         MenuItem            m_menu_record;
         Menu                m_submenu_record;
@@ -216,6 +223,9 @@ class EditWindow : public Window {
         void create_midibus_menu();
         void create_event_menu();
         void update_event_menu();
+
+        void update_background_menu();
+        void set_background_sequence(int i, sequence * seq);
 
         void set_data_type(unsigned char status, unsigned char control = 0, bool alt=false);
 

@@ -57,6 +57,7 @@ class PianoRoll : public DrawingArea {
 
         perform            *m_perform;
         sequence           *m_sequence;
+        sequence           *m_bg_sequence;
         PianoKeys          *m_pianokeys;
 
         Cairo::RefPtr<Cairo::ImageSurface> m_surface;

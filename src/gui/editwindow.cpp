@@ -27,6 +27,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_sequence(seq),
     m_mainwindow(m),
     m_seqnum(seqnum),
+    m_bg_seqnum(-1),
     m_pianokeys(p, seq),
     m_eventroll(p, seq),
     m_timeroll(p, seq),
@@ -203,6 +204,36 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_edit_close.add_accelerator("activate", get_accel_group(), 'w', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_edit_close.signal_activate().connect([&]{menu_callback(EDIT_MENU_CLOSE);});
     m_submenu_edit.append(m_menu_edit_close);
+
+    m_menu_view.set_label("_View");
+    m_menu_view.set_use_underline(true);
+    m_menu_view.set_submenu(m_submenu_view);
+    m_menu.append(m_menu_view);
+
+    m_menu_view_bg_sequence.set_label("Background sequence");
+    m_menu_view_bg_sequence.set_submenu(m_submenu_bg_sequence);
+    m_submenu_view.append(m_menu_view_bg_sequence);
+    m_menu_items_bgseq[c_seqs_in_set] =  new CheckMenuItem();
+    m_menu_items_bgseq[c_seqs_in_set]->set_label("None");
+    m_menu_items_bgseq[c_seqs_in_set]->signal_toggled().connect([&]{
+        set_background_sequence(-1, NULL);
+    });
+    m_submenu_bg_sequence.append(*m_menu_items_bgseq[c_seqs_in_set]);
+    int off_i = ((int) m_seqnum / c_seqs_in_set) * c_seqs_in_set;
+    for (int i=0; i < c_seqs_in_set; i++) {
+        m_menu_items_bgseq[i] = new CheckMenuItem();
+        m_menu_items_bgseq[i]->signal_toggled().connect([&, i]{
+            if (m_bg_seqnum != i + off_i) {
+                set_background_sequence(i + off_i, m_perform->get_sequence(i + off_i));
+            }
+        });
+        m_submenu_bg_sequence.append(*m_menu_items_bgseq[i]);
+        m_menu_items_bgseq[i]->hide();
+    }
+    m_submenu_view.signal_popped_up().connect([&](const Gdk::Rectangle* const&, const Gdk::Rectangle* const&, const bool&, const bool&){
+        update_background_menu();
+    });
+    update_background_menu();
 
     m_menu_transport.set_label("_Transport");
     m_menu_transport.set_use_underline(true);
@@ -697,6 +728,10 @@ EditWindow::timer_callback()
         return false;
     }
 
+    if (m_bg_seqnum != -1 && !m_perform->is_active(m_bg_seqnum)) {
+        set_background_sequence(-1, NULL);
+    }
+
     bool rec = m_sequence->get_recording();
     if (m_menu_record_state != rec) {
         m_menu_record_state = rec;
@@ -1095,6 +1130,39 @@ EditWindow::set_data_type(unsigned char status, unsigned char control, bool alt)
 
     m_event_dropdown.set_label(label);
 }
+
+void
+EditWindow::update_background_menu()
+{
+    int off_i = ((int) m_seqnum / c_seqs_in_set) * c_seqs_in_set;
+    bool check = false;
+    m_menu_items_bgseq[c_seqs_in_set]->set_active(false);
+    m_menu_items_bgseq[c_seqs_in_set]->get_style_context()->remove_class("checked");
+    for (int i=0; i < c_seqs_in_set; i++) {
+        m_menu_items_bgseq[i]->set_active(false);
+        m_menu_items_bgseq[i]->get_style_context()->remove_class("checked");
+        m_menu_items_bgseq[i]->hide();
+        if (m_perform->is_active(i + off_i) && i + off_i != m_seqnum) {
+            m_menu_items_bgseq[i]->set_label(m_perform->get_sequence(i + off_i)->get_name());
+            if (i + off_i == m_bg_seqnum) {
+                m_menu_items_bgseq[i]->get_style_context()->add_class("checked");
+                check = true;
+            }
+            m_menu_items_bgseq[i]->show();
+        }
+    }
+    if (!check) m_menu_items_bgseq[c_seqs_in_set]->get_style_context()->add_class("checked");
+
+}
+
+void
+EditWindow::set_background_sequence(int i, sequence * seq)
+{
+    m_bg_seqnum = i;
+    m_pianoroll.m_bg_sequence = seq;
+    m_pianoroll.queue_draw_background();
+}
+
 
 
 void

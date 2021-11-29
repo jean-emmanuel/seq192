@@ -22,6 +22,7 @@ PianoRoll::PianoRoll(perform * p, sequence * seq, PianoKeys * pianokeys)
 {
     m_perform = p;
     m_sequence = seq;
+    m_bg_sequence = NULL;
     m_pianokeys = pianokeys;
 
     m_hscroll = 0;
@@ -157,53 +158,72 @@ PianoRoll::draw_background()
     int note_y;
     int note_height = c_key_height - 3;
 
-    m_sequence->reset_draw_list();
 
-    while ((dt = m_sequence->get_next_note_event( &tick_s, &tick_f, &note, &selected, &velocity )) != DRAW_FIN)
-    {
-        if ((tick_s >= start_tick && tick_s <= end_tick) || ((dt == DRAW_NORMAL_LINKED) && (tick_f >= start_tick && tick_f <= end_tick)))
+    for (int i = 0; i < 2; i++) {
+
+        sequence * seq;
+        color color_event;
+        float alpha_event;
+        if (i == 0) {
+            if (m_bg_sequence == NULL) continue;
+            seq = m_bg_sequence;
+            color_event = c_color_event_alt;
+            alpha_event = c_alpha_event_alt;
+        } else {
+            seq = m_sequence;
+            color_event = c_color_event;
+            alpha_event = c_alpha_event;
+        }
+
+        seq->reset_draw_list();
+
+        while ((dt = seq->get_next_note_event( &tick_s, &tick_f, &note, &selected, &velocity )) != DRAW_FIN)
         {
-
-            if (selected)
+            if ((tick_s >= start_tick && tick_s <= end_tick) || ((dt == DRAW_NORMAL_LINKED) && (tick_f >= start_tick && tick_f <= end_tick)))
             {
-                cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_event);
-            }
-            else
-            {
-                cr->set_source_rgba(c_color_event.r, c_color_event.g, c_color_event.b, c_alpha_event);
-            }
 
-            note_x = tick_s / m_zoom;
-            note_y = height - c_key_height * (note + 1) + 1;
-
-            if (dt == DRAW_NORMAL_LINKED)
-            {
-                if (tick_f >= tick_s)
+                if (selected)
                 {
-                    note_width = (tick_f - tick_s) / m_zoom;
-                    if ( note_width < 4 ) note_width = 4;
+                    cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_event);
                 }
                 else
                 {
-                    note_width = (m_sequence->get_length() - tick_s) / m_zoom;
+                    cr->set_source_rgba(color_event.r, color_event.g, color_event.b, alpha_event);
                 }
+
+                note_x = tick_s / m_zoom;
+                note_y = height - c_key_height * (note + 1) + 1;
+
+                if (dt == DRAW_NORMAL_LINKED)
+                {
+                    if (tick_f >= tick_s)
+                    {
+                        note_width = (tick_f - tick_s) / m_zoom;
+                        if ( note_width < 4 ) note_width = 4;
+                    }
+                    else
+                    {
+                        note_width = (seq->get_length() - tick_s) / m_zoom;
+                    }
+                }
+                else
+                {
+                    note_width = 16 / m_zoom;
+                }
+
+                note_x -= m_hscroll / m_zoom;
+
+                cr->rectangle(note_x + 2, note_y, note_width - 2, note_height + (note == 0 ? 1 : 0));
+
+                if (tick_f < tick_s)
+                {
+                    cr->rectangle(0 - m_hscroll / m_zoom, note_y, tick_f / m_zoom - 2, note_height + (note == 0 ? 1 : 0));
+                }
+
+                cr->fill();
             }
-            else
-            {
-                note_width = 16 / m_zoom;
-            }
-
-            note_x -= m_hscroll / m_zoom;
-
-            cr->rectangle(note_x + 2, note_y, note_width - 2, note_height + (note == 0 ? 1 : 0));
-
-            if (tick_f < tick_s)
-            {
-                cr->rectangle(0 - m_hscroll / m_zoom, note_y, tick_f / m_zoom - 2, note_height + (note == 0 ? 1 : 0));
-            }
-
-            cr->fill();
         }
+
     }
 
 }
