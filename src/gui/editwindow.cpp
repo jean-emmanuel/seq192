@@ -222,7 +222,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     int off_i = ((int) m_seqnum / c_seqs_in_set) * c_seqs_in_set;
     for (int i=0; i < c_seqs_in_set; i++) {
         m_menu_items_bgseq[i] = new CheckMenuItem();
-        m_menu_items_bgseq[i]->signal_toggled().connect([&, i]{
+        m_menu_items_bgseq[i]->signal_toggled().connect([&, i, off_i]{
             if (m_bg_seqnum != i + off_i) {
                 set_background_sequence(i + off_i, m_perform->get_sequence(i + off_i));
             }
