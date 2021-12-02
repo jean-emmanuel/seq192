@@ -37,6 +37,9 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
 
     m_toolbar_play_state = false;
 
+    m_accelgroup = Gtk::AccelGroup::create();
+    add_accel_group(m_accelgroup);
+
     for (int i = 0; i < c_max_sequence; i++)
     {
         m_editwindows[i] = NULL;
@@ -57,25 +60,25 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
 
     m_menu_file_new.set_label("_New");
     m_menu_file_new.set_use_underline(true);
-    m_menu_file_new.add_accelerator("activate", get_accel_group(), 'n', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_file_new.add_accelerator("activate", m_accelgroup, 'n', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_file_new.signal_activate().connect([this]{menu_callback(MAIN_MENU_NEW, 0, 0);});
     m_submenu_file.append(m_menu_file_new);
 
     m_menu_file_open.set_label("_Open");
     m_menu_file_open.set_use_underline(true);
-    m_menu_file_open.add_accelerator("activate", get_accel_group(), 'o', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_file_open.add_accelerator("activate", m_accelgroup, 'o', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_file_open.signal_activate().connect([this]{menu_callback(MAIN_MENU_OPEN, 0, 0);});
     m_submenu_file.append(m_menu_file_open);
 
     m_menu_file_save.set_label("_Save");
     m_menu_file_save.set_use_underline(true);
-    m_menu_file_save.add_accelerator("activate", get_accel_group(), 's', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_file_save.add_accelerator("activate", m_accelgroup, 's', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_file_save.signal_activate().connect([this]{menu_callback(MAIN_MENU_SAVE, 0, 0);});
     m_submenu_file.append(m_menu_file_save);
 
     m_menu_file_saveas.set_label("Save _As");
     m_menu_file_saveas.set_use_underline(true);
-    m_menu_file_saveas.add_accelerator("activate", get_accel_group(), 's', Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_file_saveas.add_accelerator("activate", m_accelgroup, 's', Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_file_saveas.signal_activate().connect([this]{menu_callback(MAIN_MENU_SAVEAS, 0, 0);});
     m_submenu_file.append(m_menu_file_saveas);
 
@@ -95,7 +98,7 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
 
     m_menu_file_quit.set_label("_Quit");
     m_menu_file_quit.set_use_underline(true);
-    m_menu_file_quit.add_accelerator("activate", get_accel_group(), 'q', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_file_quit.add_accelerator("activate", m_accelgroup, 'q', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_file_quit.signal_activate().connect([this]{menu_callback(MAIN_MENU_QUIT, 0, 0);});
     m_submenu_file.append(m_menu_file_quit);
 
@@ -105,7 +108,7 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     m_menu.append(m_menu_transport);
 
     m_menu_transport_start_label.set_label("Start");
-    m_menu_transport_start_label.set_alignment(0);
+    m_menu_transport_start_label.set_xalign(0.0);
     m_menu_transport_start_label.set_accel(GDK_KEY_space, (Gdk::ModifierType)0);
     m_menu_transport_start.add(m_menu_transport_start_label);
     m_menu_transport_start.signal_activate().connect([&]{
@@ -114,7 +117,7 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     m_submenu_transport.append(m_menu_transport_start);
 
     m_menu_transport_stop_label.set_label("Stop");
-    m_menu_transport_stop_label.set_alignment(0);
+    m_menu_transport_stop_label.set_xalign(0.0);
     m_menu_transport_stop_label.set_accel(GDK_KEY_Escape, (Gdk::ModifierType)0);
     m_menu_transport_stop.add(m_menu_transport_stop_label);
     m_menu_transport_stop.signal_activate().connect([&]{
@@ -168,7 +171,7 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     m_toolbar_bpm.set_width_chars(6);
     m_toolbar_bpm.set_digits(2);
     m_toolbar_bpm.set_numeric(true);
-    m_toolbar_bpm.set_alignment(0.5);
+    m_toolbar_bpm.set_halign(Gtk::ALIGN_CENTER);
     m_toolbar_bpm.set_adjustment(m_toolbar_bpm_adj);
     m_toolbar_bpm.signal_activate().connect([&]{clear_focus();});
     m_toolbar_bpm.signal_value_changed().connect([&]{
@@ -225,8 +228,8 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     m_sequence_grid.set_row_homogeneous(true);
     m_sequence_grid.set_column_spacing(c_grid_spacing);
     m_sequence_grid.set_row_spacing(c_grid_spacing);
-    m_sequence_grid.set_margin_left(c_grid_padding);
-    m_sequence_grid.set_margin_right(c_grid_padding);
+    m_sequence_grid.set_margin_start(c_grid_padding);
+    m_sequence_grid.set_margin_end(c_grid_padding);
     m_sequence_grid.set_margin_top(c_grid_padding);
     m_sequence_grid.set_margin_bottom(c_grid_padding);
     m_scroll_wrapper.add(m_sequence_grid);
@@ -417,8 +420,8 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
 
                 dialog.set_transient_for(*this);
 
-                dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-                dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
+                dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+                dialog.add_button("_Open", Gtk::RESPONSE_OK);
 
                 auto filter_midi = Gtk::FileFilter::create();
                 filter_midi->set_name("MIDI files");
@@ -483,8 +486,8 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
 
                 dialog.set_transient_for(*this);
 
-                dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-                dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
+                dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+                dialog.add_button("_Save", Gtk::RESPONSE_OK);
 
                 auto filter_midi = Gtk::FileFilter::create();
                 filter_midi->set_name("MIDI files");
@@ -594,9 +597,9 @@ MainWindow::unsaved_changes()
 
         MessageDialog dialog(*this, query_str, false, Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_NONE, false);
 
-        dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_YES);
-        dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-        dialog.add_button(Gtk::Stock::NO, Gtk::RESPONSE_NO);
+        dialog.add_button("_Save", Gtk::RESPONSE_YES);
+        dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+        dialog.add_button("_No", Gtk::RESPONSE_NO);
 
         switch (dialog.run()) {
             case Gtk::RESPONSE_YES:

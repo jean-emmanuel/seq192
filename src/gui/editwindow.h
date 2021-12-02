@@ -75,6 +75,8 @@ class EditWindow : public Window {
         int                 m_seqnum;
         int                 m_bg_seqnum;
 
+        Glib::RefPtr<Gtk::AccelGroup>          m_accelgroup;
+
         // components
         PianoKeys           m_pianokeys;
         EventRoll           m_eventroll;
@@ -97,6 +99,7 @@ class EditWindow : public Window {
         ScrolledWindow      m_pianoroll_scroller;
         Scrollbar           m_vscrollbar;
         Scrollbar           m_hscrollbar;
+        Label               m_event_dropdown_label;
         MenuButton          m_event_dropdown;
 
         // menu

@@ -60,6 +60,7 @@ class MainWindow : public Window {
 
         perform            *m_perform;
 
+        Glib::RefPtr<Gtk::AccelGroup>          m_accelgroup;
 
         // layout
         VBox                m_vbox;
