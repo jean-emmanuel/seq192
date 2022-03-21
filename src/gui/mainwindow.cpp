@@ -533,8 +533,10 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
                         MessageDialog errdialog (*this, "Error writing file.", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
                         errdialog.run();
                     } else if (action == MAIN_MENU_SAVEAS) {
-                        global_filename = fn;
-                        global_is_modified = false;
+                        if (!m_nsm) {
+                            global_filename = fn;
+                            global_is_modified = false;
+                        }
                     }
                 }
 
@@ -677,7 +679,7 @@ MainWindow::nsm_set_client(nsm_client_t *nsm, bool optional_gui)
     m_nsm_optional_gui = optional_gui;
     m_menu_file_new.set_sensitive(false);
     m_menu_file_open.set_sensitive(false);
-    m_menu_file_saveas.set_sensitive(false);
+    m_menu_file_saveas.set_label("Export session");
     if (m_nsm_optional_gui) m_menu_file_quit.set_label("Hide");
 }
 
