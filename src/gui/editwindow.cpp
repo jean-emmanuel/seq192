@@ -699,6 +699,7 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             m_sequence->reverse_pattern();
             break;
         case EDIT_MENU_CLOSE:
+            clear_focus();
             close();
             break;
 
