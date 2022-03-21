@@ -3194,14 +3194,12 @@ sequence::fill_list( list<char> *a_list, int a_pos )
     a_list->push_front( m_resume );
 
     /* meta */
-    if (m_alt_cc != -1) {
-        addListVar( a_list, 0 );
-        a_list->push_front( 0xFF );
-        a_list->push_front( 0x7F );
-        a_list->push_front( 0x05 );
-        addLongList( a_list, c_alt_cc );
-        a_list->push_front( m_alt_cc );
-    }
+    addListVar( a_list, 0 );
+    a_list->push_front( 0xFF );
+    a_list->push_front( 0x7F );
+    a_list->push_front( 0x05 );
+    addLongList( a_list, c_alt_cc );
+    a_list->push_front( m_alt_cc + 1); // can't write -1 here
 
 
     delta_time = m_length - prev_timestamp;

@@ -317,7 +317,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
                                     else if (proprietary == c_alt_cc)
                                     {
-                                        seq->set_alt_cc (m_d[m_pos++]);
+                                        seq->set_alt_cc (m_d[m_pos++] - 1);
                                         len--;
                                     }
 
