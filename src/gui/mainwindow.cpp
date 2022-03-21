@@ -452,7 +452,8 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
                     }
 
                     last_used_dir = fn.substr(0, fn.rfind("/") + 1);
-                    global_filename = fn;
+
+                    if (action != MAIN_MENU_IMPORT) global_filename = fn;
                     update_window_title();
                     update_sset_name(m_perform->get_screenset());
                     for (int i = 0; i < c_seqs_in_set; i++) {
