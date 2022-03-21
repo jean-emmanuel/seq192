@@ -3197,7 +3197,7 @@ sequence::fill_list( list<char> *a_list, int a_pos )
     addListVar( a_list, 0 );
     a_list->push_front( 0xFF );
     a_list->push_front( 0x7F );
-    a_list->push_front( 0x06 );
+    a_list->push_front( 0x05 );
     addLongList( a_list, c_alt_cc );
     a_list->push_front( m_alt_cc );
 
