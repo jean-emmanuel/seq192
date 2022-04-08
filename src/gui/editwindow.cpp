@@ -312,8 +312,14 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
         string s = m_toolbar_name.get_text();
         m_sequence->set_name(s);
         update_window_title();
+        add_accel_group(m_accelgroup);
         return false;
     });
+    m_toolbar_name.signal_focus_in_event().connect([&](GdkEventFocus *focus)->bool{
+        remove_accel_group(m_accelgroup);
+        return false;
+    });
+
     m_toolbar_name.set_text(m_sequence->get_name());
     m_toolbar.pack_start(m_toolbar_name, true, true);
 
@@ -842,6 +848,7 @@ EditWindow::focus_callback(string name)
 void
 EditWindow::clear_focus()
 {
+    m_toolbar_name.select_region(0, 0);
     m_toolbar_bpm.select_region(0, 0);
     m_toolbar_bw.select_region(0, 0);
     m_toolbar_measures.select_region(0, 0);
