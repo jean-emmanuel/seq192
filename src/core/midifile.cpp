@@ -439,7 +439,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
                 notes[len] = '\0';
                 string notess (notes);
-                a_perf->set_screen_set_notepad (x, &notess);
+                a_perf->set_screen_set_notepad (x + a_screen_set, &notess);
                 delete[]notes;
             }
         }
