@@ -64,6 +64,8 @@ class perform
     bool m_outputing;
     bool m_looping;
 
+    bool m_transport_stopping;
+
     long m_tick;
 
     void set_running( bool a_running );
@@ -85,7 +87,6 @@ class perform
 
     jack_client_t *m_jack_client;
     bool m_jack_running;
-    bool m_jack_stopping;
 
     void inner_start();
     void inner_stop();

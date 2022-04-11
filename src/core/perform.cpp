@@ -39,13 +39,14 @@ perform::perform()
     m_outputing = true;
     m_tick = 0;
 
+    m_transport_stopping = false;
+
     // m_key_start  = GDK_space;
     // m_key_stop   = GDK_Escape;
 
     m_screen_set = 0;
 
     m_jack_running = false;
-    m_jack_stopping = false;
 
     m_out_thread_launched = false;
     m_in_thread_launched = false;
@@ -54,10 +55,11 @@ perform::perform()
 void
 perform::start_playing()
 {
+    inner_stop();
     stop_playing();
 
-    if (!m_jack_running) {
-        usleep(1000 * c_thread_trigger_ms);
+    while (m_transport_stopping) {
+        usleep(100);
     }
 
     position_jack();
@@ -70,6 +72,7 @@ perform::start_playing()
 void
 perform::stop_playing()
 {
+
     stop_jack();
     stop();
 }
@@ -743,7 +746,6 @@ void perform::stop_jack(  )
 {
     //printf( "perform::stop_jack()\n" );
     if( m_jack_running ) {
-        m_jack_stopping = true;
         jack_transport_stop (m_jack_client);
     }
 }
@@ -782,7 +784,7 @@ void perform::inner_start()
 {
     m_condition_var.lock();
 
-    if (!is_running()) {
+    if (!is_running() && !m_transport_stopping) {
         set_running(true);
         m_condition_var.signal();
     }
@@ -796,6 +798,7 @@ void perform::inner_stop()
 
     if (is_running()) {
         set_running(false);
+        m_transport_stopping = true;
         //off_sequences();
         reset_sequences();
     }
@@ -898,12 +901,11 @@ int jack_process_callback(jack_nframes_t nframes, void* arg)
         m_mainperf->m_master_bus.set_bpm(pos.beats_per_minute);
     }
 
-    if (state == JackTransportRolling && !m_mainperf->m_jack_stopping)
+    if (state == JackTransportRolling)
     {
         m_mainperf->inner_start();
     }
     else if (state == JackTransportStopped || state == JackTransportStarting) {
-        m_mainperf->m_jack_stopping = false;
         m_mainperf->inner_stop();
     }
 
@@ -986,6 +988,8 @@ void perform::output_func()
 
         m_tick = 0;
         m_master_bus.flush();
+
+        m_transport_stopping = false;
     }
 
     pthread_exit(0);
