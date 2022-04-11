@@ -791,9 +791,11 @@ void perform::inner_start()
 
 void perform::inner_stop()
 {
-    set_running(false);
-    //off_sequences();
-    reset_sequences();
+    if (is_running()) {
+        set_running(false);
+        //off_sequences();
+        reset_sequences();
+    }
 }
 
 
@@ -939,12 +941,8 @@ void perform::output_func()
         long long delta_time;
         long long exec_time;
 
-        if (m_jack_running) {
-            last_time = jack_get_time();
-        } else {
-            clock_gettime(CLOCK_REALTIME, &system_time);
-            last_time = (system_time.tv_sec * 1000000) + (system_time.tv_nsec / 1000);
-        }
+        clock_gettime(CLOCK_REALTIME, &system_time);
+        last_time = (system_time.tv_sec * 1000000) + (system_time.tv_nsec / 1000);
 
         int ppqn = m_master_bus.get_ppqn();
         long current_tick = 0;
@@ -952,14 +950,8 @@ void perform::output_func()
         while( m_running ){
 
             // delta time
-            if (m_jack_running) {
-                // jack
-                now_time = jack_get_time();
-            } else {
-                // or system
-                clock_gettime(CLOCK_REALTIME, &system_time);
-                now_time = ((system_time.tv_sec * 1000000) + (system_time.tv_nsec / 1000));
-            }
+            clock_gettime(CLOCK_REALTIME, &system_time);
+            now_time = ((system_time.tv_sec * 1000000) + (system_time.tv_nsec / 1000));
 
             // bpm
             double bpm = m_master_bus.get_bpm();
@@ -979,14 +971,8 @@ void perform::output_func()
             play(current_tick);
 
             // exec time
-            if (m_jack_running) {
-                // jack
-                exec_time = jack_get_time();
-            } else {
-                // or system
-                clock_gettime(CLOCK_REALTIME, &system_time);
-                exec_time = ((system_time.tv_sec * 1000000) + (system_time.tv_nsec / 1000));
-            }
+            clock_gettime(CLOCK_REALTIME, &system_time);
+            exec_time = ((system_time.tv_sec * 1000000) + (system_time.tv_nsec / 1000));
 
             // adjust sleep time
             ts.tv_nsec = 1000000 * c_thread_trigger_ms - (exec_time - now_time) * 1000;
