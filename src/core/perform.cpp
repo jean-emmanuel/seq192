@@ -426,13 +426,14 @@ void perform::clear_all()
 perform::~perform()
 {
 
+    stop();
+    
     m_inputing = false;
     m_outputing = false;
     m_running = false;
 
     m_condition_var.signal();
 
-    all_notes_off();
 
     if (m_out_thread_launched )
         pthread_join( m_out_thread, NULL );
