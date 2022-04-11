@@ -54,15 +54,15 @@ perform::perform()
 void
 perform::start_playing()
 {
-    inner_stop();
+    stop_playing();
 
     if (!m_jack_running) {
         usleep(1000 * c_thread_trigger_ms);
     }
 
     position_jack();
-    start_jack();
 
+    start_jack();
     start();
 }
 
@@ -742,8 +742,10 @@ void perform::start_jack(  )
 void perform::stop_jack(  )
 {
     //printf( "perform::stop_jack()\n" );
-    if( m_jack_running )
+    if( m_jack_running ) {
+        m_jack_stopping = true;
         jack_transport_stop (m_jack_client);
+    }
 }
 
 
@@ -793,9 +795,6 @@ void perform::inner_stop()
 {
 
     if (is_running()) {
-        if (m_jack_running) {
-            m_jack_stopping = true;
-        }
         set_running(false);
         //off_sequences();
         reset_sequences();
