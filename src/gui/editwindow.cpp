@@ -43,7 +43,10 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
 {
 
     m_accelgroup = Gtk::AccelGroup::create();
+    m_accelgroup_persistent = Gtk::AccelGroup::create();
+
     add_accel_group(m_accelgroup);
+    add_accel_group(m_accelgroup_persistent);
 
     Glib::RefPtr<Gtk::CssProvider> css_provider = Gtk::CssProvider::create();
     css_provider->load_from_data(c_mainwindow_css);
@@ -202,7 +205,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
 
     m_menu_edit_close.set_label("_Close");
     m_menu_edit_close.set_use_underline(true);
-    m_menu_edit_close.add_accelerator("activate", m_accelgroup, 'w', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_close.add_accelerator("activate", m_accelgroup_persistent, 'w', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_edit_close.signal_activate().connect([&]{menu_callback(EDIT_MENU_CLOSE);});
     m_submenu_edit.append(m_menu_edit_close);
 

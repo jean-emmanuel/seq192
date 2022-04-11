@@ -76,6 +76,7 @@ class EditWindow : public Window {
         int                 m_bg_seqnum;
 
         Glib::RefPtr<Gtk::AccelGroup>          m_accelgroup;
+        Glib::RefPtr<Gtk::AccelGroup>          m_accelgroup_persistent;
 
         // components
         PianoKeys           m_pianokeys;
