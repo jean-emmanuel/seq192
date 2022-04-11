@@ -85,6 +85,7 @@ class perform
 
     jack_client_t *m_jack_client;
     bool m_jack_running;
+    bool m_jack_stopping;
 
     void inner_start();
     void inner_stop();

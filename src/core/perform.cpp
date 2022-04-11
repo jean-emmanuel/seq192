@@ -45,6 +45,7 @@ perform::perform()
     m_screen_set = 0;
 
     m_jack_running = false;
+    m_jack_stopping = false;
 
     m_out_thread_launched = false;
     m_in_thread_launched = false;
@@ -780,7 +781,6 @@ void perform::inner_start()
     m_condition_var.lock();
 
     if (!is_running()) {
-
         set_running(true);
         m_condition_var.signal();
     }
@@ -791,7 +791,11 @@ void perform::inner_start()
 
 void perform::inner_stop()
 {
+
     if (is_running()) {
+        if (m_jack_running) {
+            m_jack_stopping = true;
+        }
         set_running(false);
         //off_sequences();
         reset_sequences();
@@ -895,11 +899,12 @@ int jack_process_callback(jack_nframes_t nframes, void* arg)
         m_mainperf->m_master_bus.set_bpm(pos.beats_per_minute);
     }
 
-    if (state == JackTransportRolling  )
+    if (state == JackTransportRolling && !m_mainperf->m_jack_stopping)
     {
         m_mainperf->inner_start();
     }
     else if (state == JackTransportStopped || state == JackTransportStarting) {
+        m_mainperf->m_jack_stopping = false;
         m_mainperf->inner_stop();
     }
 
