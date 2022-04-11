@@ -55,7 +55,6 @@ perform::perform()
 void
 perform::start_playing()
 {
-    inner_stop();
     stop_playing();
 
     while (m_transport_stopping) {
@@ -426,11 +425,14 @@ void perform::clear_all()
 
 perform::~perform()
 {
+
     m_inputing = false;
     m_outputing = false;
     m_running = false;
 
     m_condition_var.signal();
+
+    all_notes_off();
 
     if (m_out_thread_launched )
         pthread_join( m_out_thread, NULL );
@@ -772,10 +774,6 @@ void perform::start()
 
 void perform::stop()
 {
-    if (m_jack_running) {
-        return;
-    }
-
     inner_stop();
 }
 

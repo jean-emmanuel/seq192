@@ -300,6 +300,13 @@ main (int argc, char *argv[])
             });
         }
 
+        // bind ctrl+c signal
+        signal(SIGINT, [](int param){
+            global_is_running = false;
+            application->quit();
+        });
+
+
         status = application->run(window);
     }
 
