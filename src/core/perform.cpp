@@ -34,12 +34,11 @@ perform::perform()
     }
 
     m_running = false;
+    m_stopping = false;
     m_looping = false;
     m_inputing = true;
     m_outputing = true;
     m_tick = 0;
-
-    m_transport_stopping = false;
 
     // m_key_start  = GDK_space;
     // m_key_stop   = GDK_Escape;
@@ -55,11 +54,12 @@ perform::perform()
 void
 perform::start_playing()
 {
+
     stop_playing();
 
-    while (m_transport_stopping) {
-        usleep(100);
-    }
+    m_stopping_lock.lock();
+    while (m_stopping) m_stopping_lock.wait();
+    m_stopping_lock.unlock();
 
     position_jack();
 
@@ -427,13 +427,13 @@ perform::~perform()
 {
 
     stop();
-    
+
     m_inputing = false;
     m_outputing = false;
     m_running = false;
 
-    m_condition_var.signal();
-
+    m_running_lock.signal();
+    m_stopping_lock.signal();
 
     if (m_out_thread_launched )
         pthread_join( m_out_thread, NULL );
@@ -781,26 +781,31 @@ void perform::stop()
 
 void perform::inner_start()
 {
-    m_condition_var.lock();
 
-    if (!is_running() && !m_transport_stopping) {
+    m_running_lock.lock();
+
+    if (!is_running()) {
         set_running(true);
-        m_condition_var.signal();
+        m_running_lock.signal();
     }
 
-    m_condition_var.unlock();
+    m_running_lock.unlock();
 }
 
 
 void perform::inner_stop()
 {
 
-    if (is_running()) {
-        set_running(false);
-        m_transport_stopping = true;
-        //off_sequences();
-        reset_sequences();
+    m_running_lock.lock();
+    m_stopping_lock.lock();
+
+    if (is_running() && !m_stopping) {
+        m_stopping = true;
     }
+
+    m_stopping_lock.unlock();
+    m_running_lock.unlock();
+
 }
 
 
@@ -919,18 +924,18 @@ void perform::output_func()
 
         //printf ("waiting for signal\n");
 
-        m_condition_var.lock();
+        m_running_lock.lock();
 
         while (!m_running) {
 
-            m_condition_var.wait();
+            m_running_lock.wait();
 
             /* if stopping, then kill thread */
             if (!m_outputing)
                 break;
         }
 
-        m_condition_var.unlock();
+        m_running_lock.unlock();
 
         // system time
         struct timespec system_time;
@@ -952,7 +957,7 @@ void perform::output_func()
         int ppqn = m_master_bus.get_ppqn();
         long current_tick = 0;
 
-        while( m_running ){
+        while (m_running) {
 
             // delta time
             clock_gettime(CLOCK_REALTIME, &system_time);
@@ -982,13 +987,29 @@ void perform::output_func()
             // adjust sleep time
             ts.tv_nsec = 1000000 * c_thread_trigger_ms - (exec_time - now_time) * 1000;
 
+            m_stopping_lock.lock();
+            if (m_stopping) break;
+            m_stopping_lock.unlock();
+
             nanosleep(&ts, NULL);
         }
 
         m_tick = 0;
-        m_master_bus.flush();
 
-        m_transport_stopping = false;
+        if (m_stopping) {
+            m_running_lock.lock();
+            set_running(false);
+            m_running_lock.unlock();
+            
+            reset_sequences();
+            m_stopping = false;
+            m_stopping_lock.signal();
+        } else {
+            m_master_bus.flush();
+        }
+
+        m_stopping_lock.unlock();
+
     }
 
     pthread_exit(0);

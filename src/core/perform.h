@@ -60,6 +60,7 @@ class perform
     bool m_in_thread_launched;
 
     bool m_running;
+    bool m_stopping;
     bool m_inputing;
     bool m_outputing;
     bool m_looping;
@@ -76,7 +77,8 @@ class perform
     int m_control_status;
     int m_screen_set;
 
-    condition_var m_condition_var;
+    condition_var m_running_lock;
+    condition_var m_stopping_lock;
 
     // do not access these directly, use set/lookup below
     std::map<unsigned int,long> key_events;
