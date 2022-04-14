@@ -26,6 +26,9 @@ SequenceButton::SequenceButton(perform * p, MainWindow * m, int seqpos)
     m_drag_start = false;
     m_last_seqnum = -1;
 
+    m_last_marker_pos = 0;
+    m_next_marker_pos = 0;
+
     set_last_sequence_number();
 
     Gtk::Allocation allocation = get_allocation();
@@ -229,18 +232,41 @@ SequenceButton::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         cr->paint();
 
         // draw marker
-        long tick = seq->get_last_tick();
-        int tick_x = tick * (m_rect_w - 4) / seq->get_length();
         color color = seq->get_playing() ? c_sequence_marker_on : c_sequence_marker;
         cr->set_source_rgb(color.r, color.g, color.b);
         cr->set_line_width(1.0);
-        cr->move_to(m_rect_x + tick_x + 2.5, m_rect_y + 1);
-        cr->line_to(m_rect_x + tick_x + 2.5, m_rect_y + m_rect_h - 1);
+        cr->move_to(m_next_marker_pos - 0.5, m_rect_y + 1);
+        cr->line_to(m_next_marker_pos - 0.5, m_rect_y + m_rect_h - 1);
         cr->stroke();
 
+        m_last_marker_pos = m_next_marker_pos;
     }
 
     return true;
+}
+
+void
+SequenceButton::update()
+{
+
+    sequence * seq = get_sequence();
+    if (seq != NULL) {
+        long tick = seq->get_last_tick();
+        m_next_marker_pos = tick * (m_rect_w - 4) / seq->get_length() + 3;
+
+        if (seq->is_dirty_main()) {
+            draw_background();
+            queue_draw();
+        } else {
+            if (m_next_marker_pos > m_last_marker_pos) {
+                queue_draw_area(m_last_marker_pos - 1, m_rect_y, m_next_marker_pos - m_last_marker_pos + 1, m_rect_h);
+            } else {
+                queue_draw_area(m_last_marker_pos - 1, m_rect_y, 1, m_rect_h);
+                queue_draw_area(m_next_marker_pos - 1, m_rect_y, 1, m_rect_h);
+            }
+        }
+    }
+
 }
 
 bool

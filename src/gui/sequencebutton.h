@@ -51,6 +51,7 @@ class SequenceButton : public DrawingArea {
         int get_last_sequence_number();
         void set_last_sequence_number();
         void draw_background();
+        void update();
 
     protected:
 
@@ -76,6 +77,9 @@ class SequenceButton : public DrawingArea {
         int m_rect_y;
         int m_rect_w;
         int m_rect_h;
+
+        int m_last_marker_pos;
+        int m_next_marker_pos;
 
     friend class MainWindow;
 
