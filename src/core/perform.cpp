@@ -901,7 +901,7 @@ int jack_process_callback(jack_nframes_t nframes, void* arg)
     jack_position_t pos;
     jack_transport_state_t state = jack_transport_query( m_mainperf->m_jack_client, &pos );
 
-    if (pos.beats_per_minute > 0.1) {
+    if (pos.beats_per_minute > c_bpm_minimum) {
         m_mainperf->m_master_bus.set_bpm(pos.beats_per_minute);
     }
 
@@ -1000,7 +1000,7 @@ void perform::output_func()
             m_running_lock.lock();
             set_running(false);
             m_running_lock.unlock();
-            
+
             reset_sequences();
             m_stopping = false;
             m_stopping_lock.signal();
