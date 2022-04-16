@@ -38,7 +38,7 @@ perform::perform()
     m_looping = false;
     m_inputing = true;
     m_outputing = true;
-    m_tick = 0;
+    m_tick = -1;
 
     // m_key_start  = GDK_space;
     // m_key_stop   = GDK_Escape;
@@ -698,9 +698,7 @@ int perform::get_screenset()
 void perform::play( long a_tick )
 {
 
-    /* just run down the list of sequences and have them dump */
-
-    //printf( "play [%d]\n", a_tick );
+    if (a_tick <= m_tick) return;
 
     m_tick = a_tick;
     for (int i=0; i< c_max_sequence; i++ ){
@@ -948,7 +946,7 @@ void perform::output_func()
 
         long long start_time;
         long long now_time;
-        long double playing_time; // double to keep track of tick decimals
+        long long playing_time;
         long long delta_time;
         long long exec_time;
 
@@ -957,7 +955,8 @@ void perform::output_func()
         playing_time = 0;
 
         double ppqn = m_master_bus.get_ppqn();
-        long current_tick = 0;
+
+        long double current_tick = 0;
 
         while (m_running) {
 
@@ -973,20 +972,16 @@ void perform::output_func()
 
             // delta time to ticks
             double tick_duration = 1e6 * 60. / bpm / ppqn;
-            int ticks = (int)(delta_time / tick_duration);
+            double ticks = delta_time / tick_duration;
 
-            if (ticks > 0) {
+            // increment ticks
+            current_tick += ticks;
 
-                // increment ticks
-                current_tick += ticks;
+            // increment playing time
+            playing_time = now_time;
 
-                // increment playing time
-                playing_time += ticks * tick_duration;
-
-                // play sequences at current tick
-                play(current_tick);
-
-            }
+            // play sequences at current tick
+            play(current_tick);
 
             m_stopping_lock.lock();
             if (m_stopping) break;
@@ -1003,7 +998,7 @@ void perform::output_func()
             }
         }
 
-        m_tick = 0;
+        m_tick = -1;
 
         if (m_stopping) {
             m_running_lock.lock();
@@ -1054,7 +1049,7 @@ void perform::input_func()
                     if (ev.get_status() <= EVENT_SYSEX) {
 
                         /* is there a sequence set? */
-                        if (m_master_bus.is_dumping()) {
+                        if (m_master_bus.is_dumping() && m_tick >= 0) {
 
                             ev.set_timestamp(m_tick);
 
