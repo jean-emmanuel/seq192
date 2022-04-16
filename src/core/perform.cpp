@@ -988,18 +988,19 @@ void perform::output_func()
 
             }
 
-            // exec time
-            clock_gettime(CLOCK_MONOTONIC_RAW, &system_time);
-            exec_time = ((system_time.tv_sec * 1e6) + (system_time.tv_nsec / 1e3)) - start_time;
-
-            // adjust sleep time
-            ts.tv_nsec = 1e3 * c_thread_trigger_us - (exec_time - now_time) * 1e3;
-
             m_stopping_lock.lock();
             if (m_stopping) break;
             m_stopping_lock.unlock();
 
-            nanosleep(&ts, NULL);
+            // exec time
+            clock_gettime(CLOCK_MONOTONIC_RAW, &system_time);
+            exec_time = ((system_time.tv_sec * 1e6) + (system_time.tv_nsec / 1e3)) - start_time;
+
+            if (exec_time - now_time < c_thread_trigger_us) {
+                // adjust sleep time
+                ts.tv_nsec = 1e3 * c_thread_trigger_us - (exec_time - now_time) * 1e3;
+                nanosleep(&ts, NULL);
+            }
         }
 
         m_tick = 0;

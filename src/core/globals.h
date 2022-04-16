@@ -21,7 +21,7 @@
 
 using namespace std;
 
-const int c_thread_trigger_us = 500;
+const int c_thread_trigger_us = 1000;
 
 /* 182 per screen */
 const int c_mainwnd_rows = 13; //ORL
