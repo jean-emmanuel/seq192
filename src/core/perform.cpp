@@ -943,49 +943,57 @@ void perform::output_func()
         // loop timeout: 2ms
         struct timespec ts = {
             .tv_sec = 0,
-            .tv_nsec = 1000000 * c_thread_trigger_ms
+            .tv_nsec = 1000 * c_thread_trigger_us
         };
 
+        long long start_time;
         long long now_time;
-        long long last_time;
+        long double playing_time; // double to keep track of tick decimals
         long long delta_time;
         long long exec_time;
 
-        clock_gettime(CLOCK_REALTIME, &system_time);
-        last_time = (system_time.tv_sec * 1000000) + (system_time.tv_nsec / 1000);
+        clock_gettime(CLOCK_MONOTONIC_RAW, &system_time);
+        start_time = (system_time.tv_sec * 1e6) + (system_time.tv_nsec / 1e3);
+        playing_time = 0;
 
-        int ppqn = m_master_bus.get_ppqn();
+        double ppqn = m_master_bus.get_ppqn();
         long current_tick = 0;
 
         while (m_running) {
 
             // delta time
-            clock_gettime(CLOCK_REALTIME, &system_time);
-            now_time = ((system_time.tv_sec * 1000000) + (system_time.tv_nsec / 1000));
+            clock_gettime(CLOCK_MONOTONIC_RAW, &system_time);
+            now_time = ((system_time.tv_sec * 1e6) + (system_time.tv_nsec / 1e3)) - start_time;
 
             // bpm
             double bpm = m_master_bus.get_bpm();
 
             // delta time
-            delta_time = now_time - last_time;
+            delta_time = now_time - playing_time;
 
             // delta time to ticks
-            double tick_duration = 1000000 * 60. / bpm / ppqn;
+            double tick_duration = 1e6 * 60. / bpm / ppqn;
             int ticks = (int)(delta_time / tick_duration);
-            current_tick += ticks;
 
-            // increment time
-            last_time += ticks * tick_duration;
+            if (ticks > 0) {
 
-            // play sequences at current tick
-            play(current_tick);
+                // increment ticks
+                current_tick += ticks;
+
+                // increment playing time
+                playing_time += ticks * tick_duration;
+
+                // play sequences at current tick
+                play(current_tick);
+
+            }
 
             // exec time
-            clock_gettime(CLOCK_REALTIME, &system_time);
-            exec_time = ((system_time.tv_sec * 1000000) + (system_time.tv_nsec / 1000));
+            clock_gettime(CLOCK_MONOTONIC_RAW, &system_time);
+            exec_time = ((system_time.tv_sec * 1e6) + (system_time.tv_nsec / 1e3)) - start_time;
 
             // adjust sleep time
-            ts.tv_nsec = 1000000 * c_thread_trigger_ms - (exec_time - now_time) * 1000;
+            ts.tv_nsec = 1e3 * c_thread_trigger_us - (exec_time - now_time) * 1e3;
 
             m_stopping_lock.lock();
             if (m_stopping) break;
