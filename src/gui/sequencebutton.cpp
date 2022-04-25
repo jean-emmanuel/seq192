@@ -221,12 +221,6 @@ SequenceButton::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     sequence * seq = get_sequence();
     if (seq != NULL) {
 
-        // sequence changed or screenset change
-        if (!newsurface && seq->is_dirty_main())
-        {
-            draw_background();
-        }
-
         // draw background
         cr->set_source(m_surface, 0.0, 0.0);
         cr->paint();
