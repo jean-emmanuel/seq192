@@ -213,7 +213,7 @@ DataRoll::draw_background()
         ti->get_pixel_size(text_width, text_height);
 
         cr->set_source_rgba(c_color_event_alt.r, c_color_event_alt.g, c_color_event_alt.b, c_alpha_event_alt);
-        cr->move_to(c_keys_width -text_width, height - c_data_text_height - c_dataroll_padding);
+        cr->move_to(c_keys_width - text_width - c_dataroll_padding, height - c_data_text_height - c_dataroll_padding);
         ti->show_in_cairo_context(cr);
     }
 
@@ -267,6 +267,13 @@ DataRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     return true;
 }
 
+void
+DataRoll::draw_update()
+{
+    if (m_draw_background_queued || m_dragging) {
+        queue_draw();
+    }
+}
 
 void
 DataRoll::set_zoom(double zoom)
@@ -411,6 +418,8 @@ DataRoll::on_button_release_event(GdkEventButton* event)
 
         /* convert x,y to ticks, then set events in range */
         m_dragging = false;
+
+        queue_draw_background();
     }
 
     if (m_drag_handle)

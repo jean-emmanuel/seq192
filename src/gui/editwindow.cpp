@@ -783,12 +783,12 @@ EditWindow::timer_callback()
         m_pianoroll.queue_draw_background();
         m_eventroll.queue_draw_background();
         m_dataroll.queue_draw_background();
+        m_timeroll.queue_draw();
     }
 
-    m_timeroll.queue_draw();
-    m_eventroll.queue_draw();
-    m_pianoroll.queue_draw();
-    m_dataroll.queue_draw();
+    m_eventroll.draw_update();
+    m_pianoroll.draw_update();
+    m_dataroll.draw_update();
 
     if (m_sequence->m_have_undo && !m_menu_edit_undo.get_sensitive()) m_menu_edit_undo.set_sensitive(true);
     else if (!m_sequence->m_have_undo && m_menu_edit_undo.get_sensitive()) m_menu_edit_undo.set_sensitive(false);
@@ -836,6 +836,10 @@ EditWindow::scroll_callback(GdkEventScroll* event)
         {
             adj->set_value(adj->get_value() - adj->get_step_increment());
         }
+        m_pianoroll.queue_draw_background();
+        m_eventroll.queue_draw_background();
+        m_dataroll.queue_draw_background();
+        m_timeroll.queue_draw();
     }
 
     return false;

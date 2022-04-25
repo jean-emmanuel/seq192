@@ -34,6 +34,7 @@ class DataRoll : public DrawingArea {
 
         void set_data_type(unsigned char a_status, unsigned char a_control, bool alt=false);
         void queue_draw_background();
+        void draw_update();
 
 
     protected:

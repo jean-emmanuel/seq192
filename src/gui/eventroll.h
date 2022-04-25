@@ -37,6 +37,7 @@ class EventRoll : public DrawingArea {
 
         void set_data_type(unsigned char a_status, unsigned char a_control);
         void queue_draw_background();
+        void draw_update();
 
 
     protected:

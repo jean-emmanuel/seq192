@@ -239,6 +239,13 @@ EventRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     return true;
 }
 
+void
+EventRoll::draw_update()
+{
+    if (m_draw_background_queued || m_selecting || m_moving || m_paste) {
+        queue_draw();
+    }
+}
 
 void
 EventRoll::set_zoom(double zoom)

@@ -63,6 +63,7 @@ class PianoRoll : public DrawingArea {
         Cairo::RefPtr<Cairo::ImageSurface> m_surface;
         bool                m_draw_background_queued;
         void draw_background();
+        void draw_update();
 
         // hscroll
         int                 m_hscroll;
@@ -104,6 +105,9 @@ class PianoRoll : public DrawingArea {
         int m_current_x;
         int m_current_y;
         int m_last_x;
+
+        int m_last_marker_pos;
+        int m_next_marker_pos;
 
         double get_zoom() {return m_zoom;};
         void set_zoom(double zoom);

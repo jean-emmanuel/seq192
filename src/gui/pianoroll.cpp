@@ -45,6 +45,9 @@ PianoRoll::PianoRoll(perform * p, sequence * seq, PianoKeys * pianokeys)
 
     m_draw_background_queued = false;
 
+    m_last_marker_pos = 0;
+    m_next_marker_pos = 0;
+
     Gtk::Allocation allocation = get_allocation();
     m_surface = Cairo::ImageSurface::create(
         Cairo::Format::FORMAT_ARGB32,
@@ -254,7 +257,7 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     cr->set_line_width(1.0);
 
     // mouse edition
-    if (m_selecting || m_moving || m_paste ||  m_growing)
+    if (m_selecting || m_moving || m_paste || m_growing)
     {
         int x,y,w,h;
         cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_lasso_stroke);
@@ -314,17 +317,37 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
 
     // progress marker
-    long tick = (m_sequence->get_last_tick() - m_hscroll) / m_zoom;
-    if (tick != 0)
+    if (m_next_marker_pos > 1)
     {
         cr->set_line_width(1.0);
         cr->set_source_rgba(c_color_primary.get_red(), c_color_primary.get_green(), c_color_primary.get_blue(), 0.75);
-        cr->move_to(tick + 0.5, 0);
-        cr->line_to(tick + 0.5, height);
+        cr->move_to(m_next_marker_pos - 0.5, 0);
+        cr->line_to(m_next_marker_pos - 0.5, height);
         cr->stroke();
     }
+    m_last_marker_pos = m_next_marker_pos;
 
     return true;
+}
+
+void
+PianoRoll::draw_update()
+{
+
+    Gtk::Allocation allocation = get_allocation();
+    const int height = allocation.get_height();
+
+    m_next_marker_pos = (m_sequence->get_last_tick() - m_hscroll) / m_zoom + 1;
+
+    if (m_draw_background_queued || m_selecting || m_moving || m_paste || m_growing) {
+        queue_draw();
+    } else if (m_next_marker_pos > m_last_marker_pos) {
+        queue_draw_area(m_last_marker_pos - 1, 0, m_next_marker_pos - m_last_marker_pos + 1, height);
+    } else {
+        queue_draw_area(m_last_marker_pos - 1, 0, 1, height);
+        queue_draw_area(m_next_marker_pos - 1, 0, 1, height);
+    }
+
 }
 
 void
@@ -335,6 +358,7 @@ PianoRoll::set_zoom(double zoom)
     if (zoom != m_zoom) {
         m_zoom = zoom;
         queue_draw_background();
+        queue_draw();
     }
 }
 
