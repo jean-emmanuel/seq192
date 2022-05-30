@@ -345,6 +345,10 @@ SequenceButton::on_button_release_event(GdkEventButton* event)
                 MenuItem * menu_item5 = new MenuItem("Export sequence");
                 menu_item5->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_EXPORT, 0, 0));
                 menu->append(*menu_item5);
+
+                MenuItem * menu_item6 = new MenuItem("Delete");
+                menu_item6->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_DELETE, 0, 0));
+                menu->append(*menu_item6);
             } else {
                 MenuItem * menu_item6 = new MenuItem("Paste");
                 menu_item6->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_PASTE, 0, 0));
@@ -420,6 +424,9 @@ SequenceButton::menu_callback(context_menu_action action, int data1, int data2)
             break;
         case MENU_EXPORT:
             m_mainwindow->menu_callback(MAIN_MENU_EXPORT_SEQUENCE, get_sequence_number(), -1);
+            break;
+        case MENU_DELETE:
+            m_perform->delete_sequence(get_sequence_number());
             break;
         case MENU_PASTE:
             m_perform->paste_sequence(get_sequence_number());

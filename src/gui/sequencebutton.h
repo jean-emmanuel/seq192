@@ -34,6 +34,7 @@ enum context_menu_action
     MENU_CUT,
     MENU_COPY,
     MENU_EXPORT,
+    MENU_DELETE,
     MENU_PASTE,
     MENU_MIDI_BUS
 };
