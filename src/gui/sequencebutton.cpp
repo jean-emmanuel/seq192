@@ -75,6 +75,13 @@ SequenceButton::get_sequence() {
     }
 }
 
+bool
+SequenceButton::set_active(bool active) {
+    bool changed = active != m_active;
+    m_active = active;
+    return changed;
+}
+
 void
 SequenceButton::draw_background()
 {
@@ -401,14 +408,12 @@ SequenceButton::menu_callback(context_menu_action action, int data1, int data2)
     switch (action) {
         case MENU_NEW:
             m_perform->new_sequence(get_sequence_number());
-            queue_draw();
             // no break -> edit
         case MENU_EDIT:
             m_mainwindow->open_edit_window(get_sequence_number(), get_sequence());
             break;
         case MENU_CUT:
             m_perform->cut_sequence(get_sequence_number());
-            queue_draw();
             break;
         case MENU_COPY:
             m_perform->copy_sequence(get_sequence_number());
@@ -418,7 +423,6 @@ SequenceButton::menu_callback(context_menu_action action, int data1, int data2)
             break;
         case MENU_PASTE:
             m_perform->paste_sequence(get_sequence_number());
-            queue_draw();
             break;
         case MENU_MIDI_BUS:
             sequence * seq = get_sequence();

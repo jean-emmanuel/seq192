@@ -49,6 +49,7 @@ class SequenceButton : public DrawingArea {
         sequence * get_sequence();
         int get_sequence_number();
         int get_last_sequence_number();
+        bool set_active(bool active);
         void set_last_sequence_number();
         void draw_background();
         void update();
@@ -67,6 +68,7 @@ class SequenceButton : public DrawingArea {
         MainWindow * m_mainwindow;
         int m_seqpos;
         int m_last_seqnum;
+        bool m_active;
         bool m_click;
         bool m_drag_start;
         Cairo::RefPtr<Cairo::ImageSurface> m_surface;
