@@ -169,6 +169,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
 
     m_menu_edit_movefineleft_label.set_label("Left (fine)");
     m_menu_edit_movefineleft_label.set_accel(GDK_KEY_Left, Gdk::SHIFT_MASK);
+    m_menu_edit_movefineleft_label.set_xalign(0.0);
     m_menu_edit_movefineleft.add(m_menu_edit_movefineleft_label);
     m_menu_edit_movefineleft.signal_activate().connect([&]{menu_callback(EDIT_MENU_MOVE, -1);});
     m_submenu_move.append(m_menu_edit_movefineleft);
@@ -179,6 +180,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_submenu_move.append(m_menu_edit_moveright);
 
     m_menu_edit_movefineright_label.set_label("Right (fine)");
+    m_menu_edit_movefineright_label.set_xalign(0.0);
     m_menu_edit_movefineright_label.set_accel(GDK_KEY_Right, Gdk::SHIFT_MASK);
     m_menu_edit_movefineright.add(m_menu_edit_movefineright_label);
     m_menu_edit_movefineright.signal_activate().connect([&]{menu_callback(EDIT_MENU_MOVE, 1);});
