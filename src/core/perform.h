@@ -206,7 +206,6 @@ class perform
         SEQ_SSEQ_QUEUED,
         SEQ_STATUS,
         SEQ_STATUS_EXT,
-        SEQ_CLEAR,              // Test clear notes in clip
 
         SEQ_MODE_SOLO,
         SEQ_MODE_ON,
@@ -214,7 +213,13 @@ class perform
         SEQ_MODE_TOGGLE,
         SEQ_MODE_RECORD,
         SEQ_MODE_RECORD_ON,
-        SEQ_MODE_RECORD_OFF
+        SEQ_MODE_RECORD_OFF,
+        SEQ_MODE_COPY,
+        SEQ_MODE_CUT,
+        SEQ_MODE_PASTE,
+        SEQ_MODE_DELETE,
+        SEQ_MODE_CLEAR,
+
     };
 
     std::map<std::string, int> osc_commands = {
@@ -238,7 +243,11 @@ class perform
         {"record",              SEQ_MODE_RECORD},
         {"record_on",           SEQ_MODE_RECORD_ON},
         {"record_off",          SEQ_MODE_RECORD_OFF},
-        {"clear",               SEQ_CLEAR}
+        {"copy",                SEQ_MODE_COPY},
+        {"cut",                 SEQ_MODE_CUT},
+        {"paste",               SEQ_MODE_PASTE},
+        {"delete",              SEQ_MODE_DELETE},
+        {"clear",               SEQ_MODE_CLEAR}
     };
 
 

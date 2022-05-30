@@ -260,13 +260,32 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                                 // only one sequence can be armed for recording
                                 // ignore matching sequences after the first
                                 return 0;
-                            case SEQ_CLEAR:
+                            case SEQ_MODE_CLEAR:
                                 self->m_seqs[nseq]->select_all();
                                 self->m_seqs[nseq]->mark_selected();
                                 self->m_seqs[nseq]->remove_marked();
                                 break;
-
+                            case SEQ_MODE_COPY:
+                                // only one sequence can be copied at a time
+                                // ignore matching sequences after the first
+                                self->copy_sequence(nseq);
+                                return 0;
+                            case SEQ_MODE_CUT:
+                                // only one sequence can be cut at a time
+                                // ignore matching sequences after the first
+                                self->cut_sequence(nseq);
+                                return 0;
+                            case SEQ_MODE_DELETE:
+                                self->delete_sequence(nseq);
+                                break;
                         }
+                    } else if (nseq < c_max_sequence && !self->is_active(nseq)) {
+                        switch (mode) {
+                            case SEQ_MODE_PASTE:
+                                self->paste_sequence(nseq);
+                                return 0;
+                        }
+
                     }
                 }
             }
