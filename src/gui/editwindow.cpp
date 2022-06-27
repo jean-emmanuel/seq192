@@ -776,10 +776,14 @@ EditWindow::timer_callback()
     adj->set_page_increment(c_ppqn * m_sequence->get_bpm() * 4.0 / m_sequence->get_bw() * m_pianoroll.get_zoom());
     if (adj->get_value() + m_pianoroll.get_width() * m_pianoroll.get_zoom() > adj->get_upper()) adj->set_value(adj->get_upper());
 
-    m_timeroll.set_hscroll(adj->get_value());
-    m_eventroll.set_hscroll(adj->get_value());
-    m_pianoroll.set_hscroll(adj->get_value());
-    m_dataroll.set_hscroll(adj->get_value());
+    bool scrolled = adj->get_value() != m_timeroll.m_hscroll;
+    if (scrolled) {
+        m_timeroll.set_hscroll(adj->get_value());
+        m_eventroll.set_hscroll(adj->get_value());
+        m_pianoroll.set_hscroll(adj->get_value());
+        m_dataroll.set_hscroll(adj->get_value());
+        m_timeroll.queue_draw();
+    }
 
     if (m_sequence->is_dirty_edit()) {
         m_pianoroll.queue_draw_background();
