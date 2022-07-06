@@ -556,7 +556,7 @@ EditWindow::on_key_press(GdkEventKey* event)
     if (get_focus() != NULL) {
         string focus = get_focus()->get_name();
         if (event->keyval == GDK_KEY_space && focus == "seqname") return false;
-        if ((event->keyval == GDK_KEY_Left || event->keyval == GDK_KEY_Right || event->keyval == GDK_KEY_Delete || event->keyval == GDK_KEY_Backspace) &&
+        if ((event->keyval == GDK_KEY_Left || event->keyval == GDK_KEY_Right || event->keyval == GDK_KEY_Delete || event->keyval == GDK_KEY_BackSpace) &&
             (focus == "seqname" || focus == "bpm" || focus == "bw" || focus == "measures"))
         {
             return false;
