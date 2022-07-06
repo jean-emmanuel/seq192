@@ -585,6 +585,9 @@ EditWindow::on_key_press(GdkEventKey* event)
         case GDK_KEY_Delete:
             menu_callback(EDIT_MENU_DELETE);
             return true;
+        case GDK_KEY_BackSpace:
+            menu_callback(EDIT_MENU_DELETE);
+            return true;
         case GDK_KEY_Alt_L:
             m_pianoroll.set_snap_bypass(true);
             m_eventroll.set_snap_bypass(true);
