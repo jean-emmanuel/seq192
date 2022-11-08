@@ -1,5 +1,12 @@
 # seq192
 
+Fork infos:
+- Adding some OSC commands:
+  Command base is /sequence/edit edit_mode sequence_name args...
+  - set sequence length : `sendosc 127.0.0.1 9000 /sequence/edit s beats s Untitled i 4 i 4 i 2` 4/4 x 2, 6/8 x 4 etc...
+  - add note : `sendosc 127.0.0.1 9000 /sequence/edit s add_note s Untitled i 16 i 8 i 60` start tick, length, midi pitch (start and length in 64th)
+  - remove note : `sendosc 127.0.0.1 9000 /sequence/edit s delete_note s Untitled i 16 i 60` start tick, midi pitch (start also in 64th)
+
 MIDI sequencer based on seq24 with less features and more swag.
 
 **Less features**
