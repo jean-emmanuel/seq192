@@ -1,11 +1,26 @@
 CXX = g++
-CXXFLAGS = -g -O0 $(shell pkg-config --cflags liblo jack alsa gtkmm-3.0) -Wall -DGTKMM_DISABLE_DEPRECATED
-LDFLAGS = $(shell pkg-config --libs liblo jack alsa gtkmm-3.0)
-SOURCES = $(wildcard src/core/*.cpp) $(wildcard src/gui/*.cpp) src/seq192.cpp
-OBJ = $(SOURCES:.cpp=.o)
-DEPENDS := $(SOURCES:.cpp=.d)
+CXXFLAGS = -g -O0 $(shell pkg-config --cflags liblo alsa) -Wall
+LDFLAGS = $(shell pkg-config --libs liblo alsa)
+SOURCES = $(wildcard src/core/*.cpp) src/seq192.cpp
 BIN = seq192
 PREFIX = /usr/local
+
+
+USE_GTK=1
+ifeq ($(USE_GTK), 1)
+	CXXFLAGS += $(shell pkg-config --cflags gtkmm-3.0) -DGTKMM_DISABLE_DEPRECATED -D USE_GTK
+	LDFLAGS += $(shell pkg-config --libs gtkmm-3.0)
+	SOURCES += $(wildcard src/gui/*.cpp)
+endif
+
+USE_JACK=1
+ifeq ($(USE_JACK), 1)
+	CXXFLAGS += $(shell pkg-config --cflags jack) -D USE_JACK
+	LDFLAGS += $(shell pkg-config --libs jack)
+endif
+
+OBJ = $(SOURCES:.cpp=.o)
+DEPENDS := $(SOURCES:.cpp=.d)
 
 .PHONY: all clean install uninstall
 

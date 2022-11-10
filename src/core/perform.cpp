@@ -45,7 +45,9 @@ perform::perform()
 
     m_screen_set = 0;
 
+    #ifdef USE_JACK
     m_jack_running = false;
+    #endif
 
     m_out_thread_launched = false;
     m_in_thread_launched = false;
@@ -61,9 +63,11 @@ perform::start_playing()
     while (m_stopping) m_stopping_lock.wait();
     m_stopping_lock.unlock();
 
+    #ifdef USE_JACK
     position_jack();
-
     start_jack();
+    #endif
+
     start();
 }
 
@@ -72,7 +76,10 @@ void
 perform::stop_playing()
 {
 
+    #ifdef USE_JACK
     stop_jack();
+    #endif
+
     stop();
 }
 
@@ -364,6 +371,7 @@ void perform::osc_status( char* address, const char* path)
 
 }
 
+#ifdef USE_JACK
 void perform::init_jack()
 {
     if ( global_with_jack_transport  && !m_jack_running)
@@ -423,7 +431,14 @@ void perform::deinit_jack()
 
     }
 }
+void jack_shutdown(void *arg)
+{
+    perform *p = (perform *) arg;
+    p->m_jack_running = false;
 
+    printf("JACK shut down.\nJACK sync Disabled.\n");
+}
+#endif
 
 void perform::clear_all()
 {
@@ -466,7 +481,9 @@ perform::~perform()
         }
     }
 
+    #ifdef USE_JACK
     deinit_jack();
+    #endif
 
     if (global_oscport != 0) {
         oscserver->stop();
@@ -754,6 +771,7 @@ void perform::set_orig_ticks( long a_tick  )
 }
 
 
+#ifdef USE_JACK
 void perform::start_jack(  )
 {
     //printf( "perform::start_jack()\n" );
@@ -778,13 +796,15 @@ void perform::position_jack()
         jack_transport_locate( m_jack_client, 0 );
     }
 }
-
+#endif
 
 void perform::start()
 {
+    #ifdef USE_JACK
     if (m_jack_running) {
         return;
     }
+    #endif
 
     inner_start();
 }
@@ -910,7 +930,7 @@ void* output_thread_func(void *a_pef )
 }
 
 
-
+#ifdef USE_JACK
 int jack_process_callback(jack_nframes_t nframes, void* arg)
 {
     perform *m_mainperf = (perform *) arg;
@@ -932,7 +952,7 @@ int jack_process_callback(jack_nframes_t nframes, void* arg)
 
     return 0;
 }
-
+#endif
 
 
 void perform::output_func()
@@ -1113,10 +1133,69 @@ void perform::restore_playing_state()
     }
 }
 
-void jack_shutdown(void *arg)
-{
-    perform *p = (perform *) arg;
-    p->m_jack_running = false;
 
-    printf("JACK shut down.\nJACK sync Disabled.\n");
+void perform::file_new()
+{
+    clear_all();
+    global_filename = "";
+    global_is_modified = false;
+}
+
+bool perform::file_open(std::string filename)
+{
+    clear_all();
+    midifile f(filename);
+    bool result = f.parse(this, 0);
+    global_is_modified = !result;
+    if (result) global_filename = filename;
+    return result;
+}
+
+bool perform::file_import(std::string filename)
+{
+    midifile f(filename);
+    bool result = f.parse(this, get_screenset());
+    global_is_modified = !result;
+    return result;
+}
+
+bool perform::file_save()
+{
+    midifile f(global_filename);
+    bool result = f.write(this, -1, -1);
+    if (result) global_is_modified = false;
+    return result;
+}
+
+bool perform::file_saveas(std::string filename)
+{
+    midifile f(filename);
+    bool result = f.write(this, -1, -1);
+    if (result) {
+        global_filename = filename;
+        global_is_modified = false;
+    }
+    return result;
+
+}
+
+bool perform::file_export(std::string filename)
+{
+    midifile f(filename);
+    bool result = f.write(this, -1, -1);
+    return result;
+}
+
+bool perform::file_export_screenset(std::string filename)
+{
+    midifile f(filename);
+    bool result = f.write(this, get_screenset(), -1);
+    return result;
+}
+
+bool perform::file_export_sequence(std::string filename, int seqnum)
+{
+    midifile f(filename);
+    bool result = f.write(this, get_screenset(), seqnum);
+    return result;
 }

@@ -51,7 +51,6 @@ class MainWindow : public Window {
 
         // nsm
         void nsm_set_client(nsm_client_t *nsm, bool optional_gui);
-        void nsm_save();
 
         Glib::RefPtr<Gtk::Application> m_app;
 

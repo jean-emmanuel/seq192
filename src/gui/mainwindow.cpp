@@ -395,9 +395,7 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
         case MAIN_MENU_NEW:
             if (global_is_modified && !unsaved_changes()) return;
             close_all_edit_windows();
-            m_perform->clear_all();
-            global_filename = "";
-            global_is_modified = false;
+            m_perform->file_new();
             update_window_title();
             update_sset_name(m_perform->get_screenset());
             for (int i = 0; i < c_seqs_in_set; i++) {
@@ -435,12 +433,13 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
                 if (dialog.run() == Gtk::RESPONSE_OK)
                 {
                     auto fn = dialog.get_filename();
+                    bool result;
 
-                    if (action == MAIN_MENU_OPEN) m_perform->clear_all();
-
-                    midifile f(fn);
-                    bool result = f.parse(m_perform, action == MAIN_MENU_OPEN ? 0 : m_perform->get_screenset());
-                    global_is_modified = !result;
+                    if (action == MAIN_MENU_OPEN) {
+                        result = m_perform->file_open(fn);
+                    } else if (action == MAIN_MENU_IMPORT) {
+                        result = m_perform->file_import(fn);
+                    }
 
                     if (!result) {
                         MessageDialog errdialog(*this, "Error reading file: " + fn, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
@@ -450,7 +449,6 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
 
                     last_used_dir = fn.substr(0, fn.rfind("/") + 1);
 
-                    if (action != MAIN_MENU_IMPORT) global_filename = fn;
                     update_window_title();
                     update_sset_name(m_perform->get_screenset());
                     for (int i = 0; i < c_seqs_in_set; i++) {
@@ -463,13 +461,10 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
             if (global_filename == "") {
                 menu_callback(MAIN_MENU_SAVEAS, -1, -1);
             } else {
-                midifile f(global_filename);
-                bool result = f.write(m_perform, -1, -1);
+                bool result = m_perform->file_save();
                 if (!result) {
                     Gtk::MessageDialog errdialog(*this, "Error writing file.", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
                     errdialog.run();
-                } else {
-                    global_is_modified = false;
                 }
             }
             break;
@@ -523,22 +518,25 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
                         if (warning.run() == Gtk::RESPONSE_NO) return;
                     }
 
-                    midifile f(fn);
-                    int a_sset = action == MAIN_MENU_EXPORT_SCREENSET ? m_perform->get_screenset() : -1;
-                    int a_seq  = action == MAIN_MENU_EXPORT_SEQUENCE ? data1 : -1;
-                    bool result = f.write(m_perform, a_sset, a_seq);
+                    bool result;
+                    if (action == MAIN_MENU_SAVEAS) {
+                        if (m_nsm) {
+                            result = m_perform->file_export(fn);
+                        } else {
+                            result = m_perform->file_saveas(fn);
+                        }
+                    } else if (action == MAIN_MENU_EXPORT_SCREENSET) {
+                        result = m_perform->file_export_screenset(fn);
+                    } else if (action == MAIN_MENU_EXPORT_SEQUENCE) {
+                        result = m_perform->file_export_sequence(fn, data1);
+                    }
+
                     if (!result) {
                         MessageDialog errdialog (*this, "Error writing file.", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
                         errdialog.run();
-                    } else if (action == MAIN_MENU_SAVEAS) {
-                        if (!m_nsm) {
-                            global_filename = fn;
-                            global_is_modified = false;
-                        }
                     }
                 }
-
-                }
+            }
             break;
         case MAIN_MENU_QUIT:
             if (m_nsm && m_nsm_optional_gui) global_nsm_gui = false;
@@ -679,10 +677,4 @@ MainWindow::nsm_set_client(nsm_client_t *nsm, bool optional_gui)
     m_menu_file_open.set_sensitive(false);
     m_menu_file_saveas.set_label("Export session");
     if (m_nsm_optional_gui) m_menu_file_quit.set_label("Hide");
-}
-
-void
-MainWindow::nsm_save()
-{
-    menu_callback(MAIN_MENU_SAVE, 0, 0);
 }

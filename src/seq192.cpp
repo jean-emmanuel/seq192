@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <sys/stat.h>
 
 #include "package.h"
 
@@ -27,8 +28,10 @@
 #include "core/cachefile.h"
 #include "core/perform.h"
 
+#ifdef USE_GTK
 #include "gui/mainwindow.h"
 #include <gtkmm.h>
+#endif
 
 /* struct for command parsing */
 static struct
@@ -49,7 +52,12 @@ string config_filename = "";
 string global_filename = "";
 string last_used_dir = getenv("HOME");
 
+#ifndef USE_GTK
+bool global_no_gui = true;
+#else
 bool global_no_gui = false;
+#endif
+
 bool global_with_jack_transport = false;
 
 bool global_is_running = true;
@@ -62,7 +70,9 @@ user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];
 user_instrument_definition global_user_instrument_definitions[c_max_instruments];
 user_keymap_definition     global_user_keymap_definitions[c_max_instruments];
 
+#ifdef USE_GTK
 Glib::RefPtr<Gtk::Application> application;
+#endif
 
 // nsm
 bool global_nsm_gui = false;
@@ -73,14 +83,16 @@ string nsm_folder = "";
 int
 nsm_save_cb(char **,  void *userdata)
 {
-    MainWindow *w = (MainWindow *) userdata;
-    w->nsm_save();
+    perform *p = (perform *) userdata;
+    p->file_save();
     return ERR_OK;
 }
 void
 nsm_hide_cb(void *userdata)
 {
+    #ifdef USE_GTK
     application->hold();
+    #endif
     global_nsm_gui = false;
 }
 void
@@ -146,15 +158,28 @@ main (int argc, char *argv[])
             case 'h':
 
                 printf("\n");
-                printf("seq192 - live MIDI sequencer\n\n");
-                printf("Usage: seq192 [options]\n\n");
+                printf("seq192 - live MIDI sequencer ");
+
+                #if !defined USE_JACK && !defined USE_GTK
+                printf("(compiled without jack support and gtk support)");
+                #elif !defined USE_JACK
+                printf("(compiled without jack support)");
+                #elif !defined USE_GTK
+                printf("(compiled without gtk support)");
+                #endif
+
+                printf("\n\nUsage: seq192 [options]\n\n");
                 printf("Options:\n");
                 printf("  -h, --help              show available options\n");
                 printf("  -f, --file <filename>   load midi file on startup\n");
                 printf("  -c, --config <filename> load config file on startup\n");
                 printf("  -p, --osc-port <port>   osc input port (udp port number or unix socket path)\n");
+                #ifdef USE_JACK
                 printf("  -j, --jack-transport    sync to jack transport\n");
+                #endif
+                #ifdef USE_GTK
                 printf("  -n, --no-gui            enable headless mode\n");
+                #endif
                 printf("  -v, --version           show version and exit\n");
                 printf("\n");
 
@@ -247,7 +272,10 @@ main (int argc, char *argv[])
 
     p->launch_input_thread();
     p->launch_output_thread();
+
+    #ifdef USE_JACK
     p->init_jack();
+    #endif
 
     if (nsm) {
         global_filename = nsm_folder + "/session.midi";
@@ -257,6 +285,7 @@ main (int argc, char *argv[])
             midifile f(global_filename);
             f.write(p, -1, -1);
         }
+        nsm_set_save_callback(nsm, nsm_save_cb, (void*) &p);
     }
 
     if (global_filename != "") {
@@ -276,12 +305,11 @@ main (int argc, char *argv[])
             usleep(1000);
         }
     } else {
+        #ifdef USE_GTK
         application = Gtk::Application::create();
         MainWindow window(p, application);
 
         if (nsm) {
-            // register callbacks
-            nsm_set_save_callback(nsm, nsm_save_cb, (void*) &window);
             // setup optional-gui
             if (nsm_opional_gui_support) {
                 nsm_set_show_callback(nsm, nsm_show_cb, 0);
@@ -308,6 +336,7 @@ main (int argc, char *argv[])
 
 
         status = application->run(window);
+        #endif
     }
 
     // write cache file

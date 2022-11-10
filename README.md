@@ -31,7 +31,13 @@ libjack-jackd2-dev liblo-dev libgtkmm-3.0-dev libasound2-dev nlohmann-json3-dev
 make clean && make -j8
 ```
 
+**Build options**
 
+Jack and Gtk can be stripped out at compile time with `USE_JACK=0` and `USE_GTK=0` options.
+```
+# build headless and jackless binary
+make -j8 USE_JACK=0 USE_GTK=0
+```
 
 **Run**
 

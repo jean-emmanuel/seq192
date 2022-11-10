@@ -28,9 +28,10 @@ class perform;
 #include <unistd.h>
 #include <pthread.h>
 
+#ifdef USE_JACK
 #include <jack/jack.h>
 #include <jack/transport.h>
-
+#endif
 
 /* class contains sequences that make up a live set */
 class perform
@@ -86,9 +87,10 @@ class perform
     std::map<long,unsigned int> key_events_rev; // reverse lookup, keep this in sync!!
     std::map<long,unsigned int> key_groups_rev; // reverse lookup, keep this in sync!!
 
-
+    #ifdef USE_JACK
     jack_client_t *m_jack_client;
     bool m_jack_running;
+    #endif
 
     void inner_start();
     void inner_stop();
@@ -131,8 +133,6 @@ class perform
 
     void launch_input_thread();
     void launch_output_thread();
-    void init_jack();
-    void deinit_jack();
 
     void add_sequence( sequence *a_seq, int a_perf );
     void delete_sequence( int a_num );
@@ -154,9 +154,13 @@ class perform
     void start();
     void stop();
 
+    #ifdef USE_JACK
+    void init_jack();
+    void deinit_jack();
     void start_jack();
     void stop_jack();
     void position_jack();
+    #endif
 
     void off_sequences();
     void all_notes_off();
@@ -187,6 +191,15 @@ class perform
 
     void save_playing_state();
     void restore_playing_state();
+
+    void file_new();
+    bool file_open(std::string filename);
+    bool file_import(std::string filename);
+    bool file_save();
+    bool file_saveas(std::string filename);
+    bool file_export(std::string filename);
+    bool file_export_screenset(std::string filename);
+    bool file_export_sequence(std::string filename, int seqnum);
 
     OSCServer *oscserver;
     static int osc_callback(const char *path, const char *types, lo_arg ** argv,
@@ -256,8 +269,10 @@ class perform
     friend class optionsfile;
     friend class options;
 
+    #ifdef USE_JACK
     friend int jack_process_callback(jack_nframes_t nframes, void* arg);
     friend void jack_shutdown(void *arg);
+    #endif
 };
 
 /* located in perform.C */
@@ -265,7 +280,9 @@ extern void *output_thread_func(void *a_p);
 extern void *input_thread_func(void *a_p);
 
 
+#ifdef USE_JACK
 int jack_process_callback(jack_nframes_t nframes, void* arg);
 void jack_shutdown(void *arg);
+#endif
 
 #endif
