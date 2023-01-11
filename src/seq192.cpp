@@ -285,7 +285,7 @@ main (int argc, char *argv[])
             midifile f(global_filename);
             f.write(p, -1, -1);
         }
-        nsm_set_save_callback(nsm, nsm_save_cb, (void*) &p);
+        nsm_set_save_callback(nsm, nsm_save_cb, (void*) p);
     }
 
     if (global_filename != "") {
