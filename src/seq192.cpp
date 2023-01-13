@@ -158,7 +158,7 @@ main (int argc, char *argv[])
             case 'h':
 
                 printf("\n");
-                printf("seq192 - live MIDI sequencer ");
+                printf("%s - live MIDI sequencer (version %s)", PACKAGE, VERSION);
 
                 #if !defined USE_JACK && !defined USE_GTK
                 printf("(compiled without jack support and gtk support)");
@@ -168,7 +168,7 @@ main (int argc, char *argv[])
                 printf("(compiled without gtk support)");
                 #endif
 
-                printf("\n\nUsage: seq192 [options]\n\n");
+                printf("\n\nUsage: %s [options]\n\n", PACKAGE);
                 printf("Options:\n");
                 printf("  -h, --help              show available options\n");
                 printf("  -f, --file <filename>   load midi file on startup\n");
