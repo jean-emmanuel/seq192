@@ -23,6 +23,7 @@ SequenceButton::SequenceButton(perform * p, MainWindow * m, int seqpos)
     m_mainwindow = m;
     m_seqpos = seqpos;
     m_click = false;
+    m_middle_click = false;
     m_drag_start = false;
     m_last_seqnum = -1;
 
@@ -274,6 +275,10 @@ SequenceButton::on_button_press_event(GdkEventButton* event)
     if (event->button == 1) m_drag_start = true;
     m_mainwindow->clear_focus();
     m_click = true;
+    if (event->button == 2){
+        m_middle_click = true;
+    }
+
     return false;
 }
 
@@ -314,8 +319,12 @@ SequenceButton::on_button_release_event(GdkEventButton* event)
             queue_draw();
         }
 
-        else if (event->button == 3) {
+        else if (event->button == 2 and m_middle_click){
+            m_middle_click = false;
+            m_mainwindow->open_edit_window(get_sequence_number(), seq);
+        }
 
+        else if (event->button == 3) {
             Menu * menu = new Menu();
             menu->attach_to_widget(*this);
 
