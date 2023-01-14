@@ -49,7 +49,7 @@ The main window consist in a toolbar and a sequence grid.
     *Screenset name entry*: set name of current screenset<br/>
     *Screenset number entry*: select current screenset<br/>
 
-* The **sequence grid** is empty by default. Right-clicking in the grid allows creating a new sequence or editing an existing one. Sequences can be rearranged in the grid by dragging them. Left-clicking on a sequence toggles its playing state.
+* The **sequence grid** is empty by default. Right-clicking in the grid allows creating a new sequence or editing an existing one. Sequences can be rearranged in the grid by dragging them. Left-clicking on a sequence toggles its playing state. Middle-clicking on a sequence opens its edit window.
 
 **Edit window**
 
