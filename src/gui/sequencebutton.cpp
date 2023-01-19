@@ -16,6 +16,7 @@
 
 #include "sequencebutton.h"
 #include "editwindow.h"
+#include "../core/globals.h"
 
 SequenceButton::SequenceButton(perform * p, MainWindow * m, int seqpos)
 {
@@ -97,10 +98,25 @@ SequenceButton::draw_background()
         color color;
 
         // background
-        color = seq->get_playing() ? c_sequence_background_on : c_sequence_background;
+        color = seq->get_playing() ? c_sequence_background_on : c_sequence_background;        
         cr->set_source_rgb(color.r, color.g, color.b);
         cr->rectangle(0, 0, width, height);
         cr->fill();
+
+        // background colored if present in config file for this instrument
+        int instrument_number = seq->get_midi_channel() + seq->get_midi_bus() * 16;
+        string color_name = global_user_instrument_definitions[instrument_number].color;
+
+        if (! color_name.empty()){
+            const Gdk::RGBA c_chan_col = Gdk::RGBA(color_name.c_str());
+            cr->set_source_rgba(
+                c_chan_col.get_red(),
+                c_chan_col.get_green(),
+                c_chan_col.get_blue(),
+                0.125);
+            cr->rectangle(0, 0, width, height);
+            cr->fill();
+        }
 
         // font
         Pango::FontDescription font;
