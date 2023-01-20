@@ -103,20 +103,7 @@ SequenceButton::draw_background()
         cr->rectangle(0, 0, width, height);
         cr->fill();
 
-        // background colored if present in config file for this instrument
-        int instrument_number = seq->get_midi_channel() + seq->get_midi_bus() * 16;
-        string color_name = global_user_instrument_definitions[instrument_number].color;
-
-        if (! color_name.empty()){
-            const Gdk::RGBA c_chan_col = Gdk::RGBA(color_name.c_str());
-            cr->set_source_rgba(
-                c_chan_col.get_red(),
-                c_chan_col.get_green(),
-                c_chan_col.get_blue(),
-                0.125);
-            cr->rectangle(0, 0, width, height);
-            cr->fill();
-        }
+        
 
         // font
         Pango::FontDescription font;
@@ -140,17 +127,34 @@ SequenceButton::draw_background()
             queued->show_in_cairo_context(cr);
         }
 
-        // name
-        color = seq->get_playing() ? c_sequence_text_on : c_sequence_text;
-        if (get_sequence()->get_recording()) {
-            color = c_sequence_text_record;
-        }
-        cr->set_source_rgb(color.r, color.g, color.b);
+        // prepare the text, it will define the text_height needed for the next step
         auto name = create_pango_layout(seq->get_name());
         name->set_font_description(font);
         name->get_pixel_size(text_width, text_height);
         name->set_width((width - c_sequence_padding * 2 - queued_width) * Pango::SCALE);
         name->set_ellipsize(Pango::ELLIPSIZE_END);
+
+        // background colored if present in config file for this instrument
+        int instrument_number = seq->get_midi_channel() + seq->get_midi_bus() * 16;
+        string color_name = global_user_instrument_definitions[instrument_number].color;
+
+        if (! color_name.empty()){
+            const Gdk::RGBA c_chan_col = Gdk::RGBA(color_name.c_str());
+            cr->set_source_rgba(
+                c_chan_col.get_red(),
+                c_chan_col.get_green(),
+                c_chan_col.get_blue(),
+                0.4);
+            cr->rectangle(0, 0, width, c_sequence_padding * 2 + text_height * 2);
+            cr->fill();
+        }
+
+        // print the name
+        color = seq->get_playing() ? c_sequence_text_on : c_sequence_text;
+        if (get_sequence()->get_recording()) {
+            color = c_sequence_text_record;
+        }
+        cr->set_source_rgb(color.r, color.g, color.b);
         cr->move_to(c_sequence_padding, c_sequence_padding);
         name->show_in_cairo_context(cr);
 
@@ -171,6 +175,8 @@ SequenceButton::draw_background()
         timesig->set_ellipsize(Pango::ELLIPSIZE_END);
         cr->move_to(c_sequence_padding, c_sequence_padding + text_height);
         timesig->show_in_cairo_context(cr);
+
+        
 
         // events
         cr->set_source_rgba(color.r, color.g, color.b, 0.1);
