@@ -162,7 +162,8 @@ DataRoll::draw_background()
 
                 /* draw vert lines */
                 cr->move_to(event_x, y);
-                cr->line_to(event_x, height - c_data_text_height - c_dataroll_padding - c_data_handle_radius - 1);
+                if (status == EVENT_PITCH_WHEEL) cr->line_to(event_x, 0.5 * (c_data_y1 - c_data_y0) + c_data_y0);
+                else cr->line_to(event_x, height - c_data_text_height - c_dataroll_padding - c_data_handle_radius - 1);
                 cr->stroke();
 
                 /* draw handle */

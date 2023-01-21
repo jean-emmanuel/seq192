@@ -1,6 +1,12 @@
 # Changelog
 
-## 1.0.0-alpha
+## 1.0.1
+
+- edit window
+    - fix upper bound of pitch wheel events: skip step 8064 to reach 8192 when displayed value is 127
+    - change pitch wheel event slider's origin
+
+## 1.0.0
 
 - removed song editor
 - interface rewritten with GTK3
@@ -15,3 +21,4 @@
 - refactored config file system using JSON
 - added resume playback mode to sequences
 - added NSM support (with "optional-gui" and "dirty" capabilities)
+- toggleable alt-control display in edit window
