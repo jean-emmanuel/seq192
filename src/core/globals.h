@@ -97,6 +97,7 @@ struct user_midi_bus_definition
 struct user_instrument_definition
 {
     string instrument;
+    string color;
     bool controllers_active[128];
     string controllers[128];
 };

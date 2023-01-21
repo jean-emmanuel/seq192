@@ -82,6 +82,11 @@ ConfigFile::parse()
                         global_user_instrument_definitions[instrument_number].instrument = channel_name;
                     }
 
+                    auto channel_color = channel_data["color"];
+                    if (channel_color.is_string()){
+                        global_user_instrument_definitions[instrument_number].color = channel_color;
+                    }
+
                     auto controls = channel_data["controls"];
                     if (controls.is_object()) {
                         for (json::iterator it = controls.begin(); it != controls.end(); ++it) {
