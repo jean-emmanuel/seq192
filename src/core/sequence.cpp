@@ -1601,6 +1601,15 @@ sequence::adjust_data_handle( unsigned char a_status, int a_data )
 
             data[data_idx] = data_item;
 
+            if ( a_status == EVENT_PITCH_WHEEL ) {
+                // pitchbend lsb is not supported in gui
+                // set to 127 when msb is 127
+                // so that we can reach the maximum value
+                // (yes, it skips a step)
+                data[0] = a_data == 127 ? 127 : 0;
+            }
+
+
             (*i).set_data(data[0], data[1]);
         }
     }
@@ -1770,8 +1779,14 @@ sequence::change_event_data_range( long a_tick_s, long a_tick_f,
             if ( a_status == EVENT_CHANNEL_PRESSURE )
                 d0 = newdata; /* d0 == pressure */
 
-            if ( a_status == EVENT_PITCH_WHEEL )
+            if ( a_status == EVENT_PITCH_WHEEL ) {
                 d1 = newdata;
+                // pitchbend lsb is not supported in gui
+                // set to 127 when msb is 127
+                // so that we can reach the maximum value
+                // (yes, it skips a step)
+                d0 = (int)d1 == 127 ? 127 : 0;
+            }
 
             (*i).set_data( d0, d1 );
         }

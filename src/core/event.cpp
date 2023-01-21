@@ -17,8 +17,6 @@
 #include "event.h"
 #include "string.h"
 
-char max_val = 127;
-
 event::event()
 {
     m_timestamp = 0;
@@ -98,14 +96,6 @@ event::set_data( char a_D1, char a_D2 )
 {
     m_data[0] = a_D1 & 0x7F;
     m_data[1] = a_D2 & 0x7F;
-
-    if (m_status == EVENT_PITCH_WHEEL) {
-        // pitchbend lsb is not supported
-        // set to 127 when msb is 127
-        // so that we can reach the maximum value
-        // (yes, it skips a step)
-        m_data[0] = m_data[1] == max_val ? 127 : 0;
-    }
 }
 
 void
@@ -118,7 +108,7 @@ event::increment_data2()
         // set to 127 when msb is 127
         // so that we can reach the maximum value
         // (yes, it skips a step)
-        m_data[0] = m_data[1] == max_val ? 127 : 0;
+        m_data[0] = (int)m_data[1] == 127 ? 127 : 0;
     }
 }
 
@@ -132,7 +122,7 @@ event::decrement_data2()
         // set to 127 when msb is 127
         // so that we can reach the maximum value
         // (yes, it skips a step)
-        m_data[0] = m_data[1] == max_val ? 127 : 0;
+        m_data[0] = (int)m_data[1] == 127 ? 127 : 0;
     }
 }
 
