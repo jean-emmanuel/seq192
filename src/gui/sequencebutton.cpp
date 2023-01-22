@@ -146,12 +146,12 @@ SequenceButton::draw_background()
         int bus = seq->get_midi_bus();
         int chan = seq->get_midi_channel();
         string busname = global_user_midi_bus_definitions[bus].alias;
-        if (busname.empty()) busname = "Bus " + to_string(bus);
+        if (busname.empty()) busname = "Bus " + to_string(bus + 1);
         if (!global_user_instrument_definitions[bus * 16 + chan].instrument.empty())
         {
              busname += ": " + global_user_instrument_definitions[bus * 16 + chan].instrument;
         }
-        else busname += ": Ch " + to_string(chan);
+        else busname += ": Ch " + to_string(chan + 1);
 
         auto channame = create_pango_layout(busname);
         channame->set_font_description(font);
