@@ -18,7 +18,6 @@
 
 #include "dataroll.h"
 #include "styles.h"
-#include "strings.h"
 
 DataRoll::DataRoll(perform * p, sequence * seq)
 {
@@ -206,8 +205,30 @@ DataRoll::draw_background()
     if (m_alt_status != 0)
     {
         unsigned char status = m_alt_control_view ? m_status : m_alt_status;
-        string alt_string = status_strings[status];
-        if (status == EVENT_CONTROL_CHANGE) alt_string = "CC " + to_string(m_alt_control_view ? m_cc : m_alt_cc);
+        string alt_string;
+        switch (status) {
+            case EVENT_NOTE_ON:
+                alt_string = "Note On";
+                break;
+            case EVENT_NOTE_OFF:
+                alt_string = "Note Off";
+                break;
+            case EVENT_AFTERTOUCH:
+                alt_string = "Aftertouch";
+                break;
+            case EVENT_PROGRAM_CHANGE:
+                alt_string = "Program Change";
+                break;
+            case EVENT_CHANNEL_PRESSURE:
+                alt_string = "Channel Pressure";
+                break;
+            case EVENT_PITCH_WHEEL:
+                alt_string = "Pitch wheel";
+                break;
+            case EVENT_CONTROL_CHANGE:
+                alt_string = "CC " + to_string(m_alt_control_view ? m_cc : m_alt_cc);
+                break;
+        }
         auto ti = create_pango_layout(alt_string);
         ti->set_font_description(font);
         ti->set_alignment(Pango::ALIGN_CENTER);
