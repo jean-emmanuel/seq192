@@ -45,6 +45,17 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
         m_editwindows[i] = NULL;
     }
 
+    // create instrument colors
+    Gdk::RGBA color;
+    for (int i = 0; i < c_max_instruments; i++)
+    {
+        if (!global_user_instrument_definitions[i].color.empty()) {
+            color = Gdk::RGBA(global_user_instrument_definitions[i].color);
+            global_user_instrument_colors[i] = {color.get_red(), color.get_green(), color.get_blue()};
+        }
+    }
+
+
     Glib::RefPtr<Gtk::CssProvider> css_provider = Gtk::CssProvider::create();
     css_provider->load_from_data(c_mainwindow_css);
     this->get_style_context()->add_class("mainwindow");

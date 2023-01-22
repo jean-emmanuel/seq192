@@ -98,12 +98,10 @@ SequenceButton::draw_background()
         color color;
 
         // background
-        color = seq->get_playing() ? c_sequence_background_on : c_sequence_background;        
+        color = seq->get_playing() ? c_sequence_background_on : c_sequence_background;
         cr->set_source_rgb(color.r, color.g, color.b);
         cr->rectangle(0, 0, width, height);
         cr->fill();
-
-        
 
         // font
         Pango::FontDescription font;
@@ -127,56 +125,59 @@ SequenceButton::draw_background()
             queued->show_in_cairo_context(cr);
         }
 
-        // prepare the text, it will define the text_height needed for the next step
+        // name
+        color = seq->get_playing() ? c_sequence_text_on : c_sequence_text;
+        if (get_sequence()->get_recording()) {
+            color = c_sequence_text_record;
+        }
+        cr->set_source_rgb(color.r, color.g, color.b);
+
         auto name = create_pango_layout(seq->get_name());
         name->set_font_description(font);
         name->get_pixel_size(text_width, text_height);
         name->set_width((width - c_sequence_padding * 2 - queued_width) * Pango::SCALE);
         name->set_ellipsize(Pango::ELLIPSIZE_END);
 
-        // background colored if present in config file for this instrument
-        int instrument_number = seq->get_midi_channel() + seq->get_midi_bus() * 16;
-        string color_name = global_user_instrument_definitions[instrument_number].color;
-
-        if (! color_name.empty()){
-            const Gdk::RGBA c_chan_col = Gdk::RGBA(color_name.c_str());
-            cr->set_source_rgba(
-                c_chan_col.get_red(),
-                c_chan_col.get_green(),
-                c_chan_col.get_blue(),
-                0.4);
-            cr->rectangle(0, 0, width, c_sequence_padding * 2 + text_height * 2);
-            cr->fill();
-        }
-
-        // print the name
-        color = seq->get_playing() ? c_sequence_text_on : c_sequence_text;
-        if (get_sequence()->get_recording()) {
-            color = c_sequence_text_record;
-        }
-        cr->set_source_rgb(color.r, color.g, color.b);
         cr->move_to(c_sequence_padding, c_sequence_padding);
         name->show_in_cairo_context(cr);
 
-        // timesig
+        // bus & channel name
+        color = seq->get_playing() ? c_sequence_text_on : c_sequence_text;
+        int bus = seq->get_midi_bus();
+        int chan = seq->get_midi_channel();
+        string busname = global_user_midi_bus_definitions[bus].alias;
+        if (busname.empty()) busname = "Bus " + to_string(bus);
+        if (!global_user_instrument_definitions[bus * 16 + chan].instrument.empty())
+        {
+             busname += ": " + global_user_instrument_definitions[bus * 16 + chan].instrument;
+        }
+        else busname += ": Ch " + to_string(chan);
+
+        auto channame = create_pango_layout(busname);
+        channame->set_font_description(font);
+        channame->get_pixel_size(text_width, text_height);
+        channame->set_width((width - c_sequence_padding * 2) * Pango::SCALE);
+        channame->set_ellipsize(Pango::ELLIPSIZE_END);
         cr->set_source_rgba(color.r, color.g, color.b, 0.6);
-        char str[20];
-        sprintf( str,
-            "%ld/%ld → %d:%d ",
-            seq->get_bpm(), seq->get_bw(),
-            seq->get_midi_bus()+1,
-            seq->get_midi_channel()+1
-        );
-
-        auto timesig = create_pango_layout(str);
-        timesig->set_font_description(font);
-        timesig->get_pixel_size(text_width, text_height);
-        timesig->set_width((width - c_sequence_padding * 2) * Pango::SCALE);
-        timesig->set_ellipsize(Pango::ELLIPSIZE_END);
         cr->move_to(c_sequence_padding, c_sequence_padding + text_height);
-        timesig->show_in_cairo_context(cr);
+        channame->show_in_cairo_context(cr);
 
-        
+
+        // instrument color
+        string instrument_color = global_user_instrument_definitions[bus * 16 + chan].color;
+        if (!global_user_instrument_definitions[bus * 16 + chan].color.empty())
+        {
+            color = global_user_instrument_colors[bus * 16 + chan];
+            cr->set_source_rgba(color.r, color.g, color.b, 0.8);
+        }
+        else
+        {
+            // use default text color
+            cr->set_source_rgba(color.r, color.g, color.b, 0.3);
+        }
+        cr->rectangle(0, c_sequence_padding * 2 + text_height * 2 - 2,width, 2);
+        cr->fill();
+
 
         // events
         cr->set_source_rgba(color.r, color.g, color.b, 0.1);
@@ -189,7 +190,7 @@ SequenceButton::draw_background()
         cr->fill();
         // cr->stroke();
 
-        cr->set_source_rgba(color.r, color.g, color.b, 0.8);
+        cr->set_source_rgba(color.r, color.g, color.b, 0.6);
         long tick_s;
         long tick_f;
         int note;
@@ -205,7 +206,7 @@ SequenceButton::draw_background()
         seq->reset_draw_list();
         while ( (dt = seq->get_next_note_event( &tick_s, &tick_f, &note, &selected, &velocity )) != DRAW_FIN ) {
 
-            int note_y = rect_h - (note + 1 - lowest_note) / interval_height * (rect_h - 3);
+            int note_y = rect_h - (note + 1 - lowest_note) / interval_height * (rect_h - 4);
             int tick_s_x = tick_s * (rect_w - 3) / length + 2;
             int tick_f_x = tick_f * (rect_w - 3) / length + 2;
 

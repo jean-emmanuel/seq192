@@ -2,6 +2,10 @@
 
 ## 1.0.1
 
+- main window
+    - support user instrument colors (set in config file)
+    - display user bus name and instrument name in sequence grid
+
 - edit window
     - fix upper bound of pitch wheel events: skip step 8064 to reach 8192 when displayed value is 127
     - change pitch wheel event slider's origin

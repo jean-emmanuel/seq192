@@ -71,6 +71,7 @@ user_instrument_definition global_user_instrument_definitions[c_max_instruments]
 user_keymap_definition     global_user_keymap_definitions[c_max_instruments];
 
 #ifdef USE_GTK
+color global_user_instrument_colors[c_max_instruments];
 Glib::RefPtr<Gtk::Application> application;
 #endif
 

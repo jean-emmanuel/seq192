@@ -18,6 +18,7 @@
 #define SEQ192_STYLE
 
 #include <gtkmm.h>
+#include "../core/globals.h"
 
 const Gdk::RGBA c_color_background = Gdk::RGBA("#21252b");
 const Gdk::RGBA c_color_foreground = Gdk::RGBA("#42454A");
@@ -45,6 +46,8 @@ const int c_sequence_padding = 4;
 const int c_sequence_fontsize = 8;
 const char * const c_font = "sans";
 
+extern color global_user_instrument_colors[c_max_instruments];
+const color c_sequence_default_instrument_color = {0.4, 0.4, 0.4};
 
 const color c_sequence_background = {c_color_foreground.get_red(), c_color_foreground.get_green(), c_color_foreground.get_blue()};
 const color c_sequence_background_on = {c_color_text.get_red(), c_color_text.get_green(), c_color_text.get_blue()};
