@@ -182,7 +182,9 @@ class EditWindow : public Window {
         Menu                m_event_menu;
         CheckMenuItem       m_menu_item_noteon;
         CheckMenuItem       m_menu_item_noteoff;
-        CheckMenuItem       m_menu_item_aftertouch;
+        MenuItem            m_menu_item_aftertouch;
+        Menu                m_submenu_aftertouch;
+        CheckMenuItem       *m_menu_items_aftertouch[128];
         CheckMenuItem       m_menu_item_program;
         CheckMenuItem       m_menu_item_pitch;
         CheckMenuItem       m_menu_item_pressure;
@@ -287,6 +289,21 @@ class EditWindow : public Window {
             {c_ppqn / 4 / 3,    12},
             {c_ppqn / 8 / 3,    13},
             {c_ppqn / 16 / 3,   14}
+        };
+
+        std::map<int, std::string> key_to_note = {
+            {0, "C"},
+            {1, "C#"},
+            {2, "D"},
+            {3, "D#"},
+            {4, "E"},
+            {5, "E#"},
+            {6, "F"},
+            {7, "F#"},
+            {8, "G"},
+            {9, "G#"},
+            {10, "A"},
+            {11, "A#"}
         };
 
 };

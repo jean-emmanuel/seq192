@@ -966,10 +966,6 @@ EditWindow::create_event_menu()
     m_menu_item_noteoff.signal_toggled().connect([&]{set_data_type(EVENT_NOTE_OFF, 0);});
     m_event_menu.append(m_menu_item_noteoff);
 
-    m_menu_item_aftertouch.set_label("Aftertouch");
-    m_menu_item_aftertouch.signal_toggled().connect([&]{set_data_type(EVENT_AFTERTOUCH, 0);});
-    m_event_menu.append(m_menu_item_aftertouch);
-
     m_menu_item_program.set_label("Program Change");
     m_menu_item_program.signal_toggled().connect([&]{set_data_type(EVENT_PROGRAM_CHANGE, 0);});
     m_event_menu.append(m_menu_item_program);
@@ -981,6 +977,18 @@ EditWindow::create_event_menu()
     m_menu_item_pitch.set_label("Pitch Wheel");
     m_menu_item_pitch.signal_toggled().connect([&]{set_data_type(EVENT_PITCH_WHEEL, 0);});
     m_event_menu.append(m_menu_item_pitch);
+
+    m_menu_item_aftertouch.set_label("Aftertouch");
+    m_event_menu.append(m_menu_item_aftertouch);
+    m_menu_item_aftertouch.set_submenu(m_submenu_aftertouch);
+
+    for (int i=0; i<128; i++) {
+        m_menu_items_aftertouch[i] = new CheckMenuItem();
+        m_menu_items_aftertouch[i]->signal_toggled().connect([&, i]{
+            set_data_type(EVENT_AFTERTOUCH, 127 - i);
+        });
+        m_submenu_aftertouch.append(*m_menu_items_aftertouch[i]);
+    }
 
     m_menu_item_control.set_label("Control Change");
     m_event_menu.append(m_menu_item_control);
@@ -1042,14 +1050,12 @@ EditWindow::update_event_menu()
 
     m_menu_item_noteon.set_active(false);
     m_menu_item_noteoff.set_active(false);
-    m_menu_item_aftertouch.set_active(false);
     m_menu_item_program.set_active(false);
     m_menu_item_pitch.set_active(false);
     m_menu_item_pressure.set_active(false);
 
     m_menu_item_noteon.get_style_context()->remove_class("checked");
     m_menu_item_noteoff.get_style_context()->remove_class("checked");
-    m_menu_item_aftertouch.get_style_context()->remove_class("checked");
     m_menu_item_program.get_style_context()->remove_class("checked");
     m_menu_item_pitch.get_style_context()->remove_class("checked");
     m_menu_item_pressure.get_style_context()->remove_class("checked");
@@ -1061,6 +1067,8 @@ EditWindow::update_event_menu()
         m_menu_items_control[i]->get_style_context()->remove_class("checked");
         m_menu_items_alt_control[i+1]->set_active(false);
         m_menu_items_alt_control[i+1]->get_style_context()->remove_class("checked");
+        m_menu_items_aftertouch[i]->set_active(false);
+        m_menu_items_aftertouch[i]->get_style_context()->remove_class("checked");
 
         string ccname = to_string(i);
         int instrument = global_user_midi_bus_definitions[midi_bus].instrument[midi_ch];
@@ -1073,6 +1081,16 @@ EditWindow::update_event_menu()
         }
         m_menu_items_control[i]->set_label(ccname);
         m_menu_items_alt_control[i+1]->set_label(ccname);
+
+        int keymap = global_user_midi_bus_definitions[midi_bus].keymap[midi_ch];
+        string key_name = to_string(127 - i) + " ";
+        if (global_user_keymap_definitions[keymap].keys_active[127 - i]) {
+            key_name += global_user_keymap_definitions[keymap].keys[127 - i];
+        } else {
+            key_name += key_to_note[(127-i)%12] + to_string( (127 - i)  / 12 - 1);
+        }
+        m_menu_items_aftertouch[i]->set_label(key_name);
+
     }
 
     unsigned char status, cc;
@@ -1087,7 +1105,7 @@ EditWindow::update_event_menu()
                 m_menu_item_noteon.get_style_context()->add_class("checked");
                 break;
             case EVENT_AFTERTOUCH:
-                m_menu_item_aftertouch.get_style_context()->add_class("checked");
+                m_menu_items_aftertouch[127 - cc]->get_style_context()->add_class("checked");
                 break;
             case EVENT_CONTROL_CHANGE:
                 m_menu_items_control[cc]->get_style_context()->add_class("checked");

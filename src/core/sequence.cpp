@@ -820,8 +820,10 @@ sequence::get_num_selected_events( unsigned char a_status,
             unsigned char d0,d1;
             (*i).get_data( &d0, &d1 );
 
-            if ( (a_status == EVENT_CONTROL_CHANGE && d0 == a_cc )
-                 || (a_status != EVENT_CONTROL_CHANGE) ){
+            if (  (a_status == EVENT_CONTROL_CHANGE && d0 == a_cc )
+                || (a_status == EVENT_AFTERTOUCH && d0 == a_cc )
+                || (a_status != EVENT_CONTROL_CHANGE && a_status != EVENT_AFTERTOUCH) )
+            {
 
                 if ( (*i).is_selected( ))
                     ret++;
@@ -1175,10 +1177,10 @@ sequence::select_events( long a_tick_s,
             unsigned char d0,d1;
             (*i).get_data( &d0, &d1 );
 
-            if ( (a_status == EVENT_CONTROL_CHANGE &&
-                        d0 == a_cc )
-                    || (a_status != EVENT_CONTROL_CHANGE) ){
-
+            if (  (a_status == EVENT_CONTROL_CHANGE && d0 == a_cc )
+                || (a_status == EVENT_AFTERTOUCH && d0 == a_cc )
+                || (a_status != EVENT_CONTROL_CHANGE && a_status != EVENT_AFTERTOUCH) )
+            {
 
                 if ( a_action == e_select ||
                      a_action == e_select_one )
@@ -1759,11 +1761,12 @@ sequence::change_event_data_range( long a_tick_s, long a_tick_f,
 
         /* correct status and not CC */
         if ( a_status != EVENT_CONTROL_CHANGE &&
+             a_status != EVENT_AFTERTOUCH &&
                 (*i).get_status() == a_status )
             set = true;
 
         /* correct status and correct cc */
-        if ( a_status == EVENT_CONTROL_CHANGE &&
+        if ( (a_status == EVENT_CONTROL_CHANGE || a_status == EVENT_AFTERTOUCH) &&
                 (*i).get_status() == a_status &&
                 d0 == a_cc )
             set = true;
@@ -2345,9 +2348,9 @@ sequence::get_next_event( unsigned char a_status,
 
             /* either we have a control change with the right CC
                or its a different type of event */
-            if ( (a_status == EVENT_CONTROL_CHANGE &&
-                    *a_D0 == a_cc )
-                    || (a_status != EVENT_CONTROL_CHANGE) )
+            if (  (a_status == EVENT_CONTROL_CHANGE && *a_D0 == a_cc )
+                || (a_status == EVENT_AFTERTOUCH && *a_D0 == a_cc )
+                || (a_status != EVENT_CONTROL_CHANGE && a_status != EVENT_AFTERTOUCH) )
             {
                 /* we have a good one */
                 /* update and return */
@@ -2765,12 +2768,12 @@ sequence::select_events( unsigned char a_status, unsigned char a_cc, bool a_inve
 	(*i).get_data( &d0, &d1 );
 
 	/* correct status and not CC */
-	if ( a_status != EVENT_CONTROL_CHANGE &&
+	if ( a_status != EVENT_CONTROL_CHANGE && a_status != EVENT_AFTERTOUCH &&
 	     (*i).get_status() == a_status )
 	    set = true;
 
 	/* correct status and correct cc */
-	if ( a_status == EVENT_CONTROL_CHANGE &&
+	if ( (a_status == EVENT_CONTROL_CHANGE || a_status == EVENT_AFTERTOUCH) &&
 	     (*i).get_status() == a_status &&
 	     d0 == a_cc )
 	    set = true;
@@ -2917,12 +2920,12 @@ sequence::quantize_events( unsigned char a_status, unsigned char a_cc,
         (*i).get_data( &d0, &d1 );
 
         /* correct status and not CC */
-        if ( a_status != EVENT_CONTROL_CHANGE &&
+        if ( a_status != EVENT_CONTROL_CHANGE && a_status != EVENT_AFTERTOUCH &&
                 (*i).get_status() == a_status )
             set = true;
 
         /* correct status and correct cc */
-        if ( a_status == EVENT_CONTROL_CHANGE &&
+        if ( (a_status == EVENT_CONTROL_CHANGE || a_status == EVENT_AFTERTOUCH) &&
                 (*i).get_status() == a_status &&
                 d0 == a_cc )
             set = true;

@@ -334,7 +334,6 @@ EventRoll::drop_event(long a_tick)
     unsigned char d0 = m_cc;
     unsigned char d1 = 0x40;
 
-    if (m_status == EVENT_AFTERTOUCH) d0 = 0;
     if (m_status == EVENT_PROGRAM_CHANGE) d0 = 0; /* d0 == new patch */
     if (m_status == EVENT_CHANNEL_PRESSURE) d0 = 0x40; /* d0 == pressure */
     if (m_status == EVENT_PITCH_WHEEL) d0 = 0;
