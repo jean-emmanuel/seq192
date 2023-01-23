@@ -302,6 +302,11 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_playback_resume.signal_activate().connect([&]{menu_callback(EDIT_MENU_RESUME);});
     m_submenu_playback.append(m_menu_playback_resume);
 
+    m_menu_playback_chase.set_label("Chase controls and pitch wheel");
+    m_menu_playback_chase.set_active(m_sequence->get_chase());
+    m_menu_playback_chase.signal_activate().connect([&]{menu_callback(EDIT_MENU_CHASE);});
+    m_submenu_playback.append(m_menu_playback_chase);
+
 
     // toolbar
     m_toolbar.set_size_request(0, 55);
@@ -734,6 +739,9 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             break;
         case EDIT_MENU_RESUME:
             m_sequence->set_resume(m_menu_playback_resume.get_active());
+            break;
+        case EDIT_MENU_CHASE:
+            m_sequence->set_chase(m_menu_playback_chase.get_active());
             break;
     }
 }

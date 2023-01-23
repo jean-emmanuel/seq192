@@ -56,7 +56,8 @@ enum edit_menu_action
     EDIT_MENU_RECORD_THRU,
 
     EDIT_MENU_PLAY,
-    EDIT_MENU_RESUME
+    EDIT_MENU_RESUME,
+    EDIT_MENU_CHASE
 };
 
 class MainWindow;
@@ -175,6 +176,7 @@ class EditWindow : public Window {
         MenuItem            m_menu_playback_playing;
         bool                m_menu_playing_state;
         CheckMenuItem       m_menu_playback_resume;
+        CheckMenuItem       m_menu_playback_chase;
 
         // event menu
         Menu                m_event_menu;

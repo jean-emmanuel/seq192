@@ -66,6 +66,10 @@ class sequence
        messages */
     int m_playing_notes[c_midi_notes];
 
+    bool m_chase;
+    int m_chase_pitchbend;
+    int m_chase_controls[128];
+
     /* states */
     bool m_was_playing;
     bool m_playing;
@@ -192,6 +196,9 @@ class sequence
     long get_times_played();
     void set_resume(bool a_resume);
     bool get_resume();
+
+    void set_chase(bool a_chase);
+    bool get_chase();
 
     void set_sync_offset(long offset);
     void set_sync_reference(bool state);

@@ -30,6 +30,7 @@ sequence::sequence( )
     m_queued        = false;
     m_resume        = false;
     m_resume_next   = false;
+    m_chase         = true;
 
     m_time_beats_per_measure = 4;
     m_time_beat_width = 4;
@@ -47,6 +48,11 @@ sequence::sequence( )
     /* no notes are playing */
     for (int i=0; i< c_midi_notes; i++ )
         m_playing_notes[i] = 0;
+
+    for (int i=0; i< 128; i++ )
+        m_chase_controls[i] = 0;
+
+    m_chase_pitchbend = 0;
 
     m_last_tick = 0;
     m_starting_tick = 0;
@@ -319,6 +325,18 @@ bool
 sequence::get_resume()
 {
     return m_resume;
+}
+
+void
+sequence::set_chase(bool a_chase)
+{
+    m_chase = a_chase;
+}
+
+bool
+sequence::get_chase()
+{
+    return m_chase;
 }
 
 
@@ -2379,6 +2397,11 @@ sequence::operator= (const sequence& a_rhs)
 	for (int i=0; i< c_midi_notes; i++ )
 	    m_playing_notes[i] = 0;
 
+    for (int i=0; i< 128; i++ )
+        m_chase_controls[i] = 0;
+
+    m_chase_pitchbend = 0;
+
 	/* reset */
 	zero_markers( );
 
@@ -2648,6 +2671,20 @@ sequence::put_event_on_bus( event *a_e )
         }
     }
 
+    if ( a_e->m_status == EVENT_PITCH_WHEEL) {
+        unsigned char d0, d1;
+        a_e->get_data(&d0, &d1);
+        if (d0 != 0 && d1 != 64) m_chase_pitchbend = 1;
+        else m_chase_pitchbend = 0;
+    }
+
+    if ( a_e->m_status == EVENT_CONTROL_CHANGE) {
+        unsigned char d0, d1;
+        a_e->get_data(&d0, &d1);
+        if (d1 != 0) m_chase_controls[d0] = 1;
+        else m_chase_controls[d0] = 0;
+    }
+
     if ( !skip ){
         m_masterbus->play( m_bus, a_e,  m_midi_channel );
     }
@@ -2676,6 +2713,24 @@ sequence::off_playing_notes()
             m_masterbus->play( m_bus, &e, m_midi_channel );
 
             m_playing_notes[x]--;
+        }
+    }
+
+    if (get_chase()) {
+        for (int i=0; i<128; i++) {
+            if (m_chase_controls[i] == 1) {
+                e.set_status( EVENT_CONTROL_CHANGE );
+                e.set_data( i, 0 );
+                m_masterbus->play( m_bus, &e, m_midi_channel );
+                m_chase_controls[i] = 0;
+            }
+        }
+
+        if (m_chase_pitchbend == 1) {
+            e.set_status( EVENT_PITCH_WHEEL );
+            e.set_data( 0, 64 );
+            m_masterbus->play( m_bus, &e, m_midi_channel );
+            m_chase_pitchbend = 0;
         }
     }
 
@@ -3240,7 +3295,7 @@ sequence::fill_list( list<char> *a_list, int a_pos )
     addLongList( a_list, c_resume );
     a_list->push_front( m_resume );
 
-    /* meta */
+    /* meta: alt cc */
     addListVar( a_list, 0 );
     a_list->push_front( 0xFF );
     a_list->push_front( 0x7F );
@@ -3248,6 +3303,13 @@ sequence::fill_list( list<char> *a_list, int a_pos )
     addLongList( a_list, c_alt_cc );
     a_list->push_front( m_alt_cc + 1); // can't write -1 here
 
+    /* chase */
+    addListVar( a_list, 0 );
+    a_list->push_front( 0xFF );
+    a_list->push_front( 0x7F );
+    a_list->push_front( 0x05 );
+    addLongList( a_list, c_chase );
+    a_list->push_front( m_chase );
 
     delta_time = m_length - prev_timestamp;
 

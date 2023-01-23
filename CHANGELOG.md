@@ -10,9 +10,13 @@
 - perform
     - add the possibility to choose a sequence as sync reference for queued sequences (allows proper metric changes)
 
+- sequence
+    - add simple chasing option for control changes and pitch wheel events when sequence is disabled and when playback restarts : reset their value to 0 (or 8192 for pitch wheel) if the sequence has sent a different value while playing.
+
 - edit window
     - fix upper bound of pitch wheel events: skip step 8064 to reach 8192 when displayed value is 127
     - change pitch wheel event slider's origin
+    - chase option (under playback)
 
 ## 1.0.0
 
