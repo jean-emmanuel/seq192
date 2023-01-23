@@ -379,6 +379,8 @@ class sequence
 
     int get_lowest_note_event ();
     int get_highest_note_event ();
+    int get_lowest_selected_note_event ();
+    int get_highest_selected_note_event ();
 
     bool get_next_event (unsigned char a_status,
                          unsigned char a_cc,

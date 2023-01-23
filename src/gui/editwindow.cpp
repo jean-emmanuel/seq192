@@ -548,6 +548,10 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     resize(1024, 600);
     show_all();
 
+    int highv = c_key_height * (127 - m_sequence->get_highest_note_event());
+    int lowv = c_key_height * (127 - m_sequence->get_lowest_note_event()) - m_pianokeys_scroller.get_height() + c_key_height;
+    m_pianokeys_scroller.get_vadjustment()->set_value((highv + lowv) / 2);
+
 }
 
 EditWindow::~EditWindow()
@@ -700,8 +704,14 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             m_sequence->unselect();
             break;
         case EDIT_MENU_TRANSPOSE:
+        {
             m_sequence->transpose_notes(data1);
+            int highv = c_key_height * (127 - m_sequence->get_highest_selected_note_event());
+            int lowv = c_key_height * (127 - m_sequence->get_lowest_selected_note_event()) + c_key_height;
+            auto adj = m_pianokeys_scroller.get_vadjustment();
+            adj->clamp_page(highv, lowv);
             break;
+        }
         case EDIT_MENU_QUANTIZE:
             if (m_focus == "eventroll") {
                 m_sequence->quantize_events(m_status, m_cc, m_pianoroll.m_snap, 1);

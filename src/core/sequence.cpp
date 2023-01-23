@@ -2221,6 +2221,26 @@ sequence::get_lowest_note_event()
     return ret;
 }
 
+int
+sequence::get_lowest_selected_note_event()
+{
+    lock();
+
+    int ret = 127;
+    list<event>::iterator i;
+
+    for ( i = m_list_event.begin(); i != m_list_event.end(); i++ ){
+
+	if ( (*i).is_note_on() || (*i).is_note_off() )
+	    if ( (*i).is_selected() && (*i).get_note() < ret )
+		ret = (*i).get_note();
+    }
+
+    unlock();
+
+    return ret;
+}
+
 
 
 int
@@ -2235,6 +2255,26 @@ sequence::get_highest_note_event()
 
 	if ( (*i).is_note_on() || (*i).is_note_off() )
 	    if ( (*i).get_note() > ret )
+		ret = (*i).get_note();
+    }
+
+    unlock();
+
+    return ret;
+}
+
+int
+sequence::get_highest_selected_note_event()
+{
+    lock();
+
+    int ret = 0;
+    list<event>::iterator i;
+
+    for ( i = m_list_event.begin(); i != m_list_event.end(); i++ ){
+
+	if ( (*i).is_note_on() || (*i).is_note_off() )
+	    if ( (*i).is_selected() && (*i).get_note() > ret )
 		ret = (*i).get_note();
     }
 
