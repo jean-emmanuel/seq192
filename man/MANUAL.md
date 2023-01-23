@@ -49,7 +49,7 @@ The main window consist in a toolbar and a sequence grid.
     *Screenset name entry*: set name of current screenset<br/>
     *Screenset number entry*: select current screenset<br/>
 
-* The **sequence grid** is empty by default. Right-clicking in the grid allows creating a new sequence or editing an existing one. Sequences can be rearranged in the grid by dragging them. Left-clicking on a sequence toggles its playing state. Middle-clicking on a sequence opens its edit window.
+* The **sequence grid** is empty by default. Right-clicking in the grid allows creating a new sequence or editing an existing one. Sequences can be rearranged in the grid by dragging them. Left-clicking on a sequence toggles its playing state. Middle-clicking on a sequence opens its edit window. Shift+click defines the sequence as the synchronization reference for queued sequences. Ctrl+click toggles the sequence's queued state.
 
 **Edit window**
 
@@ -96,6 +96,7 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
 
     - MIDI bus names
     - MIDI channel names per bus
+    - MIDI channel colors (as css color strings)
     - Note names in the piano roll (per channel)
     - Control names in the event dropdown (per channel)
 
@@ -109,6 +110,7 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
             "channels": {
                 "0": {
                     "name": "Drums",
+                    "color": "orange",
                     "notes": {
                         "64": "Kick",
                         "65": "Snare",
@@ -151,7 +153,7 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
 
 * `/sequence` <string: mode> <int: column> <int: row>:
     Set sequence(s) state<br/>
-    _mode_: "solo", "on", "off", "toggle", "record", "record_on", "record_off", "clear", "copy", "cut", "paste", "delete"; only one sequence can be recording at a time; "record_off" mode doesn't require any argument<br/>
+    _mode_: "solo", "on", "off", "toggle", "record", "record_on", "record_off", "sync", "clear", "copy", "cut", "paste", "delete"; only one sequence can be recording at a time; "record_off" mode doesn't require any argument<br/>
     _column_: column number on screen set (zero indexed)<br/>
     _row_: row number; if omitted, all rows are affected; multiple rows can be specified
 

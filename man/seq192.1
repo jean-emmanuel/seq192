@@ -52,7 +52,7 @@ The \fBtoolbar\fR contains the following controls
 .br
 
 .IP "\[ci]" 4
-The \fBsequence grid\fR is empty by default\. Right\-clicking in the grid allows creating a new sequence or editing an existing one\. Sequences can be rearranged in the grid by dragging them\. Left\-clicking on a sequence toggles its playing state\. Middle\-clicking on a sequence opens its edit window\.
+The \fBsequence grid\fR is empty by default\. Right\-clicking in the grid allows creating a new sequence or editing an existing one\. Sequences can be rearranged in the grid by dragging them\. Left\-clicking on a sequence toggles its playing state\. Middle\-clicking on a sequence opens its edit window\. Shift+click defines the sequence as the synchronization reference for queued sequences\. Ctrl+click toggles the sequence's queued state\.
 .IP "" 0
 .P
 \fBEdit window\fR
@@ -112,6 +112,7 @@ The configration file is located in \fB$XDG_CONFIG_HOME/seq192/config\.json\fR (
 .nf
 \- MIDI bus names
 \- MIDI channel names per bus
+\- MIDI channel colors (as css color strings)
 \- Note names in the piano roll (per channel)
 \- Control names in the event dropdown (per channel)
 .fi
@@ -127,6 +128,7 @@ The configration file is located in \fB$XDG_CONFIG_HOME/seq192/config\.json\fR (
             "channels": {
                 "0": {
                     "name": "Drums",
+                    "color": "orange",
                     "notes": {
                         "64": "Kick",
                         "65": "Snare",
@@ -170,7 +172,7 @@ Disable all sequences and cancel queued sequences
 \fB/sequence\fR <string: mode> <int: column> <int: row>
 Set sequence(s) state
 .br
-\fImode\fR: "solo", "on", "off", "toggle", "record", "record_on", "record_off", "clear", "copy", "cut", "paste", "delete"; only one sequence can be recording at a time; "record_off" mode doesn't require any argument
+\fImode\fR: "solo", "on", "off", "toggle", "record", "record_on", "record_off", "sync", "clear", "copy", "cut", "paste", "delete"; only one sequence can be recording at a time; "record_off" mode doesn't require any argument
 .br
 \fIcolumn\fR: column number on screen set (zero indexed)
 .br
