@@ -739,9 +739,11 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             break;
         case EDIT_MENU_RESUME:
             m_sequence->set_resume(m_menu_playback_resume.get_active());
+            global_is_modified = true;
             break;
         case EDIT_MENU_CHASE:
             m_sequence->set_chase(m_menu_playback_chase.get_active());
+            global_is_modified = true;
             break;
     }
 }
@@ -1115,6 +1117,7 @@ EditWindow::set_data_type(unsigned char status, unsigned char control, bool alt)
         m_menu_item_alt_control.set_label("Alt Control Change (" + to_string(control) + ")");
         m_menu_item_toggle_alt_control.set_sensitive(true);
         m_sequence->set_alt_cc(control);
+        global_is_modified = true;
     } else {
         m_status = status;
         m_cc = control;

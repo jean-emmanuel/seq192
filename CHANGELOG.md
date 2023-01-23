@@ -17,6 +17,7 @@
     - fix upper bound of pitch wheel events: skip step 8064 to reach 8192 when displayed value is 127
     - change pitch wheel event slider's origin
     - chase option (under playback)
+    - session not seen as modified when editing sequence
 
 ## 1.0.0
 
