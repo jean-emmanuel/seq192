@@ -44,6 +44,8 @@ const int c_grid_spacing = 1;
 // Sequence button
 const int c_sequence_padding = 4;
 const int c_sequence_fontsize = 8;
+const int c_sequence_signature_size = 6;
+
 const char * const c_font = "sans";
 
 extern color global_user_instrument_colors[c_max_instruments];

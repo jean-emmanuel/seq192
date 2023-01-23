@@ -125,19 +125,31 @@ SequenceButton::draw_background()
             queued->show_in_cairo_context(cr);
         }
 
-        // name
+        // text color
         color = seq->get_playing() ? c_sequence_text_on : c_sequence_text;
         if (get_sequence()->get_recording()) {
             color = c_sequence_text_record;
         }
-        cr->set_source_rgb(color.r, color.g, color.b);
 
+        // time signature
+        string signature = to_string(seq->get_bpm()) + "/" + to_string(seq->get_bw());
+        auto siglayout = create_pango_layout(signature);
+        int sigwidth;
+        font.set_size(c_sequence_signature_size * Pango::SCALE);
+        siglayout->set_font_description(font);
+        siglayout->get_pixel_size(sigwidth, text_height);
+        cr->set_source_rgba(color.r, color.g, color.b, 0.6);
+        cr->move_to(width - c_sequence_padding - sigwidth, c_sequence_padding);
+        siglayout->show_in_cairo_context(cr);
+
+        // sequence name
         auto name = create_pango_layout(seq->get_name());
+        font.set_size(c_sequence_fontsize * Pango::SCALE);
         name->set_font_description(font);
         name->get_pixel_size(text_width, text_height);
-        name->set_width((width - c_sequence_padding * 2 - queued_width) * Pango::SCALE);
+        name->set_width((width - c_sequence_padding * 2 - queued_width - sigwidth) * Pango::SCALE);
         name->set_ellipsize(Pango::ELLIPSIZE_END);
-
+        cr->set_source_rgb(color.r, color.g, color.b);
         cr->move_to(c_sequence_padding, c_sequence_padding);
         name->show_in_cairo_context(cr);
 
@@ -179,7 +191,7 @@ SequenceButton::draw_background()
         cr->fill();
 
 
-        // events
+        // events zone
         cr->set_source_rgba(color.r, color.g, color.b, 0.1);
         int rect_x = 0;
         int rect_y = c_sequence_padding * 2 + text_height * 2;
@@ -188,8 +200,8 @@ SequenceButton::draw_background()
         cr->set_line_width(1.0);
         cr->rectangle(rect_x , rect_y , rect_w, rect_h);
         cr->fill();
-        // cr->stroke();
 
+        // events (notes)
         cr->set_source_rgba(color.r, color.g, color.b, 0.6);
         long tick_s;
         long tick_f;
