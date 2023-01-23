@@ -75,8 +75,8 @@ class perform
     string m_screen_set_notepad[c_max_sets];
 
     int m_offset;
-    int m_control_status;
     int m_screen_set;
+    int m_reference_sequence;
 
     condition_var m_running_lock;
     condition_var m_stopping_lock;
@@ -150,6 +150,9 @@ class perform
 
     void set_screenset( int a_ss );
     int get_screenset();
+
+    void set_reference_sequence( int a_seqnum );
+    sequence * get_reference_sequence();
 
     void start();
     void stop();
@@ -227,6 +230,7 @@ class perform
         SEQ_MODE_RECORD,
         SEQ_MODE_RECORD_ON,
         SEQ_MODE_RECORD_OFF,
+        SEQ_MODE_SYNC,
         SEQ_MODE_COPY,
         SEQ_MODE_CUT,
         SEQ_MODE_PASTE,
@@ -256,6 +260,7 @@ class perform
         {"record",              SEQ_MODE_RECORD},
         {"record_on",           SEQ_MODE_RECORD_ON},
         {"record_off",          SEQ_MODE_RECORD_OFF},
+        {"sync",                SEQ_MODE_SYNC},
         {"copy",                SEQ_MODE_COPY},
         {"cut",                 SEQ_MODE_CUT},
         {"paste",               SEQ_MODE_PASTE},

@@ -93,6 +93,9 @@ class sequence
 
     long m_starting_tick;
 
+    long m_sync_offset;
+    bool m_sync_reference;
+
     /* length of sequence in pulses
        should be powers of two in bars */
     long m_length;
@@ -182,13 +185,17 @@ class sequence
     bool get_playing ();
     void toggle_playing ();
 
-    void toggle_queued();
+    void toggle_queued(sequence * reference);
     void off_queued();
     bool get_queued();
     long get_queued_tick();
     long get_times_played();
     void set_resume(bool a_resume);
     bool get_resume();
+
+    void set_sync_offset(long offset);
+    void set_sync_reference(bool state);
+    bool is_sync_reference();
 
     void set_recording (bool);
     bool get_recording ();

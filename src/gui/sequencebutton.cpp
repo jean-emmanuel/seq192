@@ -111,20 +111,6 @@ SequenceButton::draw_background()
         font.set_size(c_sequence_fontsize * Pango::SCALE);
         font.set_weight(Pango::WEIGHT_NORMAL);
 
-        // queued ?
-        bool queued = get_sequence()->get_queued();
-        int queued_width = 0;
-        if (queued)
-        {
-            color = seq->get_playing() ? c_sequence_text_on : c_sequence_text;
-            cr->set_source_rgb(color.r, color.g, color.b);
-            auto queued = create_pango_layout("⌛");
-            queued->set_font_description(font);
-            queued->get_pixel_size(queued_width, text_height);
-            cr->move_to(width - c_sequence_padding - queued_width, c_sequence_padding);
-            queued->show_in_cairo_context(cr);
-        }
-
         // text color
         color = seq->get_playing() ? c_sequence_text_on : c_sequence_text;
         if (get_sequence()->get_recording()) {
@@ -138,7 +124,14 @@ SequenceButton::draw_background()
         font.set_size(c_sequence_signature_size * Pango::SCALE);
         siglayout->set_font_description(font);
         siglayout->get_pixel_size(sigwidth, text_height);
-        cr->set_source_rgba(color.r, color.g, color.b, 0.6);
+        if (seq->is_sync_reference()) {
+            cr->set_source_rgba(c_sequence_syncref_bg.r, c_sequence_syncref_bg.g, c_sequence_syncref_bg.b, 0.5);
+            cr->rectangle(width - c_sequence_padding - sigwidth - 1, c_sequence_padding - 1, sigwidth + 2, text_height + 2);
+            cr->fill();
+            cr->set_source_rgba(c_sequence_syncref.r, c_sequence_syncref.g, c_sequence_syncref.b, 1.0);
+        } else {
+            cr->set_source_rgba(color.r, color.g, color.b, 0.6);
+        }
         cr->move_to(width - c_sequence_padding - sigwidth, c_sequence_padding);
         siglayout->show_in_cairo_context(cr);
 
@@ -147,11 +140,25 @@ SequenceButton::draw_background()
         font.set_size(c_sequence_fontsize * Pango::SCALE);
         name->set_font_description(font);
         name->get_pixel_size(text_width, text_height);
-        name->set_width((width - c_sequence_padding * 2 - queued_width - sigwidth) * Pango::SCALE);
+        name->set_width((width - c_sequence_padding * 2 - sigwidth) * Pango::SCALE);
         name->set_ellipsize(Pango::ELLIPSIZE_END);
         cr->set_source_rgb(color.r, color.g, color.b);
         cr->move_to(c_sequence_padding, c_sequence_padding);
         name->show_in_cairo_context(cr);
+
+        // queued ?
+        bool queued = get_sequence()->get_queued();
+        int queued_width = 0;
+        if (queued)
+        {
+            color = seq->get_playing() ? c_sequence_text_on : c_sequence_text;
+            cr->set_source_rgb(color.r, color.g, color.b);
+            auto queued = create_pango_layout("⌛");
+            queued->set_font_description(font);
+            queued->get_pixel_size(queued_width, text_height);
+            cr->move_to(width - c_sequence_padding - queued_width, c_sequence_padding + text_height + 1);
+            queued->show_in_cairo_context(cr);
+        }
 
         // bus & channel name
         color = seq->get_playing() ? c_sequence_text_on : c_sequence_text;
@@ -159,16 +166,16 @@ SequenceButton::draw_background()
         int chan = seq->get_midi_channel();
         string busname = global_user_midi_bus_definitions[bus].alias;
         if (busname.empty()) busname = "Bus " + to_string(bus + 1);
-        if (!global_user_instrument_definitions[bus * 16 + chan].instrument.empty())
-        {
+        if (!global_user_instrument_definitions[bus * 16 + chan].instrument.empty()) {
              busname += ": " + global_user_instrument_definitions[bus * 16 + chan].instrument;
+        } else {
+            busname += ": Ch " + to_string(chan + 1);
         }
-        else busname += ": Ch " + to_string(chan + 1);
 
         auto channame = create_pango_layout(busname);
         channame->set_font_description(font);
         channame->get_pixel_size(text_width, text_height);
-        channame->set_width((width - c_sequence_padding * 2) * Pango::SCALE);
+        channame->set_width((width - c_sequence_padding * 2 - queued_width) * Pango::SCALE);
         channame->set_ellipsize(Pango::ELLIPSIZE_END);
         cr->set_source_rgba(color.r, color.g, color.b, 0.6);
         cr->move_to(c_sequence_padding, c_sequence_padding + text_height);
@@ -177,13 +184,10 @@ SequenceButton::draw_background()
 
         // instrument color
         string instrument_color = global_user_instrument_definitions[bus * 16 + chan].color;
-        if (!global_user_instrument_definitions[bus * 16 + chan].color.empty())
-        {
+        if (!global_user_instrument_definitions[bus * 16 + chan].color.empty()) {
             color = global_user_instrument_colors[bus * 16 + chan];
             cr->set_source_rgba(color.r, color.g, color.b, 0.8);
-        }
-        else
-        {
+        } else {
             // use default text color
             cr->set_source_rgba(color.r, color.g, color.b, 0.3);
         }
@@ -348,7 +352,18 @@ SequenceButton::on_button_release_event(GdkEventButton* event)
         sequence * seq = get_sequence();
 
         if (event->button == 1 && seq != NULL) {
-            seq->toggle_playing();
+            guint modifiers = gtk_accelerator_get_default_mod_mask ();
+            if ((event->state & modifiers) == GDK_SHIFT_MASK) {
+                if (seq->is_sync_reference()) {
+                    m_perform->set_reference_sequence(-1);
+                } else {
+                    m_perform->set_reference_sequence(get_sequence_number());
+                }
+            } else if ((event->state & modifiers) == GDK_CONTROL_MASK) {
+                seq->toggle_queued(m_perform->get_reference_sequence());
+            } else {
+                seq->toggle_playing();
+            }
             queue_draw();
         }
 

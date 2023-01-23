@@ -51,6 +51,9 @@ sequence::sequence( )
     m_last_tick = 0;
     m_starting_tick = 0;
 
+    m_sync_offset = 0;
+    m_sync_reference = false;
+
     m_masterbus = NULL;
     m_dirty_main = true;
     m_dirty_edit = true;
@@ -234,17 +237,46 @@ sequence::set_orig_tick( long a_tick )
 
 
 void
-sequence::toggle_queued()
+sequence::toggle_queued(sequence * reference)
 {
     lock();
 
     set_dirty_main();
 
     m_queued = !m_queued;
-    m_queued_tick = m_last_tick - (m_last_tick % m_length) + m_length;
+
+    if (reference != NULL && reference != this) {
+        m_queued_tick = reference->m_last_tick - ((reference->m_last_tick -reference->m_sync_offset)% reference->m_length) + reference->m_length;
+    } else {
+        m_queued_tick = m_last_tick - ((m_last_tick - m_sync_offset) % m_length) + m_length;
+    }
 
     unlock();
 }
+
+void
+sequence::set_sync_offset(long offset)
+{
+    lock();
+    m_sync_offset = offset;
+    unlock();
+}
+
+void
+sequence::set_sync_reference(bool state)
+{
+    lock();
+    set_dirty_main();
+    m_sync_reference = state;
+    unlock();
+}
+
+bool
+sequence::is_sync_reference()
+{
+    return m_sync_reference;
+}
+
 
 void
 sequence::off_queued()
@@ -298,7 +330,7 @@ sequence::play( long a_tick )
     lock();
 
     long times_played  = m_last_tick / m_length;
-    long offset_base   = times_played * m_length;
+    long offset_base   = times_played * m_length - m_sync_offset;
 
     long start_tick = m_last_tick;
     long end_tick = a_tick;
@@ -2386,7 +2418,7 @@ sequence::get_name()
 long
 sequence::get_last_tick( )
 {
-    return (m_last_tick + (m_length)) % m_length;
+    return (m_last_tick + m_length - m_sync_offset) % m_length;
 }
 
 void

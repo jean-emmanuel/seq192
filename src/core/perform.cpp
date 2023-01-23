@@ -44,6 +44,7 @@ perform::perform()
     // m_key_stop   = GDK_Escape;
 
     m_screen_set = 0;
+    m_reference_sequence = -1;
 
     #ifdef USE_JACK
     m_jack_running = false;
@@ -218,7 +219,7 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                     if (self->is_active(i) && self->m_seqs[i]->get_playing()) {
                         if (command == SEQ_SSEQ_QUEUED) {
                             if (!self->m_seqs[i]->get_queued()) {
-                                self->m_seqs[i]->toggle_queued();
+                                self->m_seqs[i]->toggle_queued(self->get_reference_sequence());
                             }
                         } else {
                             self->m_seqs[i]->set_playing(false);
@@ -236,7 +237,7 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                             case SEQ_MODE_ON:
                                 if (command == SEQ_SSEQ_QUEUED) {
                                     if (!self->m_seqs[nseq]->get_playing() && !self->m_seqs[nseq]->get_queued()) {
-                                        self->m_seqs[nseq]->toggle_queued();
+                                        self->m_seqs[nseq]->toggle_queued(self->get_reference_sequence());
                                     }
                                 } else {
                                     self->m_seqs[nseq]->set_playing(true);
@@ -246,7 +247,7 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                                 if (command == SEQ_SSEQ_QUEUED) {
                                     if (self->m_seqs[nseq]->get_playing() != self->m_seqs[nseq]->get_queued()) {
                                         // if playing and not queued or queued and not playing
-                                        self->m_seqs[nseq]->toggle_queued();
+                                        self->m_seqs[nseq]->toggle_queued(self->get_reference_sequence());
                                     }
                                 } else {
                                     self->m_seqs[nseq]->set_playing(false);
@@ -254,7 +255,7 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                                 break;
                             case SEQ_MODE_TOGGLE:
                                 if (command == SEQ_SSEQ_QUEUED) {
-                                    self->m_seqs[nseq]->toggle_queued();
+                                    self->m_seqs[nseq]->toggle_queued(self->get_reference_sequence());
                                 } else {
                                     self->m_seqs[nseq]->toggle_playing();
                                 }
@@ -265,6 +266,11 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                             case SEQ_MODE_RECORD_ON:
                                 self->get_master_midi_bus()->set_sequence_input(self->m_seqs[nseq]);
                                 // only one sequence can be armed for recording
+                                // ignore matching sequences after the first
+                                return 0;
+                            case SEQ_MODE_SYNC:
+                                self->set_reference_sequence(nseq);
+                                // only one sequence can be selected as reference
                                 // ignore matching sequences after the first
                                 return 0;
                             case SEQ_MODE_CLEAR:
@@ -730,29 +736,63 @@ int perform::get_screenset()
     return m_screen_set;
 }
 
+void perform::set_reference_sequence( int a_seqnum )
+{
+    if (a_seqnum == m_reference_sequence) return;
+
+    if (is_active(m_reference_sequence))
+    {
+        get_sequence(m_reference_sequence)->set_sync_reference(false);
+    }
+
+    m_reference_sequence = a_seqnum;
+
+    if (is_active(m_reference_sequence))
+    {
+        get_sequence(m_reference_sequence)->set_sync_reference(true);
+    }
+}
+
+sequence * perform::get_reference_sequence()
+{
+    if (is_active(m_reference_sequence))
+    {
+        return get_sequence(m_reference_sequence);
+    }
+    else
+    {
+        m_reference_sequence = -1;
+        return NULL;
+    }
+}
+
+
+
 
 void perform::play( long a_tick )
 {
 
     if (a_tick <= m_tick) return;
 
-    m_tick = a_tick;
     for (int i=0; i< c_max_sequence; i++ ){
 
         if ( is_active(i) ){
             assert( m_seqs[i] );
 
 
-            if ( m_seqs[i]->get_queued() &&
-                    m_seqs[i]->get_queued_tick() <= a_tick ){
+            if ( m_seqs[i]->get_queued() && m_seqs[i]->get_queued_tick() <= a_tick) {
 
                 m_seqs[i]->play( m_seqs[i]->get_queued_tick() - 1 );
+                if (get_reference_sequence() != NULL && get_reference_sequence() != m_seqs[i]) {
+                    m_seqs[i]->set_sync_offset(m_tick % m_seqs[i]->get_length());
+                }
                 m_seqs[i]->toggle_playing();
             }
 
             m_seqs[i]->play( a_tick );
         }
     }
+    m_tick = a_tick;
 
     /* flush the bus */
     m_master_bus.flush();
@@ -882,6 +922,7 @@ void perform::reset_sequences()
             bool state = m_seqs[i]->get_playing();
 
             m_seqs[i]->off_playing_notes();
+            m_seqs[i]->set_sync_offset(0);
             m_seqs[i]->set_playing(false);
             m_seqs[i]->zero_markers();
             m_seqs[i]->set_playing(state);

@@ -54,6 +54,9 @@ const color c_sequence_default_instrument_color = {0.4, 0.4, 0.4};
 const color c_sequence_background = {c_color_foreground.get_red(), c_color_foreground.get_green(), c_color_foreground.get_blue()};
 const color c_sequence_background_on = {c_color_text.get_red(), c_color_text.get_green(), c_color_text.get_blue()};
 
+const color c_sequence_syncref = {c_color_secondary.get_red(), c_color_secondary.get_green(), c_color_secondary.get_blue()};
+const color c_sequence_syncref_bg = {c_color_background.get_red(), c_color_background.get_green(), c_color_background.get_blue()};
+
 const color c_sequence_text = {c_color_text.get_red(), c_color_text.get_green(), c_color_text.get_blue()};
 const color c_sequence_text_on = {c_color_background.get_red(), c_color_background.get_green(), c_color_background.get_blue()};
 const color c_sequence_text_record = {1.0, 0.0, 0.0};
