@@ -5,6 +5,10 @@
 - main window
     - support user instrument colors (set in config file)
     - display user bus name and instrument name in sequence grid
+    - add ctrl+click for queuing, shift+click for chosing sync reference
+
+- perform
+    - add the possibility to choose a sequence as sync reference for queued sequences (allows proper metric changes)
 
 - edit window
     - fix upper bound of pitch wheel events: skip step 8064 to reach 8192 when displayed value is 127
