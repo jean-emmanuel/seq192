@@ -330,7 +330,7 @@ sequence::play( long a_tick )
     lock();
 
     long times_played  = m_last_tick / m_length;
-    long offset_base   = times_played * m_length - m_sync_offset;
+    long offset_base   = times_played * m_length + m_sync_offset;
 
     long start_tick = m_last_tick;
     long end_tick = a_tick;

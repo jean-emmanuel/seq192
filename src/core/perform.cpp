@@ -782,8 +782,10 @@ void perform::play( long a_tick )
 
             if ( m_seqs[i]->get_queued() && m_seqs[i]->get_queued_tick() <= a_tick) {
 
-                m_seqs[i]->play( m_seqs[i]->get_queued_tick() - 1 );
+
+                // m_seqs[i]->play( m_seqs[i]->get_queued_tick() - 1 );
                 if (get_reference_sequence() != NULL && get_reference_sequence() != m_seqs[i]) {
+                    m_seqs[i]->set_orig_tick( m_tick );
                     m_seqs[i]->set_sync_offset(m_tick % m_seqs[i]->get_length());
                 }
                 m_seqs[i]->toggle_playing();
