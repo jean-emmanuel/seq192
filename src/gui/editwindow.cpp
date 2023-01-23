@@ -938,6 +938,7 @@ void EditWindow::create_midibus_menu()
                 m_sequence->set_midi_bus(i);
                 m_sequence->set_midi_channel(j);
                 set_data_type(m_status, m_cc); // update event dropdown tooltip
+                global_is_modified = true;
                 m_pianokeys.queue_draw();
             });
             menu_channels->append(*menu_item_channel);
@@ -1135,7 +1136,6 @@ EditWindow::set_data_type(unsigned char status, unsigned char control, bool alt)
         m_menu_item_alt_control.set_label("Alt Control Change (" + to_string(control) + ")");
         m_menu_item_toggle_alt_control.set_sensitive(true);
         m_sequence->set_alt_cc(control);
-        global_is_modified = true;
     } else {
         m_status = status;
         m_cc = control;
