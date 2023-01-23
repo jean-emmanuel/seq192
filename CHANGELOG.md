@@ -19,6 +19,8 @@
     - chase option (under playback)
     - session not seen as modified when editing sequence
     - fix Aftertouch editing
+    - center verticall scroll around present notes when the window opens
+    - scroll vertically to follow transposition
 
 ## 1.0.0
 
