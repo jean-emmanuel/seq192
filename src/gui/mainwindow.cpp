@@ -20,6 +20,14 @@
 #include "../package.h"
 #include <time.h>
 
+#include "../xpm/panic.xpm"
+#include "../xpm/play.xpm"
+#include "../xpm/stop.xpm"
+#include "../xpm/minus.xpm"
+#include "../xpm/plus.xpm"
+#include "../xpm/prev.xpm"
+#include "../xpm/next.xpm"
+
 #include "../xpm/seq192.xpm"
 #include "../xpm/seq192_32.xpm"
 
@@ -145,7 +153,8 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
 
     m_toolbar_panic.set_size_request(36, 0);
     m_toolbar_panic.set_can_focus(false);
-    m_toolbar_panic.set_label("◭");
+    m_toolbar_panic_icon.set(Gdk::Pixbuf::create_from_xpm_data(panic_xpm));
+    m_toolbar_panic.add(m_toolbar_panic_icon);
     m_toolbar_panic.set_tooltip_text("Disable all sequences");
     m_toolbar_panic.get_style_context()->add_class("panic");
     m_toolbar_panic.signal_clicked().connect([&]{
@@ -156,7 +165,8 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
 
     m_toolbar_stop.set_size_request(36, 0);
     m_toolbar_stop.set_can_focus(false);
-    m_toolbar_stop.set_label("◼");
+    m_toolbar_stop_icon.set(Gdk::Pixbuf::create_from_xpm_data(stop_xpm));
+    m_toolbar_stop.add(m_toolbar_stop_icon);
     m_toolbar_stop.set_tooltip_text("Stop transport");
     m_toolbar_stop.get_style_context()->add_class("stop");
     m_toolbar_stop.signal_clicked().connect([&]{
@@ -167,7 +177,8 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
 
     m_toolbar_play.set_size_request(36, 0);
     m_toolbar_play.set_can_focus(false);
-    m_toolbar_play.set_label("▶");
+    m_toolbar_play_icon.set(Gdk::Pixbuf::create_from_xpm_data(play_xpm));
+    m_toolbar_play.add(m_toolbar_play_icon);
     m_toolbar_play.set_tooltip_text("Start transport");
     m_toolbar_play.get_style_context()->add_class("play");
     m_toolbar_play.signal_clicked().connect([&]{
@@ -176,19 +187,45 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     });
     m_toolbar.pack_start(m_toolbar_play, false, false);
 
-    m_toolbar_bpm_adj = Gtk::Adjustment::create(m_perform->get_bpm(), c_bpm_minimum, c_bpm_maximum, 1, 10, 1);
     m_toolbar_bpm.set_name("bpm");
     m_toolbar_bpm.set_tooltip_text("Beats per minute");
+    m_toolbar_bpm.set_alignment(0.5);
     m_toolbar_bpm.set_width_chars(6);
-    m_toolbar_bpm.set_digits(2);
-    m_toolbar_bpm.set_numeric(true);
-    m_toolbar_bpm.set_halign(Gtk::ALIGN_CENTER);
-    m_toolbar_bpm.set_adjustment(m_toolbar_bpm_adj);
+    m_toolbar_bpm.get_style_context()->add_class("nomargin");
     m_toolbar_bpm.signal_activate().connect([&]{clear_focus();});
-    m_toolbar_bpm.signal_value_changed().connect([&]{
-        m_perform->set_bpm(m_toolbar_bpm.get_value());
+    m_toolbar_bpm.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
+        string s = m_toolbar_bpm.get_text();
+        double bpm = atof(s.c_str());
+        if (bpm != m_toolbar_bpm_value) {
+            m_toolbar_bpm_value = bpm;
+            m_perform->set_bpm(bpm);
+        } else {
+            char str[6];
+            sprintf(str, "%.2f",m_toolbar_bpm_value);
+            m_toolbar_bpm.set_text(str);
+        }
+        return false;
     });
+    m_toolbar_bpm_minus.set_size_request(30, 0);
+    m_toolbar_bpm_minus.get_style_context()->add_class("nomargin");
+    m_toolbar_bpm_minus.set_can_focus(false);
+    m_toolbar_minus_icon.set(Gdk::Pixbuf::create_from_xpm_data(minus_xpm));
+    m_toolbar_bpm_minus.add(m_toolbar_minus_icon);
+    m_toolbar_bpm_minus.signal_clicked().connect([&]{
+        m_perform->set_bpm(m_toolbar_bpm_value - 1);
+    });
+    m_toolbar_bpm_plus.set_size_request(36, 0);
+    m_toolbar_bpm_plus.set_can_focus(false);
+    m_toolbar_plus_icon.set(Gdk::Pixbuf::create_from_xpm_data(plus_xpm));
+    m_toolbar_bpm_plus.add(m_toolbar_plus_icon);
+    m_toolbar_bpm_plus.signal_clicked().connect([&]{
+        m_perform->set_bpm(m_toolbar_bpm_value + 1);
+    });
+
     m_toolbar.pack_start(m_toolbar_bpm, false, false);
+    m_toolbar.pack_start(m_toolbar_bpm_minus, false, false);
+    m_toolbar.pack_start(m_toolbar_bpm_plus, false, false);
+
 
     m_toolbar_sset_name.set_name("sset_name");
     m_toolbar_sset_name.set_tooltip_text("Screen set name");
@@ -196,26 +233,51 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     m_toolbar_sset_name.signal_activate().connect([&]{clear_focus();});
     m_toolbar_sset_name.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
         string s = m_toolbar_sset_name.get_text();
-        m_perform->set_screen_set_notepad(m_toolbar_sset.get_value(), &s);
+        m_perform->set_screen_set_notepad(m_toolbar_sset_value, &s);
         return false;
     });
     m_toolbar.pack_start(m_toolbar_sset_name);
 
-    m_toolbar_sset_adj = Gtk::Adjustment::create(0, 0, c_max_sets, 1, 1, 1);
     m_toolbar_sset.set_name("sset");
+    m_toolbar_sset.get_style_context()->add_class("nomargin");
+    m_toolbar_sset.set_size_request(36, 0);
     m_toolbar_sset.set_tooltip_text("Screen set number");
-    m_toolbar_sset.set_width_chars(2);
-    m_toolbar_sset.set_numeric(true);
     m_toolbar_sset.set_alignment(0.5);
-    m_toolbar_sset.set_adjustment(m_toolbar_sset_adj);
+    m_toolbar_sset.set_width_chars(2);
     m_toolbar_sset.signal_activate().connect([&]{clear_focus();});
-    m_toolbar_sset.signal_value_changed().connect([&]{
-        int sset = m_toolbar_sset.get_value();
-        m_perform->set_screenset(sset);
-        update_sset_name(sset);
+    m_toolbar_sset.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
+        string s = m_toolbar_sset.get_text();
+        int sset = atof(s.c_str());
+        if (sset >= 0 && sset < c_max_sets && sset != m_toolbar_sset_value) {
+            m_toolbar_sset_value = sset;
+            m_perform->set_screenset(sset);
+        } else {
+            m_toolbar_sset.set_text(to_string(m_toolbar_sset_value));
+        }
+        return false;
     });
+    m_toolbar_sset_prev.set_size_request(30, 0);
+    m_toolbar_sset_prev.get_style_context()->add_class("nomargin");
+    m_toolbar_sset_prev.set_can_focus(false);
+    m_toolbar_prev_icon.set(Gdk::Pixbuf::create_from_xpm_data(prev_xpm));
+    m_toolbar_sset_prev.add(m_toolbar_prev_icon);
+    m_toolbar_sset_prev.signal_clicked().connect([&]{
+        m_perform->set_screenset(m_toolbar_sset_value - 1);
+    });
+    m_toolbar_sset_next.set_size_request(36, 0);
+    m_toolbar_sset_next.set_can_focus(false);
+    m_toolbar_next_icon.set(Gdk::Pixbuf::create_from_xpm_data(next_xpm));
+    m_toolbar_sset_next.add(m_toolbar_next_icon);
+    m_toolbar_sset_next.signal_clicked().connect([&]{
+        m_perform->set_screenset(m_toolbar_sset_value + 1);
+    });
+
     m_toolbar.pack_start(m_toolbar_sset, false, false);
+    m_toolbar.pack_start(m_toolbar_sset_prev, false, false);
+    m_toolbar.pack_start(m_toolbar_sset_next, false, false);
+
     update_sset_name(m_perform->get_screenset());
+
 
     m_toolbar_logo.set(Gdk::Pixbuf::create_from_xpm_data(seq192_xpm));
     m_toolbar.pack_end(m_toolbar_logo, false, false);
@@ -315,15 +377,19 @@ MainWindow::timer_callback()
 
     // screenset name
     int sset = m_perform->get_screenset();
-    if (m_toolbar_sset.get_value() != sset) {
+    if (m_toolbar_sset_value != sset) {
         update_sset_name(sset);
-        m_toolbar_sset.set_value(sset);
+        m_toolbar_sset_value = sset;
+        m_toolbar_sset.set_text(to_string(sset));
     }
 
     // bpm
     double bpm = m_perform->get_bpm();
-    if (m_toolbar_bpm.get_value() != bpm) {
-        m_toolbar_bpm.set_value(bpm);
+    if (m_toolbar_bpm_value != bpm) {
+        m_toolbar_bpm_value = bpm;
+        char str[6];
+        sprintf(str, "%.2f",m_toolbar_bpm_value);
+        m_toolbar_bpm.set_text(str);
     }
 
     // sequence grid

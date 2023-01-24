@@ -20,6 +20,10 @@
 #include "../package.h"
 #include "../core/controllers.h"
 
+#include "../xpm/length.xpm"
+#include "../xpm/snap.xpm"
+#include "../xpm/bus.xpm"
+
 #include "../xpm/seq192_32.xpm"
 
 EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) :
@@ -396,7 +400,8 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar.pack_start(m_toolbar_measures, false, false);
 
 
-    m_toolbar_snap_active.set_label("Snap");
+    m_toolbar_snap_icon.set(Gdk::Pixbuf::create_from_xpm_data(snap_xpm));
+    m_toolbar_snap_active.add(m_toolbar_snap_icon);
     m_toolbar_snap_active.set_tooltip_text("Snap to grid");
     m_toolbar_snap_active.get_style_context()->add_class("nomargin");
     m_toolbar_snap_active.get_style_context()->add_class("togglebutton");
@@ -407,12 +412,18 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     });
     m_toolbar_snap_active.set_active(true);
 
-    m_toolbar_length_label.set_label("Note");
-    m_toolbar_length_label.set_sensitive(false);
+    m_toolbar_length_box.get_style_context()->add_class("buttonbox");
+    m_toolbar_length_box.set_tooltip_text("Note size");
     m_toolbar_length_label.get_style_context()->add_class("nomargin");
+    m_toolbar_length_label.set_can_focus(false);
+    m_toolbar_length_label.signal_clicked().connect([&]{
+        m_toolbar_length.popup();
+    });
+    m_toolbar_length_icon.set(Gdk::Pixbuf::create_from_xpm_data(length_xpm));
+    m_toolbar_length_label.add(m_toolbar_length_icon);
+
     m_toolbar_snap.set_tooltip_text("Grid size");
     m_toolbar_snap.append("1");
-    m_toolbar_length.set_tooltip_text("Note size");
     m_toolbar_length.append("1");
     char s[13];
     for (int i = 1; i < 8; i++) {
@@ -444,21 +455,34 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
 
     m_toolbar.pack_start(m_toolbar_snap_active, false, false);
     m_toolbar.pack_start(m_toolbar_snap, false, false);
-    m_toolbar.pack_start(m_toolbar_length_label, false, false);
-    m_toolbar.pack_start(m_toolbar_length, false, false);
 
-    m_toolbar_bus_label.set_label("Output");
-    m_toolbar_bus_label.set_sensitive(false);
-    m_toolbar_bus_label.get_style_context()->add_class("nomargin");
+    m_toolbar_length_box.pack_start(m_toolbar_length_label, false, false);
+    m_toolbar_length_box.pack_start(m_toolbar_length, false, false);
+    m_toolbar.pack_start(m_toolbar_length_box, false, false);
+
+    m_toolbar_bus_icon.set(Gdk::Pixbuf::create_from_xpm_data(bus_xpm));
+    m_toolbar_bus_label.add(m_toolbar_bus_icon);
     m_toolbar_bus.set_can_focus(false);
-    m_toolbar_bus.set_editable(false);
+    m_toolbar_bus_label.get_style_context()->add_class("nomargin");
+    m_toolbar_bus_label.signal_clicked().connect([&]{
+        m_toolbar_bus_dropdown.set_active(true);
+    });
+    m_toolbar_bus.signal_clicked().connect([&]{
+        m_toolbar_bus_dropdown.set_active(true);
+    });
     m_toolbar_bus.get_style_context()->add_class("nomargin");
+    m_toolbar_bus.set_can_focus(false);
+
     m_toolbar_bus_dropdown.set_sensitive(true);
     m_toolbar_bus_dropdown.set_direction(Gtk::ARROW_DOWN);
 
-    m_toolbar.pack_end(m_toolbar_bus_dropdown, false, false);
-    m_toolbar.pack_end(m_toolbar_bus, true, true);
-    m_toolbar.pack_end(m_toolbar_bus_label, false, false);
+    m_toolbar_bus_box.set_tooltip_text("MIDI output");
+    m_toolbar_bus_box.get_style_context()->add_class("buttonbox");
+    m_toolbar_bus_box.pack_end(m_toolbar_bus_dropdown, false, false);
+    m_toolbar_bus_box.pack_end(m_toolbar_bus, true, true);
+    m_toolbar_bus_box.pack_end(m_toolbar_bus_label, false, false);
+    m_toolbar_bus_box.set_size_request(300, 0);
+    m_toolbar.pack_end(m_toolbar_bus_box, false, false);
 
 
     // layout
@@ -913,7 +937,7 @@ EditWindow::update_midibus_name()
             busname += ": Channel " + to_string(m_midichannel + 1);
         }
 
-        m_toolbar_bus.set_text(busname);
+        m_toolbar_bus.set_label(busname);
 
     }
 

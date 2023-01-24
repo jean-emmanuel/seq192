@@ -22,6 +22,9 @@
     - center verticall scroll around present notes when the window opens
     - scroll vertically to follow transposition
 
+- misc
+    - new icons
+
 ## 1.0.0
 
 - removed song editor

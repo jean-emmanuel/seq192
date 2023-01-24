@@ -204,11 +204,18 @@ class EditWindow : public Window {
         Label               m_toolbar_times;
         Entry               m_toolbar_measures;
         ToggleButton        m_toolbar_snap_active;
+        Image               m_toolbar_snap_icon;
         ComboBoxText        m_toolbar_snap;
+
+        HBox                m_toolbar_length_box;
         Button              m_toolbar_length_label;
+        Image               m_toolbar_length_icon;
         ComboBoxText        m_toolbar_length;
+
+        HBox                m_toolbar_bus_box;
         Button              m_toolbar_bus_label;
-        Entry               m_toolbar_bus;
+        Image               m_toolbar_bus_icon;
+        Button              m_toolbar_bus;
         MenuButton          m_toolbar_bus_dropdown;
         Menu                m_toolbar_bus_menu;
 

@@ -225,16 +225,6 @@ overshoot, undershoot {
     border-bottom: 1px solid @color_bg
 }
 
-#sset .down, #sset .up {
--gtk-icon-transform: scale(0);
-background: -gtk-icontheme("pan-start-symbolic") center no-repeat, @color_raised;
-background-size: 20px;
-}
-
-#sset .up {
-background-image: -gtk-icontheme("pan-end-symbolic");
-}
-
 /* widgets */
 
 button {
@@ -252,13 +242,28 @@ button:active {
     opacity: 0.6
 }
 
+.buttonbox {
+    background: @color_raised;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+.buttonbox button:hover image {
+    opacity: 0.8
+}
+
+
+.buttonbox button {
+    background: transparent;
+    box-shadow: none;
+    opacity: 1;
+}
+
 .togglebutton:checked, button.on {
-    color: @color_primary;
+    background: alpha(@color_primary, 0.5);
 }
 
 button.bypass.on,
 .togglebutton.bypass:checked {
-    color: @color_text;
+    background: @color_raised;
 }
 
 entry {
@@ -274,25 +279,6 @@ entry:focus {
 selection {
     background: @color_primary;
     color: @color_text_hilight
-}
-
-spinbutton entry {
-    box-shadow: none
-}
-
-spinbutton {
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
-    color: inherit;
-    background: transparent
-}
-
-spinbutton button {
-    box-shadow: none;
-    padding: 2px 6px;
-}
-
-spinbutton button:last-child {
-    margin-left: 1px;
 }
 
 combobox {

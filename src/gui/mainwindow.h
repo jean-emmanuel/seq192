@@ -97,17 +97,27 @@ class MainWindow : public Window {
         Button              m_toolbar_stop;
         Button              m_toolbar_play;
         bool                m_toolbar_play_state;
-        Entry               m_toolbar_bpm_entry;
-        Glib::RefPtr<Gtk::Adjustment> m_toolbar_bpm_adj;
-        SpinButton          m_toolbar_bpm;
+
+        Entry               m_toolbar_bpm;
+        double              m_toolbar_bpm_value;
+        Button              m_toolbar_bpm_minus;
+        Image               m_toolbar_minus_icon;
+        Button              m_toolbar_bpm_plus;
+        Image               m_toolbar_plus_icon;
+
         Entry               m_toolbar_sset_name;
-        Glib::RefPtr<Gtk::Adjustment> m_toolbar_sset_adj;
-        SpinButton          m_toolbar_sset;
-        Entry               m_toolbar_sset_entry;
+        Entry               m_toolbar_sset;
+        int                 m_toolbar_sset_value;
+        Button              m_toolbar_sset_prev;
+        Image               m_toolbar_prev_icon;
+        Button              m_toolbar_sset_next;
+        Image               m_toolbar_next_icon;
+
         Image               m_toolbar_logo;
         Image               m_toolbar_play_icon;
         Image               m_toolbar_stop_icon;
         Image               m_toolbar_panic_icon;
+
 
         // drag and drop
         SequenceButton     *m_drag_source;
