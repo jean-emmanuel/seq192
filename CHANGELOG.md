@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.1
+## 1.1.0
 
 - main window
     - support user instrument colors (set in config file)
