@@ -270,6 +270,14 @@ DataRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     cr->line_to(width, c_data_y1 + 0.5);
     cr->stroke();
 
+    if (m_status == EVENT_PITCH_WHEEL) {
+        cr->set_source_rgba(c_color_event.r, c_color_event.g, c_color_event.b, c_alpha_bottom_line / 3);
+        cr->set_line_width(1.0);
+        cr->move_to(0, (c_data_y0 + c_data_y1) / 2 + 0.5);
+        cr->line_to(width, (c_data_y0 + c_data_y1) / 2 + 0.5);
+        cr->stroke();
+    }
+
     if (m_dragging)
     {
         // int x,y,w,h;
