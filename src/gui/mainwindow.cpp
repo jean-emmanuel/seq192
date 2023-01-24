@@ -44,6 +44,8 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     m_drag_destination = NULL;
 
     m_toolbar_play_state = false;
+    m_toolbar_bpm_value = -1;
+    m_toolbar_sset_value = -1;
 
     m_accelgroup = Gtk::AccelGroup::create();
     add_accel_group(m_accelgroup);
@@ -200,8 +202,8 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
             m_toolbar_bpm_value = bpm;
             m_perform->set_bpm(bpm);
         } else {
-            char str[6];
-            sprintf(str, "%.2f",m_toolbar_bpm_value);
+            char str[7];
+            snprintf(str, sizeof(str), "%.02f", m_toolbar_bpm_value);
             m_toolbar_bpm.set_text(str);
         }
         return false;
@@ -326,6 +328,16 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     resize(1024, 600);
     show_all();
 
+    add_events(
+        // Gdk::POINTER_MOTION_MASK |
+        // Gdk::BUTTON_PRESS_MASK |
+        // Gdk::BUTTON_RELEASE_MASK |
+        // Gdk::POINTER_MOTION_MASK |
+        // Gdk::ENTER_NOTIFY_MASK |
+        // Gdk::LEAVE_NOTIFY_MASK |
+        Gdk::SCROLL_MASK
+    );
+
 }
 
 MainWindow::~MainWindow()
@@ -366,6 +378,32 @@ MainWindow::on_key_press(GdkEventKey* event)
 }
 
 bool
+MainWindow::on_scroll_event(GdkEventScroll* event)
+{
+
+    string focus = get_focus()->get_name();
+
+    if (focus == "bpm") {
+        if (event->direction == GDK_SCROLL_DOWN) {
+            m_perform->set_bpm(m_toolbar_bpm_value - 1);
+        } else if (event->direction == GDK_SCROLL_UP) {
+            m_perform->set_bpm(m_toolbar_bpm_value + 1);
+        }
+    }
+
+    if (focus == "sset") {
+        if (event->direction == GDK_SCROLL_DOWN) {
+            m_perform->set_screenset(m_toolbar_sset_value - 1);
+        } else if (event->direction == GDK_SCROLL_UP) {
+            m_perform->set_screenset(m_toolbar_sset_value + 1);
+        }
+    }
+
+
+    return false;
+}
+
+bool
 MainWindow::timer_callback()
 {
 
@@ -387,8 +425,8 @@ MainWindow::timer_callback()
     double bpm = m_perform->get_bpm();
     if (m_toolbar_bpm_value != bpm) {
         m_toolbar_bpm_value = bpm;
-        char str[6];
-        sprintf(str, "%.2f",m_toolbar_bpm_value);
+        char str[7];
+        snprintf(str, sizeof(str), "%.02f", m_toolbar_bpm_value);
         m_toolbar_bpm.set_text(str);
     }
 

@@ -140,6 +140,7 @@ class MainWindow : public Window {
         void clear_focus();
         bool on_key_press(GdkEventKey* event);
         bool on_delete_event(GdkEventAny *event);
+        bool on_scroll_event(GdkEventScroll* event);
 
         // nsm
         bool m_nsm_optional_gui;
