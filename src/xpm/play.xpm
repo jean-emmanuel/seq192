@@ -16,9 +16,10 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 static const char * play_xpm[] = {
-"16 16 2 1",
+"16 16 3 1",
 " 	c None",
 "+	c #cccccc",
+"=	c #aaaaaa",
 "                ",
 "                ",
 "     +++        ",
@@ -27,11 +28,11 @@ static const char * play_xpm[] = {
 "     ++ +++     ",
 "     ++  +++    ",
 "     ++   +++   ",
+"     ++   +++=  ",
 "     ++   +++   ",
 "     ++  +++    ",
 "     +  +++     ",
 "       +++      ",
 "      +++       ",
 "     +++        ",
-"                ",
 "                "};
