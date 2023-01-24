@@ -1166,8 +1166,10 @@ EditWindow::set_data_type(unsigned char status, unsigned char control, bool alt)
             label = "Note On";
             break;
         case EVENT_AFTERTOUCH:
-            label = "Aftertouch";
+        {
+            label = "ATouch " + to_string(control);
             break;
+        }
         case EVENT_CONTROL_CHANGE:
         {
             label = "CC " + to_string(control);
