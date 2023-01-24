@@ -444,7 +444,7 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
                 if (dialog.run() == Gtk::RESPONSE_OK)
                 {
                     auto fn = dialog.get_filename();
-                    bool result;
+                    bool result = true;
 
                     if (action == MAIN_MENU_OPEN) {
                         result = m_perform->file_open(fn);
@@ -529,7 +529,7 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
                         if (warning.run() == Gtk::RESPONSE_NO) return;
                     }
 
-                    bool result;
+                    bool result = true;
                     if (action == MAIN_MENU_SAVEAS) {
                         if (m_nsm) {
                             result = m_perform->file_export(fn);
