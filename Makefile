@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -g -O0 $(shell pkg-config --cflags liblo alsa) -Wall
+CXXFLAGS = -g -Og $(shell pkg-config --cflags liblo alsa) -Wall -Wpointer-arith
 LDFLAGS = $(shell pkg-config --libs liblo alsa)
 SOURCES = $(wildcard src/core/*.cpp) src/seq192.cpp
 BIN = seq192
