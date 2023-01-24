@@ -904,17 +904,16 @@ EditWindow::update_midibus_name()
         m_midibus = m_sequence->get_midi_bus();
         m_midichannel = m_sequence->get_midi_channel();
 
-        mastermidibus *mmb =  m_perform->get_master_midi_bus();
-        string bus = mmb->get_midi_out_bus_name(m_midibus);
 
-        string channel = to_string(m_midichannel + 1);
-        int instrument = global_user_midi_bus_definitions[m_midibus].instrument[m_midichannel];
-        if (instrument >= 0 && instrument < c_maxBuses)
-        {
-            channel = channel + " " + global_user_instrument_definitions[instrument].instrument;
+        string busname = global_user_midi_bus_definitions[m_midibus].alias;
+        if (busname.empty()) busname = "Bus " + to_string(m_midibus + 1);
+        if (!global_user_instrument_definitions[m_midibus * 16 + m_midichannel].instrument.empty()) {
+             busname += ": " + global_user_instrument_definitions[m_midibus * 16 + m_midichannel].instrument;
+        } else {
+            busname += ": Channel " + to_string(m_midichannel + 1);
         }
 
-        m_toolbar_bus.set_text(bus + ": " + channel);
+        m_toolbar_bus.set_text(busname);
 
     }
 
