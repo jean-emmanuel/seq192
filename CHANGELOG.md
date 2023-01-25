@@ -6,6 +6,7 @@
     - support user instrument colors (set in config file)
     - display user bus name and instrument name in sequence grid
     - add ctrl+click for queuing, shift+click for chosing sync reference
+    - open edit window with middle-click on sequence
 
 - perform
     - add the possibility to choose a sequence as sync reference for queued sequences (allows proper metric changes)
