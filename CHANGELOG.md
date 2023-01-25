@@ -24,6 +24,7 @@
 
 - misc
     - new icons
+    - seq192 can now be built without gtk (headless only)
 
 ## 1.0.0
 
