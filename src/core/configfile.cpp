@@ -61,9 +61,49 @@ ConfigFile::parse()
             int bus_number = stoi(it.key());
             auto bus_data = it.value();
 
+            // per-bus options
+
             auto bus_name = bus_data["name"];
             if (bus_name.is_string()) {
                 global_user_midi_bus_definitions[bus_number].alias = bus_name;
+            }
+
+            auto bus_color = bus_data["color"];
+            if (bus_color.is_string()){
+                for (int channel_number=0; channel_number<16; channel_number++) {
+                    int instrument_number = channel_number + bus_number * 16;
+                    global_user_midi_bus_definitions[bus_number].instrument[channel_number] = instrument_number;
+                    global_user_instrument_definitions[instrument_number].color = bus_color;
+                }
+            }
+
+            auto controls = bus_data["controls"];
+            if (controls.is_object()) {
+                for (int channel_number=0; channel_number<16; channel_number++) {
+                    int instrument_number = channel_number + bus_number * 16;
+                    global_user_midi_bus_definitions[bus_number].instrument[channel_number] = instrument_number;
+                    for (json::iterator it = controls.begin(); it != controls.end(); ++it) {
+                        int cc_number = stoi(it.key());
+                        auto cc_data = it.value();
+                        global_user_instrument_definitions[instrument_number].controllers[cc_number] = cc_data;
+                        global_user_instrument_definitions[instrument_number].controllers_active[cc_number] = true;
+                    }
+                }
+            }
+
+            auto notes = bus_data["notes"];
+            if (notes.is_object()) {
+                for (int channel_number=0; channel_number<16; channel_number++) {
+                    int instrument_number = channel_number + bus_number * 16;
+                    global_user_midi_bus_definitions[bus_number].instrument[channel_number] = instrument_number;
+                    global_user_midi_bus_definitions[bus_number].keymap[channel_number] = instrument_number;
+                    for (json::iterator it = notes.begin(); it != notes.end(); ++it) {
+                        int note_number = stoi(it.key());
+                        auto note_data = it.value();
+                        global_user_keymap_definitions[instrument_number].keys[note_number] = note_data;
+                        global_user_keymap_definitions[instrument_number].keys_active[note_number] = true;
+                    }
+                }
             }
 
             auto channels = bus_data["channels"];
@@ -73,6 +113,8 @@ ConfigFile::parse()
 
                     int channel_number = stoi(it.key());
                     auto channel_data = it.value();
+
+                    // per-channel options
 
                     int instrument_number = channel_number + bus_number * 16;
                     global_user_midi_bus_definitions[bus_number].instrument[channel_number] = instrument_number;

@@ -96,9 +96,9 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
 
     - MIDI bus names
     - MIDI channel names per bus
-    - MIDI channel colors (as css color strings)
-    - Note names in the piano roll (per channel)
-    - Control names in the event dropdown (per channel)
+    - Sequence colors as css color strings (per bus or per channel )
+    - Note names in the piano roll (per bus or per channel)
+    - Control names in the event dropdown (per bus or per channel )
 
 **Example**
 

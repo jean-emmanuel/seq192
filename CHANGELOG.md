@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.0
+
+- config file
+    - allow setting colors, controls and note names per bus, not only per channel
+
 ## 1.1.0
 
 - main window
