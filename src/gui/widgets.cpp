@@ -43,6 +43,7 @@ CustomEntry::on_leave_notify_event(GdkEventCrossing* event) {
 
 CustomHBox::CustomHBox()
 {
+    m_color = NULL;
     add(m_box);
     add_events(
         Gdk::ENTER_NOTIFY_MASK |
@@ -74,12 +75,11 @@ CustomHBox::set_color(color * c) {
 bool
 CustomHBox::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
-    Gtk::Allocation allocation = get_allocation();
-    const int width = allocation.get_width();
-    const int height = allocation.get_height();
     bool ret = EventBox::on_draw(cr);
-
     if (m_color != NULL) {
+        Gtk::Allocation allocation = get_allocation();
+        const int width = allocation.get_width();
+        const int height = allocation.get_height();
         cr->set_source_rgba(m_color->r, m_color->g, m_color->b, 0.5);
         cr->set_line_width(2.0);
         cr->move_to(1, height - 2);
