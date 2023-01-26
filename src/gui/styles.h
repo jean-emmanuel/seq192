@@ -417,6 +417,11 @@ dialog modelbutton:hover {
     opacity: 1;
 }
 
+dialog button {
+    border: 0;
+    box-shadow: 0 0 0 1px mix(@color_fg, @color_bg, 0.5);
+}
+
 )CSS";
 
 #endif
