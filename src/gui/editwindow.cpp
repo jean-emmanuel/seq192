@@ -14,6 +14,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include "css.h"
 #include "editwindow.h"
 #include "pianoroll.h"
 #include "../core/globals.h"

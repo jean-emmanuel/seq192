@@ -22,7 +22,6 @@
 #include "../core/globals.h"
 #include "../core/mutex.h"
 
-#include "styles.h"
 #include "widgets.h"
 #include "mainwindow.h"
 #include "sequencebutton.h"

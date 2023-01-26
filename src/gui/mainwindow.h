@@ -23,7 +23,6 @@
 #include "../lib/nsm.h"
 
 #include "widgets.h"
-#include "styles.h"
 #include "sequencebutton.h"
 #include "editwindow.h"
 

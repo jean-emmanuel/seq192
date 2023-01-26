@@ -18,6 +18,7 @@
 #include "../core/globals.h"
 #include "../lib/nsm.h"
 #include "../package.h"
+#include "css.h"
 #include <time.h>
 
 #include "../xpm/panic.xpm"
