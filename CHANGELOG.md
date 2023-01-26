@@ -2,9 +2,13 @@
 
 ## 1.2.0
 
+- main window
+    - re-enable mousewheel support on bpm and screenset entries and buttons
 - config file
     - allow setting colors, controls and note names per bus, not only per channel
-
+- misc
+    - various style tweaks
+    
 ## 1.1.0
 
 - main window

@@ -229,12 +229,16 @@ overshoot, undershoot {
 
 button {
     background: @color_raised;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
     min-width: 20px;
-    padding: 2px 10px;
+    padding: 2px 8px;
 }
 
-button:hover {
+button, entry, .buttonbox {
+    border: 1px solid mix(@color_fg, @color_bg, 0.5);
+    transition: opacity 0.25s, background-color 0.25s;
+}
+
+button:hover, .buttonbox.hover {
     opacity: 0.8
 }
 
@@ -244,17 +248,16 @@ button:active {
 
 .buttonbox {
     background: @color_raised;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
 }
 .buttonbox button:hover image {
-    opacity: 0.8
+    opacity: 0.8;
 }
 
 
 .buttonbox button {
     background: transparent;
-    box-shadow: none;
     opacity: 1;
+    border: 0;
 }
 
 .togglebutton:checked, button.on {
@@ -267,13 +270,12 @@ button.bypass.on,
 }
 
 entry {
-    background: rgba(0, 0, 0, 0.15);
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+    background: mix(@color_fg, @color_bg, 0.3);
     color: inherit
 }
 
 entry:focus {
-    background: rgba(0, 0, 0, 0.2);
+    background: mix(@color_fg, @color_bg, 0.4);
 }
 
 selection {
@@ -318,7 +320,11 @@ check:checked:hover, .checked check:hover {
 }
 
 .nomargin {
-    margin-right: -9px;
+    margin-right: -11px;
+}
+
+.group > :not(:first-child) {
+    border-left:0;
 }
 
 /* edit window */
@@ -344,8 +350,6 @@ check:checked:hover, .checked check:hover {
     box-shadow: none;
     padding-right: 4px;
     min-height: 0;
-    border-top: 1px solid @color_bg;
-    border-right: 1px solid @color_bg;
 }
 
 /* dialogs */

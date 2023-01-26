@@ -23,6 +23,7 @@
 #include "../core/mutex.h"
 
 #include "styles.h"
+#include "widgets.h"
 #include "mainwindow.h"
 #include "sequencebutton.h"
 #include "timeroll.h"
@@ -207,12 +208,12 @@ class EditWindow : public Window {
         Image               m_toolbar_snap_icon;
         ComboBoxText        m_toolbar_snap;
 
-        HBox                m_toolbar_length_box;
+        CustomHBox          m_toolbar_length_box;
         Button              m_toolbar_length_label;
         Image               m_toolbar_length_icon;
         ComboBoxText        m_toolbar_length;
 
-        HBox                m_toolbar_bus_box;
+        CustomHBox          m_toolbar_bus_box;
         Button              m_toolbar_bus_label;
         Image               m_toolbar_bus_icon;
         Button              m_toolbar_bus;

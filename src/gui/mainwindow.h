@@ -22,6 +22,7 @@
 #include "../core/globals.h"
 #include "../lib/nsm.h"
 
+#include "widgets.h"
 #include "styles.h"
 #include "sequencebutton.h"
 #include "editwindow.h"
@@ -53,6 +54,8 @@ class MainWindow : public Window {
         void nsm_set_client(nsm_client_t *nsm, bool optional_gui);
 
         Glib::RefPtr<Gtk::Application> m_app;
+
+        sigc::signal<void(string name)> signal_hover;
 
 
     private:
@@ -98,25 +101,30 @@ class MainWindow : public Window {
         Button              m_toolbar_play;
         bool                m_toolbar_play_state;
 
-        Entry               m_toolbar_bpm;
+        HBox                m_toolbar_bpm_box;
+        CustomEntry         m_toolbar_bpm;
         double              m_toolbar_bpm_value;
-        Button              m_toolbar_bpm_minus;
+        CustomButton        m_toolbar_bpm_minus;
         Image               m_toolbar_minus_icon;
-        Button              m_toolbar_bpm_plus;
+        CustomButton        m_toolbar_bpm_plus;
         Image               m_toolbar_plus_icon;
 
+        HBox                m_toolbar_sset_box;
         Entry               m_toolbar_sset_name;
-        Entry               m_toolbar_sset;
+        CustomEntry         m_toolbar_sset;
         int                 m_toolbar_sset_value;
-        Button              m_toolbar_sset_prev;
+        CustomButton        m_toolbar_sset_prev;
         Image               m_toolbar_prev_icon;
-        Button              m_toolbar_sset_next;
+        CustomButton        m_toolbar_sset_next;
         Image               m_toolbar_next_icon;
 
         Image               m_toolbar_logo;
         Image               m_toolbar_play_icon;
         Image               m_toolbar_stop_icon;
         Image               m_toolbar_panic_icon;
+
+        // misc
+        string              m_hover;
 
 
         // drag and drop
