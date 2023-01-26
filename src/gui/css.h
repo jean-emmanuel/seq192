@@ -143,6 +143,10 @@ button:hover, .buttonbox.hover {
     opacity: 0.8
 }
 
+button:hover image {
+    -gtk-icon-effect: none;
+}
+
 button:active {
     opacity: 0.6
 }
