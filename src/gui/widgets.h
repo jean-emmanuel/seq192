@@ -18,6 +18,7 @@
 #define SEQ192_GTKWIDGETS
 
 #include <gtkmm.h>
+#include "styles.h"
 
 using namespace Gtk;
 
@@ -43,17 +44,25 @@ class CustomEntry : public Entry {
 
 class CustomHBox : public EventBox {
     // HBox with css :hover state as .hover
+    // And settable color
 
     public:
         CustomHBox();
         void pack_start(Widget &w, bool a, bool b);
         void pack_end(Widget &w, bool a, bool b);
+        void set_color(color * c);
+
 
     private:
 
+        color * m_color;
         HBox m_box;
         bool on_enter_notify_event(GdkEventCrossing* event);
         bool on_leave_notify_event(GdkEventCrossing* event);
+
+    protected:
+
+        bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
 
 };
 

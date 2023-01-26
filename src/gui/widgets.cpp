@@ -67,3 +67,25 @@ CustomHBox::on_leave_notify_event(GdkEventCrossing* event) {
     get_style_context()->remove_class("hover");
     return Gtk::Widget::on_leave_notify_event(event);
 }
+void
+CustomHBox::set_color(color * c) {
+    m_color = c;
+}
+bool
+CustomHBox::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+{
+    Gtk::Allocation allocation = get_allocation();
+    const int width = allocation.get_width();
+    const int height = allocation.get_height();
+    bool ret = EventBox::on_draw(cr);
+
+    if (m_color != NULL) {
+        cr->set_source_rgba(m_color->r, m_color->g, m_color->b, 0.5);
+        cr->set_line_width(2.0);
+        cr->move_to(1, height - 2);
+        cr->line_to(width - 1, height - 2);
+        cr->stroke();
+    }
+
+    return ret;
+}

@@ -939,6 +939,13 @@ EditWindow::update_midibus_name()
         }
 
         m_toolbar_bus.set_label(busname);
+        if (!global_user_instrument_definitions[m_midibus * 16 + m_midichannel].color.empty()) {
+            m_toolbar_bus_box.set_color(&global_user_instrument_colors[m_midibus * 16 + m_midichannel]);
+        } else {
+            m_toolbar_bus_box.set_color(NULL);
+        }
+        m_toolbar_bus_box.queue_draw();
+
 
     }
 
