@@ -2,20 +2,11 @@
 
 MIDI sequencer based on seq24 with less features and more swag.
 
-**Less features**
-- No song editor
-- No keyboard controls
-- No midi controls
-- Linux only
+Read the [Changelog](CHANGELOG.md) for more details.
 
-**More swag**
-- Interface rewritten with GTK3
-- OSC controls
-- almost 192 patterns per set
+![Seq192 main window](https://user-images.githubusercontent.com/5261671/215058107-55ec762c-a9c7-488b-aff8-70c26bea93b7.png)
 
-![Seq192 main window](https://user-images.githubusercontent.com/5261671/133999743-445a4285-a1b6-400a-a6cd-9bce6714f8a2.png)
-
-![Seq192 edit window](https://user-images.githubusercontent.com/5261671/133999740-bc7f57e5-4c3d-4496-98cf-3df88d8b7a48.png)
+![Seq192 edit window](https://user-images.githubusercontent.com/5261671/215058105-f825167b-2d37-4296-a8d8-da17b280ee66.png)
 
 
 

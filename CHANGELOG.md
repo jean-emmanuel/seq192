@@ -5,7 +5,7 @@
 - main window
     - re-enable mousewheel support on bpm and screenset entries and buttons
 - edit window
-    - display user-defined bus/channel color under the output menu button 
+    - display user-defined bus/channel color under the output menu button
 - config file
     - allow setting colors, controls and note names per bus, not only per channel
 - misc
@@ -54,3 +54,4 @@
 - added resume playback mode to sequences
 - added NSM support (with "optional-gui" and "dirty" capabilities)
 - toggleable alt-control display in edit window
+- 182 sequences per screenset
