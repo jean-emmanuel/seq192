@@ -96,9 +96,10 @@ SequenceButton::draw_background()
     if (seq != NULL) {
 
         color color;
+        bool playing = seq->get_playing();
 
         // background
-        color = seq->get_playing() ? c_sequence_background_on : c_sequence_background;
+        color = playing ? c_sequence_background_on : c_sequence_background;
         cr->set_source_rgb(color.r, color.g, color.b);
         cr->rectangle(0, 0, width, height);
         cr->fill();
@@ -112,7 +113,7 @@ SequenceButton::draw_background()
         font.set_weight(Pango::WEIGHT_NORMAL);
 
         // text color
-        color = seq->get_playing() ? c_sequence_text_on : c_sequence_text;
+        color = playing ? c_sequence_text_on : c_sequence_text;
         if (get_sequence()->get_recording()) {
             color = c_sequence_text_record;
         }
@@ -151,7 +152,7 @@ SequenceButton::draw_background()
         int queued_width = 0;
         if (queued)
         {
-            color = seq->get_playing() ? c_sequence_text_on : c_sequence_text;
+            color = playing ? c_sequence_text_on : c_sequence_text;
             cr->set_source_rgb(color.r, color.g, color.b);
             auto queued = create_pango_layout("⌛");
             queued->set_font_description(font);
@@ -161,7 +162,7 @@ SequenceButton::draw_background()
         }
 
         // bus & channel name
-        color = seq->get_playing() ? c_sequence_text_on : c_sequence_text;
+        color = playing ? c_sequence_text_on : c_sequence_text;
         int bus = seq->get_midi_bus();
         int chan = seq->get_midi_channel();
         string busname = global_user_midi_bus_definitions[bus].alias;
@@ -196,7 +197,7 @@ SequenceButton::draw_background()
 
 
         // events zone
-        cr->set_source_rgba(color.r, color.g, color.b, 0.1);
+        cr->set_source_rgba(color.r, color.g, color.b, playing ? 0.15 : 0.1);
         int rect_x = 0;
         int rect_y = c_sequence_padding * 2 + text_height * 2;
         int rect_w = width ;
@@ -206,7 +207,8 @@ SequenceButton::draw_background()
         cr->fill();
 
         // events (notes)
-        cr->set_source_rgba(color.r, color.g, color.b, 0.6);
+        if (playing) color = c_sequence_text_on;
+        cr->set_source_rgba(color.r, color.g, color.b, playing ? 0.4 : 0.6);
         long tick_s;
         long tick_f;
         int note;
