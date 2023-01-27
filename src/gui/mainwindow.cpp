@@ -759,6 +759,7 @@ MainWindow::set_drag_destination(SequenceButton *s)
         if (m_editwindows[seqnum_src] != NULL) m_editwindows[seqnum_src]->close();
         m_perform->move_sequence(seqnum_src, seqnum_dest);
         m_drag_source->queue_draw();
+        m_drag_destination->update();
         m_drag_destination->queue_draw();
         m_drag_source = NULL;
         m_drag_destination = NULL;
