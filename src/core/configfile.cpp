@@ -61,6 +61,8 @@ ConfigFile::parse()
             int bus_number = stoi(it.key());
             auto bus_data = it.value();
 
+            if (!bus_data.is_object()) continue;
+
             // per-bus options
 
             auto bus_name = bus_data["name"];
@@ -113,6 +115,8 @@ ConfigFile::parse()
 
                     int channel_number = stoi(it.key());
                     auto channel_data = it.value();
+
+                    if (!channel_data.is_object()) continue;
 
                     // per-channel options
 
