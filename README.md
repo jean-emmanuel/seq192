@@ -12,9 +12,13 @@ Read the [Changelog](CHANGELOG.md) for more details.
 
 ## Build
 
-**Dependencies** (as debian packages)
+**Dependencies**
 ```
+# as debian packages
 libjack-jackd2-dev liblo-dev libgtkmm-3.0-dev libasound2-dev nlohmann-json3-dev
+
+# as fedora packages
+jack-audio-connection-kit-devel alsa-lib-devel liblo-devel gtkmm30-devel json-devel
 ```
 
 **Build**
