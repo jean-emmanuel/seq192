@@ -3,7 +3,10 @@
 ## 1.2.1
 
 - edit window
-    - when no event is selected, hitting Del or Backspace removes the event under the pointer 
+    - when no event is selected, hitting Del or Backspace removes the event under the pointer
+
+- misc
+    - add `ctrl+space` shortcut to stop playback
 
 ## 1.2.0
 

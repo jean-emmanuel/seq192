@@ -264,6 +264,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_transport_stop_label.set_label("Stop");
     m_menu_transport_stop_label.set_xalign(0.0);
     m_menu_transport_stop_label.set_accel(GDK_KEY_Escape, (Gdk::ModifierType)0);
+    m_menu_transport_stop.add_accelerator("activate", m_accelgroup, GDK_KEY_space, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_transport_stop.add(m_menu_transport_stop_label);
     m_menu_transport_stop.signal_activate().connect([&]{
         m_perform->stop_playing();
