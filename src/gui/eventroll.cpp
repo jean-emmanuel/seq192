@@ -513,6 +513,8 @@ EventRoll::on_motion_notify_event(GdkEventMotion* event)
 
     long tick = 0;
 
+    m_current_x = m_last_x = (int) event->x  + m_hscroll / m_zoom - 1;
+
     if (m_moving_init)
     {
         m_moving_init = false;
@@ -521,7 +523,6 @@ EventRoll::on_motion_notify_event(GdkEventMotion* event)
 
     if (m_selecting || m_moving || m_paste)
     {
-        m_current_x = m_last_x = (int) event->x  + m_hscroll / m_zoom - 1;
 
         if (m_moving || m_paste) snap_x(&m_current_x);
     }
@@ -529,7 +530,7 @@ EventRoll::on_motion_notify_event(GdkEventMotion* event)
 
     if (m_painting)
     {
-        m_current_x = (int) event->x   + m_hscroll / m_zoom - 1;
+        // m_current_x = (int) event->x   + m_hscroll / m_zoom - 1;
         snap_x(&m_current_x);
         convert_x(m_current_x, &tick);
         drop_event(tick);

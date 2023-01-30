@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.1
+
+- edit window
+    - when no event is selected, hitting Del or Backspace removes the event under the pointer 
+
 ## 1.2.0
 
 - main window

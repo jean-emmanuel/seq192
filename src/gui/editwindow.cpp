@@ -703,12 +703,30 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             }
             break;
         case EDIT_MENU_DELETE:
-            if(m_sequence->mark_selected())
             {
-                m_sequence->push_undo();
-                m_sequence->remove_marked();
+                bool selection = m_sequence->mark_selected();
+                if (!selection) {
+                    if (m_focus == "eventroll") {
+                        long tick_s;
+                        long tick_w;
+                        m_eventroll.convert_x(c_event_width + 4, &tick_w);
+                        m_eventroll.convert_x(m_eventroll.m_current_x, &tick_s);
+                        m_sequence->select_events(tick_s, tick_s, tick_w, m_status, m_cc, sequence::e_select_one);
+                    } else {
+                        long tick_s;
+                        int note_h;
+                        m_pianoroll.convert_xy(m_pianoroll.m_current_x, m_pianoroll.m_current_y, &tick_s, &note_h);
+                        m_sequence->select_note_events(tick_s, note_h, tick_s, note_h, sequence::e_select_one);
+                    }
+                    selection = m_sequence->mark_selected();
+                }
+                if (selection)
+                {
+                    m_sequence->push_undo();
+                    m_sequence->remove_marked();
+                }
+                break;
             }
-            break;
         case EDIT_MENU_INVERT:
             if (m_focus == "eventroll") {
                 m_sequence->select_events(m_status, m_cc, true);
