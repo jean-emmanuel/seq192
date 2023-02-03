@@ -39,7 +39,7 @@ perform::perform()
     m_inputing = true;
     m_outputing = true;
     m_tick = -1;
-
+    m_tick_offset = 0;
     // m_key_start  = GDK_space;
     // m_key_stop   = GDK_Escape;
 
@@ -60,10 +60,6 @@ perform::start_playing()
 
     stop_playing();
 
-    m_stopping_lock.lock();
-    while (m_stopping) m_stopping_lock.wait();
-    m_stopping_lock.unlock();
-
     #ifdef USE_JACK
     position_jack();
     start_jack();
@@ -82,6 +78,11 @@ perform::stop_playing()
     #endif
 
     stop();
+
+    m_stopping_lock.lock();
+    while (m_stopping) m_stopping_lock.wait();
+    m_stopping_lock.unlock();
+
 }
 
 void
@@ -144,6 +145,17 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                 else if (types[0] == 'f') bpm = argv[0]->f;
                 else break;
                 self->set_bpm(bpm);
+            }
+            break;
+        case SEQ_CURSOR:
+            if (argc == 1 && (types[0] == 'i' || types[0] == 'f' || types[0] == 'd')) {
+                bool restart = self->m_running;
+                if (restart) self->stop_playing();
+                if (types[0] == 'i') self->m_tick_offset = argv[0]->i * c_ppqn;
+                if (types[0] == 'f') self->m_tick_offset = argv[0]->f * c_ppqn;
+                if (types[0] == 'd') self->m_tick_offset = argv[0]->d * c_ppqn;
+                self->set_orig_ticks(self->m_tick_offset);
+                if (restart) self->start_playing();
             }
             break;
         case SEQ_SSET:
@@ -926,7 +938,7 @@ void perform::reset_sequences()
             m_seqs[i]->off_playing_notes();
             m_seqs[i]->set_sync_offset(0);
             m_seqs[i]->set_playing(false);
-            m_seqs[i]->zero_markers();
+            m_seqs[i]->set_orig_tick(m_tick_offset);
             m_seqs[i]->set_playing(state);
         }
     }
@@ -1063,7 +1075,7 @@ void perform::output_func()
             playing_time = now_time;
 
             // play sequences at current tick
-            play(current_tick);
+            play(current_tick + m_tick_offset);
 
             m_stopping_lock.lock();
             if (m_stopping) break;

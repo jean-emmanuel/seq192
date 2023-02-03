@@ -69,6 +69,7 @@ class perform
     bool m_transport_stopping;
 
     long m_tick;
+    long m_tick_offset;
 
     void set_running( bool a_running );
 
@@ -215,6 +216,7 @@ class perform
         SEQ_PLAY,
         SEQ_STOP,
         SEQ_BPM,
+        SEQ_CURSOR,
         SEQ_SSET,
         SEQ_PANIC,
         SEQ_SSEQ,
@@ -243,6 +245,7 @@ class perform
         {"/play",               SEQ_PLAY},
         {"/stop",               SEQ_STOP},
         {"/bpm",                SEQ_BPM},
+        {"/cursor",             SEQ_CURSOR},
         {"/screenset",          SEQ_SSET},
         {"/panic",              SEQ_PANIC},
         {"/sequence",           SEQ_SSEQ},
