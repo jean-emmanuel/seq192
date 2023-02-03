@@ -145,6 +145,9 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
 * `/bpm` <float_or_int: bpm>:
     Set bpm
 
+* `/cursor` <float_or_int: position>:
+    Set playhead position (affects all sequences). Position is >= 0 and expressed in quarter notes (0 = first beat)
+
 * `/screenset` <int: screen>:
     Change active screen set
 
