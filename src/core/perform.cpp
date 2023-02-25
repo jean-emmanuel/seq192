@@ -230,7 +230,7 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                 for (int i = 0; i < c_max_sequence; i++) {
                     if (self->is_active(i) && self->m_seqs[i]->get_playing()) {
                         if (command == SEQ_SSEQ_QUEUED) {
-                            if (!self->m_seqs[i]->get_queued()) {
+                            if (!self->m_seqs[i]->is_queued()) {
                                 self->m_seqs[i]->toggle_queued(self->get_reference_sequence());
                             }
                         } else {
@@ -248,19 +248,15 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                             case SEQ_MODE_SOLO:
                             case SEQ_MODE_ON:
                                 if (command == SEQ_SSEQ_QUEUED) {
-                                    if (!self->m_seqs[nseq]->get_playing() && !self->m_seqs[nseq]->get_queued()) {
-                                        self->m_seqs[nseq]->toggle_queued(self->get_reference_sequence());
-                                    }
+                                        self->m_seqs[nseq]->set_on_queued(self->get_reference_sequence());
                                 } else {
                                     self->m_seqs[nseq]->set_playing(true);
                                 }
                                 break;
                             case SEQ_MODE_OFF:
                                 if (command == SEQ_SSEQ_QUEUED) {
-                                    if (self->m_seqs[nseq]->get_playing() != self->m_seqs[nseq]->get_queued()) {
                                         // if playing and not queued or queued and not playing
-                                        self->m_seqs[nseq]->toggle_queued(self->get_reference_sequence());
-                                    }
+                                        self->m_seqs[nseq]->set_off_queued(self->get_reference_sequence());
                                 } else {
                                     self->m_seqs[nseq]->set_playing(false);
                                 }
@@ -368,7 +364,7 @@ void perform::osc_status( char* address, const char* path)
                     json += "\"time\":\"" + std::to_string(m_seqs[nseq]->get_bpm()) + "/" + std::to_string(m_seqs[nseq]->get_bw()) + "\",";
                     json += "\"bars\":" + std::to_string((int)((double)m_seqs[nseq]->get_length() / c_ppqn / m_seqs[nseq]->get_bpm() * (m_seqs[nseq]->get_bw() / 4))) + ",";
                     json += "\"ticks\":" + std::to_string(m_seqs[nseq]->get_length()) + ",";
-                    json += "\"queued\":" + std::to_string(m_seqs[nseq]->get_queued()) + ",";
+                    json += "\"queued\":" + std::to_string(m_seqs[nseq]->is_queued()) + ",";
                     json += "\"playing\":" + std::to_string(m_seqs[nseq]->get_playing()) + ",";
                     json += "\"timesPlayed\":" + std::to_string(m_seqs[nseq]->get_times_played()) + ",";
                     json += "\"recording\":" + std::to_string(m_seqs[nseq]->get_recording());
@@ -792,7 +788,7 @@ void perform::play( long a_tick )
             assert( m_seqs[i] );
 
 
-            if ( m_seqs[i]->get_queued() && m_seqs[i]->get_queued_tick() <= a_tick) {
+            if ( m_seqs[i]->is_queued() && m_seqs[i]->get_queued_tick() <= a_tick) {
 
 
                 // m_seqs[i]->play( m_seqs[i]->get_queued_tick() - 1 );
@@ -800,7 +796,8 @@ void perform::play( long a_tick )
                     m_seqs[i]->set_orig_tick( m_tick );
                     m_seqs[i]->set_sync_offset(m_tick % m_seqs[i]->get_length());
                 }
-                m_seqs[i]->toggle_playing();
+
+                m_seqs[i]->set_playing(m_seqs[i]->get_queued() == QUEUED_ON);
             }
 
             m_seqs[i]->play( a_tick );

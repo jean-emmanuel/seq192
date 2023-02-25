@@ -27,7 +27,7 @@ sequence::sequence( )
     m_recording     = false;
     m_quanized_rec  = false;
     m_thru          = false;
-    m_queued        = false;
+    m_queued        = QUEUED_NOT;
     m_resume        = false;
     m_resume_next   = false;
     m_chase         = true;
@@ -243,13 +243,49 @@ sequence::set_orig_tick( long a_tick )
 
 
 void
+sequence::set_on_queued(sequence * reference)
+{
+    lock();
+
+    set_dirty_main();
+
+    m_queued = QUEUED_ON;
+
+    if (reference != NULL && reference != this) {
+        m_queued_tick = reference->m_last_tick - ((reference->m_last_tick -reference->m_sync_offset)% reference->m_length) + reference->m_length;
+    } else {
+        m_queued_tick = m_last_tick - ((m_last_tick - m_sync_offset) % m_length) + m_length;
+    }
+
+    unlock();
+}
+
+void
+sequence::set_off_queued(sequence * reference)
+{
+    lock();
+
+    set_dirty_main();
+
+    m_queued = QUEUED_OFF;
+
+    if (reference != NULL && reference != this) {
+        m_queued_tick = reference->m_last_tick - ((reference->m_last_tick -reference->m_sync_offset)% reference->m_length) + reference->m_length;
+    } else {
+        m_queued_tick = m_last_tick - ((m_last_tick - m_sync_offset) % m_length) + m_length;
+    }
+
+    unlock();
+}
+
+void
 sequence::toggle_queued(sequence * reference)
 {
     lock();
 
     set_dirty_main();
 
-    m_queued = !m_queued;
+    m_queued = m_playing ? QUEUED_OFF : QUEUED_ON;
 
     if (reference != NULL && reference != this) {
         m_queued_tick = reference->m_last_tick - ((reference->m_last_tick -reference->m_sync_offset)% reference->m_length) + reference->m_length;
@@ -292,15 +328,21 @@ sequence::off_queued()
 
     set_dirty_main();
 
-    m_queued = false;
+    m_queued = QUEUED_NOT;
 
     unlock();
 }
 
-bool
+queued_mode
 sequence::get_queued()
 {
     return m_queued;
+}
+
+bool
+sequence::is_queued()
+{
+    return (m_queued != QUEUED_NOT);
 }
 
 long
@@ -2567,11 +2609,10 @@ sequence::set_playing( bool a_p )
 
         }
 
-        //printf( "set_dirty\n");
-        set_dirty();
     }
+    set_dirty();
 
-    m_queued = false;
+    m_queued = QUEUED_NOT;
 
     unlock();
 }

@@ -148,7 +148,7 @@ SequenceButton::draw_background()
         name->show_in_cairo_context(cr);
 
         // queued ?
-        bool queued = get_sequence()->get_queued();
+        bool queued = get_sequence()->is_queued();
         int queued_width = 0;
         if (queued)
         {
