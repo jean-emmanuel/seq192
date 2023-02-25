@@ -36,6 +36,14 @@ enum draw_type
     DRAW_NOTE_OFF
 };
 
+enum queued_mode
+{
+   QUEUED_NOT,
+   QUEUED_OFF,
+   QUEUED_ON
+};
+
+
 class sequence
 {
 
@@ -76,7 +84,7 @@ class sequence
     bool m_recording;
     bool m_quanized_rec;
     bool m_thru;
-    bool m_queued;
+    queued_mode m_queued;
     bool m_resume;
     bool m_resume_next;
 
@@ -190,8 +198,11 @@ class sequence
     void toggle_playing ();
 
     void toggle_queued(sequence * reference);
+    void set_on_queued(sequence * reference);
+    void set_off_queued(sequence * reference);
     void off_queued();
-    bool get_queued();
+    queued_mode get_queued();
+    bool is_queued();
     long get_queued_tick();
     long get_times_played();
     void set_resume(bool a_resume);
