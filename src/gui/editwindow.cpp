@@ -1143,12 +1143,15 @@ EditWindow::update_event_menu()
         m_menu_items_control[i]->set_label(ccname);
         m_menu_items_alt_control[i+1]->set_label(ccname);
 
-        int keymap = global_user_midi_bus_definitions[midi_bus].keymap[midi_ch];
         string key_name = to_string(127 - i) + " ";
-        if (global_user_keymap_definitions[keymap].keys_active[127 - i]) {
-            key_name += global_user_keymap_definitions[keymap].keys[127 - i];
-        } else {
-            key_name += key_to_note[(127-i)%12] + to_string( (127 - i)  / 12 - 1);
+        int keymap = global_user_midi_bus_definitions[midi_bus].keymap[midi_ch];
+        if (keymap > -1)
+        {
+            if (global_user_keymap_definitions[keymap].keys_active[127 - i]) {
+                key_name += global_user_keymap_definitions[keymap].keys[127 - i];
+            } else {
+                key_name += key_to_note[(127-i)%12] + to_string( (127 - i)  / 12 - 1);
+            }
         }
         m_menu_items_aftertouch[i]->set_label(key_name);
 
