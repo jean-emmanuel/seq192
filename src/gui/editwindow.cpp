@@ -988,7 +988,7 @@ void EditWindow::create_midibus_menu()
         for( int j=0; j<16; j++ ){
             std::string name = to_string(j + 1);
             int instrument = global_user_midi_bus_definitions[i].instrument[j];
-            if ( instrument >= 0 && instrument < c_maxBuses )
+            if ( instrument >= 0 && instrument < c_max_instruments )
             {
                 name = name + " " + global_user_instrument_definitions[instrument].instrument;
             }

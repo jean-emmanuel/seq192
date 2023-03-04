@@ -441,7 +441,7 @@ SequenceButton::on_button_release_event(GdkEventButton* event)
                         snprintf(b, sizeof(b), "%d", j + 1);
                         std::string name = string(b);
                         int instrument = global_user_midi_bus_definitions[i].instrument[j];
-                        if ( instrument >= 0 && instrument < c_maxBuses )
+                        if ( instrument >= 0 && instrument < c_max_instruments )
                         {
                             name = name + (string(" (") +
                                     global_user_instrument_definitions[instrument].instrument +
