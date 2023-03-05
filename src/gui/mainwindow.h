@@ -69,6 +69,7 @@ class MainWindow : public Window {
         ScrolledWindow      m_scroll_wrapper;
         Grid                m_sequence_grid;
         SequenceButton     *m_sequences[c_seqs_in_set];
+        SequenceButton     *m_sequence_hover;
         EditWindow         *m_editwindows[c_max_sequence];
 
         // menu
@@ -133,6 +134,9 @@ class MainWindow : public Window {
         void set_drag_source(SequenceButton *s);
         void set_drag_destination(SequenceButton *s);
 
+        // hovered sequence
+        void set_hover_sequence(SequenceButton *s){m_sequence_hover=s;};
+        SequenceButton* get_hover_sequence(){return m_sequence_hover;};
 
         // edit
         void open_edit_window(int seqnum, sequence * seq);

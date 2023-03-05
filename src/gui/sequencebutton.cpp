@@ -283,6 +283,13 @@ SequenceButton::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         m_last_marker_pos = m_next_marker_pos;
     }
 
+    if (this == m_mainwindow->get_hover_sequence()) {
+        cr->set_source_rgba(c_sequence_text.r, c_sequence_text.g, c_sequence_text.b, 0.25);
+        cr->set_line_width(1.0);
+        cr->rectangle(0, 0, width, height);
+        cr->stroke();
+    }
+
     return true;
 }
 
@@ -325,6 +332,8 @@ bool
 SequenceButton::on_enter_notify_event(GdkEventCrossing* event)
 {
     if (!m_drag_start && !m_click) m_mainwindow->set_drag_destination(this);
+    m_mainwindow->set_hover_sequence(this);
+    queue_draw();
     return true;
 }
 
@@ -336,6 +345,8 @@ SequenceButton::on_leave_notify_event(GdkEventCrossing* event)
         set_opacity(0.5);
         m_drag_start = false;
     }
+    m_mainwindow->set_hover_sequence(NULL);
+    queue_draw();
     m_click = false;
     return true;
 }
@@ -382,14 +393,18 @@ SequenceButton::on_button_release_event(GdkEventButton* event)
 
             if (seq != NULL) {
                 MenuItem * menu_item1 = manage(new MenuItem("Edit"));
+                ((AccelLabel*)menu_item1->get_child())->set_accel(GDK_KEY_E, Gdk::CONTROL_MASK);
                 menu_item1->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_EDIT, 0, 0));
                 menu->append(*menu_item1);
 
+
                 MenuItem * menu_item1b = manage(new MenuItem("Rename"));
+                ((AccelLabel*)menu_item1b->get_child())->set_accel(GDK_KEY_R, Gdk::CONTROL_MASK);
                 menu_item1b->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_RENAME, 0, 0));
                 menu->append(*menu_item1b);
             } else {
                 MenuItem * menu_item2 = manage(new MenuItem("New"));
+                ((AccelLabel*)menu_item2->get_child())->set_accel(GDK_KEY_B, Gdk::CONTROL_MASK);
                 menu_item2->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_NEW, 0, 0));
                 menu->append(*menu_item2);
             }
@@ -400,10 +415,12 @@ SequenceButton::on_button_release_event(GdkEventButton* event)
 
             if (seq != NULL) {
                 MenuItem * menu_item3 = manage(new MenuItem("Cut"));
+                ((AccelLabel*)menu_item3->get_child())->set_accel(GDK_KEY_X, Gdk::CONTROL_MASK);
                 menu_item3->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_CUT, 0, 0));
                 menu->append(*menu_item3);
 
                 MenuItem * menu_item4 = manage(new MenuItem("Copy"));
+                ((AccelLabel*)menu_item4->get_child())->set_accel(GDK_KEY_C, Gdk::CONTROL_MASK);
                 menu_item4->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_COPY, 0, 0));
                 menu->append(*menu_item4);
 
@@ -412,10 +429,12 @@ SequenceButton::on_button_release_event(GdkEventButton* event)
                 menu->append(*menu_item5);
 
                 MenuItem * menu_item6 = manage(new MenuItem("Delete"));
+                ((AccelLabel*)menu_item6->get_child())->set_accel(GDK_KEY_Delete, (Gdk::ModifierType)0);
                 menu_item6->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_DELETE, 0, 0));
                 menu->append(*menu_item6);
             } else {
                 MenuItem * menu_item6 = manage(new MenuItem("Paste"));
+                ((AccelLabel*)menu_item6->get_child())->set_accel(GDK_KEY_V, Gdk::CONTROL_MASK);
                 menu_item6->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_PASTE, 0, 0));
                 menu->append(*menu_item6);
             }

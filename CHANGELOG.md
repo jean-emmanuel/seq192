@@ -1,10 +1,18 @@
 # Changelog
 
-## 1.2.1
+## 1.3.0
 
+- main window
+    - add keyboard shortcuts for sequence menu actions
+    - add `rename` action to sequence menu
 - edit window
     - when no event is selected, hitting Del or Backspace removes the event under the pointer
-
+    - prevent crash when opening event menu with a config file loaded
+    - fix display of user-defined instrument names in bus menu
+- osc
+    - add `/cursor` method
+- sequence
+    - synchronize the sequence when /sequence/queue is received, even if wanted playing state is the same than the current one
 - misc
     - add `ctrl+space` shortcut to stop playback
 

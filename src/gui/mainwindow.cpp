@@ -365,9 +365,7 @@ MainWindow::on_key_press(GdkEventKey* event)
 {
     if (get_focus() != NULL) {
         string focus = get_focus()->get_name();
-        if (event->keyval == GDK_KEY_space && focus == "sset_name") return false;
-        if ((event->keyval == GDK_KEY_Up || event->keyval == GDK_KEY_Down) &&
-            (focus == "bpm" || focus == "sset"))
+        if (focus == "bpm" || focus == "sset" || focus == "sset_name")
         {
             return false;
         }
@@ -384,6 +382,40 @@ MainWindow::on_key_press(GdkEventKey* event)
         case GDK_KEY_Up:
         case GDK_KEY_Down:
             return true;
+            break;
+        case GDK_KEY_Delete:
+            if (get_hover_sequence() != NULL)
+                get_hover_sequence()->menu_callback(MENU_DELETE, 0, 0);
+            break;
+        case GDK_KEY_B:
+        case GDK_KEY_b:
+            if (event->state & GDK_CONTROL_MASK && get_hover_sequence() != NULL)
+                get_hover_sequence()->menu_callback(MENU_NEW, 0, 0);
+            break;
+        case GDK_KEY_E:
+        case GDK_KEY_e:
+            if (event->state & GDK_CONTROL_MASK && get_hover_sequence() != NULL)
+                get_hover_sequence()->menu_callback(MENU_EDIT, 0, 0);
+            break;
+        case GDK_KEY_X:
+        case GDK_KEY_x:
+            if (event->state & GDK_CONTROL_MASK && get_hover_sequence() != NULL)
+                get_hover_sequence()->menu_callback(MENU_CUT, 0, 0);
+            break;
+        case GDK_KEY_C:
+        case GDK_KEY_c:
+            if (event->state & GDK_CONTROL_MASK && get_hover_sequence() != NULL)
+                get_hover_sequence()->menu_callback(MENU_COPY, 0, 0);
+            break;
+        case GDK_KEY_V:
+        case GDK_KEY_v:
+            if (event->state & GDK_CONTROL_MASK && get_hover_sequence() != NULL)
+                get_hover_sequence()->menu_callback(MENU_PASTE, 0, 0);
+            break;
+        case GDK_KEY_R:
+        case GDK_KEY_r:
+            if (event->state & GDK_CONTROL_MASK && get_hover_sequence() != NULL)
+                get_hover_sequence()->menu_callback(MENU_RENAME, 0, 0);
             break;
         default:
             return false;
