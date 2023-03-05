@@ -304,7 +304,7 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
             int n = i + j * c_mainwnd_rows;
             m_sequences[n] = new SequenceButton(m_perform, this, n);
             m_sequences[n]->set_size_request(100,60);
-            m_sequences[n]->set_can_focus(false);
+            m_sequences[n]->set_can_focus(true);
             m_sequence_grid.attach(*m_sequences[n], j, i);
         }
     }
@@ -317,6 +317,8 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     m_sequence_grid.set_margin_end(c_grid_padding);
     m_sequence_grid.set_margin_top(c_grid_padding);
     m_sequence_grid.set_margin_bottom(c_grid_padding);
+    m_sequence_grid.set_focus_hadjustment(m_scroll_wrapper.get_hadjustment());
+    m_sequence_grid.set_focus_vadjustment(m_scroll_wrapper.get_vadjustment());
     m_scroll_wrapper.add(m_sequence_grid);
 
     // main layout packing
@@ -339,7 +341,7 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     show_all();
 
     add_events(
-        // Gdk::POINTER_MOTION_MASK |
+        Gdk::POINTER_MOTION_MASK |
         // Gdk::BUTTON_PRESS_MASK |
         // Gdk::BUTTON_RELEASE_MASK |
         // Gdk::POINTER_MOTION_MASK |
@@ -385,57 +387,58 @@ MainWindow::on_key_press(GdkEventKey* event)
         case GDK_KEY_Right:
         {
             int pos = -1;
-            if (get_hover_sequence() == NULL) {
+            if (get_focus_sequence() == NULL) {
                 if (event->keyval == GDK_KEY_Down) pos = 0;
                 else if (event->keyval == GDK_KEY_Up) pos = c_mainwnd_rows - 1;
                 else if (event->keyval == GDK_KEY_Left) pos = c_mainwnd_cols - 1;
                 else if (event->keyval == GDK_KEY_Right) pos = 0;
             } else {
-                pos = get_hover_sequence()->m_seqpos;
+                pos = get_focus_sequence()->m_seqpos;
                 if (event->keyval == GDK_KEY_Down && pos % c_mainwnd_rows != (c_mainwnd_rows - 1)) pos++;
                 else if (event->keyval == GDK_KEY_Up && pos % c_mainwnd_rows != 0) pos--;
                 else if (event->keyval == GDK_KEY_Left) pos -= c_mainwnd_rows;
                 else if (event->keyval == GDK_KEY_Right) pos += c_mainwnd_rows;
             }
             if (pos >= 0 && pos < c_seqs_in_set) {
-                set_hover_sequence(m_sequences[pos]);
+                m_sequence_keyboard_nav = true;
+                set_focus_sequence(m_sequences[pos]);
             }
             return true;
             break;
         }
         case GDK_KEY_Delete:
-            if (get_hover_sequence() != NULL)
-                get_hover_sequence()->menu_callback(MENU_DELETE, 0, 0);
+            if (get_focus_sequence() != NULL)
+                get_focus_sequence()->menu_callback(MENU_DELETE, 0, 0);
             break;
         case GDK_KEY_B:
         case GDK_KEY_b:
-            if (event->state & GDK_CONTROL_MASK && get_hover_sequence() != NULL)
-                get_hover_sequence()->menu_callback(MENU_NEW, 0, 0);
+            if (event->state & GDK_CONTROL_MASK && get_focus_sequence() != NULL)
+                get_focus_sequence()->menu_callback(MENU_NEW, 0, 0);
             break;
         case GDK_KEY_E:
         case GDK_KEY_e:
-            if (event->state & GDK_CONTROL_MASK && get_hover_sequence() != NULL)
-                get_hover_sequence()->menu_callback(MENU_EDIT, 0, 0);
+            if (event->state & GDK_CONTROL_MASK && get_focus_sequence() != NULL)
+                get_focus_sequence()->menu_callback(MENU_EDIT, 0, 0);
             break;
         case GDK_KEY_X:
         case GDK_KEY_x:
-            if (event->state & GDK_CONTROL_MASK && get_hover_sequence() != NULL)
-                get_hover_sequence()->menu_callback(MENU_CUT, 0, 0);
+            if (event->state & GDK_CONTROL_MASK && get_focus_sequence() != NULL)
+                get_focus_sequence()->menu_callback(MENU_CUT, 0, 0);
             break;
         case GDK_KEY_C:
         case GDK_KEY_c:
-            if (event->state & GDK_CONTROL_MASK && get_hover_sequence() != NULL)
-                get_hover_sequence()->menu_callback(MENU_COPY, 0, 0);
+            if (event->state & GDK_CONTROL_MASK && get_focus_sequence() != NULL)
+                get_focus_sequence()->menu_callback(MENU_COPY, 0, 0);
             break;
         case GDK_KEY_V:
         case GDK_KEY_v:
-            if (event->state & GDK_CONTROL_MASK && get_hover_sequence() != NULL)
-                get_hover_sequence()->menu_callback(MENU_PASTE, 0, 0);
+            if (event->state & GDK_CONTROL_MASK && get_focus_sequence() != NULL)
+                get_focus_sequence()->menu_callback(MENU_PASTE, 0, 0);
             break;
         case GDK_KEY_R:
         case GDK_KEY_r:
-            if (event->state & GDK_CONTROL_MASK && get_hover_sequence() != NULL)
-                get_hover_sequence()->menu_callback(MENU_RENAME, 0, 0);
+            if (event->state & GDK_CONTROL_MASK && get_focus_sequence() != NULL)
+                get_focus_sequence()->menu_callback(MENU_RENAME, 0, 0);
             break;
         default:
             return false;
@@ -443,6 +446,14 @@ MainWindow::on_key_press(GdkEventKey* event)
 
     return false;
 }
+
+bool
+MainWindow::on_motion_notify_event(GdkEventMotion* event)
+{
+    m_sequence_keyboard_nav = false;
+    return false;
+}
+
 
 bool
 MainWindow::on_scroll_event(GdkEventScroll* event)
@@ -862,10 +873,12 @@ MainWindow::nsm_set_client(nsm_client_t *nsm, bool optional_gui)
 
 
 void
-MainWindow::set_hover_sequence(SequenceButton *s)
+MainWindow::set_focus_sequence(SequenceButton *s)
 {
-    if (m_sequence_hover != NULL) m_sequence_hover->queue_draw();
-    m_sequence_hover = s;
-    if (m_sequence_hover != NULL) m_sequence_hover->queue_draw();
-
+    if (m_sequence_focus != NULL) m_sequence_focus->queue_draw();
+    m_sequence_focus = s;
+    if (m_sequence_focus != NULL) {
+        m_sequence_focus->grab_focus();
+        m_sequence_focus->queue_draw();
+    }
 };

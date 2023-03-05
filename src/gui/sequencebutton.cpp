@@ -32,6 +32,7 @@ SequenceButton::SequenceButton(perform * p, MainWindow * m, int seqpos)
     m_next_marker_pos = 0;
 
     set_last_sequence_number();
+    set_can_focus(true);
 
     Gtk::Allocation allocation = get_allocation();
     m_surface = Cairo::ImageSurface::create(
@@ -283,7 +284,7 @@ SequenceButton::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         m_last_marker_pos = m_next_marker_pos;
     }
 
-    if (this == m_mainwindow->get_hover_sequence()) {
+    if (this == m_mainwindow->get_focus_sequence()) {
         cr->set_source_rgba(c_sequence_text.r, c_sequence_text.g, c_sequence_text.b, seq != NULL ? 0.5 : 0.25);
         cr->set_line_width(1.0);
         cr->rectangle(0, 0, width, height);
@@ -332,7 +333,7 @@ bool
 SequenceButton::on_enter_notify_event(GdkEventCrossing* event)
 {
     if (!m_drag_start && !m_click) m_mainwindow->set_drag_destination(this);
-    m_mainwindow->set_hover_sequence(this);
+    if (!m_mainwindow->m_sequence_keyboard_nav) m_mainwindow->set_focus_sequence(this);
     return true;
 }
 
@@ -344,7 +345,7 @@ SequenceButton::on_leave_notify_event(GdkEventCrossing* event)
         set_opacity(0.5);
         m_drag_start = false;
     }
-    m_mainwindow->set_hover_sequence(NULL);
+    if (!m_mainwindow->m_sequence_keyboard_nav) m_mainwindow->set_focus_sequence(NULL);
     m_click = false;
     return true;
 }

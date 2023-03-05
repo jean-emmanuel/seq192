@@ -69,7 +69,8 @@ class MainWindow : public Window {
         ScrolledWindow      m_scroll_wrapper;
         Grid                m_sequence_grid;
         SequenceButton     *m_sequences[c_seqs_in_set];
-        SequenceButton     *m_sequence_hover;
+        SequenceButton     *m_sequence_focus;
+        bool                m_sequence_keyboard_nav = false;
         EditWindow         *m_editwindows[c_max_sequence];
 
         // menu
@@ -135,8 +136,8 @@ class MainWindow : public Window {
         void set_drag_destination(SequenceButton *s);
 
         // hovered sequence
-        void set_hover_sequence(SequenceButton *s);
-        SequenceButton* get_hover_sequence(){return m_sequence_hover;};
+        void set_focus_sequence(SequenceButton *s);
+        SequenceButton* get_focus_sequence(){return m_sequence_focus;};
 
         // edit
         void open_edit_window(int seqnum, sequence * seq);
@@ -152,6 +153,7 @@ class MainWindow : public Window {
         bool on_key_press(GdkEventKey* event);
         bool on_delete_event(GdkEventAny *event);
         bool on_scroll_event(GdkEventScroll* event);
+        bool on_motion_notify_event(GdkEventMotion* event);
 
         // nsm
         bool m_nsm_optional_gui;
