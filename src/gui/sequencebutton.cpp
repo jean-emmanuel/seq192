@@ -518,6 +518,10 @@ SequenceButton::menu_callback(context_menu_action action, int data1, int data2)
                 {
                     string s = entry.get_text();
                     seq->set_name(s);
+                    if (m_mainwindow->m_editwindows[get_sequence_number()] != NULL) {
+                        m_mainwindow->m_editwindows[get_sequence_number()]->update_name();
+                    }
+
                 }
             }
             break;

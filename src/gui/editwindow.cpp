@@ -328,7 +328,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar_name.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
         string s = m_toolbar_name.get_text();
         m_sequence->set_name(s);
-        update_window_title();
+        update_name();
         add_accel_group(m_accelgroup);
         return false;
     });
@@ -337,7 +337,6 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
         return false;
     });
 
-    m_toolbar_name.set_text(m_sequence->get_name());
     m_toolbar.pack_start(m_toolbar_name, true, true);
 
     m_toolbar_bpm.set_name("bpm");
@@ -569,7 +568,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     set_icon(Gdk::Pixbuf::create_from_xpm_data(seq192_32_xpm));
 
     clear_focus();
-    update_window_title();
+    update_name();
     set_position(Gtk::WIN_POS_CENTER);
     resize(1024, 600);
     show_all();
@@ -1294,8 +1293,10 @@ EditWindow::update_hscrollbar_visibility() {
 }
 
 void
-EditWindow::update_window_title()
+EditWindow::update_name()
 {
-    std::string title = string(PACKAGE) + " - " + m_toolbar_name.get_text();
+    string name = m_sequence->get_name();
+    m_toolbar_name.set_text(name);
+    string title = string(PACKAGE) + " - " + name;
     set_title(title.c_str());
 }
