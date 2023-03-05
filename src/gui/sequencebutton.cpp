@@ -284,7 +284,7 @@ SequenceButton::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     }
 
     if (this == m_mainwindow->get_hover_sequence()) {
-        cr->set_source_rgba(c_sequence_text.r, c_sequence_text.g, c_sequence_text.b, 0.25);
+        cr->set_source_rgba(c_sequence_text.r, c_sequence_text.g, c_sequence_text.b, seq != NULL ? 0.5 : 0.25);
         cr->set_line_width(1.0);
         cr->rectangle(0, 0, width, height);
         cr->stroke();
@@ -333,7 +333,6 @@ SequenceButton::on_enter_notify_event(GdkEventCrossing* event)
 {
     if (!m_drag_start && !m_click) m_mainwindow->set_drag_destination(this);
     m_mainwindow->set_hover_sequence(this);
-    queue_draw();
     return true;
 }
 
@@ -346,7 +345,6 @@ SequenceButton::on_leave_notify_event(GdkEventCrossing* event)
         m_drag_start = false;
     }
     m_mainwindow->set_hover_sequence(NULL);
-    queue_draw();
     m_click = false;
     return true;
 }

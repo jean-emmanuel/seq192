@@ -381,8 +381,28 @@ MainWindow::on_key_press(GdkEventKey* event)
             break;
         case GDK_KEY_Up:
         case GDK_KEY_Down:
+        case GDK_KEY_Left:
+        case GDK_KEY_Right:
+        {
+            int pos = -1;
+            if (get_hover_sequence() == NULL) {
+                if (event->keyval == GDK_KEY_Down) pos = 0;
+                else if (event->keyval == GDK_KEY_Up) pos = c_mainwnd_rows - 1;
+                else if (event->keyval == GDK_KEY_Left) pos = c_mainwnd_cols - 1;
+                else if (event->keyval == GDK_KEY_Right) pos = 0;
+            } else {
+                pos = get_hover_sequence()->m_seqpos;
+                if (event->keyval == GDK_KEY_Down && pos % c_mainwnd_rows != (c_mainwnd_rows - 1)) pos++;
+                else if (event->keyval == GDK_KEY_Up && pos % c_mainwnd_rows != 0) pos--;
+                else if (event->keyval == GDK_KEY_Left) pos -= c_mainwnd_rows;
+                else if (event->keyval == GDK_KEY_Right) pos += c_mainwnd_rows;
+            }
+            if (pos >= 0 && pos < c_seqs_in_set) {
+                set_hover_sequence(m_sequences[pos]);
+            }
             return true;
             break;
+        }
         case GDK_KEY_Delete:
             if (get_hover_sequence() != NULL)
                 get_hover_sequence()->menu_callback(MENU_DELETE, 0, 0);
@@ -839,3 +859,13 @@ MainWindow::nsm_set_client(nsm_client_t *nsm, bool optional_gui)
     m_menu_file_saveas.set_label("Export session");
     if (m_nsm_optional_gui) m_menu_file_quit.set_label("Hide");
 }
+
+
+void
+MainWindow::set_hover_sequence(SequenceButton *s)
+{
+    if (m_sequence_hover != NULL) m_sequence_hover->queue_draw();
+    m_sequence_hover = s;
+    if (m_sequence_hover != NULL) m_sequence_hover->queue_draw();
+
+};

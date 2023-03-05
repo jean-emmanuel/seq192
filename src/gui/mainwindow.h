@@ -135,7 +135,7 @@ class MainWindow : public Window {
         void set_drag_destination(SequenceButton *s);
 
         // hovered sequence
-        void set_hover_sequence(SequenceButton *s){m_sequence_hover=s;};
+        void set_hover_sequence(SequenceButton *s);
         SequenceButton* get_hover_sequence(){return m_sequence_hover;};
 
         // edit
