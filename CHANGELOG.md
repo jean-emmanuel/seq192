@@ -5,6 +5,7 @@
 - main window
     - add keyboard shortcuts for sequence menu actions
     - add `rename` action to sequence menu
+    - add keyboard navigation in the sequence grid and a visual hint on the focused sequence 
 - edit window
     - when no event is selected, hitting Del or Backspace removes the event under the pointer
     - prevent crash when opening event menu with a config file loaded
