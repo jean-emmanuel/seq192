@@ -377,66 +377,66 @@ SequenceButton::on_button_release_event(GdkEventButton* event)
         }
 
         else if (event->button == 3) {
-            Menu * menu = new Menu();
+            Menu * menu = manage(new Menu());
             menu->attach_to_widget(*this);
 
             if (seq != NULL) {
-                MenuItem * menu_item1 = new MenuItem("Edit");
+                MenuItem * menu_item1 = manage(new MenuItem("Edit"));
                 menu_item1->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_EDIT, 0, 0));
                 menu->append(*menu_item1);
 
-                MenuItem * menu_item1b = new MenuItem("Rename");
+                MenuItem * menu_item1b = manage(new MenuItem("Rename"));
                 menu_item1b->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_RENAME, 0, 0));
                 menu->append(*menu_item1b);
             } else {
-                MenuItem * menu_item2 = new MenuItem("New");
+                MenuItem * menu_item2 = manage(new MenuItem("New"));
                 menu_item2->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_NEW, 0, 0));
                 menu->append(*menu_item2);
             }
 
 
-            MenuItem * sep1 = new SeparatorMenuItem();
+            MenuItem * sep1 = manage(new SeparatorMenuItem());
             menu->append(*sep1);
 
             if (seq != NULL) {
-                MenuItem * menu_item3 = new MenuItem("Cut");
+                MenuItem * menu_item3 = manage(new MenuItem("Cut"));
                 menu_item3->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_CUT, 0, 0));
                 menu->append(*menu_item3);
 
-                MenuItem * menu_item4 = new MenuItem("Copy");
+                MenuItem * menu_item4 = manage(new MenuItem("Copy"));
                 menu_item4->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_COPY, 0, 0));
                 menu->append(*menu_item4);
 
-                MenuItem * menu_item5 = new MenuItem("Export sequence");
+                MenuItem * menu_item5 = manage(new MenuItem("Export sequence"));
                 menu_item5->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_EXPORT, 0, 0));
                 menu->append(*menu_item5);
 
-                MenuItem * menu_item6 = new MenuItem("Delete");
+                MenuItem * menu_item6 = manage(new MenuItem("Delete"));
                 menu_item6->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_DELETE, 0, 0));
                 menu->append(*menu_item6);
             } else {
-                MenuItem * menu_item6 = new MenuItem("Paste");
+                MenuItem * menu_item6 = manage(new MenuItem("Paste"));
                 menu_item6->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_PASTE, 0, 0));
                 menu->append(*menu_item6);
             }
 
             if (seq != NULL) {
-                MenuItem * sep2 = new SeparatorMenuItem();
+                MenuItem * sep2 = manage(new SeparatorMenuItem());
                 menu->append(*sep2);
 
-                MenuItem * menu_item7 = new MenuItem("Midi Bus");
+                MenuItem * menu_item7 = manage(new MenuItem("Midi Bus"));
                 menu->append(*menu_item7);
 
-                Menu *menu_buses = new Menu();
+                Menu *menu_buses = manage(new Menu());
                 menu_item7->set_submenu(*menu_buses);
 
                 char b[4];
 
                 mastermidibus *masterbus = m_perform->get_master_midi_bus();
                 for ( int i=0; i< masterbus->get_num_out_buses(); i++ ){
-                    Menu *menu_channels = new Menu();
+                    Menu *menu_channels = manage(new Menu());
 
-                    MenuItem * menu_item_bus = new MenuItem(masterbus->get_midi_out_bus_name(i));
+                    MenuItem * menu_item_bus = manage(new MenuItem(masterbus->get_midi_out_bus_name(i)));
                     menu_item_bus->set_submenu(*menu_channels);
                     menu_buses->append(*menu_item_bus);
 
@@ -452,7 +452,7 @@ SequenceButton::on_button_release_event(GdkEventButton* event)
                                     string(")") );
                         }
 
-                        MenuItem * menu_item_channel = new MenuItem(name);
+                        MenuItem * menu_item_channel = manage(new MenuItem(name));
                         menu_item_channel->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_MIDI_BUS, i, j));
                         menu_channels->append(*menu_item_channel);
                     }

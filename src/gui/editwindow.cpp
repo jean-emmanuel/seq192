@@ -225,7 +225,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_view_bg_sequence.set_label("Background sequence");
     m_menu_view_bg_sequence.set_submenu(m_submenu_bg_sequence);
     m_submenu_view.append(m_menu_view_bg_sequence);
-    m_menu_items_bgseq[c_seqs_in_set] =  new CheckMenuItem();
+    m_menu_items_bgseq[c_seqs_in_set] = new CheckMenuItem();
     m_menu_items_bgseq[c_seqs_in_set]->set_label("None");
     m_menu_items_bgseq[c_seqs_in_set]->signal_toggled().connect([&]{
         set_background_sequence(-1, NULL);
@@ -978,9 +978,9 @@ void EditWindow::create_midibus_menu()
 
     mastermidibus *masterbus = m_perform->get_master_midi_bus();
     for ( int i=0; i< masterbus->get_num_out_buses(); i++ ){
-        Menu *menu_channels = new Menu();
+        Menu *menu_channels = manage(new Menu());
 
-        MenuItem * menu_item_bus = new MenuItem(masterbus->get_midi_out_bus_name(i));
+        MenuItem * menu_item_bus = manage(new MenuItem(masterbus->get_midi_out_bus_name(i)));
         menu_item_bus->set_submenu(*menu_channels);
         m_toolbar_bus_menu.append(*menu_item_bus);
 
@@ -993,7 +993,7 @@ void EditWindow::create_midibus_menu()
                 name = name + " " + global_user_instrument_definitions[instrument].instrument;
             }
 
-            MenuItem * menu_item_channel = new MenuItem(name);
+            MenuItem * menu_item_channel = manage(new MenuItem(name));
             menu_item_channel->signal_activate().connect([&,i,j]{
                 m_sequence->set_midi_bus(i);
                 m_sequence->set_midi_channel(j);
