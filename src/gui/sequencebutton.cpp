@@ -498,7 +498,7 @@ SequenceButton::menu_callback(context_menu_action action, int data1, int data2)
             m_perform->new_sequence(get_sequence_number());
             // no break -> edit
         case MENU_EDIT:
-            m_mainwindow->open_edit_window(get_sequence_number(), get_sequence());
+            if (get_sequence() != NULL) m_mainwindow->open_edit_window(get_sequence_number(), get_sequence());
             break;
         case MENU_RENAME:
         {
