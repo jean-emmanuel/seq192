@@ -496,8 +496,6 @@ SequenceButton::menu_callback(context_menu_action action, int data1, int data2)
                 dialog.add_button("_Ok", Gtk::RESPONSE_OK);
                 dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
                 dialog.set_default_response(Gtk::RESPONSE_OK);
-                dialog.set_transient_for(*m_mainwindow);
-                dialog.set_modal(true);
                 if (dialog.run() == Gtk::RESPONSE_OK)
                 {
                     string s = entry.get_text();
