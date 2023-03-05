@@ -384,6 +384,10 @@ SequenceButton::on_button_release_event(GdkEventButton* event)
                 MenuItem * menu_item1 = new MenuItem("Edit");
                 menu_item1->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_EDIT, 0, 0));
                 menu->append(*menu_item1);
+
+                MenuItem * menu_item1b = new MenuItem("Rename");
+                menu_item1b->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_RENAME, 0, 0));
+                menu->append(*menu_item1b);
             } else {
                 MenuItem * menu_item2 = new MenuItem("New");
                 menu_item2->signal_activate().connect(sigc::bind(mem_fun(*this, &SequenceButton::menu_callback), MENU_NEW, 0, 0));
@@ -477,6 +481,31 @@ SequenceButton::menu_callback(context_menu_action action, int data1, int data2)
         case MENU_EDIT:
             m_mainwindow->open_edit_window(get_sequence_number(), get_sequence());
             break;
+        case MENU_RENAME:
+        {
+            sequence * seq = get_sequence();
+            if (seq != NULL) {
+                Dialog dialog("Rename sequence");
+                Entry entry;
+                entry.set_text(seq->get_name());
+                entry.set_editable(true);
+                entry.set_activates_default(true);
+                entry.grab_focus();
+                entry.show();
+                dialog.get_content_area()->pack_start(entry, true, true);
+                dialog.add_button("_Ok", Gtk::RESPONSE_OK);
+                dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+                dialog.set_default_response(Gtk::RESPONSE_OK);
+                dialog.set_transient_for(*m_mainwindow);
+                dialog.set_modal(true);
+                if (dialog.run() == Gtk::RESPONSE_OK)
+                {
+                    string s = entry.get_text();
+                    seq->set_name(s);
+                }
+            }
+            break;
+        }
         case MENU_CUT:
             m_perform->cut_sequence(get_sequence_number());
             break;

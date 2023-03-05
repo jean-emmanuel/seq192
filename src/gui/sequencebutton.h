@@ -31,6 +31,7 @@ enum context_menu_action
 {
     MENU_NEW = 0,
     MENU_EDIT,
+    MENU_RENAME,
     MENU_CUT,
     MENU_COPY,
     MENU_EXPORT,
