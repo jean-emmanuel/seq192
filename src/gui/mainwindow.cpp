@@ -437,7 +437,8 @@ MainWindow::on_key_press(GdkEventKey* event)
             break;
         case GDK_KEY_R:
         case GDK_KEY_r:
-            if (event->state & GDK_CONTROL_MASK && get_focus_sequence() != NULL)
+        case GDK_KEY_F2:
+            if ((event->state & GDK_CONTROL_MASK || event->keyval == GDK_KEY_F2) && get_focus_sequence() != NULL)
                 get_focus_sequence()->menu_callback(MENU_RENAME, 0, 0);
             break;
         default:
