@@ -655,13 +655,15 @@ void perform::move_sequence( int a_from, int a_to )
 
 void perform::new_sequence( int a_sequence )
 {
-    undoable_lock(true);
+    if (!is_active(a_sequence)) {
+        undoable_lock(true);
 
-    m_seqs[ a_sequence ] = new sequence();
-    m_seqs[ a_sequence ]->set_master_midi_bus( &m_master_bus );
-    global_is_modified = true;
+        m_seqs[ a_sequence ] = new sequence();
+        m_seqs[ a_sequence ]->set_master_midi_bus( &m_master_bus );
+        global_is_modified = true;
 
-    undoable_unlock();
+        undoable_unlock();
+    }
 }
 
 
