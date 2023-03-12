@@ -100,9 +100,7 @@ class perform
     deque < state* >m_list_undo;
     deque < state* >m_list_redo;
     int m_undo_lock = 0;
-    void undoable_begin();
-    void undoable_end();
-    void undoable_lock();
+    void undoable_lock(bool a_push_undo);
     void undoable_unlock();
     void push_undo();
     void set_have_undo();

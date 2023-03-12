@@ -410,7 +410,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
             /* the sequence has been filled, add it  */
             //printf ( "add_sequence( %d )\n", perf + (a_screen_set * c_seqs_in_set));
-            a_perf->undoable_lock();
+            a_perf->undoable_lock(false);
             a_perf->add_sequence (seq, perf + (a_screen_set * c_seqs_in_set));
             a_perf->undoable_unlock();
         }
@@ -446,7 +446,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
                 notes[len] = '\0';
                 string notess (notes);
-                a_perf->undoable_lock();
+                a_perf->undoable_lock(false);
                 a_perf->set_screen_set_notepad (x + a_screen_set, &notess);
                 a_perf->undoable_unlock();
                 delete[]notes;

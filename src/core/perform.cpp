@@ -454,7 +454,7 @@ void jack_shutdown(void *arg)
 
 void perform::clear_all()
 {
-    undoable_lock();
+    undoable_lock(false);
 
     reset_sequences();
 
@@ -597,14 +597,14 @@ void perform::delete_sequence( int a_num )
 {
 
     if ( m_seqs[a_num] != NULL ){
-        undoable_begin();
+        undoable_lock(true);
 
         m_seqs[a_num]->set_playing( false );
         delete m_seqs[a_num];
         m_seqs[a_num] = NULL;
         global_is_modified = true;
 
-        undoable_end();
+        undoable_unlock();
     }
 }
 
@@ -619,49 +619,49 @@ void perform::copy_sequence( int a_num )
 void perform::cut_sequence( int a_num )
 {
     if (is_active(a_num)) {
-        undoable_begin();
+        undoable_lock(true);
 
         m_clipboard = *get_sequence(a_num);
         delete_sequence(a_num);
 
-        undoable_end();
+        undoable_unlock();
     }
 }
 
 void perform::paste_sequence( int a_num )
 {
     if (!is_active(a_num)) {
-        undoable_begin();
+        undoable_lock(true);
 
         new_sequence(a_num);
         *get_sequence(a_num) = m_clipboard;
 
-        undoable_end();
+        undoable_unlock();
     }
 }
 
 void perform::move_sequence( int a_from, int a_to )
 {
     if (is_active(a_from) && !is_active(a_to)) {
-        undoable_begin();
+        undoable_lock(true);
 
         new_sequence(a_to);
         *get_sequence(a_to) = *get_sequence(a_from);
         delete_sequence(a_from);
 
-        undoable_end();
+        undoable_unlock();
     }
 }
 
 void perform::new_sequence( int a_sequence )
 {
-    undoable_begin();
+    undoable_lock(true);
 
     m_seqs[ a_sequence ] = new sequence();
     m_seqs[ a_sequence ]->set_master_midi_bus( &m_master_bus );
     global_is_modified = true;
 
-    undoable_end();
+    undoable_unlock();
 }
 
 
@@ -680,11 +680,11 @@ void perform::print()
 void perform::set_screen_set_notepad( int a_screen_set, string *a_notepad )
 {
     if ( a_screen_set < c_max_sets ) {
-        undoable_begin();
+        undoable_lock(true);
 
         m_screen_set_notepad[a_screen_set] = *a_notepad;
 
-        undoable_end();
+        undoable_unlock();
     }
 }
 
@@ -1237,7 +1237,7 @@ state * perform::get_state()
 
 void perform::set_state(state * s)
 {
-    undoable_lock();
+    undoable_lock(false);
 
     for (int i = 0; i < c_max_sequence; i++) {
         if (is_active(i)) delete_sequence(i);
@@ -1310,19 +1310,9 @@ bool perform::can_redo()
 }
 
 
-void perform::undoable_begin()
+void perform::undoable_lock(bool a_push_undo)
 {
-    if (m_undo_lock == 0) push_undo();
-    m_undo_lock++;
-}
-
-void perform::undoable_end()
-{
-    m_undo_lock--;
-}
-
-void perform::undoable_lock()
-{
+    if (m_undo_lock == 0 && a_push_undo) push_undo();
     m_undo_lock++;
 }
 
