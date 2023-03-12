@@ -28,9 +28,7 @@ bool global_is_modified = false;
 perform::perform()
 {
     for (int i=0; i< c_max_sequence; i++) {
-
         m_seqs[i] = NULL;
-        m_seqs_active[i] = false;
     }
 
     m_running = false;
@@ -456,6 +454,8 @@ void jack_shutdown(void *arg)
 
 void perform::clear_all()
 {
+    undoable_lock();
+
     reset_sequences();
 
     for (int i=0; i< c_max_sequence; i++ ){
@@ -469,6 +469,21 @@ void perform::clear_all()
     for (int i=0; i<c_max_sets; i++ ){
         set_screen_set_notepad( i, &e );
     }
+
+    for (long unsigned int i = 0; i < m_list_undo.size(); i++) {
+        m_list_undo[i]->sequence_map.clear();
+    }
+    m_list_undo.clear();
+    m_list_undo.shrink_to_fit();
+
+
+    for (long unsigned int i = 0; i < m_list_redo.size(); i++) {
+        m_list_redo[i]->sequence_map.clear();
+    }
+    m_list_redo.clear();
+    m_list_redo.shrink_to_fit();
+
+    undoable_unlock();
 }
 
 perform::~perform()
@@ -513,7 +528,6 @@ void perform::add_sequence( sequence *a_seq, int a_perf )
             a_perf >= 0 ){
 
         m_seqs[a_perf] = a_seq;
-        set_active(a_perf, true);
         //a_seq->set_tag( a_perf );
 
     } else {
@@ -523,7 +537,6 @@ void perform::add_sequence( sequence *a_seq, int a_perf )
             if ( is_active(i) == false ){
 
                 m_seqs[i] = a_seq;
-                set_active(i,true);
 
                 //a_seq->set_tag( i  );
                 break;
@@ -532,80 +545,13 @@ void perform::add_sequence( sequence *a_seq, int a_perf )
     }
 }
 
-
-void perform::set_active( int a_sequence, bool a_active )
-{
-    if ( a_sequence < 0 || a_sequence >= c_max_sequence )
-        return;
-
-    //printf ("set_active %d\n", a_active );
-
-    if ( m_seqs_active[ a_sequence ] == true && a_active == false )
-    {
-        set_was_active(a_sequence);
-    }
-
-    m_seqs_active[ a_sequence ] = a_active;
-}
-
-
-void perform::set_was_active( int a_sequence )
-{
-    if ( a_sequence < 0 || a_sequence >= c_max_sequence )
-        return;
-
-    //printf( "was_active true\n" );
-
-    m_was_active_main[ a_sequence ] = true;
-    m_was_active_edit[ a_sequence ] = true;
-    m_was_active_perf[ a_sequence ] = true;
-    m_was_active_names[ a_sequence ] = true;
-}
-
-
-
 bool perform::is_active( int a_sequence )
 {
     if ( a_sequence < 0 || a_sequence >= c_max_sequence )
         return false;
 
-    return m_seqs_active[ a_sequence ];
+    return m_seqs[ a_sequence ] != NULL;
 }
-
-
-bool perform::is_dirty_main (int a_sequence)
-{
-    if ( a_sequence < 0 || a_sequence >= c_max_sequence )
-        return false;
-
-    if ( is_active(a_sequence) )
-    {
-        return m_seqs[a_sequence]->is_dirty_main();
-    }
-
-    bool was_active = m_was_active_main[ a_sequence ];
-    m_was_active_main[ a_sequence ] = false;
-
-    return was_active;
-}
-
-
-bool perform::is_dirty_edit (int a_sequence)
-{
-    if ( a_sequence < 0 || a_sequence >= c_max_sequence )
-        return false;
-
-    if ( is_active(a_sequence) )
-    {
-        return m_seqs[a_sequence]->is_dirty_edit();
-    }
-
-    bool was_active = m_was_active_edit[ a_sequence ];
-    m_was_active_edit[ a_sequence ] = false;
-
-    return was_active;
-}
-
 
 sequence* perform::get_sequence( int a_sequence )
 {
@@ -649,13 +595,16 @@ double  perform::get_bpm( )
 
 void perform::delete_sequence( int a_num )
 {
-    set_active(a_num, false);
 
     if ( m_seqs[a_num] != NULL ){
+        undoable_begin();
 
         m_seqs[a_num]->set_playing( false );
         delete m_seqs[a_num];
+        m_seqs[a_num] = NULL;
         global_is_modified = true;
+
+        undoable_end();
     }
 }
 
@@ -670,34 +619,49 @@ void perform::copy_sequence( int a_num )
 void perform::cut_sequence( int a_num )
 {
     if (is_active(a_num)) {
+        undoable_begin();
+
         m_clipboard = *get_sequence(a_num);
         delete_sequence(a_num);
+
+        undoable_end();
     }
 }
 
 void perform::paste_sequence( int a_num )
 {
     if (!is_active(a_num)) {
+        undoable_begin();
+
         new_sequence(a_num);
         *get_sequence(a_num) = m_clipboard;
+
+        undoable_end();
     }
 }
 
 void perform::move_sequence( int a_from, int a_to )
 {
     if (is_active(a_from) && !is_active(a_to)) {
+        undoable_begin();
+
         new_sequence(a_to);
         *get_sequence(a_to) = *get_sequence(a_from);
         delete_sequence(a_from);
+
+        undoable_end();
     }
 }
 
 void perform::new_sequence( int a_sequence )
 {
+    undoable_begin();
+
     m_seqs[ a_sequence ] = new sequence();
     m_seqs[ a_sequence ]->set_master_midi_bus( &m_master_bus );
-    set_active(a_sequence, true);
     global_is_modified = true;
+
+    undoable_end();
 }
 
 
@@ -715,8 +679,13 @@ void perform::print()
 
 void perform::set_screen_set_notepad( int a_screen_set, string *a_notepad )
 {
-    if ( a_screen_set < c_max_sets )
+    if ( a_screen_set < c_max_sets ) {
+        undoable_begin();
+
         m_screen_set_notepad[a_screen_set] = *a_notepad;
+
+        undoable_end();
+    }
 }
 
 
@@ -1250,4 +1219,114 @@ bool perform::file_export_sequence(std::string filename, int seqnum)
     midifile f(filename);
     bool result = f.write(this, get_screenset(), seqnum);
     return result;
+}
+
+state * perform::get_state()
+{
+    state * s = new state();
+    for (int i = 0; i < c_max_sequence; i++) {
+        if (is_active(i)) {
+            s->sequence_map[i] = *get_sequence(i);
+        }
+    }
+    for (int i = 0; i < c_max_sets; i++) {
+        s->notepad[i] = m_screen_set_notepad[i];
+    }
+    return s;
+}
+
+void perform::set_state(state * s)
+{
+    undoable_lock();
+
+    for (int i = 0; i < c_max_sequence; i++) {
+        if (is_active(i)) delete_sequence(i);
+        if (s->sequence_map.find(i) != s->sequence_map.end()) {
+            new_sequence(i);
+            *m_seqs[i] = s->sequence_map.find(i)->second;
+        }
+    }
+
+    for (int i = 0; i < c_max_sets; i++) {
+        set_screen_set_notepad(i, &s->notepad[i]);
+    }
+
+    global_is_modified = true;
+
+    undoable_unlock();
+}
+
+void perform::push_undo()
+{
+    m_list_undo.push_back(get_state());
+
+    if (can_redo()) {
+        for (long unsigned int i = 0; i < m_list_redo.size(); i++) {
+            m_list_redo[i]->sequence_map.clear();
+        }
+        m_list_redo.clear();
+        m_list_redo.shrink_to_fit();
+    }
+
+    if (m_list_undo.size() > c_max_undo_history) {
+        m_list_undo.front()->sequence_map.clear();
+        m_list_undo.pop_front();
+        m_list_undo.shrink_to_fit();
+    }
+}
+
+void perform::pop_undo()
+{
+    if (can_undo())
+    {
+        m_list_redo.push_back(get_state());
+        set_state(m_list_undo.back());
+        m_list_undo.back()->sequence_map.clear();
+        m_list_undo.pop_back();
+        m_list_undo.shrink_to_fit();
+    }
+}
+
+void perform::pop_redo()
+{
+    if (can_redo())
+    {
+        m_list_undo.push_back(get_state());
+        set_state(m_list_redo.back());
+        m_list_redo.back()->sequence_map.clear();
+        m_list_redo.pop_back();
+        m_list_redo.shrink_to_fit();
+    }
+}
+
+bool perform::can_undo()
+{
+    return m_list_undo.size() > 0;
+}
+
+bool perform::can_redo()
+{
+    return m_list_redo.size() > 0;
+}
+
+
+void perform::undoable_begin()
+{
+    if (m_undo_lock == 0) push_undo();
+    m_undo_lock++;
+}
+
+void perform::undoable_end()
+{
+    m_undo_lock--;
+}
+
+void perform::undoable_lock()
+{
+    m_undo_lock++;
+}
+
+void perform::undoable_unlock()
+{
+    m_undo_lock--;
 }

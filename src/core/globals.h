@@ -88,6 +88,8 @@ extern bool is_pattern_playing;
 
 const int c_max_instruments = 256;
 
+const int c_max_undo_history = 30;
+
 struct user_midi_bus_definition
 {
     std::string alias;

@@ -69,7 +69,7 @@ class MainWindow : public Window {
         ScrolledWindow      m_scroll_wrapper;
         Grid                m_sequence_grid;
         SequenceButton     *m_sequences[c_seqs_in_set];
-        SequenceButton     *m_sequence_focus;
+        SequenceButton     *m_sequence_focus = NULL;
         bool                m_sequence_keyboard_nav = false;
         EditWindow         *m_editwindows[c_max_sequence];
 
@@ -86,6 +86,11 @@ class MainWindow : public Window {
         MenuItem            m_menu_file_quit;
         SeparatorMenuItem   m_menu_separator1;
         SeparatorMenuItem   m_menu_separator2;
+
+        MenuItem            m_menu_edit;
+        Menu                m_submenu_edit;
+        MenuItem            m_menu_edit_undo;
+        MenuItem            m_menu_edit_redo;
 
         MenuItem            m_menu_transport;
         Menu                m_submenu_transport;

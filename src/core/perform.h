@@ -27,11 +27,19 @@ class perform;
 #include "osc.h"
 #include <unistd.h>
 #include <pthread.h>
+#include <map>
 
 #ifdef USE_JACK
 #include <jack/jack.h>
 #include <jack/transport.h>
 #endif
+
+
+typedef std::map<int, sequence> SequenceMap;
+struct state {
+    string notepad[c_max_sets];
+    SequenceMap sequence_map;
+};
 
 /* class contains sequences that make up a live set */
 class perform
@@ -41,13 +49,6 @@ class perform
     /* vector of sequences */
     sequence *m_seqs[c_max_sequence];
     sequence m_clipboard;
-
-    bool m_seqs_active[ c_max_sequence ];
-
-    bool m_was_active_main[ c_max_sequence ];
-    bool m_was_active_edit[ c_max_sequence ];
-    bool m_was_active_perf[ c_max_sequence ];
-    bool m_was_active_names[ c_max_sequence ];
 
     bool m_sequence_state[  c_max_sequence ];
 
@@ -95,6 +96,20 @@ class perform
 
     void inner_start();
     void inner_stop();
+
+    deque < state* >m_list_undo;
+    deque < state* >m_list_redo;
+    int m_undo_lock = 0;
+    void undoable_begin();
+    void undoable_end();
+    void undoable_lock();
+    void undoable_unlock();
+    void push_undo();
+    void set_have_undo();
+    void set_have_redo();
+    state * get_state();
+    void set_state(state * s);
+
 
  public:
     bool is_running();
@@ -169,11 +184,7 @@ class perform
     void off_sequences();
     void all_notes_off();
 
-    void set_active(int a_sequence, bool a_active);
-    void set_was_active( int a_sequence );
     bool is_active(int a_sequence);
-    bool is_dirty_main (int a_sequence);
-    bool is_dirty_edit (int a_sequence);
 
     void new_sequence( int a_sequence );
 
@@ -204,6 +215,11 @@ class perform
     bool file_export(std::string filename);
     bool file_export_screenset(std::string filename);
     bool file_export_sequence(std::string filename, int seqnum);
+
+    void pop_undo();
+    void pop_redo();
+    bool can_undo();
+    bool can_redo();
 
     OSCServer *oscserver;
     static int osc_callback(const char *path, const char *types, lo_arg ** argv,

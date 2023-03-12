@@ -126,6 +126,27 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     m_menu_file_quit.signal_activate().connect([this]{menu_callback(MAIN_MENU_QUIT, 0, 0);});
     m_submenu_file.append(m_menu_file_quit);
 
+    m_menu_edit.set_label("_Edit");
+    m_menu_edit.set_use_underline(true);
+    m_menu_edit.set_submenu(m_submenu_edit);
+    m_menu.append(m_menu_edit);
+
+    m_menu_edit_undo.set_label("Undo");
+    m_menu_edit_undo.add_accelerator("activate", m_accelgroup, 'z', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_undo.signal_activate().connect([&]{
+        m_perform->pop_undo();
+        update_sset_name(m_toolbar_sset_value);
+    });
+    m_submenu_edit.append(m_menu_edit_undo);
+
+    m_menu_edit_redo.set_label("Redo");
+    m_menu_edit_redo.add_accelerator("activate", m_accelgroup, 'y', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_redo.signal_activate().connect([&]{
+        m_perform->pop_redo();
+        update_sset_name(m_toolbar_sset_value);
+    });
+    m_submenu_edit.append(m_menu_edit_redo);
+
     m_menu_transport.set_label("_Transport");
     m_menu_transport.set_use_underline(true);
     m_menu_transport.set_submenu(m_submenu_transport);
@@ -506,6 +527,12 @@ MainWindow::timer_callback()
         snprintf(str, sizeof(str), "%.02f", m_toolbar_bpm_value);
         m_toolbar_bpm.set_text(str);
     }
+
+    // undo / redo states
+    if (m_perform->can_undo() && !m_menu_edit_undo.get_sensitive()) m_menu_edit_undo.set_sensitive(true);
+    else if (!m_perform->can_undo() && m_menu_edit_undo.get_sensitive()) m_menu_edit_undo.set_sensitive(false);
+    if (m_perform->can_redo() && !m_menu_edit_redo.get_sensitive()) m_menu_edit_redo.set_sensitive(true);
+    else if (!m_perform->can_redo() && m_menu_edit_redo.get_sensitive()) m_menu_edit_redo.set_sensitive(false);
 
     // sequence grid
     for (int i = 0; i < c_seqs_in_set; i++) {
