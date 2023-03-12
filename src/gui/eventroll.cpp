@@ -274,7 +274,6 @@ void
 EventRoll::set_adding(bool adding)
 {
     m_adding = adding;
-    get_window()->set_cursor(Gdk::Cursor::create(get_window()->get_display(), adding ? "pencil" : "normal"));
 }
 
 /* takes screen corrdinates, give us notes and ticks */
@@ -379,11 +378,26 @@ EventRoll::start_paste()
      m_selected.x  += m_drop_x;
 }
 
+
+bool
+EventRoll::on_enter_notify_event(GdkEventCrossing* event)
+{
+    signal_focus.emit((string)"eventroll");
+
+    return true;
+}
+
+bool
+EventRoll::on_leave_notify_event(GdkEventCrossing* event)
+{
+    signal_focus.emit((string)"");
+
+    return true;
+}
+
 bool
 EventRoll::on_button_press_event(GdkEventButton* event)
 {
-
-    signal_focus.emit((string)"eventroll");
 
     int x,w,numsel;
 
@@ -499,7 +513,7 @@ EventRoll::on_button_press_event(GdkEventButton* event)
 
         if (event->button == 3)
         {
-            set_adding(true);
+            signal_adding.emit(true);
         }
     }
 
@@ -593,7 +607,7 @@ EventRoll::on_button_release_event(GdkEventButton* event)
     if (event->button == 3)
     {
 
-        set_adding(false);
+        signal_adding.emit(false);
 
     }
 

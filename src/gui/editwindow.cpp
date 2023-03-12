@@ -24,6 +24,7 @@
 #include "../xpm/length.xpm"
 #include "../xpm/snap.xpm"
 #include "../xpm/bus.xpm"
+#include "../xpm/pen.xpm"
 
 #include "../xpm/seq192_32.xpm"
 
@@ -413,6 +414,18 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     });
     m_toolbar_snap_active.set_active(true);
 
+
+    m_toolbar_pen_icon.set(Gdk::Pixbuf::create_from_xpm_data(pen_xpm));
+    m_toolbar_pen_active.add(m_toolbar_pen_icon);
+    m_toolbar_pen_active.set_tooltip_text("Draw mode (D / Right-click)");
+    m_toolbar_pen_active.get_style_context()->add_class("nomargin");
+    m_toolbar_pen_active.get_style_context()->add_class("togglebutton");
+    m_toolbar_pen_active.set_focus_on_click(false);
+    m_toolbar_pen_active.signal_clicked().connect([&]{
+        set_adding(m_toolbar_pen_active.get_active());
+    });
+    m_toolbar_pen_active.set_active(false);
+
     m_toolbar_length_box.get_style_context()->add_class("buttonbox");
     m_toolbar_length_box.set_tooltip_text("Note size");
     m_toolbar_length_label.get_style_context()->add_class("nomargin");
@@ -457,6 +470,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar.pack_start(m_toolbar_snap_active, false, false);
     m_toolbar.pack_start(m_toolbar_snap, false, false);
 
+    m_toolbar.pack_start(m_toolbar_pen_active, false, false);
     m_toolbar_length_box.pack_start(m_toolbar_length_label, false, false);
     m_toolbar_length_box.pack_start(m_toolbar_length, false, false);
     m_toolbar.pack_start(m_toolbar_length_box, false, false);
@@ -563,6 +577,10 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_submenu_record.signal_popped_up().connect([&](const Gdk::Rectangle*, const Gdk::Rectangle*, bool, bool){on_focus_out();});
 
 
+    m_pianoroll.signal_adding.connect([&](bool a){set_adding(a, true);});
+    m_eventroll.signal_adding.connect([&](bool a){set_adding(a, true);});
+
+
     if (m_sequence->get_alt_cc() != -1) set_data_type(EVENT_CONTROL_CHANGE, m_sequence->get_alt_cc(), true);
 
     set_icon(Gdk::Pixbuf::create_from_xpm_data(seq192_32_xpm));
@@ -627,6 +645,11 @@ EditWindow::on_key_press(GdkEventKey* event)
             m_pianoroll.set_snap_bypass(true);
             m_eventroll.set_snap_bypass(true);
             m_toolbar_snap_active.get_style_context()->add_class("bypass");
+            return true;
+        case GDK_KEY_D:
+        case GDK_KEY_d:
+            m_toolbar_pen_active.set_active(!m_adding);
+            return true;
         default:
             return false;
     }
@@ -923,6 +946,7 @@ EditWindow::focus_callback(string name)
 {
     m_focus = name;
     clear_focus();
+    update_pointer_cursor();
 }
 
 void
@@ -1299,4 +1323,33 @@ EditWindow::update_name()
     m_toolbar_name.set_text(name);
     string title = string(PACKAGE) + " - " + name;
     set_title(title.c_str());
+}
+
+
+void
+EditWindow::set_adding(bool adding, bool tmp)
+{
+    if (tmp) {
+        m_adding_tmp = adding;
+    } else {
+        m_adding = adding;
+    }
+
+    m_pianoroll.set_adding(m_adding || m_adding_tmp);
+    m_eventroll.set_adding(m_adding || m_adding_tmp);
+
+    if (m_adding_tmp) {
+        m_toolbar_pen_active.get_style_context()->add_class("on");
+    } else {
+        m_toolbar_pen_active.get_style_context()->remove_class("on");
+    }
+
+    update_pointer_cursor();
+}
+
+void
+EditWindow::update_pointer_cursor()
+{
+    bool pencil = m_focus != "" && (m_adding || m_adding_tmp);
+    get_window()->set_cursor(Gdk::Cursor::create(get_window()->get_display(), pencil ? "pencil" : "normal"));
 }

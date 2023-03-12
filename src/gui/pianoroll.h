@@ -45,6 +45,7 @@ class PianoRoll : public DrawingArea {
 
         sigc::signal<bool(GdkEventScroll*)> signal_scroll;
         sigc::signal<void(string name)> signal_focus;
+        sigc::signal<void(bool adding)> signal_adding;
 
         void queue_draw_background();
 

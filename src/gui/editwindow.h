@@ -70,6 +70,9 @@ class EditWindow : public Window {
 
         void update_name();
 
+        void set_adding(bool adding, bool tmp = false);
+        bool get_adding() {return m_adding;};
+
     private:
 
         perform            *m_perform;
@@ -209,6 +212,8 @@ class EditWindow : public Window {
         Image               m_toolbar_snap_icon;
         ComboBoxText        m_toolbar_snap;
 
+        ToggleButton        m_toolbar_pen_active;
+        Image               m_toolbar_pen_icon;
         CustomHBox          m_toolbar_length_box;
         Button              m_toolbar_length_label;
         Image               m_toolbar_length_icon;
@@ -235,6 +240,10 @@ class EditWindow : public Window {
         unsigned char m_alt_status;
         unsigned char m_alt_cc;
         bool m_alt_control_view;
+
+        bool m_adding = false;
+        bool m_adding_tmp = false;
+        void update_pointer_cursor();
 
         void update_midibus_name();
         void create_midibus_menu();

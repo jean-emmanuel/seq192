@@ -5,7 +5,9 @@
 - main window
     - add undo/redo history for sequence grid and screenset names
 
-    
+- edit window
+    - add a toggle button and a keyboard shortcut for switching between draw and select modes
+
 ## 1.3.0
 
 - main window

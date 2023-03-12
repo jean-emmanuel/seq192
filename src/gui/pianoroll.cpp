@@ -386,7 +386,6 @@ void
 PianoRoll::set_adding(bool adding)
 {
     m_adding = adding;
-    get_window()->set_cursor(Gdk::Cursor::create(get_window()->get_display(), adding ? "pencil" : "normal"));
 }
 
 void
@@ -518,6 +517,7 @@ PianoRoll::start_paste()
 bool
 PianoRoll::on_leave_notify_event(GdkEventCrossing* event)
 {
+    signal_focus.emit((string)"");
     m_pianokeys->on_leave_notify_event(event);
     return true;
 }
@@ -525,6 +525,7 @@ PianoRoll::on_leave_notify_event(GdkEventCrossing* event)
 bool
 PianoRoll::on_enter_notify_event(GdkEventCrossing* event)
 {
+    signal_focus.emit((string)"eventroll");
     return true;
 }
 
@@ -536,8 +537,6 @@ PianoRoll::on_expose_event(GdkEventExpose* event)
 bool
 PianoRoll::on_button_press_event(GdkEventButton* event)
 {
-
-    signal_focus.emit((string)"pianoroll");
 
     int numsel;
     long tick_s;
@@ -555,7 +554,7 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
     m_current_y = m_drop_y = snapped_y;
 
     if (event->button == 3) {
-        set_adding(true);
+        signal_adding.emit(true);
     }
 
     if (m_paste)
@@ -695,7 +694,7 @@ bool
 PianoRoll::on_button_release_event(GdkEventButton* event)
 {
     if (event->button == 3) {
-        set_adding(false);
+        signal_adding.emit(false);
     }
 
     long tick_s;
