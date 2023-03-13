@@ -85,8 +85,11 @@ int
 nsm_save_cb(char **,  void *userdata)
 {
     perform *p = (perform *) userdata;
-    p->file_save();
-    return ERR_OK;
+    if (p->file_save()) {
+        return ERR_OK;
+    } else {
+        return ERR_GENERAL;
+    }
 }
 void
 nsm_hide_cb(void *userdata)

@@ -8,6 +8,10 @@
 - edit window
     - add a toggle button and a keyboard shortcut for switching between draw and select modes
 
+
+- nsm
+    - return correct error code when failing to save
+
 ## 1.3.0
 
 - main window
