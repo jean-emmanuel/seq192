@@ -543,10 +543,17 @@ EventRoll::on_motion_notify_event(GdkEventMotion* event)
 
     if (m_painting)
     {
-        // m_current_x = (int) event->x   + m_hscroll / m_zoom - 1;
+        long tick_w;
+
         snap_x(&m_current_x);
         convert_x(m_current_x, &tick);
-        drop_event(tick);
+        convert_x(c_event_width + 4, &tick_w);
+
+        if (!m_sequence->select_events(tick, tick, tick_w, m_status, m_cc, sequence::e_would_select))
+        {
+            m_sequence->push_undo();
+            drop_event(tick);
+        }
     }
 
     return false;
