@@ -703,9 +703,11 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
     switch (action) {
         case EDIT_MENU_UNDO:
             m_sequence->pop_undo();
+            update_name();
             break;
         case EDIT_MENU_REDO:
             m_sequence->pop_redo();
+            update_name();
             break;
         case EDIT_MENU_CUT:
             if(m_sequence->mark_selected())
@@ -1326,9 +1328,11 @@ void
 EditWindow::update_name()
 {
     string name = m_sequence->get_name();
-    m_toolbar_name.set_text(name);
-    string title = string(PACKAGE) + " - " + name;
-    set_title(title.c_str());
+    if (name != m_toolbar_name.get_text()) {
+        m_toolbar_name.set_text(name);
+        string title = string(PACKAGE) + " - " + name;
+        set_title(title.c_str());
+    }
 }
 
 

@@ -43,6 +43,10 @@ enum queued_mode
    QUEUED_ON
 };
 
+struct seqstate {
+    string name;
+    list <event> events;
+};
 
 class sequence
 {
@@ -56,8 +60,8 @@ class sequence
 
     list < event > m_list_undo_hold; // seqdata
 
-    stack < list < event > >m_list_undo;
-    stack < list < event > >m_list_redo;
+    deque <seqstate*> m_list_undo;
+    deque <seqstate*> m_list_redo;
 
     /* markers */
     list < event >::iterator m_iterator_play;
@@ -158,6 +162,8 @@ class sequence
     void push_undo (bool a_hold = false);
     void pop_undo ();
     void pop_redo ();
+    void set_state(seqstate * s);
+    seqstate * get_state(bool hold = false);
 
     //
     //  Gets and Sets

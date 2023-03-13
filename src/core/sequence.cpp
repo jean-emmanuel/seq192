@@ -107,22 +107,36 @@ sequence::get_hold_undo ()
     return m_list_undo_hold.size();
 }
 
+seqstate*
+sequence::get_state(bool hold)
+{
+    seqstate * s = new seqstate();
+    lock();
+    if (hold) s->events = m_list_undo_hold;
+    else s->events = m_list_event;
+    s->name = m_name;
+    unlock();
+    return s;
+}
+
+void
+sequence::set_state(seqstate * s)
+{
+    lock();
+    m_list_event = s->events;
+    m_name = s->name;
+    unlock();
+}
+
 void
 sequence::push_undo(bool a_hold)
 {
-    lock();
-    if(a_hold)
-        m_list_undo.push( m_list_undo_hold );
-    else
-        m_list_undo.push( m_list_event );
-    unlock();
+    m_list_undo.push_back(get_state());
+
+    if (m_have_redo) m_list_redo.clear();
+
     set_have_undo();
-    if (m_have_redo) {
-        while (!m_list_redo.empty()) {
-            m_list_redo.pop();
-        }
-        set_have_redo();
-    }
+    set_have_redo();
 }
 
 void
@@ -132,9 +146,9 @@ sequence::pop_undo()
 
     if (m_list_undo.size() > 0 )
     {
-        m_list_redo.push( m_list_event );
-        m_list_event = m_list_undo.top();
-        m_list_undo.pop();
+        m_list_redo.push_back(get_state());
+        set_state(m_list_undo.back());
+        m_list_undo.pop_back();
         verify_and_link();
         unselect();
         set_dirty_main();
@@ -152,9 +166,9 @@ sequence::pop_redo()
 
     if (m_list_redo.size() > 0 )
     {
-        m_list_undo.push( m_list_event );
-        m_list_event = m_list_redo.top();
-        m_list_redo.pop();
+        m_list_undo.push_back(get_state());
+        set_state(m_list_redo.back());
+        m_list_redo.pop_back();
         verify_and_link();
         unselect();
         set_dirty_main();
@@ -2723,6 +2737,7 @@ sequence::set_name( char *a_name )
 void
 sequence::set_name( string a_name )
 {
+    push_undo();
     m_name = a_name;
     set_dirty_main();
 }
