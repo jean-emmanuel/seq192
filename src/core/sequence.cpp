@@ -20,6 +20,18 @@
 
 list < event > sequence::m_list_clipboard;
 
+inline double fastPow(double a, double b) {
+    // Cheap pow() approximation for swing
+    // https://martin.ankerl.com/2012/01/25/optimized-approximative-pow-in-c-and-cpp/
+    union {
+        double d;
+        int x[2];
+    } u = { a };
+    u.x[1] = (int)(b * (u.x[1] - 1072632447) + 1072632447);
+    u.x[0] = 0;
+    return u.d;
+}
+
 sequence::sequence( )
 {
 
@@ -412,7 +424,8 @@ sequence::play( long a_tick, double swing_ratio, int swing_reference )
                 double beat_timing = (double)t / swing_reference;
                 beat_timing -= (int)beat_timing;
                 t -= beat_timing * swing_reference;
-                beat_timing = pow(beat_timing, swing_ratio);
+                // beat_timing = pow(beat_timing, swing_ratio);
+                beat_timing = fastPow(1 - fastPow(1 - beat_timing, 1/swing_ratio), swing_ratio);
                 t += beat_timing * swing_reference;
             }
 
