@@ -1,6 +1,6 @@
 .\" generated with Ronn-NG/v0.9.1
 .\" http://github.com/apjanke/ronn-ng/tree/0.9.1
-.TH "SEQ192" "1" "February 2023" "" "User manual"
+.TH "SEQ192" "1" "March 2023" "" "User manual"
 .SH "NAME"
 \fBseq192\fR \- live MIDI sequencer
 .SH "SYNOPSIS"
@@ -162,6 +162,12 @@ Stop playback
 .TP
 \fB/bpm\fR <float_or_int: bpm>
 Set bpm
+.TP
+\fB/swing\fR <float_or_int: position>
+Set swing strength (0: no swing, >0: swing, <0: anti\-swing)
+.TP
+\fB/swing/reference\fR <float_or_int: position>
+Set swing reference (8: 8ths will swing, 16: 16th will swing, etc)
 .TP
 \fB/cursor\fR <float_or_int: position>
 Set playhead position (affects all sequences)\. Position is >= 0 and expressed in quarter notes (0 = first beat)

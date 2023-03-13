@@ -145,6 +145,12 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
 * `/bpm` <float_or_int: bpm>:
     Set bpm
 
+* `/swing` <float_or_int: position>:
+    Set swing strength (0: no swing, >0: swing, <0: anti-swing)
+
+* `/swing/reference` <float_or_int: position>:
+    Set swing reference (8: 8ths will swing, 16: 16th will swing, etc)
+
 * `/cursor` <float_or_int: position>:
     Set playhead position (affects all sequences). Position is >= 0 and expressed in quarter notes (0 = first beat)
 
