@@ -16,6 +16,7 @@
 
 #include "sequence.h"
 #include <stdlib.h>
+#include <math.h>
 
 list < event > sequence::m_list_clipboard;
 
@@ -384,7 +385,7 @@ sequence::get_chase()
 
 /* tick comes in as global tick */
 void
-sequence::play( long a_tick )
+sequence::play( long a_tick, double swing_ratio, int swing_reference )
 {
 
     lock();
@@ -405,6 +406,15 @@ sequence::play( long a_tick )
 
         while ( e != m_list_event.end()){
 
+            long t = (*e).get_timestamp();
+
+            if (swing_ratio != 1) {
+                double beat_timing = (double)t / swing_reference;
+                beat_timing -= (int)beat_timing;
+                t -= beat_timing * swing_reference;
+                beat_timing = pow(beat_timing, swing_ratio);
+                t += beat_timing * swing_reference;
+            }
 
             if ( m_resume_next &&
                  (*e).is_note_on() &&
@@ -415,14 +425,14 @@ sequence::play( long a_tick )
             }
 
             //printf ( "s[%ld] -> t[%ld] ", start_tick, end_tick  ); (*e).print();
-            if ( ((*e).get_timestamp() + offset_base ) >= (start_tick_offset) &&
-                    ((*e).get_timestamp() + offset_base ) <= (end_tick_offset) ){
+            if ( (t + offset_base ) >= (start_tick_offset) &&
+                    (t + offset_base ) <= (end_tick_offset) ){
 
                 put_event_on_bus( &(*e) );
                 //printf( "bus: ");(*e).print();
             }
 
-            else if ( ((*e).get_timestamp() + offset_base) >  end_tick_offset ){
+            else if ( (t + offset_base) >  end_tick_offset ){
                 break;
             }
 

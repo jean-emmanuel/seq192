@@ -245,7 +245,7 @@ class sequence
 
     /* dumps notes from tick and prebuffers to
        ahead.  Called by sequencer thread - performance */
-    void play (long a_tick);
+    void play (long a_tick, double swing_ratio, int swing_reference );
     void set_orig_tick (long a_tick);
 
     //

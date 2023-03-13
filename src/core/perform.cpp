@@ -50,6 +50,9 @@ perform::perform()
 
     m_out_thread_launched = false;
     m_in_thread_launched = false;
+
+    set_swing(0);
+    set_swing_reference(8);
 }
 
 void
@@ -143,6 +146,26 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                 else if (types[0] == 'f') bpm = argv[0]->f;
                 else break;
                 self->set_bpm(bpm);
+            }
+            break;
+        case SEQ_SWING:
+            if (argc > 0)
+            {
+                double swing = 0;
+                if (types[0] == 'i') swing = argv[0]->i;
+                else if (types[0] == 'f') swing = argv[0]->f;
+                else break;
+                self->set_swing(swing);
+            }
+            break;
+        case SEQ_SWING_REFERENCE:
+            if (argc > 0)
+            {
+                int ref = 0;
+                if (types[0] == 'i') ref = argv[0]->i;
+                else if (types[0] == 'f') ref = argv[0]->f;
+                else break;
+                self->set_swing_reference(ref);
             }
             break;
         case SEQ_CURSOR:
@@ -771,7 +794,7 @@ void perform::play( long a_tick )
                 m_seqs[i]->set_playing(m_seqs[i]->get_queued() == QUEUED_ON);
             }
 
-            m_seqs[i]->play( a_tick );
+            m_seqs[i]->play( a_tick, m_swing_ratio, m_swing_reference );
         }
     }
     m_tick = a_tick;
@@ -1321,4 +1344,21 @@ void perform::undoable_lock(bool a_push_undo)
 void perform::undoable_unlock()
 {
     m_undo_lock--;
+}
+
+void perform::set_swing(double swing)
+{
+    // define swing strengh
+    // 0 = no swing
+    // > 0 = swing
+    // < = anti-swing
+    m_swing_ratio = 1 - (0.33 * swing);
+}
+
+void perform::set_swing_reference(int swing_reference)
+{
+    // define which beat unit should be the swing reference
+    // 8 = 8th will swing
+    // 16 = 16th will swing
+    m_swing_reference = 2 * (4 * c_ppqn) / swing_reference;
 }

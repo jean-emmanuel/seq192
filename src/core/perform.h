@@ -72,6 +72,9 @@ class perform
     long m_tick;
     long m_tick_offset;
 
+    double m_swing_ratio;
+    double m_swing_reference;
+
     void set_running( bool a_running );
 
     string m_screen_set_notepad[c_max_sets];
@@ -197,6 +200,10 @@ class perform
     void set_bpm(double a_bpm);
     double  get_bpm( );
 
+    double get_swing();
+    void set_swing(double swing);
+    void set_swing_reference(int swing_reference);
+
     mastermidibus* get_master_midi_bus( );
 
     void output_func();
@@ -230,6 +237,8 @@ class perform
         SEQ_PLAY,
         SEQ_STOP,
         SEQ_BPM,
+        SEQ_SWING,
+        SEQ_SWING_REFERENCE,
         SEQ_CURSOR,
         SEQ_SSET,
         SEQ_PANIC,
@@ -259,6 +268,8 @@ class perform
         {"/play",               SEQ_PLAY},
         {"/stop",               SEQ_STOP},
         {"/bpm",                SEQ_BPM},
+        {"/swing",              SEQ_SWING},
+        {"/swing/reference",    SEQ_SWING_REFERENCE},
         {"/cursor",             SEQ_CURSOR},
         {"/screenset",          SEQ_SSET},
         {"/panic",              SEQ_PANIC},
