@@ -678,7 +678,7 @@ PianoRoll::on_motion_notify_event(GdkEventMotion* event)
         convert_xy(m_current_x, m_current_y, &tick, &note);
 
         // prevent adding overlapping note
-        if (!m_sequence->select_note_events(tick, note, tick + m_note_length, note, sequence::e_would_select))
+        if (!m_sequence->select_note_events(tick, note, tick + m_note_length - c_note_off_margin, note, sequence::e_would_select))
         {
             m_sequence->add_note(tick, m_note_length - c_note_off_margin, note, true);
         }
