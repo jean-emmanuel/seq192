@@ -1360,5 +1360,6 @@ void perform::set_swing_reference(int swing_reference)
     // define which beat unit should be the swing reference
     // 8 = 8th will swing
     // 16 = 16th will swing
+    if (swing_reference <= 0) swing_reference = 1;
     m_swing_reference = 2 * (4 * c_ppqn) / swing_reference;
 }
