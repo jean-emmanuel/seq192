@@ -594,7 +594,7 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
 
             if (!m_sequence->select_note_events(tick_s, note_h, tick_s, note_h, sequence::e_is_selected))
             {
-                if (!(event->state & GDK_CONTROL_MASK))
+                if (!(event->state & GDK_CONTROL_MASK) && !(event->state & GDK_SHIFT_MASK))
                 {
                     m_sequence->unselect();
                 }
@@ -609,6 +609,7 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
                     m_selecting = true;
                 }
             }
+
             if (m_sequence->select_note_events(tick_s, note_h, tick_s, note_h, sequence::e_is_selected))
             {
                 // moving - left click only
@@ -619,6 +620,9 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
                     /* get the box that selected elements are in */
                     m_sequence->get_selected_box(&tick_s, &note_h, &tick_f, &note_l);
 
+                    if (event->state & GDK_SHIFT_MASK) {
+                        m_sequence->select_note_events(tick_s, note_h, tick_f, note_l, sequence::e_select);
+                    }
                     convert_tn_box_to_coords(tick_s, tick_f, note_h, note_l, &m_selection.x1, &m_selection.y1, &m_selection.x2, &m_selection.y2);
                     convert_tn_box_to_coords(tick_s, tick_f, note_h, note_l, &m_edition.x1, &m_edition.y1, &m_edition.x2, &m_edition.y2);
                 }

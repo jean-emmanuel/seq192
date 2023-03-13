@@ -447,7 +447,7 @@ EventRoll::on_button_press_event(GdkEventButton* event)
             {
                 if (!m_sequence->select_events(tick_s, tick_s, tick_w, m_status, m_cc, sequence::e_is_selected))
                 {
-                    if (!(event->state & GDK_CONTROL_MASK))
+                    if (!(event->state & GDK_CONTROL_MASK) && !(event->state & GDK_SHIFT_MASK))
                     {
                         m_sequence->unselect();
                     }
@@ -476,6 +476,10 @@ EventRoll::on_button_press_event(GdkEventButton* event)
 
                     /* get the box that selected elements are in */
                     m_sequence->get_selected_box(&tick_s, &note, &tick_f, &note);
+
+                    if (event->state & GDK_SHIFT_MASK) {
+                        m_sequence->select_events(tick_s, tick_f, tick_w, m_status, m_cc, sequence::e_select);
+                    }
 
                     tick_f += tick_w;
 

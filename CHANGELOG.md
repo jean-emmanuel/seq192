@@ -9,6 +9,7 @@
     - add a toggle button and a keyboard shortcut for switching between draw and select modes
     - fixed some regressions with editing actions
     - prevent adding overlapping events when drawing multiple events in a single drag of mouse
+    - add shift + click range selection
 
 - nsm
     - return correct error code when failing to save
