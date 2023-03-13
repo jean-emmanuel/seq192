@@ -120,6 +120,7 @@ PianoRoll::draw_background()
     for (int i=start_tick; i<=end_tick; i += ticks_per_step)
     {
         int base_line = (i - m_hscroll) / m_zoom;
+        bool draw = true;
 
         if ( i % ticks_per_m_line == 0 )
         {
@@ -129,22 +130,20 @@ PianoRoll::draw_background()
         {
             cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_beat);
         }
-        else
+        else if (i % m_snap <= last_snap)
         {
-            if (i % m_snap <= last_snap) {
-                cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_snap);
-                base_line -= (i - m_snap * (i / m_snap)) / m_zoom;
-            } else {
-                cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, 0);
-
-            }
+            cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_snap);
+            base_line -= (i - m_snap * (i / m_snap)) / m_zoom;
         }
+        else draw = false;
 
         last_snap = i % m_snap;
 
-        cr->move_to(base_line + 0.5, 0);
-        cr->line_to(base_line + 0.5, height);
-        cr->stroke();
+        if (draw) {
+            cr->move_to(base_line + 0.5, 0);
+            cr->line_to(base_line + 0.5, height);
+            cr->stroke();
+        }
     }
 
 
