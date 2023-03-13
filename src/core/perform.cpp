@@ -1264,6 +1264,8 @@ void perform::set_state(state * s)
 {
     undoable_lock(false);
 
+    save_playing_state();
+
     for (int i = 0; i < c_max_sequence; i++) {
         if (is_active(i)) delete_sequence(i);
         if (s->sequence_map.find(i) != s->sequence_map.end()) {
@@ -1275,6 +1277,8 @@ void perform::set_state(state * s)
     for (int i = 0; i < c_max_sets; i++) {
         set_screen_set_notepad(i, &s->notepad[i]);
     }
+
+    restore_playing_state();
 
     global_is_modified = true;
 
