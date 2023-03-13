@@ -33,7 +33,8 @@ class EventRoll : public DrawingArea {
         ~EventRoll();
 
         sigc::signal<bool(GdkEventScroll*)> signal_scroll;
-        sigc::signal<void(string name)> signal_focus;
+        sigc::signal<void(string name)> signal_hover;
+        sigc::signal<void(string name)> signal_click;
         sigc::signal<void(bool adding)> signal_adding;
 
         void set_data_type(unsigned char a_status, unsigned char a_control);

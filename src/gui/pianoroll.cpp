@@ -517,7 +517,7 @@ PianoRoll::start_paste()
 bool
 PianoRoll::on_leave_notify_event(GdkEventCrossing* event)
 {
-    signal_focus.emit((string)"");
+    signal_hover.emit((string)"");
     m_pianokeys->on_leave_notify_event(event);
     return true;
 }
@@ -525,7 +525,7 @@ PianoRoll::on_leave_notify_event(GdkEventCrossing* event)
 bool
 PianoRoll::on_enter_notify_event(GdkEventCrossing* event)
 {
-    signal_focus.emit((string)"eventroll");
+    signal_hover.emit((string)"pianoroll");
     return true;
 }
 
@@ -537,6 +537,7 @@ PianoRoll::on_expose_event(GdkEventExpose* event)
 bool
 PianoRoll::on_button_press_event(GdkEventButton* event)
 {
+    signal_click.emit((string)"pianoroll");
 
     int numsel;
     long tick_s;

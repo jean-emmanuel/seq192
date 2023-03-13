@@ -91,7 +91,8 @@ class EditWindow : public Window {
         PianoRoll           m_pianoroll;
         DataRoll            m_dataroll;
 
-        string              m_focus;
+        string              m_hover_focus;
+        string              m_click_focus;
 
         // layout
         VBox                m_vbox;
@@ -261,7 +262,8 @@ class EditWindow : public Window {
         bool timer_callback();
 
         bool scroll_callback(GdkEventScroll* event);
-        void focus_callback(string name);
+        void click_callback(string name);
+        void hover_callback(string name);
 
         void update_hscrollbar_visibility();
 

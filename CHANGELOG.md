@@ -7,7 +7,7 @@
 
 - edit window
     - add a toggle button and a keyboard shortcut for switching between draw and select modes
-
+    - fixed some regressions with editing actions
 
 - nsm
     - return correct error code when failing to save

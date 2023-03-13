@@ -567,8 +567,10 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_pianoroll.signal_scroll.connect(mem_fun(*this, &EditWindow::scroll_callback));
     m_eventroll.signal_scroll.connect(mem_fun(*this, &EditWindow::scroll_callback));
     m_dataroll.signal_scroll.connect(mem_fun(*this, &EditWindow::scroll_callback));
-    m_pianoroll.signal_focus.connect(mem_fun(*this, &EditWindow::focus_callback));
-    m_eventroll.signal_focus.connect(mem_fun(*this, &EditWindow::focus_callback));
+    m_pianoroll.signal_click.connect(mem_fun(*this, &EditWindow::click_callback));
+    m_eventroll.signal_click.connect(mem_fun(*this, &EditWindow::click_callback));
+    m_pianoroll.signal_hover.connect(mem_fun(*this, &EditWindow::hover_callback));
+    m_eventroll.signal_hover.connect(mem_fun(*this, &EditWindow::hover_callback));
 
     signal_size_allocate().connect([&](Gdk::Rectangle){update_hscrollbar_visibility();});
     signal_focus_out_event().connect([&](GdkEventFocus *e)->bool{on_focus_out();return false;});
@@ -719,7 +721,7 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             m_sequence->copy_selected();
             break;
         case EDIT_MENU_PASTE:
-            if (m_focus == "eventroll") {
+            if (m_click_focus == "eventroll") {
                 m_eventroll.start_paste();
             } else {
                 m_pianoroll.start_paste();
@@ -729,7 +731,7 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             {
                 bool selection = m_sequence->mark_selected();
                 if (!selection) {
-                    if (m_focus == "eventroll") {
+                    if (m_click_focus == "eventroll") {
                         long tick_s;
                         long tick_w;
                         m_eventroll.convert_x(c_event_width + 4, &tick_w);
@@ -751,7 +753,7 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
                 break;
             }
         case EDIT_MENU_INVERT:
-            if (m_focus == "eventroll") {
+            if (m_click_focus == "eventroll") {
                 m_sequence->select_events(m_status, m_cc, true);
             } else {
                 m_sequence->select_events(EVENT_NOTE_ON, 0, true);
@@ -759,7 +761,7 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             }
             break;
         case EDIT_MENU_SELECTALL:
-            if (m_focus == "eventroll") {
+            if (m_click_focus == "eventroll") {
                 m_sequence->select_events(m_status, m_cc);
             } else {
                 m_sequence->select_events(EVENT_NOTE_ON, 0);
@@ -779,7 +781,7 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             break;
         }
         case EDIT_MENU_QUANTIZE:
-            if (m_focus == "eventroll") {
+            if (m_click_focus == "eventroll") {
                 m_sequence->quantize_events(m_status, m_cc, m_pianoroll.m_snap, 1);
             } else {
                 m_sequence->quantize_events(EVENT_NOTE_ON, 0, m_pianoroll.m_snap, 1, true);
@@ -942,11 +944,17 @@ EditWindow::scroll_callback(GdkEventScroll* event)
 }
 
 void
-EditWindow::focus_callback(string name)
+EditWindow::hover_callback(string name)
 {
-    m_focus = name;
-    clear_focus();
+    m_hover_focus = name;
     update_pointer_cursor();
+}
+
+void
+EditWindow::click_callback(string name)
+{
+    m_click_focus = name;
+    clear_focus();
 }
 
 void
@@ -1350,6 +1358,6 @@ EditWindow::set_adding(bool adding, bool tmp)
 void
 EditWindow::update_pointer_cursor()
 {
-    bool pencil = m_focus != "" && (m_adding || m_adding_tmp);
+    bool pencil = m_hover_focus != "" && (m_adding || m_adding_tmp);
     get_window()->set_cursor(Gdk::Cursor::create(get_window()->get_display(), pencil ? "pencil" : "normal"));
 }

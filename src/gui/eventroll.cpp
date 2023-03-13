@@ -382,7 +382,7 @@ EventRoll::start_paste()
 bool
 EventRoll::on_enter_notify_event(GdkEventCrossing* event)
 {
-    signal_focus.emit((string)"eventroll");
+    signal_hover.emit((string)"eventroll");
 
     return true;
 }
@@ -390,7 +390,7 @@ EventRoll::on_enter_notify_event(GdkEventCrossing* event)
 bool
 EventRoll::on_leave_notify_event(GdkEventCrossing* event)
 {
-    signal_focus.emit((string)"");
+    signal_hover.emit((string)"");
 
     return true;
 }
@@ -398,6 +398,7 @@ EventRoll::on_leave_notify_event(GdkEventCrossing* event)
 bool
 EventRoll::on_button_press_event(GdkEventButton* event)
 {
+    signal_click.emit((string)"eventroll");
 
     int x,w,numsel;
 
