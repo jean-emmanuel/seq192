@@ -49,7 +49,7 @@ The main window consist in a toolbar and a sequence grid.
     *Screenset name entry*: set name of current screenset<br/>
     *Screenset number entry*: select current screenset<br/>
 
-* The **sequence grid** is empty by default. Right-clicking in the grid allows creating a new sequence or editing an existing one. Sequences can be rearranged in the grid by dragging them. Left-clicking on a sequence toggles its playing state. Middle-clicking on a sequence opens its edit window. Shift+click defines the sequence as the synchronization reference for queued sequences. Ctrl+click toggles the sequence's queued state.
+* The **sequence grid** is empty by default. Right-clicking in the grid allows creating a new sequence or editing an existing one. Sequences can be rearranged in the grid by dragging them. Left-clicking on a sequence toggles its playing state. Middle-clicking on a sequence opens its edit window. Shift+click defines the sequence as the synchronization reference for queued sequences. Ctrl+click toggles the sequence's queued state. The keyboard's arrow keys can be used to navigate accross sequences.
 
 **Edit window**
 
@@ -76,7 +76,10 @@ The edit window consist in a menu, a toolbar, a pianoroll and an event editor.
 
 **Important note**
 
-Undo/redo only works in the edit window, and with some limitations: only MIDI events are journalized, other changes (sequence name, sequence length, etc) can't be undone. Reducing the length of a sequence may result in a loss of data.
+Each window has its own undo/redo history:
+
+    - main window: screnset name and sequences (position and content)
+    - edit window: MIDI events, sequence name, number of measures and time signature
 
 
 ## JACK TRANSPORT
