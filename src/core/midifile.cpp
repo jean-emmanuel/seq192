@@ -304,8 +304,10 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
                                     else if (proprietary == c_timesig)
                                     {
+                                        seq->undoable_lock(false);
                                         seq->set_bpm (m_d[m_pos++]);
                                         seq->set_bw (m_d[m_pos++]);
+                                        seq->undoable_unlock();
                                         len -= 2;
                                     }
 
@@ -341,7 +343,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                         CurrentTime += 1;
                                     }
 
-                                    seq->set_length (CurrentTime);
+                                    // seq->set_length (CurrentTime);
                                     seq->zero_markers ();
                                     done = true;
                                     break;

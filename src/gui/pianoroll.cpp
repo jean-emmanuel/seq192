@@ -575,6 +575,7 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
         {
             /* start the paint job */
             m_painting = true;
+            m_sequence->undoable_lock(false);
 
             /* adding, snapped x */
             m_current_x = m_drop_x = snapped_x;
@@ -771,6 +772,10 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
                 m_sequence->grow_selected(delta_tick);
             }
         }
+    }
+
+    if (m_painting) {
+        m_sequence->undoable_unlock();
     }
 
     m_selecting = false;

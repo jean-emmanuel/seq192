@@ -45,6 +45,9 @@ enum queued_mode
 
 struct seqstate {
     string name;
+    long measures;
+    long beats;
+    long beat_width;
     list <event> events;
 };
 
@@ -57,8 +60,6 @@ class sequence
     list < event > m_list_event;
     list < event > m_list_event_draw;
     static list < event > m_list_clipboard;
-
-    list < event > m_list_undo_hold; // seqdata
 
     deque <seqstate*> m_list_undo;
     deque <seqstate*> m_list_redo;
@@ -119,7 +120,7 @@ class sequence
 
     /* these are just for the editor to mark things
        in correct time */
-    //long m_length_measures;
+    long m_time_measures;
     long m_time_beats_per_measure;
     long m_time_beat_width;
 
@@ -152,18 +153,16 @@ class sequence
     sequence ();
     ~sequence ();
 
-    /* seqdata hold for undo */
-    void set_hold_undo (bool a_hold);
-    int get_hold_undo ();
-
     bool m_have_undo;
     bool m_have_redo;
-
-    void push_undo (bool a_hold = false);
+    int m_undo_lock = 0;
+    void push_undo ();
     void pop_undo ();
     void pop_redo ();
     void set_state(seqstate * s);
-    seqstate * get_state(bool hold = false);
+    seqstate * get_state();
+    void undoable_lock(bool a_push_undo);
+    void undoable_unlock();
 
     //
     //  Gets and Sets
@@ -189,6 +188,7 @@ class sequence
     const char *get_name();
 
     /* length in ticks */
+    void update_length();
     void set_length (long a_len);
     long get_length ();
 

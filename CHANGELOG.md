@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.0
+
+- edit window
+    - add measures and time signature to undo history
+    - fix some unconsistent undo/redo behaviors
+
+
 ## 1.4.0
 
 - main window
@@ -11,7 +18,7 @@
     - prevent adding overlapping events when drawing multiple events in a single drag of mouse
     - add shift + click range selection
     - include sequence name changes in undo/redo history
-    
+
 - nsm
     - return correct error code when failing to save
 

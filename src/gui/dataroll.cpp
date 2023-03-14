@@ -363,7 +363,7 @@ DataRoll::on_button_press_event(GdkEventButton* event)
 
     m_drag_handle = m_sequence->select_event_handle(tick_s, tick_f, get_status(), get_cc(), 127 - m_drop_y, c_data_handle_radius);
 
-    if (m_drag_handle && !m_sequence->get_hold_undo()) m_sequence->push_undo(); // if they used line draw but did not leave...
+    m_sequence->undoable_lock(true);
 
     m_dragging = !m_drag_handle;
 
@@ -459,12 +459,7 @@ DataRoll::on_button_release_event(GdkEventButton* event)
         m_sequence->set_dirty();
     }
 
-    if (m_sequence->get_hold_undo())
-    {
-        m_sequence->push_undo(true);
-        m_sequence->set_hold_undo(false);
-    }
-
+    m_sequence->undoable_unlock();
 
     return true;
 }

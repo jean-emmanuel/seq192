@@ -348,14 +348,11 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar_bpm.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
         string s = m_toolbar_bpm.get_text();
         int bpm = atof(s.c_str());
-        if (bpm > 0) m_bpm = bpm;
-        m_sequence->set_bpm(m_bpm);
-        m_sequence->set_length(m_measures * m_bpm * ((c_ppqn * 4) / m_bw));
-        m_toolbar_bpm.set_text(to_string(m_bpm));
+        if (bpm > 0) m_sequence->set_bpm(bpm);
+        m_toolbar_bpm.set_text(to_string(m_sequence->get_bpm()));
         return false;
     });
-    m_bpm = m_sequence->get_bpm();
-    m_toolbar_bpm.set_text(to_string(m_bpm));
+    m_toolbar_bpm.set_text(to_string(m_sequence->get_bpm()));
     m_toolbar.pack_start(m_toolbar_bpm, false, false);
 
     m_toolbar_slash.set_label("/");
@@ -369,14 +366,11 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar_bw.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
         string s = m_toolbar_bw.get_text();
         int bw = atof(s.c_str());
-        if (bw > 0) m_bw = bw;
-        m_sequence->set_bw(m_bw);
-        m_sequence->set_length(m_measures * m_bpm * ((c_ppqn * 4) / m_bw));
-        m_toolbar_bw.set_text(to_string(m_bw));
+        if (bw > 0) m_sequence->set_bw(bw);
+        m_toolbar_bw.set_text(to_string(m_sequence->get_bw()));
         return false;
     });
-    m_bw = m_sequence->get_bw();
-    m_toolbar_bw.set_text(to_string(m_bw));
+    m_toolbar_bw.set_text(to_string(m_sequence->get_bw()));
     m_toolbar.pack_start(m_toolbar_bw, false, false);
 
     m_toolbar_times.set_label("x");
@@ -390,15 +384,11 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar_measures.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
         string s = m_toolbar_measures.get_text();
         int measures = atof(s.c_str());
-        if (measures > 0) m_measures = measures;
-        m_sequence->set_length(m_measures * m_bpm * ((c_ppqn * 4) / m_bw));
-        m_toolbar_measures.set_text(to_string(m_measures));
+        if (measures > 0) m_sequence->set_measures(measures);
+        m_toolbar_measures.set_text(to_string(m_sequence->get_measures()));
         return false;
     });
-    long units = ((m_sequence->get_bpm() * (c_ppqn * 4)) /  m_sequence->get_bw() );
-    m_measures = (m_sequence->get_length() / units);
-    if (m_sequence->get_length() % units != 0) m_measures++;
-    m_toolbar_measures.set_text(to_string(m_measures));
+    m_toolbar_measures.set_text(to_string(m_sequence->get_measures()));
     m_toolbar.pack_start(m_toolbar_measures, false, false);
 
 
@@ -702,11 +692,12 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
 {
     switch (action) {
         case EDIT_MENU_UNDO:
-            m_sequence->pop_undo();
-            update_name();
-            break;
         case EDIT_MENU_REDO:
-            m_sequence->pop_redo();
+            if (action == EDIT_MENU_UNDO) m_sequence->pop_undo();
+            else m_sequence->pop_redo();
+            m_toolbar_measures.set_text(to_string(m_sequence->get_measures()));
+            m_toolbar_bpm.set_text(to_string(m_sequence->get_bpm()));
+            m_toolbar_bw.set_text(to_string(m_sequence->get_bw()));
             update_name();
             break;
         case EDIT_MENU_CUT:

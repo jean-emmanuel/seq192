@@ -414,7 +414,6 @@ EventRoll::on_button_press_event(GdkEventButton* event)
         snap_x(&m_current_x);
         convert_x(m_current_x, &tick_s);
         m_paste = false;
-        m_sequence->push_undo();
         m_sequence->paste_selected(tick_s, 0);
 
     }
@@ -430,6 +429,7 @@ EventRoll::on_button_press_event(GdkEventButton* event)
             if (m_adding)
             {
                 m_painting = true;
+                m_sequence->undoable_lock(false);
 
                 snap_x(&m_drop_x);
                 /* turn x,y in to tick/note */
@@ -555,7 +555,6 @@ EventRoll::on_motion_notify_event(GdkEventMotion* event)
 
         if (!m_sequence->select_events(tick, tick, tick_w, m_status, m_cc, sequence::e_would_select))
         {
-            m_sequence->push_undo();
             drop_event(tick);
         }
     }
@@ -608,7 +607,6 @@ EventRoll::on_button_release_event(GdkEventButton* event)
             convert_x(delta_x, &delta_tick);
 
             /* not really notes, but still moves events */
-            m_sequence->push_undo();
             m_sequence->move_selected_notes(delta_tick, 0);
         }
 
@@ -619,6 +617,10 @@ EventRoll::on_button_release_event(GdkEventButton* event)
 
         signal_adding.emit(false);
 
+    }
+
+    if (m_painting) {
+        m_sequence->undoable_unlock();
     }
 
     /* turn off */

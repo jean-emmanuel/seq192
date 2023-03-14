@@ -227,11 +227,6 @@ class EditWindow : public Window {
         MenuButton          m_toolbar_bus_dropdown;
         Menu                m_toolbar_bus_menu;
 
-
-        int                 m_bpm;
-        int                 m_bw;
-        int                 m_measures;
-
         int                 m_midibus;
         int                 m_midichannel;
 
