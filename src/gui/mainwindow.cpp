@@ -141,6 +141,7 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
 
     m_menu_edit_redo.set_label("Redo");
     m_menu_edit_redo.add_accelerator("activate", m_accelgroup, 'y', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_redo.add_accelerator("activate", m_accelgroup, 'z', Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_edit_redo.signal_activate().connect([&]{
         m_perform->pop_redo();
         update_sset_name(m_toolbar_sset_value);

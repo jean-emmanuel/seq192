@@ -106,8 +106,6 @@ class perform
     void undoable_lock(bool a_push_undo);
     void undoable_unlock();
     void push_undo();
-    void set_have_undo();
-    void set_have_redo();
     state * get_state();
     void set_state(state * s);
 
