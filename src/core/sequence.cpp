@@ -272,7 +272,18 @@ sequence::update_length()
 
 sequence::~sequence()
 {
+    for (long unsigned int i = 0; i < m_list_undo.size(); i++) {
+        m_list_undo[i]->events.clear();
+    }
+    m_list_undo.clear();
+    m_list_undo.shrink_to_fit();
 
+    for (long unsigned int i = 0; i < m_list_redo.size(); i++) {
+        m_list_redo[i]->events.clear();
+    }
+    m_list_redo.clear();
+    m_list_redo.shrink_to_fit();
+    m_list_event.clear();
 }
 
 /* adds event in sorted manner */
@@ -2521,32 +2532,38 @@ sequence::operator= (const sequence& a_rhs)
     lock();
 
     /* dont copy to self */
-    if (this != &a_rhs){
+    if (this != &a_rhs) {
 
-	m_list_event   = a_rhs.m_list_event;
+    	m_list_event   = a_rhs.m_list_event;
+        m_list_undo    = a_rhs.m_list_undo;
+        m_list_redo    = a_rhs.m_list_redo;
 
-	m_midi_channel = a_rhs.m_midi_channel;
-	m_masterbus    = a_rhs.m_masterbus;
-	m_bus          = a_rhs.m_bus;
-	m_name         = a_rhs.m_name;
-	m_length       = a_rhs.m_length;
+    	m_midi_channel = a_rhs.m_midi_channel;
+    	m_masterbus    = a_rhs.m_masterbus;
+    	m_bus          = a_rhs.m_bus;
+    	m_name         = a_rhs.m_name;
+    	m_length       = a_rhs.m_length;
 
-	m_time_beats_per_measure = a_rhs.m_time_beats_per_measure;
-	m_time_beat_width = a_rhs.m_time_beat_width;
+        m_time_measures = a_rhs.m_time_measures;
+    	m_time_beats_per_measure = a_rhs.m_time_beats_per_measure;
+    	m_time_beat_width = a_rhs.m_time_beat_width;
 
-	m_playing      = false;
+    	m_playing      = false;
 
-	/* no notes are playing */
-	for (int i=0; i< c_midi_notes; i++ )
-	    m_playing_notes[i] = 0;
+    	/* no notes are playing */
+    	for (int i=0; i< c_midi_notes; i++ )
+    	    m_playing_notes[i] = 0;
 
-    for (int i=0; i< 128; i++ )
-        m_chase_controls[i] = 0;
+        for (int i=0; i< 128; i++ )
+            m_chase_controls[i] = 0;
 
-    m_chase_pitchbend = 0;
+        m_chase_pitchbend = 0;
 
-	/* reset */
-	zero_markers( );
+    	/* reset */
+    	zero_markers( );
+
+        set_have_redo();
+        set_have_undo();
 
     }
 
