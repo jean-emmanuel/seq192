@@ -225,13 +225,13 @@ sequence::get_measures()
 }
 
 void
-sequence::set_bpm( long a_beats_per_measure )
+sequence::set_bpm( long a_beats_per_measure, bool update )
 {
     undoable_lock(true);
     lock();
     if (a_beats_per_measure < 1) a_beats_per_measure = 1;
     m_time_beats_per_measure = a_beats_per_measure;
-    update_length();
+    if (update) update_length();
     unlock();
     undoable_unlock();
 }
@@ -243,14 +243,14 @@ sequence::get_bpm()
 }
 
 void
-sequence::set_bw( long a_beat_width )
+sequence::set_bw( long a_beat_width, bool update )
 {
     undoable_lock(true);
     lock();
     if (a_beat_width < 1) a_beat_width = 1;
     if (a_beat_width > 192) a_beat_width = 192;
     m_time_beat_width = a_beat_width;
-    update_length();
+    if (update) update_length();
     unlock();
     undoable_unlock();
 }

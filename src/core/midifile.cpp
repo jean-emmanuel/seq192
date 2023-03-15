@@ -305,8 +305,8 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                     else if (proprietary == c_timesig)
                                     {
                                         seq->undoable_lock(false);
-                                        seq->set_bpm (m_d[m_pos++]);
-                                        seq->set_bw (m_d[m_pos++]);
+                                        seq->set_bpm (m_d[m_pos++], false);
+                                        seq->set_bw (m_d[m_pos++], false);
                                         seq->undoable_unlock();
                                         len -= 2;
                                     }
@@ -334,7 +334,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
                                     /* Trk Done */
                                 case 0x2f:
-
+                                {
                                     // If delta is 0, then another event happened at the same time
                                     // as the track end.  the sequence class will discard the last
                                     // note.  This is a fix for that.   Native Seq24 file will always
@@ -343,11 +343,16 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                         CurrentTime += 1;
                                     }
 
-                                    // seq->set_length (CurrentTime);
+                                    seq->undoable_lock(false);
+                                    long units = ((seq->get_bpm() * (c_ppqn * 4)) /  seq->get_bw() );
+                                    long measures = CurrentTime / units;
+                                    if (CurrentTime % units != 0) measures++;
+                                    seq->set_measures(measures);
+                                    seq->undoable_unlock();
                                     seq->zero_markers ();
                                     done = true;
                                     break;
-
+                                }
                                     /* Track name */
                                 case 0x03:
                                     for (i = 0; i < len; i++)

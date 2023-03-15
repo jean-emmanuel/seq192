@@ -178,10 +178,10 @@ class sequence
     void set_measures (long a_length_measures);
     long get_measures();
 
-    void set_bpm (long a_beats_per_measure);
+    void set_bpm (long a_beats_per_measure, bool update = true);
     long get_bpm();
 
-    void set_bw (long a_beat_width);
+    void set_bw (long a_beat_width, bool update = true);
     long get_bw();
 
     /* returns string of name */
