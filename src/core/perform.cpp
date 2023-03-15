@@ -38,8 +38,6 @@ perform::perform()
     m_outputing = true;
     m_tick = -1;
     m_tick_offset = 0;
-    // m_key_start  = GDK_space;
-    // m_key_stop   = GDK_Escape;
 
     m_screen_set = 0;
     m_reference_sequence = -1;

@@ -86,12 +86,6 @@ class perform
     condition_var m_running_lock;
     condition_var m_stopping_lock;
 
-    // do not access these directly, use set/lookup below
-    std::map<unsigned int,long> key_events;
-    std::map<unsigned int,long> key_groups;
-    std::map<long,unsigned int> key_events_rev; // reverse lookup, keep this in sync!!
-    std::map<long,unsigned int> key_groups_rev; // reverse lookup, keep this in sync!!
-
     #ifdef USE_JACK
     jack_client_t *m_jack_client;
     bool m_jack_running;
@@ -112,28 +106,6 @@ class perform
 
  public:
     bool is_running();
-
-    unsigned int m_key_bpm_up;
-    unsigned int m_key_bpm_dn;
-
-    unsigned int m_key_replace;
-    unsigned int m_key_queue;
-    unsigned int m_key_keep_queue;
-    unsigned int m_key_snapshot_1;
-    unsigned int m_key_snapshot_2;
-
-    unsigned int m_key_screenset_up;
-    unsigned int m_key_screenset_dn;
-    unsigned int m_key_set_playing_screenset;
-
-    unsigned int m_key_group_on;
-    unsigned int m_key_group_off;
-    unsigned int m_key_group_learn;
-
-    unsigned int m_key_screenset[c_max_sets];
-
-    unsigned int m_key_start;
-    unsigned int m_key_stop;
 
     perform();
     ~perform();
