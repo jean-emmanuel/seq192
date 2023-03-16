@@ -1357,7 +1357,7 @@ void perform::set_swing(double swing)
     m_swing_ratio = 1 - (0.25 * swing);
 }
 
-void perform::set_swing_reference(int swing_reference)
+void perform::set_swing_reference(double swing_reference)
 {
     // define which beat unit should be the swing reference
     // 8 = 8th will swing

@@ -475,10 +475,13 @@ sequence::play( long a_tick, double swing_ratio, int swing_reference )
             long t = (*e).get_timestamp();
 
             if (swing_ratio != 1) {
+                // limit swing reference to sequence length to avoid loosing events
+                if (swing_reference > m_length) swing_reference = m_length;
+                // compute relative position on event on time reference
                 double beat_timing = (double)t / swing_reference;
+                // adjust timing
                 beat_timing -= (int)beat_timing;
                 t -= beat_timing * swing_reference;
-                // beat_timing = pow(beat_timing, swing_ratio);
                 beat_timing = fastPow(1 - fastPow(1 - beat_timing, 1/swing_ratio), swing_ratio);
                 t += beat_timing * swing_reference;
             }

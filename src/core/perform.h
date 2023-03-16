@@ -172,7 +172,7 @@ class perform
 
     double get_swing();
     void set_swing(double swing);
-    void set_swing_reference(int swing_reference);
+    void set_swing_reference(double swing_reference);
 
     mastermidibus* get_master_midi_bus( );
 
