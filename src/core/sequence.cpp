@@ -457,6 +457,7 @@ sequence::play( long a_tick, double swing_ratio, int swing_reference )
 
     double beat_timing;
     double s = 1 - (0.25 * abs(swing_ratio));;
+    // limit swing reference to sequence length to avoid loosing events
     if (swing_reference > m_length) swing_reference = m_length;
 
     /* play the notes in our frame */
@@ -469,7 +470,6 @@ sequence::play( long a_tick, double swing_ratio, int swing_reference )
             t = (*e).get_timestamp();
 
             if (swing_ratio != 0) {
-                // limit swing reference to sequence length to avoid loosing events
                 // compute relative position on event on time reference
                 beat_timing = (double)t / swing_reference;
                 beat_timing -= (int)beat_timing;
