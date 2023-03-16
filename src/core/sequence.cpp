@@ -20,18 +20,6 @@
 
 list < event > sequence::m_list_clipboard;
 
-inline double fastPow(double a, double b) {
-    // Cheap pow() approximation for swing
-    // https://martin.ankerl.com/2012/01/25/optimized-approximative-pow-in-c-and-cpp/
-    union {
-        double d;
-        int x[2];
-    } u = { a };
-    u.x[1] = (int)(b * (u.x[1] - 1072632447) + 1072632447);
-    u.x[0] = 0;
-    return u.d;
-}
-
 sequence::sequence( )
 {
 
@@ -465,6 +453,12 @@ sequence::play( long a_tick, double swing_ratio, int swing_reference )
     long start_tick_offset = (start_tick + m_length);
     long end_tick_offset = (end_tick + m_length);
 
+    long t;
+
+    double beat_timing;
+    double s = 1 - (0.25 * abs(swing_ratio));;
+    if (swing_reference > m_length) swing_reference = m_length;
+
     /* play the notes in our frame */
     if ( m_playing ){
 
@@ -472,17 +466,25 @@ sequence::play( long a_tick, double swing_ratio, int swing_reference )
 
         while ( e != m_list_event.end()){
 
-            long t = (*e).get_timestamp();
+            t = (*e).get_timestamp();
 
-            if (swing_ratio != 1) {
+            if (swing_ratio != 0) {
                 // limit swing reference to sequence length to avoid loosing events
-                if (swing_reference > m_length) swing_reference = m_length;
                 // compute relative position on event on time reference
-                double beat_timing = (double)t / swing_reference;
-                // adjust timing
+                beat_timing = (double)t / swing_reference;
                 beat_timing -= (int)beat_timing;
+
+                // adjust timing
                 t -= beat_timing * swing_reference;
-                beat_timing = fastPow(1 - fastPow(1 - beat_timing, 1/swing_ratio), swing_ratio);
+
+                // compute new beat timing
+                if (swing_ratio < 0){
+                    beat_timing = 1 - pow(1 - pow(beat_timing, 1 / s), s);
+                } else {
+                    beat_timing = pow(1 - pow(1 - beat_timing, 1 / s), s);
+                }
+
+                // apply swing
                 t += beat_timing * swing_reference;
             }
 

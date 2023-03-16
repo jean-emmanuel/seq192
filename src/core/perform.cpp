@@ -1354,7 +1354,9 @@ void perform::set_swing(double swing)
     // 0 = no swing
     // > 0 = swing
     // < = anti-swing
-    m_swing_ratio = 1 - (0.25 * swing);
+    if (swing > 3.99) swing = 3.99;
+    else if (swing < -3.99) swing = -3.99;
+    m_swing_ratio = swing;
 }
 
 void perform::set_swing_reference(double swing_reference)
