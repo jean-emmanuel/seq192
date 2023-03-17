@@ -6,6 +6,8 @@
     - add measures and time signature to undo history
     - fix some unconsistent undo/redo behaviors
 
+- misc
+    - add osc controllable swing option
 
 ## 1.4.0
 
