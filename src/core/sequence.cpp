@@ -20,6 +20,15 @@
 
 list < event > sequence::m_list_clipboard;
 
+inline double swingFunction(double x, double s)
+{
+    if (x * s < 1 - x) {
+        return x * s;
+    } else {
+        return x/s + 1 - 1/s;
+    }
+}
+
 sequence::sequence( )
 {
 
@@ -456,7 +465,10 @@ sequence::play( long a_tick, double swing_ratio, int swing_reference )
     long t;
 
     double beat_timing;
-    double s = 1 - (0.25 * abs(swing_ratio));;
+    // triplet swing for swing_ratio = 1
+    double s = 1 - 0.33 * abs(swing_ratio);
+    // quadruplet swing for swing_ratio = 2
+    if (abs(swing_ratio) > 1) s += (abs(swing_ratio) - 1) * 0.166;
     // limit swing reference to sequence length to avoid loosing events
     if (swing_reference > m_length) swing_reference = m_length;
 
@@ -479,9 +491,9 @@ sequence::play( long a_tick, double swing_ratio, int swing_reference )
 
                 // compute new beat timing
                 if (swing_ratio < 0){
-                    beat_timing = 1 - pow(1 - pow(beat_timing, 1 / s), s);
+                    beat_timing = swingFunction(beat_timing, s);
                 } else {
-                    beat_timing = pow(1 - pow(1 - beat_timing, 1 / s), s);
+                    beat_timing = 1 - swingFunction(1 - beat_timing, s);
                 }
 
                 // apply swing

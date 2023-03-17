@@ -1353,9 +1353,9 @@ void perform::set_swing(double swing)
     // define swing strengh
     // 0 = no swing
     // > 0 = swing
-    // < = anti-swing
-    if (swing > 3.99) swing = 3.99;
-    else if (swing < -3.99) swing = -3.99;
+    // < 0 = anti-swing
+    if (swing > 4.99) swing = 4.99;
+    else if (swing < -4.99) swing = -4.99;
     m_swing_ratio = swing;
 }
 
