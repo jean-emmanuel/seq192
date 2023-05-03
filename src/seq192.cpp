@@ -306,6 +306,7 @@ main (int argc, char *argv[])
     int status = 0;
     if (global_no_gui) {
         while (global_is_running) {
+            if (nsm) nsm_check_nowait(nsm);
             usleep(1000);
         }
     } else {
