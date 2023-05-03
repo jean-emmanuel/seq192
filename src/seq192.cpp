@@ -308,7 +308,7 @@ main (int argc, char *argv[])
     if (global_no_gui) {
         while (global_is_running) {
             if (nsm) nsm_check_nowait(nsm);
-            usleep(1000);
+            usleep(10000);
         }
     } else {
         #ifdef USE_GTK
