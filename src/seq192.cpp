@@ -227,7 +227,8 @@ main (int argc, char *argv[])
         nsm = nsm_new();
         nsm_set_open_callback(nsm, nsm_open_cb, 0);
         if (nsm_init(nsm, nsm_url) == 0) {
-            nsm_send_announce(nsm, PACKAGE, ":optional-gui:dirty:", argv[0]);
+            if (!global_no_gui) nsm_send_announce(nsm, PACKAGE, ":optional-gui:dirty:", argv[0]);
+            else nsm_send_announce(nsm, PACKAGE, ":dirty:", argv[0]);
         }
         int timeout = 0;
         while (nsm_wait) {

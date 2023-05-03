@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.1
+
+- nsm
+  - fix save command in headless mode
+  - don't announce optional gui capability in headless mode
+
 ## 1.5.0
 
 - edit window
