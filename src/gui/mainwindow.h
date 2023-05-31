@@ -22,7 +22,7 @@
 #include "../core/globals.h"
 #include "../lib/nsm.h"
 
-#include "styles.h"
+#include "widgets.h"
 #include "sequencebutton.h"
 #include "editwindow.h"
 
@@ -51,9 +51,10 @@ class MainWindow : public Window {
 
         // nsm
         void nsm_set_client(nsm_client_t *nsm, bool optional_gui);
-        void nsm_save();
 
         Glib::RefPtr<Gtk::Application> m_app;
+
+        sigc::signal<void(string name)> signal_hover;
 
 
     private:
@@ -68,6 +69,8 @@ class MainWindow : public Window {
         ScrolledWindow      m_scroll_wrapper;
         Grid                m_sequence_grid;
         SequenceButton     *m_sequences[c_seqs_in_set];
+        SequenceButton     *m_sequence_focus = NULL;
+        bool                m_sequence_keyboard_nav = false;
         EditWindow         *m_editwindows[c_max_sequence];
 
         // menu
@@ -84,6 +87,11 @@ class MainWindow : public Window {
         SeparatorMenuItem   m_menu_separator1;
         SeparatorMenuItem   m_menu_separator2;
 
+        MenuItem            m_menu_edit;
+        Menu                m_submenu_edit;
+        MenuItem            m_menu_edit_undo;
+        MenuItem            m_menu_edit_redo;
+
         MenuItem            m_menu_transport;
         Menu                m_submenu_transport;
         AccelLabel          m_menu_transport_start_label;
@@ -98,17 +106,32 @@ class MainWindow : public Window {
         Button              m_toolbar_stop;
         Button              m_toolbar_play;
         bool                m_toolbar_play_state;
-        Entry               m_toolbar_bpm_entry;
-        Glib::RefPtr<Gtk::Adjustment> m_toolbar_bpm_adj;
-        SpinButton          m_toolbar_bpm;
+
+        HBox                m_toolbar_bpm_box;
+        CustomEntry         m_toolbar_bpm;
+        double              m_toolbar_bpm_value;
+        CustomButton        m_toolbar_bpm_minus;
+        Image               m_toolbar_minus_icon;
+        CustomButton        m_toolbar_bpm_plus;
+        Image               m_toolbar_plus_icon;
+
+        HBox                m_toolbar_sset_box;
         Entry               m_toolbar_sset_name;
-        Glib::RefPtr<Gtk::Adjustment> m_toolbar_sset_adj;
-        SpinButton          m_toolbar_sset;
-        Entry               m_toolbar_sset_entry;
+        CustomEntry         m_toolbar_sset;
+        int                 m_toolbar_sset_value;
+        CustomButton        m_toolbar_sset_prev;
+        Image               m_toolbar_prev_icon;
+        CustomButton        m_toolbar_sset_next;
+        Image               m_toolbar_next_icon;
+
         Image               m_toolbar_logo;
         Image               m_toolbar_play_icon;
         Image               m_toolbar_stop_icon;
         Image               m_toolbar_panic_icon;
+
+        // misc
+        string              m_hover;
+
 
         // drag and drop
         SequenceButton     *m_drag_source;
@@ -117,6 +140,9 @@ class MainWindow : public Window {
         void set_drag_source(SequenceButton *s);
         void set_drag_destination(SequenceButton *s);
 
+        // hovered sequence
+        void set_focus_sequence(SequenceButton *s);
+        SequenceButton* get_focus_sequence(){return m_sequence_focus;};
 
         // edit
         void open_edit_window(int seqnum, sequence * seq);
@@ -131,6 +157,8 @@ class MainWindow : public Window {
         void clear_focus();
         bool on_key_press(GdkEventKey* event);
         bool on_delete_event(GdkEventAny *event);
+        bool on_scroll_event(GdkEventScroll* event);
+        bool on_motion_notify_event(GdkEventMotion* event);
 
         // nsm
         bool m_nsm_optional_gui;

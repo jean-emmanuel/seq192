@@ -116,6 +116,7 @@ EventRoll::draw_background()
     for (int i=start_tick; i<=end_tick; i += ticks_per_step)
     {
         int base_line = (i - m_hscroll) / m_zoom;
+        bool draw = true;
 
         if (i % ticks_per_m_line == 0)
         {
@@ -125,22 +126,19 @@ EventRoll::draw_background()
         {
             cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_beat);
         }
-        else
-        {
-            if (i % m_snap <= last_snap) {
-                cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_snap);
-                base_line -= (i - m_snap * (i / m_snap)) / m_zoom;
-            } else {
-                cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, 0);
-
-            }
+        else if (i % m_snap <= last_snap) {
+            cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_snap);
+            base_line -= (i - m_snap * (i / m_snap)) / m_zoom;
         }
+        else draw = false;
 
         last_snap = i % m_snap;
 
-        cr->move_to(base_line + 0.5, 0);
-        cr->line_to(base_line + 0.5, height);
-        cr->stroke();
+        if (draw) {
+            cr->move_to(base_line + 0.5, 0);
+            cr->line_to(base_line + 0.5, height);
+            cr->stroke();
+        }
     }
 
     // Events
@@ -274,7 +272,6 @@ void
 EventRoll::set_adding(bool adding)
 {
     m_adding = adding;
-    get_window()->set_cursor(Gdk::Cursor::create(get_window()->get_display(), adding ? "pencil" : "normal"));
 }
 
 /* takes screen corrdinates, give us notes and ticks */
@@ -334,7 +331,6 @@ EventRoll::drop_event(long a_tick)
     unsigned char d0 = m_cc;
     unsigned char d1 = 0x40;
 
-    if (m_status == EVENT_AFTERTOUCH) d0 = 0;
     if (m_status == EVENT_PROGRAM_CHANGE) d0 = 0; /* d0 == new patch */
     if (m_status == EVENT_CHANNEL_PRESSURE) d0 = 0x40; /* d0 == pressure */
     if (m_status == EVENT_PITCH_WHEEL) d0 = 0;
@@ -380,11 +376,27 @@ EventRoll::start_paste()
      m_selected.x  += m_drop_x;
 }
 
+
+bool
+EventRoll::on_enter_notify_event(GdkEventCrossing* event)
+{
+    signal_hover.emit((string)"eventroll");
+
+    return true;
+}
+
+bool
+EventRoll::on_leave_notify_event(GdkEventCrossing* event)
+{
+    signal_hover.emit((string)"");
+
+    return true;
+}
+
 bool
 EventRoll::on_button_press_event(GdkEventButton* event)
 {
-
-    signal_focus.emit((string)"eventroll");
+    signal_click.emit((string)"eventroll");
 
     int x,w,numsel;
 
@@ -402,7 +414,6 @@ EventRoll::on_button_press_event(GdkEventButton* event)
         snap_x(&m_current_x);
         convert_x(m_current_x, &tick_s);
         m_paste = false;
-        m_sequence->push_undo();
         m_sequence->paste_selected(tick_s, 0);
 
     }
@@ -418,6 +429,7 @@ EventRoll::on_button_press_event(GdkEventButton* event)
             if (m_adding)
             {
                 m_painting = true;
+                m_sequence->undoable_lock(false);
 
                 snap_x(&m_drop_x);
                 /* turn x,y in to tick/note */
@@ -435,7 +447,7 @@ EventRoll::on_button_press_event(GdkEventButton* event)
             {
                 if (!m_sequence->select_events(tick_s, tick_s, tick_w, m_status, m_cc, sequence::e_is_selected))
                 {
-                    if (!(event->state & GDK_CONTROL_MASK))
+                    if (!(event->state & GDK_CONTROL_MASK) && !(event->state & GDK_SHIFT_MASK))
                     {
                         m_sequence->unselect();
                     }
@@ -464,6 +476,10 @@ EventRoll::on_button_press_event(GdkEventButton* event)
 
                     /* get the box that selected elements are in */
                     m_sequence->get_selected_box(&tick_s, &note, &tick_f, &note);
+
+                    if (event->state & GDK_SHIFT_MASK) {
+                        m_sequence->select_events(tick_s, tick_f, tick_w, m_status, m_cc, sequence::e_select);
+                    }
 
                     tick_f += tick_w;
 
@@ -500,7 +516,7 @@ EventRoll::on_button_press_event(GdkEventButton* event)
 
         if (event->button == 3)
         {
-            set_adding(true);
+            signal_adding.emit(true);
         }
     }
 
@@ -514,6 +530,8 @@ EventRoll::on_motion_notify_event(GdkEventMotion* event)
 
     long tick = 0;
 
+    m_current_x = m_last_x = (int) event->x  + m_hscroll / m_zoom - 1;
+
     if (m_moving_init)
     {
         m_moving_init = false;
@@ -522,7 +540,6 @@ EventRoll::on_motion_notify_event(GdkEventMotion* event)
 
     if (m_selecting || m_moving || m_paste)
     {
-        m_current_x = m_last_x = (int) event->x  + m_hscroll / m_zoom - 1;
 
         if (m_moving || m_paste) snap_x(&m_current_x);
     }
@@ -530,10 +547,16 @@ EventRoll::on_motion_notify_event(GdkEventMotion* event)
 
     if (m_painting)
     {
-        m_current_x = (int) event->x   + m_hscroll / m_zoom - 1;
+        long tick_w;
+
         snap_x(&m_current_x);
         convert_x(m_current_x, &tick);
-        drop_event(tick);
+        convert_x(c_event_width + 4, &tick_w);
+
+        if (!m_sequence->select_events(tick, tick, tick_w, m_status, m_cc, sequence::e_would_select))
+        {
+            drop_event(tick);
+        }
     }
 
     return false;
@@ -584,7 +607,6 @@ EventRoll::on_button_release_event(GdkEventButton* event)
             convert_x(delta_x, &delta_tick);
 
             /* not really notes, but still moves events */
-            m_sequence->push_undo();
             m_sequence->move_selected_notes(delta_tick, 0);
         }
 
@@ -593,8 +615,12 @@ EventRoll::on_button_release_event(GdkEventButton* event)
     if (event->button == 3)
     {
 
-        set_adding(false);
+        signal_adding.emit(false);
 
+    }
+
+    if (m_painting) {
+        m_sequence->undoable_unlock();
     }
 
     /* turn off */

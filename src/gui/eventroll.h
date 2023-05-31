@@ -33,7 +33,9 @@ class EventRoll : public DrawingArea {
         ~EventRoll();
 
         sigc::signal<bool(GdkEventScroll*)> signal_scroll;
-        sigc::signal<void(string name)> signal_focus;
+        sigc::signal<void(string name)> signal_hover;
+        sigc::signal<void(string name)> signal_click;
+        sigc::signal<void(bool adding)> signal_adding;
 
         void set_data_type(unsigned char a_status, unsigned char a_control);
         void queue_draw_background();
@@ -116,6 +118,8 @@ class EventRoll : public DrawingArea {
         void update_width();
 
         bool on_motion_notify_event(GdkEventMotion* event);
+        bool on_enter_notify_event(GdkEventCrossing* event);
+        bool on_leave_notify_event(GdkEventCrossing* event);
 
         bool on_expose_event(GdkEventExpose* event);
         bool on_button_press_event(GdkEventButton* event);

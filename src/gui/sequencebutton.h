@@ -31,6 +31,7 @@ enum context_menu_action
 {
     MENU_NEW = 0,
     MENU_EDIT,
+    MENU_RENAME,
     MENU_CUT,
     MENU_COPY,
     MENU_EXPORT,
@@ -71,6 +72,7 @@ class SequenceButton : public DrawingArea {
         int m_last_seqnum;
         bool m_active;
         bool m_click;
+        bool m_middle_click;
         bool m_drag_start;
         Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 

@@ -1,3 +1,5 @@
+/* XPM */
+//
 // This file is part of seq192
 //
 // This program is free software: you can redistribute it and/or modify
@@ -13,5 +15,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#define PACKAGE "seq192"
-#define VERSION "1.5.1"
+static const char * next_xpm[] = {
+"16 16 2 1",
+" 	c None",
+"+	c #cccccc",
+"                ",
+"                ",
+"     +++        ",
+"      +++       ",
+"       +++      ",
+"        +++     ",
+"         +++    ",
+"          +++   ",
+"          +++   ",
+"         +++    ",
+"        +++     ",
+"       +++      ",
+"      +++       ",
+"     +++        ",
+"                ",
+"                "};

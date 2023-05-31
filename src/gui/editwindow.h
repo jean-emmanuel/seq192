@@ -22,7 +22,7 @@
 #include "../core/globals.h"
 #include "../core/mutex.h"
 
-#include "styles.h"
+#include "widgets.h"
 #include "mainwindow.h"
 #include "sequencebutton.h"
 #include "timeroll.h"
@@ -56,7 +56,8 @@ enum edit_menu_action
     EDIT_MENU_RECORD_THRU,
 
     EDIT_MENU_PLAY,
-    EDIT_MENU_RESUME
+    EDIT_MENU_RESUME,
+    EDIT_MENU_CHASE
 };
 
 class MainWindow;
@@ -66,6 +67,11 @@ class EditWindow : public Window {
 
         EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq);
         ~EditWindow();
+
+        void update_name();
+
+        void set_adding(bool adding, bool tmp = false);
+        bool get_adding() {return m_adding;};
 
     private:
 
@@ -85,7 +91,8 @@ class EditWindow : public Window {
         PianoRoll           m_pianoroll;
         DataRoll            m_dataroll;
 
-        string              m_focus;
+        string              m_hover_focus;
+        string              m_click_focus;
 
         // layout
         VBox                m_vbox;
@@ -175,12 +182,15 @@ class EditWindow : public Window {
         MenuItem            m_menu_playback_playing;
         bool                m_menu_playing_state;
         CheckMenuItem       m_menu_playback_resume;
+        CheckMenuItem       m_menu_playback_chase;
 
         // event menu
         Menu                m_event_menu;
         CheckMenuItem       m_menu_item_noteon;
         CheckMenuItem       m_menu_item_noteoff;
-        CheckMenuItem       m_menu_item_aftertouch;
+        MenuItem            m_menu_item_aftertouch;
+        Menu                m_submenu_aftertouch;
+        CheckMenuItem       *m_menu_items_aftertouch[128];
         CheckMenuItem       m_menu_item_program;
         CheckMenuItem       m_menu_item_pitch;
         CheckMenuItem       m_menu_item_pressure;
@@ -200,18 +210,22 @@ class EditWindow : public Window {
         Label               m_toolbar_times;
         Entry               m_toolbar_measures;
         ToggleButton        m_toolbar_snap_active;
+        Image               m_toolbar_snap_icon;
         ComboBoxText        m_toolbar_snap;
+
+        ToggleButton        m_toolbar_pen_active;
+        Image               m_toolbar_pen_icon;
+        CustomHBox          m_toolbar_length_box;
         Button              m_toolbar_length_label;
+        Image               m_toolbar_length_icon;
         ComboBoxText        m_toolbar_length;
+
+        CustomHBox          m_toolbar_bus_box;
         Button              m_toolbar_bus_label;
-        Entry               m_toolbar_bus;
+        Image               m_toolbar_bus_icon;
+        Button              m_toolbar_bus;
         MenuButton          m_toolbar_bus_dropdown;
         Menu                m_toolbar_bus_menu;
-
-
-        int                 m_bpm;
-        int                 m_bw;
-        int                 m_measures;
 
         int                 m_midibus;
         int                 m_midichannel;
@@ -222,6 +236,10 @@ class EditWindow : public Window {
         unsigned char m_alt_status;
         unsigned char m_alt_cc;
         bool m_alt_control_view;
+
+        bool m_adding = false;
+        bool m_adding_tmp = false;
+        void update_pointer_cursor();
 
         void update_midibus_name();
         void create_midibus_menu();
@@ -239,10 +257,10 @@ class EditWindow : public Window {
         bool timer_callback();
 
         bool scroll_callback(GdkEventScroll* event);
-        void focus_callback(string name);
+        void click_callback(string name);
+        void hover_callback(string name);
 
         void update_hscrollbar_visibility();
-        void update_window_title();
 
         void clear_focus();
 
@@ -285,6 +303,21 @@ class EditWindow : public Window {
             {c_ppqn / 4 / 3,    12},
             {c_ppqn / 8 / 3,    13},
             {c_ppqn / 16 / 3,   14}
+        };
+
+        std::map<int, std::string> key_to_note = {
+            {0, "C"},
+            {1, "C#"},
+            {2, "D"},
+            {3, "D#"},
+            {4, "E"},
+            {5, "E#"},
+            {6, "F"},
+            {7, "F#"},
+            {8, "G"},
+            {9, "G#"},
+            {10, "A"},
+            {11, "A#"}
         };
 
 };

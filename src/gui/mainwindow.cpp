@@ -18,7 +18,16 @@
 #include "../core/globals.h"
 #include "../lib/nsm.h"
 #include "../package.h"
+#include "css.h"
 #include <time.h>
+
+#include "../xpm/panic.xpm"
+#include "../xpm/play.xpm"
+#include "../xpm/stop.xpm"
+#include "../xpm/minus.xpm"
+#include "../xpm/plus.xpm"
+#include "../xpm/prev.xpm"
+#include "../xpm/next.xpm"
 
 #include "../xpm/seq192.xpm"
 #include "../xpm/seq192_32.xpm"
@@ -36,6 +45,10 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     m_drag_destination = NULL;
 
     m_toolbar_play_state = false;
+    m_toolbar_bpm_value = -1;
+    m_toolbar_sset_value = -1;
+
+    m_hover = "";
 
     m_accelgroup = Gtk::AccelGroup::create();
     add_accel_group(m_accelgroup);
@@ -44,6 +57,17 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     {
         m_editwindows[i] = NULL;
     }
+
+    // create instrument colors
+    Gdk::RGBA color;
+    for (int i = 0; i < c_max_instruments; i++)
+    {
+        if (!global_user_instrument_definitions[i].color.empty()) {
+            color = Gdk::RGBA(global_user_instrument_definitions[i].color);
+            global_user_instrument_colors[i] = {color.get_red(), color.get_green(), color.get_blue()};
+        }
+    }
+
 
     Glib::RefPtr<Gtk::CssProvider> css_provider = Gtk::CssProvider::create();
     css_provider->load_from_data(c_mainwindow_css);
@@ -102,6 +126,28 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     m_menu_file_quit.signal_activate().connect([this]{menu_callback(MAIN_MENU_QUIT, 0, 0);});
     m_submenu_file.append(m_menu_file_quit);
 
+    m_menu_edit.set_label("_Edit");
+    m_menu_edit.set_use_underline(true);
+    m_menu_edit.set_submenu(m_submenu_edit);
+    m_menu.append(m_menu_edit);
+
+    m_menu_edit_undo.set_label("Undo");
+    m_menu_edit_undo.add_accelerator("activate", m_accelgroup, 'z', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_undo.signal_activate().connect([&]{
+        m_perform->pop_undo();
+        update_sset_name(m_toolbar_sset_value);
+    });
+    m_submenu_edit.append(m_menu_edit_undo);
+
+    m_menu_edit_redo.set_label("Redo");
+    m_menu_edit_redo.add_accelerator("activate", m_accelgroup, 'y', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_redo.add_accelerator("activate", m_accelgroup, 'z', Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_redo.signal_activate().connect([&]{
+        m_perform->pop_redo();
+        update_sset_name(m_toolbar_sset_value);
+    });
+    m_submenu_edit.append(m_menu_edit_redo);
+
     m_menu_transport.set_label("_Transport");
     m_menu_transport.set_use_underline(true);
     m_menu_transport.set_submenu(m_submenu_transport);
@@ -119,6 +165,7 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     m_menu_transport_stop_label.set_label("Stop");
     m_menu_transport_stop_label.set_xalign(0.0);
     m_menu_transport_stop_label.set_accel(GDK_KEY_Escape, (Gdk::ModifierType)0);
+    m_menu_transport_stop.add_accelerator("activate", m_accelgroup, GDK_KEY_space, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_transport_stop.add(m_menu_transport_stop_label);
     m_menu_transport_stop.signal_activate().connect([&]{
         m_perform->stop_playing();
@@ -132,9 +179,10 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     m_toolbar.get_style_context()->add_provider(css_provider, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
     m_toolbar.set_spacing(c_toolbar_spacing);
 
-    m_toolbar_panic.set_size_request(36, 0);
+    m_toolbar_panic.set_size_request(34, 0);
     m_toolbar_panic.set_can_focus(false);
-    m_toolbar_panic.set_label("◭");
+    m_toolbar_panic_icon.set(Gdk::Pixbuf::create_from_xpm_data(panic_xpm));
+    m_toolbar_panic.add(m_toolbar_panic_icon);
     m_toolbar_panic.set_tooltip_text("Disable all sequences");
     m_toolbar_panic.get_style_context()->add_class("panic");
     m_toolbar_panic.signal_clicked().connect([&]{
@@ -143,9 +191,10 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     });
     m_toolbar.pack_start(m_toolbar_panic, false, false);
 
-    m_toolbar_stop.set_size_request(36, 0);
+    m_toolbar_stop.set_size_request(34, 0);
     m_toolbar_stop.set_can_focus(false);
-    m_toolbar_stop.set_label("◼");
+    m_toolbar_stop_icon.set(Gdk::Pixbuf::create_from_xpm_data(stop_xpm));
+    m_toolbar_stop.add(m_toolbar_stop_icon);
     m_toolbar_stop.set_tooltip_text("Stop transport");
     m_toolbar_stop.get_style_context()->add_class("stop");
     m_toolbar_stop.signal_clicked().connect([&]{
@@ -154,9 +203,10 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     });
     m_toolbar.pack_start(m_toolbar_stop, false, false);
 
-    m_toolbar_play.set_size_request(36, 0);
+    m_toolbar_play.set_size_request(34, 0);
     m_toolbar_play.set_can_focus(false);
-    m_toolbar_play.set_label("▶");
+    m_toolbar_play_icon.set(Gdk::Pixbuf::create_from_xpm_data(play_xpm));
+    m_toolbar_play.add(m_toolbar_play_icon);
     m_toolbar_play.set_tooltip_text("Start transport");
     m_toolbar_play.get_style_context()->add_class("play");
     m_toolbar_play.signal_clicked().connect([&]{
@@ -165,19 +215,48 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     });
     m_toolbar.pack_start(m_toolbar_play, false, false);
 
-    m_toolbar_bpm_adj = Gtk::Adjustment::create(m_perform->get_bpm(), c_bpm_minimum, c_bpm_maximum, 1, 10, 1);
     m_toolbar_bpm.set_name("bpm");
     m_toolbar_bpm.set_tooltip_text("Beats per minute");
+    m_toolbar_bpm.set_alignment(0.5);
     m_toolbar_bpm.set_width_chars(6);
-    m_toolbar_bpm.set_digits(2);
-    m_toolbar_bpm.set_numeric(true);
-    m_toolbar_bpm.set_halign(Gtk::ALIGN_CENTER);
-    m_toolbar_bpm.set_adjustment(m_toolbar_bpm_adj);
     m_toolbar_bpm.signal_activate().connect([&]{clear_focus();});
-    m_toolbar_bpm.signal_value_changed().connect([&]{
-        m_perform->set_bpm(m_toolbar_bpm.get_value());
+    m_toolbar_bpm.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
+        string s = m_toolbar_bpm.get_text();
+        double bpm = atof(s.c_str());
+        if (bpm != m_toolbar_bpm_value) {
+            m_toolbar_bpm_value = bpm;
+            m_perform->set_bpm(bpm);
+        } else {
+            char str[7];
+            snprintf(str, sizeof(str), "%.02f", m_toolbar_bpm_value);
+            m_toolbar_bpm.set_text(str);
+        }
+        return false;
     });
-    m_toolbar.pack_start(m_toolbar_bpm, false, false);
+    m_toolbar_bpm_minus.set_name("bpm_minus");
+    m_toolbar_bpm_minus.set_size_request(34, 0);
+    m_toolbar_bpm_minus.set_can_focus(false);
+    m_toolbar_minus_icon.set(Gdk::Pixbuf::create_from_xpm_data(minus_xpm));
+    m_toolbar_bpm_minus.add(m_toolbar_minus_icon);
+    m_toolbar_bpm_minus.signal_clicked().connect([&]{
+        m_perform->set_bpm(m_toolbar_bpm_value - 1);
+    });
+    m_toolbar_bpm_plus.set_name("bpm_plus");
+    m_toolbar_bpm_plus.set_size_request(34, 0);
+    m_toolbar_bpm_plus.set_can_focus(false);
+    m_toolbar_plus_icon.set(Gdk::Pixbuf::create_from_xpm_data(plus_xpm));
+    m_toolbar_bpm_plus.add(m_toolbar_plus_icon);
+    m_toolbar_bpm_plus.signal_clicked().connect([&]{
+        m_perform->set_bpm(m_toolbar_bpm_value + 1);
+    });
+
+    m_toolbar_bpm_box.set_spacing(0);
+    m_toolbar_bpm_box.get_style_context()->add_class("group");
+    m_toolbar_bpm_box.pack_start(m_toolbar_bpm, false, false);
+    m_toolbar_bpm_box.pack_start(m_toolbar_bpm_minus, false, false);
+    m_toolbar_bpm_box.pack_start(m_toolbar_bpm_plus, false, false);
+    m_toolbar.pack_start(m_toolbar_bpm_box, false, false);
+
 
     m_toolbar_sset_name.set_name("sset_name");
     m_toolbar_sset_name.set_tooltip_text("Screen set name");
@@ -185,26 +264,54 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     m_toolbar_sset_name.signal_activate().connect([&]{clear_focus();});
     m_toolbar_sset_name.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
         string s = m_toolbar_sset_name.get_text();
-        m_perform->set_screen_set_notepad(m_toolbar_sset.get_value(), &s);
+        m_perform->set_screen_set_notepad(m_toolbar_sset_value, &s);
         return false;
     });
     m_toolbar.pack_start(m_toolbar_sset_name);
 
-    m_toolbar_sset_adj = Gtk::Adjustment::create(0, 0, c_max_sets, 1, 1, 1);
     m_toolbar_sset.set_name("sset");
+    m_toolbar_sset.set_size_request(34, 0);
     m_toolbar_sset.set_tooltip_text("Screen set number");
-    m_toolbar_sset.set_width_chars(2);
-    m_toolbar_sset.set_numeric(true);
     m_toolbar_sset.set_alignment(0.5);
-    m_toolbar_sset.set_adjustment(m_toolbar_sset_adj);
+    m_toolbar_sset.set_width_chars(3);
     m_toolbar_sset.signal_activate().connect([&]{clear_focus();});
-    m_toolbar_sset.signal_value_changed().connect([&]{
-        int sset = m_toolbar_sset.get_value();
-        m_perform->set_screenset(sset);
-        update_sset_name(sset);
+    m_toolbar_sset.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
+        string s = m_toolbar_sset.get_text();
+        int sset = atof(s.c_str());
+        if (sset >= 0 && sset < c_max_sets && sset != m_toolbar_sset_value) {
+            m_toolbar_sset_value = sset;
+            m_perform->set_screenset(sset);
+        } else {
+            m_toolbar_sset.set_text(to_string(m_toolbar_sset_value));
+        }
+        return false;
     });
-    m_toolbar.pack_start(m_toolbar_sset, false, false);
+    m_toolbar_sset_prev.set_name("sset_prev");
+    m_toolbar_sset_prev.set_size_request(30, 0);
+    m_toolbar_sset_prev.set_can_focus(false);
+    m_toolbar_prev_icon.set(Gdk::Pixbuf::create_from_xpm_data(prev_xpm));
+    m_toolbar_sset_prev.add(m_toolbar_prev_icon);
+    m_toolbar_sset_prev.signal_clicked().connect([&]{
+        m_perform->set_screenset(m_toolbar_sset_value - 1);
+    });
+    m_toolbar_sset_next.set_name("sset_next");
+    m_toolbar_sset_next.set_size_request(34, 0);
+    m_toolbar_sset_next.set_can_focus(false);
+    m_toolbar_next_icon.set(Gdk::Pixbuf::create_from_xpm_data(next_xpm));
+    m_toolbar_sset_next.add(m_toolbar_next_icon);
+    m_toolbar_sset_next.signal_clicked().connect([&]{
+        m_perform->set_screenset(m_toolbar_sset_value + 1);
+    });
+
+    m_toolbar_sset_box.set_spacing(0);
+    m_toolbar_sset_box.get_style_context()->add_class("group");
+    m_toolbar_sset_box.pack_start(m_toolbar_sset, false, false);
+    m_toolbar_sset_box.pack_start(m_toolbar_sset_prev, false, false);
+    m_toolbar_sset_box.pack_start(m_toolbar_sset_next, false, false);
+    m_toolbar.pack_start(m_toolbar_sset_box, false, false);
+
     update_sset_name(m_perform->get_screenset());
+
 
     m_toolbar_logo.set(Gdk::Pixbuf::create_from_xpm_data(seq192_xpm));
     m_toolbar.pack_end(m_toolbar_logo, false, false);
@@ -219,7 +326,7 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
             int n = i + j * c_mainwnd_rows;
             m_sequences[n] = new SequenceButton(m_perform, this, n);
             m_sequences[n]->set_size_request(100,60);
-            m_sequences[n]->set_can_focus(false);
+            m_sequences[n]->set_can_focus(true);
             m_sequence_grid.attach(*m_sequences[n], j, i);
         }
     }
@@ -232,6 +339,8 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     m_sequence_grid.set_margin_end(c_grid_padding);
     m_sequence_grid.set_margin_top(c_grid_padding);
     m_sequence_grid.set_margin_bottom(c_grid_padding);
+    m_sequence_grid.set_focus_hadjustment(m_scroll_wrapper.get_hadjustment());
+    m_sequence_grid.set_focus_vadjustment(m_scroll_wrapper.get_vadjustment());
     m_scroll_wrapper.add(m_sequence_grid);
 
     // main layout packing
@@ -253,6 +362,21 @@ MainWindow::MainWindow(perform * p, Glib::RefPtr<Gtk::Application> app)
     resize(1024, 600);
     show_all();
 
+    add_events(
+        Gdk::POINTER_MOTION_MASK |
+        // Gdk::BUTTON_PRESS_MASK |
+        // Gdk::BUTTON_RELEASE_MASK |
+        // Gdk::POINTER_MOTION_MASK |
+        // Gdk::ENTER_NOTIFY_MASK |
+        // Gdk::LEAVE_NOTIFY_MASK |
+        Gdk::SCROLL_MASK
+    );
+
+    signal_hover.connect([&](string name){
+        m_hover = name;
+    });
+
+
 }
 
 MainWindow::~MainWindow()
@@ -265,9 +389,7 @@ MainWindow::on_key_press(GdkEventKey* event)
 {
     if (get_focus() != NULL) {
         string focus = get_focus()->get_name();
-        if (event->keyval == GDK_KEY_space && focus == "sset_name") return false;
-        if ((event->keyval == GDK_KEY_Up || event->keyval == GDK_KEY_Down) &&
-            (focus == "bpm" || focus == "sset"))
+        if (focus == "bpm" || focus == "sset" || focus == "sset_name")
         {
             return false;
         }
@@ -283,11 +405,99 @@ MainWindow::on_key_press(GdkEventKey* event)
             break;
         case GDK_KEY_Up:
         case GDK_KEY_Down:
+        case GDK_KEY_Left:
+        case GDK_KEY_Right:
+        {
+            int pos = -1;
+            if (get_focus_sequence() == NULL) {
+                if (event->keyval == GDK_KEY_Down) pos = 0;
+                else if (event->keyval == GDK_KEY_Up) pos = c_mainwnd_rows - 1;
+                else if (event->keyval == GDK_KEY_Left) pos = c_mainwnd_cols - 1;
+                else if (event->keyval == GDK_KEY_Right) pos = 0;
+            } else {
+                pos = get_focus_sequence()->m_seqpos;
+                if (event->keyval == GDK_KEY_Down && pos % c_mainwnd_rows != (c_mainwnd_rows - 1)) pos++;
+                else if (event->keyval == GDK_KEY_Up && pos % c_mainwnd_rows != 0) pos--;
+                else if (event->keyval == GDK_KEY_Left) pos -= c_mainwnd_rows;
+                else if (event->keyval == GDK_KEY_Right) pos += c_mainwnd_rows;
+            }
+            if (pos >= 0 && pos < c_seqs_in_set) {
+                m_sequence_keyboard_nav = true;
+                set_focus_sequence(m_sequences[pos]);
+            }
             return true;
+            break;
+        }
+        case GDK_KEY_Delete:
+            if (get_focus_sequence() != NULL)
+                get_focus_sequence()->menu_callback(MENU_DELETE, 0, 0);
+            break;
+        case GDK_KEY_B:
+        case GDK_KEY_b:
+            if (event->state & GDK_CONTROL_MASK && get_focus_sequence() != NULL)
+                get_focus_sequence()->menu_callback(MENU_NEW, 0, 0);
+            break;
+        case GDK_KEY_E:
+        case GDK_KEY_e:
+            if (event->state & GDK_CONTROL_MASK && get_focus_sequence() != NULL)
+                get_focus_sequence()->menu_callback(MENU_EDIT, 0, 0);
+            break;
+        case GDK_KEY_X:
+        case GDK_KEY_x:
+            if (event->state & GDK_CONTROL_MASK && get_focus_sequence() != NULL)
+                get_focus_sequence()->menu_callback(MENU_CUT, 0, 0);
+            break;
+        case GDK_KEY_C:
+        case GDK_KEY_c:
+            if (event->state & GDK_CONTROL_MASK && get_focus_sequence() != NULL)
+                get_focus_sequence()->menu_callback(MENU_COPY, 0, 0);
+            break;
+        case GDK_KEY_V:
+        case GDK_KEY_v:
+            if (event->state & GDK_CONTROL_MASK && get_focus_sequence() != NULL)
+                get_focus_sequence()->menu_callback(MENU_PASTE, 0, 0);
+            break;
+        case GDK_KEY_R:
+        case GDK_KEY_r:
+        case GDK_KEY_F2:
+            if ((event->state & GDK_CONTROL_MASK || event->keyval == GDK_KEY_F2) && get_focus_sequence() != NULL)
+                get_focus_sequence()->menu_callback(MENU_RENAME, 0, 0);
             break;
         default:
             return false;
     }
+
+    return false;
+}
+
+bool
+MainWindow::on_motion_notify_event(GdkEventMotion* event)
+{
+    m_sequence_keyboard_nav = false;
+    return false;
+}
+
+
+bool
+MainWindow::on_scroll_event(GdkEventScroll* event)
+{
+
+    if (m_hover == "bpm" || m_hover == "bpm_minus" || m_hover == "bpm_plus") {
+        if (event->direction == GDK_SCROLL_DOWN) {
+            m_perform->set_bpm(m_toolbar_bpm_value - 1);
+        } else if (event->direction == GDK_SCROLL_UP) {
+            m_perform->set_bpm(m_toolbar_bpm_value + 1);
+        }
+    }
+
+    if (m_hover == "sset" || m_hover == "sset_prev" || m_hover == "sset_next") {
+        if (event->direction == GDK_SCROLL_DOWN) {
+            m_perform->set_screenset(m_toolbar_sset_value - 1);
+        } else if (event->direction == GDK_SCROLL_UP) {
+            m_perform->set_screenset(m_toolbar_sset_value + 1);
+        }
+    }
+
 
     return false;
 }
@@ -304,16 +514,26 @@ MainWindow::timer_callback()
 
     // screenset name
     int sset = m_perform->get_screenset();
-    if (m_toolbar_sset.get_value() != sset) {
+    if (m_toolbar_sset_value != sset) {
         update_sset_name(sset);
-        m_toolbar_sset.set_value(sset);
+        m_toolbar_sset_value = sset;
+        m_toolbar_sset.set_text(to_string(sset));
     }
 
     // bpm
     double bpm = m_perform->get_bpm();
-    if (m_toolbar_bpm.get_value() != bpm) {
-        m_toolbar_bpm.set_value(bpm);
+    if (m_toolbar_bpm_value != bpm) {
+        m_toolbar_bpm_value = bpm;
+        char str[7];
+        snprintf(str, sizeof(str), "%.02f", m_toolbar_bpm_value);
+        m_toolbar_bpm.set_text(str);
     }
+
+    // undo / redo states
+    if (m_perform->can_undo() && !m_menu_edit_undo.get_sensitive()) m_menu_edit_undo.set_sensitive(true);
+    else if (!m_perform->can_undo() && m_menu_edit_undo.get_sensitive()) m_menu_edit_undo.set_sensitive(false);
+    if (m_perform->can_redo() && !m_menu_edit_redo.get_sensitive()) m_menu_edit_redo.set_sensitive(true);
+    else if (!m_perform->can_redo() && m_menu_edit_redo.get_sensitive()) m_menu_edit_redo.set_sensitive(false);
 
     // sequence grid
     for (int i = 0; i < c_seqs_in_set; i++) {
@@ -395,9 +615,7 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
         case MAIN_MENU_NEW:
             if (global_is_modified && !unsaved_changes()) return;
             close_all_edit_windows();
-            m_perform->clear_all();
-            global_filename = "";
-            global_is_modified = false;
+            m_perform->file_new();
             update_window_title();
             update_sset_name(m_perform->get_screenset());
             for (int i = 0; i < c_seqs_in_set; i++) {
@@ -435,12 +653,13 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
                 if (dialog.run() == Gtk::RESPONSE_OK)
                 {
                     auto fn = dialog.get_filename();
+                    bool result = true;
 
-                    if (action == MAIN_MENU_OPEN) m_perform->clear_all();
-
-                    midifile f(fn);
-                    bool result = f.parse(m_perform, action == MAIN_MENU_OPEN ? 0 : m_perform->get_screenset());
-                    global_is_modified = !result;
+                    if (action == MAIN_MENU_OPEN) {
+                        result = m_perform->file_open(fn);
+                    } else if (action == MAIN_MENU_IMPORT) {
+                        result = m_perform->file_import(fn);
+                    }
 
                     if (!result) {
                         MessageDialog errdialog(*this, "Error reading file: " + fn, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
@@ -450,7 +669,6 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
 
                     last_used_dir = fn.substr(0, fn.rfind("/") + 1);
 
-                    if (action != MAIN_MENU_IMPORT) global_filename = fn;
                     update_window_title();
                     update_sset_name(m_perform->get_screenset());
                     for (int i = 0; i < c_seqs_in_set; i++) {
@@ -463,13 +681,10 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
             if (global_filename == "") {
                 menu_callback(MAIN_MENU_SAVEAS, -1, -1);
             } else {
-                midifile f(global_filename);
-                bool result = f.write(m_perform, -1, -1);
+                bool result = m_perform->file_save();
                 if (!result) {
                     Gtk::MessageDialog errdialog(*this, "Error writing file.", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
                     errdialog.run();
-                } else {
-                    global_is_modified = false;
                 }
             }
             break;
@@ -523,22 +738,25 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
                         if (warning.run() == Gtk::RESPONSE_NO) return;
                     }
 
-                    midifile f(fn);
-                    int a_sset = action == MAIN_MENU_EXPORT_SCREENSET ? m_perform->get_screenset() : -1;
-                    int a_seq  = action == MAIN_MENU_EXPORT_SEQUENCE ? data1 : -1;
-                    bool result = f.write(m_perform, a_sset, a_seq);
+                    bool result = true;
+                    if (action == MAIN_MENU_SAVEAS) {
+                        if (m_nsm) {
+                            result = m_perform->file_export(fn);
+                        } else {
+                            result = m_perform->file_saveas(fn);
+                        }
+                    } else if (action == MAIN_MENU_EXPORT_SCREENSET) {
+                        result = m_perform->file_export_screenset(fn);
+                    } else if (action == MAIN_MENU_EXPORT_SEQUENCE) {
+                        result = m_perform->file_export_sequence(fn, data1);
+                    }
+
                     if (!result) {
                         MessageDialog errdialog (*this, "Error writing file.", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
                         errdialog.run();
-                    } else if (action == MAIN_MENU_SAVEAS) {
-                        if (!m_nsm) {
-                            global_filename = fn;
-                            global_is_modified = false;
-                        }
                     }
                 }
-
-                }
+            }
             break;
         case MAIN_MENU_QUIT:
             if (m_nsm && m_nsm_optional_gui) global_nsm_gui = false;
@@ -634,6 +852,7 @@ MainWindow::set_drag_destination(SequenceButton *s)
         if (m_editwindows[seqnum_src] != NULL) m_editwindows[seqnum_src]->close();
         m_perform->move_sequence(seqnum_src, seqnum_dest);
         m_drag_source->queue_draw();
+        m_drag_destination->update();
         m_drag_destination->queue_draw();
         m_drag_source = NULL;
         m_drag_destination = NULL;
@@ -681,8 +900,14 @@ MainWindow::nsm_set_client(nsm_client_t *nsm, bool optional_gui)
     if (m_nsm_optional_gui) m_menu_file_quit.set_label("Hide");
 }
 
+
 void
-MainWindow::nsm_save()
+MainWindow::set_focus_sequence(SequenceButton *s)
 {
-    menu_callback(MAIN_MENU_SAVE, 0, 0);
-}
+    if (m_sequence_focus != NULL) m_sequence_focus->queue_draw();
+    m_sequence_focus = s;
+    if (m_sequence_focus != NULL) {
+        m_sequence_focus->grab_focus();
+        m_sequence_focus->queue_draw();
+    }
+};

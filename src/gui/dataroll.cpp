@@ -18,7 +18,6 @@
 
 #include "dataroll.h"
 #include "styles.h"
-#include "strings.h"
 
 DataRoll::DataRoll(perform * p, sequence * seq)
 {
@@ -162,7 +161,8 @@ DataRoll::draw_background()
 
                 /* draw vert lines */
                 cr->move_to(event_x, y);
-                cr->line_to(event_x, height - c_data_text_height - c_dataroll_padding - c_data_handle_radius - 1);
+                if (status == EVENT_PITCH_WHEEL) cr->line_to(event_x, 0.5 * (c_data_y1 - c_data_y0) + c_data_y0);
+                else cr->line_to(event_x, height - c_data_text_height - c_dataroll_padding - c_data_handle_radius - 1);
                 cr->stroke();
 
                 /* draw handle */
@@ -205,8 +205,30 @@ DataRoll::draw_background()
     if (m_alt_status != 0)
     {
         unsigned char status = m_alt_control_view ? m_status : m_alt_status;
-        string alt_string = status_strings[status];
-        if (status == EVENT_CONTROL_CHANGE) alt_string = "CC " + to_string(m_alt_control_view ? m_cc : m_alt_cc);
+        string alt_string;
+        switch (status) {
+            case EVENT_NOTE_ON:
+                alt_string = "Note On";
+                break;
+            case EVENT_NOTE_OFF:
+                alt_string = "Note Off";
+                break;
+            case EVENT_AFTERTOUCH:
+                alt_string = "Aftertouch";
+                break;
+            case EVENT_PROGRAM_CHANGE:
+                alt_string = "Program Change";
+                break;
+            case EVENT_CHANNEL_PRESSURE:
+                alt_string = "Channel Pressure";
+                break;
+            case EVENT_PITCH_WHEEL:
+                alt_string = "Pitch wheel";
+                break;
+            case EVENT_CONTROL_CHANGE:
+                alt_string = "CC " + to_string(m_alt_control_view ? m_cc : m_alt_cc);
+                break;
+        }
         auto ti = create_pango_layout(alt_string);
         ti->set_font_description(font);
         ti->set_alignment(Pango::ALIGN_CENTER);
@@ -247,6 +269,14 @@ DataRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     cr->move_to(0, c_data_y1 + 0.5);
     cr->line_to(width, c_data_y1 + 0.5);
     cr->stroke();
+
+    if (m_status == EVENT_PITCH_WHEEL) {
+        cr->set_source_rgba(c_color_event.r, c_color_event.g, c_color_event.b, c_alpha_bottom_line / 3);
+        cr->set_line_width(1.0);
+        cr->move_to(0, (c_data_y0 + c_data_y1) / 2 + 0.5);
+        cr->line_to(width, (c_data_y0 + c_data_y1) / 2 + 0.5);
+        cr->stroke();
+    }
 
     if (m_dragging)
     {
@@ -333,7 +363,7 @@ DataRoll::on_button_press_event(GdkEventButton* event)
 
     m_drag_handle = m_sequence->select_event_handle(tick_s, tick_f, get_status(), get_cc(), 127 - m_drop_y, c_data_handle_radius);
 
-    if (m_drag_handle && !m_sequence->get_hold_undo()) m_sequence->push_undo(); // if they used line draw but did not leave...
+    m_sequence->undoable_lock(true);
 
     m_dragging = !m_drag_handle;
 
@@ -429,12 +459,7 @@ DataRoll::on_button_release_event(GdkEventButton* event)
         m_sequence->set_dirty();
     }
 
-    if (m_sequence->get_hold_undo())
-    {
-        m_sequence->push_undo(true);
-        m_sequence->set_hold_undo(false);
-    }
-
+    m_sequence->undoable_unlock();
 
     return true;
 }

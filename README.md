@@ -9,28 +9,23 @@ Fork infos:
 
 MIDI sequencer based on seq24 with less features and more swag.
 
-**Less features**
-- No song editor
-- No keyboard controls
-- No midi controls
-- Linux only
+Read the [Changelog](CHANGELOG.md) for more details.
 
-**More swag**
-- Interface rewritten with GTK3
-- OSC controls
-- almost 192 patterns per set
+![Seq192 main window](https://user-images.githubusercontent.com/5261671/215058107-55ec762c-a9c7-488b-aff8-70c26bea93b7.png)
 
-![Seq192 main window](https://user-images.githubusercontent.com/5261671/133999743-445a4285-a1b6-400a-a6cd-9bce6714f8a2.png)
-
-![Seq192 edit window](https://user-images.githubusercontent.com/5261671/133999740-bc7f57e5-4c3d-4496-98cf-3df88d8b7a48.png)
+![Seq192 edit window](https://user-images.githubusercontent.com/5261671/215058105-f825167b-2d37-4296-a8d8-da17b280ee66.png)
 
 
 
 ## Build
 
-**Dependencies** (as debian packages)
+**Dependencies**
 ```
+# as debian packages
 libjack-jackd2-dev liblo-dev libgtkmm-3.0-dev libasound2-dev nlohmann-json3-dev
+
+# as fedora packages
+jack-audio-connection-kit-devel alsa-lib-devel liblo-devel gtkmm30-devel json-devel
 ```
 
 **Build**
@@ -38,7 +33,13 @@ libjack-jackd2-dev liblo-dev libgtkmm-3.0-dev libasound2-dev nlohmann-json3-dev
 make clean && make -j8
 ```
 
+**Build options**
 
+Jack and Gtk can be stripped out at compile time with `USE_JACK=0` and `USE_GTK=0` options.
+```
+# build headless and jackless binary
+make -j8 USE_JACK=0 USE_GTK=0
+```
 
 **Run**
 
@@ -77,4 +78,4 @@ See [seq192.ammd.net](https://seq192.ammd.net/) or run `man seq192` after instal
 
 ## Web UI
 
-A web UI built with [Open Stage Control](https://openstagecontrol.ammd.net/) is available at https://github.com/jean-emmanuel/seq192-control
+A proof-of-concept web UI built with [Open Stage Control](https://openstagecontrol.ammd.net/) is available at https://github.com/jean-emmanuel/seq192-control

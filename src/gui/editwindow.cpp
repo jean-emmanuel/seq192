@@ -14,11 +14,17 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include "css.h"
 #include "editwindow.h"
 #include "pianoroll.h"
 #include "../core/globals.h"
 #include "../package.h"
 #include "../core/controllers.h"
+
+#include "../xpm/length.xpm"
+#include "../xpm/snap.xpm"
+#include "../xpm/bus.xpm"
+#include "../xpm/pen.xpm"
 
 #include "../xpm/seq192_32.xpm"
 
@@ -220,7 +226,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_view_bg_sequence.set_label("Background sequence");
     m_menu_view_bg_sequence.set_submenu(m_submenu_bg_sequence);
     m_submenu_view.append(m_menu_view_bg_sequence);
-    m_menu_items_bgseq[c_seqs_in_set] =  new CheckMenuItem();
+    m_menu_items_bgseq[c_seqs_in_set] = new CheckMenuItem();
     m_menu_items_bgseq[c_seqs_in_set]->set_label("None");
     m_menu_items_bgseq[c_seqs_in_set]->signal_toggled().connect([&]{
         set_background_sequence(-1, NULL);
@@ -259,6 +265,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_transport_stop_label.set_label("Stop");
     m_menu_transport_stop_label.set_xalign(0.0);
     m_menu_transport_stop_label.set_accel(GDK_KEY_Escape, (Gdk::ModifierType)0);
+    m_menu_transport_stop.add_accelerator("activate", m_accelgroup, GDK_KEY_space, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_transport_stop.add(m_menu_transport_stop_label);
     m_menu_transport_stop.signal_activate().connect([&]{
         m_perform->stop_playing();
@@ -302,6 +309,11 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_playback_resume.signal_activate().connect([&]{menu_callback(EDIT_MENU_RESUME);});
     m_submenu_playback.append(m_menu_playback_resume);
 
+    m_menu_playback_chase.set_label("Chase controls and pitch wheel");
+    m_menu_playback_chase.set_active(m_sequence->get_chase());
+    m_menu_playback_chase.signal_activate().connect([&]{menu_callback(EDIT_MENU_CHASE);});
+    m_submenu_playback.append(m_menu_playback_chase);
+
 
     // toolbar
     m_toolbar.set_size_request(0, 55);
@@ -317,7 +329,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar_name.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
         string s = m_toolbar_name.get_text();
         m_sequence->set_name(s);
-        update_window_title();
+        update_name();
         add_accel_group(m_accelgroup);
         return false;
     });
@@ -326,7 +338,6 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
         return false;
     });
 
-    m_toolbar_name.set_text(m_sequence->get_name());
     m_toolbar.pack_start(m_toolbar_name, true, true);
 
     m_toolbar_bpm.set_name("bpm");
@@ -337,14 +348,11 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar_bpm.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
         string s = m_toolbar_bpm.get_text();
         int bpm = atof(s.c_str());
-        if (bpm > 0) m_bpm = bpm;
-        m_sequence->set_bpm(m_bpm);
-        m_sequence->set_length(m_measures * m_bpm * ((c_ppqn * 4) / m_bw));
-        m_toolbar_bpm.set_text(to_string(m_bpm));
+        if (bpm > 0) m_sequence->set_bpm(bpm);
+        m_toolbar_bpm.set_text(to_string(m_sequence->get_bpm()));
         return false;
     });
-    m_bpm = m_sequence->get_bpm();
-    m_toolbar_bpm.set_text(to_string(m_bpm));
+    m_toolbar_bpm.set_text(to_string(m_sequence->get_bpm()));
     m_toolbar.pack_start(m_toolbar_bpm, false, false);
 
     m_toolbar_slash.set_label("/");
@@ -358,14 +366,11 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar_bw.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
         string s = m_toolbar_bw.get_text();
         int bw = atof(s.c_str());
-        if (bw > 0) m_bw = bw;
-        m_sequence->set_bw(m_bw);
-        m_sequence->set_length(m_measures * m_bpm * ((c_ppqn * 4) / m_bw));
-        m_toolbar_bw.set_text(to_string(m_bw));
+        if (bw > 0) m_sequence->set_bw(bw);
+        m_toolbar_bw.set_text(to_string(m_sequence->get_bw()));
         return false;
     });
-    m_bw = m_sequence->get_bw();
-    m_toolbar_bw.set_text(to_string(m_bw));
+    m_toolbar_bw.set_text(to_string(m_sequence->get_bw()));
     m_toolbar.pack_start(m_toolbar_bw, false, false);
 
     m_toolbar_times.set_label("x");
@@ -379,19 +384,16 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar_measures.signal_focus_out_event().connect([&](GdkEventFocus *focus)->bool{
         string s = m_toolbar_measures.get_text();
         int measures = atof(s.c_str());
-        if (measures > 0) m_measures = measures;
-        m_sequence->set_length(m_measures * m_bpm * ((c_ppqn * 4) / m_bw));
-        m_toolbar_measures.set_text(to_string(m_measures));
+        if (measures > 0) m_sequence->set_measures(measures);
+        m_toolbar_measures.set_text(to_string(m_sequence->get_measures()));
         return false;
     });
-    long units = ((m_sequence->get_bpm() * (c_ppqn * 4)) /  m_sequence->get_bw() );
-    m_measures = (m_sequence->get_length() / units);
-    if (m_sequence->get_length() % units != 0) m_measures++;
-    m_toolbar_measures.set_text(to_string(m_measures));
+    m_toolbar_measures.set_text(to_string(m_sequence->get_measures()));
     m_toolbar.pack_start(m_toolbar_measures, false, false);
 
 
-    m_toolbar_snap_active.set_label("Snap");
+    m_toolbar_snap_icon.set(Gdk::Pixbuf::create_from_xpm_data(snap_xpm));
+    m_toolbar_snap_active.add(m_toolbar_snap_icon);
     m_toolbar_snap_active.set_tooltip_text("Snap to grid");
     m_toolbar_snap_active.get_style_context()->add_class("nomargin");
     m_toolbar_snap_active.get_style_context()->add_class("togglebutton");
@@ -402,12 +404,30 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     });
     m_toolbar_snap_active.set_active(true);
 
-    m_toolbar_length_label.set_label("Note");
-    m_toolbar_length_label.set_sensitive(false);
+
+    m_toolbar_pen_icon.set(Gdk::Pixbuf::create_from_xpm_data(pen_xpm));
+    m_toolbar_pen_active.add(m_toolbar_pen_icon);
+    m_toolbar_pen_active.set_tooltip_text("Draw mode (D / Right-click)");
+    m_toolbar_pen_active.get_style_context()->add_class("nomargin");
+    m_toolbar_pen_active.get_style_context()->add_class("togglebutton");
+    m_toolbar_pen_active.set_focus_on_click(false);
+    m_toolbar_pen_active.signal_clicked().connect([&]{
+        set_adding(m_toolbar_pen_active.get_active());
+    });
+    m_toolbar_pen_active.set_active(false);
+
+    m_toolbar_length_box.get_style_context()->add_class("buttonbox");
+    m_toolbar_length_box.set_tooltip_text("Note size");
     m_toolbar_length_label.get_style_context()->add_class("nomargin");
+    m_toolbar_length_label.set_can_focus(false);
+    m_toolbar_length_label.signal_clicked().connect([&]{
+        m_toolbar_length.popup();
+    });
+    m_toolbar_length_icon.set(Gdk::Pixbuf::create_from_xpm_data(length_xpm));
+    m_toolbar_length_label.add(m_toolbar_length_icon);
+
     m_toolbar_snap.set_tooltip_text("Grid size");
     m_toolbar_snap.append("1");
-    m_toolbar_length.set_tooltip_text("Note size");
     m_toolbar_length.append("1");
     char s[13];
     for (int i = 1; i < 8; i++) {
@@ -439,21 +459,35 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
 
     m_toolbar.pack_start(m_toolbar_snap_active, false, false);
     m_toolbar.pack_start(m_toolbar_snap, false, false);
-    m_toolbar.pack_start(m_toolbar_length_label, false, false);
-    m_toolbar.pack_start(m_toolbar_length, false, false);
 
-    m_toolbar_bus_label.set_label("Output");
-    m_toolbar_bus_label.set_sensitive(false);
-    m_toolbar_bus_label.get_style_context()->add_class("nomargin");
+    m_toolbar.pack_start(m_toolbar_pen_active, false, false);
+    m_toolbar_length_box.pack_start(m_toolbar_length_label, false, false);
+    m_toolbar_length_box.pack_start(m_toolbar_length, false, false);
+    m_toolbar.pack_start(m_toolbar_length_box, false, false);
+
+    m_toolbar_bus_icon.set(Gdk::Pixbuf::create_from_xpm_data(bus_xpm));
+    m_toolbar_bus_label.add(m_toolbar_bus_icon);
     m_toolbar_bus.set_can_focus(false);
-    m_toolbar_bus.set_editable(false);
+    m_toolbar_bus_label.get_style_context()->add_class("nomargin");
+    m_toolbar_bus_label.signal_clicked().connect([&]{
+        m_toolbar_bus_dropdown.set_active(true);
+    });
+    m_toolbar_bus.signal_clicked().connect([&]{
+        m_toolbar_bus_dropdown.set_active(true);
+    });
     m_toolbar_bus.get_style_context()->add_class("nomargin");
+    m_toolbar_bus.set_can_focus(false);
+
     m_toolbar_bus_dropdown.set_sensitive(true);
     m_toolbar_bus_dropdown.set_direction(Gtk::ARROW_DOWN);
 
-    m_toolbar.pack_end(m_toolbar_bus_dropdown, false, false);
-    m_toolbar.pack_end(m_toolbar_bus, true, true);
-    m_toolbar.pack_end(m_toolbar_bus_label, false, false);
+    m_toolbar_bus_box.set_tooltip_text("MIDI output");
+    m_toolbar_bus_box.get_style_context()->add_class("buttonbox");
+    m_toolbar_bus_box.pack_end(m_toolbar_bus_dropdown, false, false);
+    m_toolbar_bus_box.pack_end(m_toolbar_bus, true, true);
+    m_toolbar_bus_box.pack_end(m_toolbar_bus_label, false, false);
+    m_toolbar_bus_box.set_size_request(300, 0);
+    m_toolbar.pack_end(m_toolbar_bus_box, false, false);
 
 
     // layout
@@ -523,8 +557,10 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_pianoroll.signal_scroll.connect(mem_fun(*this, &EditWindow::scroll_callback));
     m_eventroll.signal_scroll.connect(mem_fun(*this, &EditWindow::scroll_callback));
     m_dataroll.signal_scroll.connect(mem_fun(*this, &EditWindow::scroll_callback));
-    m_pianoroll.signal_focus.connect(mem_fun(*this, &EditWindow::focus_callback));
-    m_eventroll.signal_focus.connect(mem_fun(*this, &EditWindow::focus_callback));
+    m_pianoroll.signal_click.connect(mem_fun(*this, &EditWindow::click_callback));
+    m_eventroll.signal_click.connect(mem_fun(*this, &EditWindow::click_callback));
+    m_pianoroll.signal_hover.connect(mem_fun(*this, &EditWindow::hover_callback));
+    m_eventroll.signal_hover.connect(mem_fun(*this, &EditWindow::hover_callback));
 
     signal_size_allocate().connect([&](Gdk::Rectangle){update_hscrollbar_visibility();});
     signal_focus_out_event().connect([&](GdkEventFocus *e)->bool{on_focus_out();return false;});
@@ -533,15 +569,23 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_submenu_record.signal_popped_up().connect([&](const Gdk::Rectangle*, const Gdk::Rectangle*, bool, bool){on_focus_out();});
 
 
+    m_pianoroll.signal_adding.connect([&](bool a){set_adding(a, true);});
+    m_eventroll.signal_adding.connect([&](bool a){set_adding(a, true);});
+
+
     if (m_sequence->get_alt_cc() != -1) set_data_type(EVENT_CONTROL_CHANGE, m_sequence->get_alt_cc(), true);
 
     set_icon(Gdk::Pixbuf::create_from_xpm_data(seq192_32_xpm));
 
     clear_focus();
-    update_window_title();
+    update_name();
     set_position(Gtk::WIN_POS_CENTER);
     resize(1024, 600);
     show_all();
+
+    int highv = c_key_height * (127 - m_sequence->get_highest_note_event());
+    int lowv = c_key_height * (127 - m_sequence->get_lowest_note_event()) - m_pianokeys_scroller.get_height() + c_key_height;
+    m_pianokeys_scroller.get_vadjustment()->set_value((highv + lowv) / 2);
 
 }
 
@@ -555,9 +599,7 @@ EditWindow::on_key_press(GdkEventKey* event)
 {
     if (get_focus() != NULL) {
         string focus = get_focus()->get_name();
-        if (event->keyval == GDK_KEY_space && focus == "seqname") return false;
-        if ((event->keyval == GDK_KEY_Left || event->keyval == GDK_KEY_Right || event->keyval == GDK_KEY_Delete || event->keyval == GDK_KEY_BackSpace) &&
-            (focus == "seqname" || focus == "bpm" || focus == "bw" || focus == "measures"))
+        if (focus == "seqname" || focus == "bpm" || focus == "bw" || focus == "measures")
         {
             return false;
         }
@@ -593,6 +635,11 @@ EditWindow::on_key_press(GdkEventKey* event)
             m_pianoroll.set_snap_bypass(true);
             m_eventroll.set_snap_bypass(true);
             m_toolbar_snap_active.get_style_context()->add_class("bypass");
+            return true;
+        case GDK_KEY_D:
+        case GDK_KEY_d:
+            m_toolbar_pen_active.set_active(!m_adding);
+            return true;
         default:
             return false;
     }
@@ -645,10 +692,13 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
 {
     switch (action) {
         case EDIT_MENU_UNDO:
-            m_sequence->pop_undo();
-            break;
         case EDIT_MENU_REDO:
-            m_sequence->pop_redo();
+            if (action == EDIT_MENU_UNDO) m_sequence->pop_undo();
+            else m_sequence->pop_redo();
+            m_toolbar_measures.set_text(to_string(m_sequence->get_measures()));
+            m_toolbar_bpm.set_text(to_string(m_sequence->get_bpm()));
+            m_toolbar_bw.set_text(to_string(m_sequence->get_bw()));
+            update_name();
             break;
         case EDIT_MENU_CUT:
             if(m_sequence->mark_selected())
@@ -662,21 +712,39 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             m_sequence->copy_selected();
             break;
         case EDIT_MENU_PASTE:
-            if (m_focus == "eventroll") {
+            if (m_click_focus == "eventroll") {
                 m_eventroll.start_paste();
             } else {
                 m_pianoroll.start_paste();
             }
             break;
         case EDIT_MENU_DELETE:
-            if(m_sequence->mark_selected())
             {
-                m_sequence->push_undo();
-                m_sequence->remove_marked();
+                bool selection = m_sequence->mark_selected();
+                if (!selection) {
+                    if (m_click_focus == "eventroll") {
+                        long tick_s;
+                        long tick_w;
+                        m_eventroll.convert_x(c_event_width + 4, &tick_w);
+                        m_eventroll.convert_x(m_eventroll.m_current_x, &tick_s);
+                        m_sequence->select_events(tick_s, tick_s, tick_w, m_status, m_cc, sequence::e_select_one);
+                    } else {
+                        long tick_s;
+                        int note_h;
+                        m_pianoroll.convert_xy(m_pianoroll.m_current_x, m_pianoroll.m_current_y, &tick_s, &note_h);
+                        m_sequence->select_note_events(tick_s, note_h, tick_s, note_h, sequence::e_select_one);
+                    }
+                    selection = m_sequence->mark_selected();
+                }
+                if (selection)
+                {
+                    m_sequence->push_undo();
+                    m_sequence->remove_marked();
+                }
+                break;
             }
-            break;
         case EDIT_MENU_INVERT:
-            if (m_focus == "eventroll") {
+            if (m_click_focus == "eventroll") {
                 m_sequence->select_events(m_status, m_cc, true);
             } else {
                 m_sequence->select_events(EVENT_NOTE_ON, 0, true);
@@ -684,7 +752,7 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             }
             break;
         case EDIT_MENU_SELECTALL:
-            if (m_focus == "eventroll") {
+            if (m_click_focus == "eventroll") {
                 m_sequence->select_events(m_status, m_cc);
             } else {
                 m_sequence->select_events(EVENT_NOTE_ON, 0);
@@ -695,10 +763,16 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             m_sequence->unselect();
             break;
         case EDIT_MENU_TRANSPOSE:
+        {
             m_sequence->transpose_notes(data1);
+            int highv = c_key_height * (127 - m_sequence->get_highest_selected_note_event());
+            int lowv = c_key_height * (127 - m_sequence->get_lowest_selected_note_event()) + c_key_height;
+            auto adj = m_pianokeys_scroller.get_vadjustment();
+            adj->clamp_page(highv, lowv);
             break;
+        }
         case EDIT_MENU_QUANTIZE:
-            if (m_focus == "eventroll") {
+            if (m_click_focus == "eventroll") {
                 m_sequence->quantize_events(m_status, m_cc, m_pianoroll.m_snap, 1);
             } else {
                 m_sequence->quantize_events(EVENT_NOTE_ON, 0, m_pianoroll.m_snap, 1, true);
@@ -734,6 +808,11 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             break;
         case EDIT_MENU_RESUME:
             m_sequence->set_resume(m_menu_playback_resume.get_active());
+            global_is_modified = true;
+            break;
+        case EDIT_MENU_CHASE:
+            m_sequence->set_chase(m_menu_playback_chase.get_active());
+            global_is_modified = true;
             break;
     }
 }
@@ -856,9 +935,16 @@ EditWindow::scroll_callback(GdkEventScroll* event)
 }
 
 void
-EditWindow::focus_callback(string name)
+EditWindow::hover_callback(string name)
 {
-    m_focus = name;
+    m_hover_focus = name;
+    update_pointer_cursor();
+}
+
+void
+EditWindow::click_callback(string name)
+{
+    m_click_focus = name;
     clear_focus();
 }
 
@@ -884,17 +970,23 @@ EditWindow::update_midibus_name()
         m_midibus = m_sequence->get_midi_bus();
         m_midichannel = m_sequence->get_midi_channel();
 
-        mastermidibus *mmb =  m_perform->get_master_midi_bus();
-        string bus = mmb->get_midi_out_bus_name(m_midibus);
 
-        string channel = to_string(m_midichannel + 1);
-        int instrument = global_user_midi_bus_definitions[m_midibus].instrument[m_midichannel];
-        if (instrument >= 0 && instrument < c_maxBuses)
-        {
-            channel = channel + " " + global_user_instrument_definitions[instrument].instrument;
+        string busname = global_user_midi_bus_definitions[m_midibus].alias;
+        if (busname.empty()) busname = "Bus " + to_string(m_midibus + 1);
+        if (!global_user_instrument_definitions[m_midibus * 16 + m_midichannel].instrument.empty()) {
+             busname += ": " + global_user_instrument_definitions[m_midibus * 16 + m_midichannel].instrument;
+        } else {
+            busname += ": Channel " + to_string(m_midichannel + 1);
         }
 
-        m_toolbar_bus.set_text(bus + ": " + channel);
+        m_toolbar_bus.set_label(busname);
+        if (!global_user_instrument_definitions[m_midibus * 16 + m_midichannel].color.empty()) {
+            m_toolbar_bus_box.set_color(&global_user_instrument_colors[m_midibus * 16 + m_midichannel]);
+        } else {
+            m_toolbar_bus_box.set_color(NULL);
+        }
+        m_toolbar_bus_box.queue_draw();
+
 
     }
 
@@ -908,9 +1000,9 @@ void EditWindow::create_midibus_menu()
 
     mastermidibus *masterbus = m_perform->get_master_midi_bus();
     for ( int i=0; i< masterbus->get_num_out_buses(); i++ ){
-        Menu *menu_channels = new Menu();
+        Menu *menu_channels = manage(new Menu());
 
-        MenuItem * menu_item_bus = new MenuItem(masterbus->get_midi_out_bus_name(i));
+        MenuItem * menu_item_bus = manage(new MenuItem(masterbus->get_midi_out_bus_name(i)));
         menu_item_bus->set_submenu(*menu_channels);
         m_toolbar_bus_menu.append(*menu_item_bus);
 
@@ -918,16 +1010,17 @@ void EditWindow::create_midibus_menu()
         for( int j=0; j<16; j++ ){
             std::string name = to_string(j + 1);
             int instrument = global_user_midi_bus_definitions[i].instrument[j];
-            if ( instrument >= 0 && instrument < c_maxBuses )
+            if ( instrument >= 0 && instrument < c_max_instruments )
             {
                 name = name + " " + global_user_instrument_definitions[instrument].instrument;
             }
 
-            MenuItem * menu_item_channel = new MenuItem(name);
+            MenuItem * menu_item_channel = manage(new MenuItem(name));
             menu_item_channel->signal_activate().connect([&,i,j]{
                 m_sequence->set_midi_bus(i);
                 m_sequence->set_midi_channel(j);
                 set_data_type(m_status, m_cc); // update event dropdown tooltip
+                global_is_modified = true;
                 m_pianokeys.queue_draw();
             });
             menu_channels->append(*menu_item_channel);
@@ -956,10 +1049,6 @@ EditWindow::create_event_menu()
     m_menu_item_noteoff.signal_toggled().connect([&]{set_data_type(EVENT_NOTE_OFF, 0);});
     m_event_menu.append(m_menu_item_noteoff);
 
-    m_menu_item_aftertouch.set_label("Aftertouch");
-    m_menu_item_aftertouch.signal_toggled().connect([&]{set_data_type(EVENT_AFTERTOUCH, 0);});
-    m_event_menu.append(m_menu_item_aftertouch);
-
     m_menu_item_program.set_label("Program Change");
     m_menu_item_program.signal_toggled().connect([&]{set_data_type(EVENT_PROGRAM_CHANGE, 0);});
     m_event_menu.append(m_menu_item_program);
@@ -971,6 +1060,18 @@ EditWindow::create_event_menu()
     m_menu_item_pitch.set_label("Pitch Wheel");
     m_menu_item_pitch.signal_toggled().connect([&]{set_data_type(EVENT_PITCH_WHEEL, 0);});
     m_event_menu.append(m_menu_item_pitch);
+
+    m_menu_item_aftertouch.set_label("Aftertouch");
+    m_event_menu.append(m_menu_item_aftertouch);
+    m_menu_item_aftertouch.set_submenu(m_submenu_aftertouch);
+
+    for (int i=0; i<128; i++) {
+        m_menu_items_aftertouch[i] = new CheckMenuItem();
+        m_menu_items_aftertouch[i]->signal_toggled().connect([&, i]{
+            set_data_type(EVENT_AFTERTOUCH, 127 - i);
+        });
+        m_submenu_aftertouch.append(*m_menu_items_aftertouch[i]);
+    }
 
     m_menu_item_control.set_label("Control Change");
     m_event_menu.append(m_menu_item_control);
@@ -1032,14 +1133,12 @@ EditWindow::update_event_menu()
 
     m_menu_item_noteon.set_active(false);
     m_menu_item_noteoff.set_active(false);
-    m_menu_item_aftertouch.set_active(false);
     m_menu_item_program.set_active(false);
     m_menu_item_pitch.set_active(false);
     m_menu_item_pressure.set_active(false);
 
     m_menu_item_noteon.get_style_context()->remove_class("checked");
     m_menu_item_noteoff.get_style_context()->remove_class("checked");
-    m_menu_item_aftertouch.get_style_context()->remove_class("checked");
     m_menu_item_program.get_style_context()->remove_class("checked");
     m_menu_item_pitch.get_style_context()->remove_class("checked");
     m_menu_item_pressure.get_style_context()->remove_class("checked");
@@ -1051,6 +1150,8 @@ EditWindow::update_event_menu()
         m_menu_items_control[i]->get_style_context()->remove_class("checked");
         m_menu_items_alt_control[i+1]->set_active(false);
         m_menu_items_alt_control[i+1]->get_style_context()->remove_class("checked");
+        m_menu_items_aftertouch[i]->set_active(false);
+        m_menu_items_aftertouch[i]->get_style_context()->remove_class("checked");
 
         string ccname = to_string(i);
         int instrument = global_user_midi_bus_definitions[midi_bus].instrument[midi_ch];
@@ -1063,6 +1164,19 @@ EditWindow::update_event_menu()
         }
         m_menu_items_control[i]->set_label(ccname);
         m_menu_items_alt_control[i+1]->set_label(ccname);
+
+        string key_name = to_string(127 - i) + " ";
+        int keymap = global_user_midi_bus_definitions[midi_bus].keymap[midi_ch];
+        if (keymap > -1)
+        {
+            if (global_user_keymap_definitions[keymap].keys_active[127 - i]) {
+                key_name += global_user_keymap_definitions[keymap].keys[127 - i];
+            } else {
+                key_name += key_to_note[(127-i)%12] + to_string( (127 - i)  / 12 - 1);
+            }
+        }
+        m_menu_items_aftertouch[i]->set_label(key_name);
+
     }
 
     unsigned char status, cc;
@@ -1077,7 +1191,7 @@ EditWindow::update_event_menu()
                 m_menu_item_noteon.get_style_context()->add_class("checked");
                 break;
             case EVENT_AFTERTOUCH:
-                m_menu_item_aftertouch.get_style_context()->add_class("checked");
+                m_menu_items_aftertouch[127 - cc]->get_style_context()->add_class("checked");
                 break;
             case EVENT_CONTROL_CHANGE:
                 m_menu_items_control[cc]->get_style_context()->add_class("checked");
@@ -1127,8 +1241,10 @@ EditWindow::set_data_type(unsigned char status, unsigned char control, bool alt)
             label = "Note On";
             break;
         case EVENT_AFTERTOUCH:
-            label = "Aftertouch";
+        {
+            label = "ATouch " + to_string(control);
             break;
+        }
         case EVENT_CONTROL_CHANGE:
         {
             label = "CC " + to_string(control);
@@ -1200,8 +1316,41 @@ EditWindow::update_hscrollbar_visibility() {
 }
 
 void
-EditWindow::update_window_title()
+EditWindow::update_name()
 {
-    std::string title = string(PACKAGE) + " - " + m_toolbar_name.get_text();
-    set_title(title.c_str());
+    string name = m_sequence->get_name();
+    if (name != m_toolbar_name.get_text()) {
+        m_toolbar_name.set_text(name);
+        string title = string(PACKAGE) + " - " + name;
+        set_title(title.c_str());
+    }
+}
+
+
+void
+EditWindow::set_adding(bool adding, bool tmp)
+{
+    if (tmp) {
+        m_adding_tmp = adding;
+    } else {
+        m_adding = adding;
+    }
+
+    m_pianoroll.set_adding(m_adding || m_adding_tmp);
+    m_eventroll.set_adding(m_adding || m_adding_tmp);
+
+    if (m_adding_tmp) {
+        m_toolbar_pen_active.get_style_context()->add_class("on");
+    } else {
+        m_toolbar_pen_active.get_style_context()->remove_class("on");
+    }
+
+    update_pointer_cursor();
+}
+
+void
+EditWindow::update_pointer_cursor()
+{
+    bool pencil = m_hover_focus != "" && (m_adding || m_adding_tmp);
+    get_window()->set_cursor(Gdk::Cursor::create(get_window()->get_display(), pencil ? "pencil" : "normal"));
 }

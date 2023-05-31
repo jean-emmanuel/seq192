@@ -28,9 +28,7 @@ bool global_is_modified = false;
 perform::perform()
 {
     for (int i=0; i< c_max_sequence; i++) {
-
         m_seqs[i] = NULL;
-        m_seqs_active[i] = false;
     }
 
     m_running = false;
@@ -39,16 +37,20 @@ perform::perform()
     m_inputing = true;
     m_outputing = true;
     m_tick = -1;
-
-    // m_key_start  = GDK_space;
-    // m_key_stop   = GDK_Escape;
+    m_tick_offset = 0;
 
     m_screen_set = 0;
+    m_reference_sequence = -1;
 
+    #ifdef USE_JACK
     m_jack_running = false;
+    #endif
 
     m_out_thread_launched = false;
     m_in_thread_launched = false;
+
+    set_swing(0);
+    set_swing_reference(8);
 }
 
 void
@@ -57,13 +59,11 @@ perform::start_playing()
 
     stop_playing();
 
-    m_stopping_lock.lock();
-    while (m_stopping) m_stopping_lock.wait();
-    m_stopping_lock.unlock();
-
+    #ifdef USE_JACK
     position_jack();
-
     start_jack();
+    #endif
+
     start();
 }
 
@@ -72,8 +72,16 @@ void
 perform::stop_playing()
 {
 
+    #ifdef USE_JACK
     stop_jack();
+    #endif
+
     stop();
+
+    m_stopping_lock.lock();
+    while (m_stopping) m_stopping_lock.wait();
+    m_stopping_lock.unlock();
+
 }
 
 void
@@ -136,6 +144,37 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                 else if (types[0] == 'f') bpm = argv[0]->f;
                 else break;
                 self->set_bpm(bpm);
+            }
+            break;
+        case SEQ_SWING:
+            if (argc > 0)
+            {
+                double swing = 0;
+                if (types[0] == 'i') swing = argv[0]->i;
+                else if (types[0] == 'f') swing = argv[0]->f;
+                else break;
+                self->set_swing(swing);
+            }
+            break;
+        case SEQ_SWING_REFERENCE:
+            if (argc > 0)
+            {
+                int ref = 0;
+                if (types[0] == 'i') ref = argv[0]->i;
+                else if (types[0] == 'f') ref = argv[0]->f;
+                else break;
+                self->set_swing_reference(ref);
+            }
+            break;
+        case SEQ_CURSOR:
+            if (argc == 1 && (types[0] == 'i' || types[0] == 'f' || types[0] == 'd')) {
+                bool restart = self->m_running;
+                if (restart) self->stop_playing();
+                if (types[0] == 'i') self->m_tick_offset = argv[0]->i * c_ppqn;
+                if (types[0] == 'f') self->m_tick_offset = argv[0]->f * c_ppqn;
+                if (types[0] == 'd') self->m_tick_offset = argv[0]->d * c_ppqn;
+                self->set_orig_ticks(self->m_tick_offset);
+                if (restart) self->start_playing();
             }
             break;
         case SEQ_SSET:
@@ -299,8 +338,8 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                 for (int i = 0; i < c_max_sequence; i++) {
                     if (self->is_active(i) && self->m_seqs[i]->get_playing()) {
                         if (command == SEQ_SSEQ_QUEUED) {
-                            if (!self->m_seqs[i]->get_queued()) {
-                                self->m_seqs[i]->toggle_queued();
+                            if (!self->m_seqs[i]->is_queued()) {
+                                self->m_seqs[i]->toggle_queued(self->get_reference_sequence());
                             }
                         } else {
                             self->m_seqs[i]->set_playing(false);
@@ -317,26 +356,22 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                             case SEQ_MODE_SOLO:
                             case SEQ_MODE_ON:
                                 if (command == SEQ_SSEQ_QUEUED) {
-                                    if (!self->m_seqs[nseq]->get_playing() && !self->m_seqs[nseq]->get_queued()) {
-                                        self->m_seqs[nseq]->toggle_queued();
-                                    }
+                                        self->m_seqs[nseq]->set_on_queued(self->get_reference_sequence());
                                 } else {
                                     self->m_seqs[nseq]->set_playing(true);
                                 }
                                 break;
                             case SEQ_MODE_OFF:
                                 if (command == SEQ_SSEQ_QUEUED) {
-                                    if (self->m_seqs[nseq]->get_playing() != self->m_seqs[nseq]->get_queued()) {
                                         // if playing and not queued or queued and not playing
-                                        self->m_seqs[nseq]->toggle_queued();
-                                    }
+                                        self->m_seqs[nseq]->set_off_queued(self->get_reference_sequence());
                                 } else {
                                     self->m_seqs[nseq]->set_playing(false);
                                 }
                                 break;
                             case SEQ_MODE_TOGGLE:
                                 if (command == SEQ_SSEQ_QUEUED) {
-                                    self->m_seqs[nseq]->toggle_queued();
+                                    self->m_seqs[nseq]->toggle_queued(self->get_reference_sequence());
                                 } else {
                                     self->m_seqs[nseq]->toggle_playing();
                                 }
@@ -347,6 +382,11 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                             case SEQ_MODE_RECORD_ON:
                                 self->get_master_midi_bus()->set_sequence_input(self->m_seqs[nseq]);
                                 // only one sequence can be armed for recording
+                                // ignore matching sequences after the first
+                                return 0;
+                            case SEQ_MODE_SYNC:
+                                self->set_reference_sequence(nseq);
+                                // only one sequence can be selected as reference
                                 // ignore matching sequences after the first
                                 return 0;
                             case SEQ_MODE_CLEAR:
@@ -434,7 +474,7 @@ void perform::osc_status( char* address, const char* path)
                     json += "\"time\":\"" + std::to_string(m_seqs[nseq]->get_bpm()) + "/" + std::to_string(m_seqs[nseq]->get_bw()) + "\",";
                     json += "\"bars\":" + std::to_string((int)((double)m_seqs[nseq]->get_length() / c_ppqn / m_seqs[nseq]->get_bpm() * (m_seqs[nseq]->get_bw() / 4))) + ",";
                     json += "\"ticks\":" + std::to_string(m_seqs[nseq]->get_length()) + ",";
-                    json += "\"queued\":" + std::to_string(m_seqs[nseq]->get_queued()) + ",";
+                    json += "\"queued\":" + std::to_string(m_seqs[nseq]->is_queued()) + ",";
                     json += "\"playing\":" + std::to_string(m_seqs[nseq]->get_playing()) + ",";
                     json += "\"timesPlayed\":" + std::to_string(m_seqs[nseq]->get_times_played()) + ",";
                     json += "\"recording\":" + std::to_string(m_seqs[nseq]->get_recording());
@@ -455,6 +495,7 @@ void perform::osc_status( char* address, const char* path)
 
 }
 
+#ifdef USE_JACK
 void perform::init_jack()
 {
     if ( global_with_jack_transport  && !m_jack_running)
@@ -514,10 +555,19 @@ void perform::deinit_jack()
 
     }
 }
+void jack_shutdown(void *arg)
+{
+    perform *p = (perform *) arg;
+    p->m_jack_running = false;
 
+    printf("JACK shut down.\nJACK sync Disabled.\n");
+}
+#endif
 
 void perform::clear_all()
 {
+    undoable_lock(false);
+
     reset_sequences();
 
     for (int i=0; i< c_max_sequence; i++ ){
@@ -531,6 +581,21 @@ void perform::clear_all()
     for (int i=0; i<c_max_sets; i++ ){
         set_screen_set_notepad( i, &e );
     }
+
+    for (long unsigned int i = 0; i < m_list_undo.size(); i++) {
+        m_list_undo[i]->sequence_map.clear();
+    }
+    m_list_undo.clear();
+    m_list_undo.shrink_to_fit();
+
+
+    for (long unsigned int i = 0; i < m_list_redo.size(); i++) {
+        m_list_redo[i]->sequence_map.clear();
+    }
+    m_list_redo.clear();
+    m_list_redo.shrink_to_fit();
+
+    undoable_unlock();
 }
 
 perform::~perform()
@@ -557,7 +622,9 @@ perform::~perform()
         }
     }
 
+    #ifdef USE_JACK
     deinit_jack();
+    #endif
 
     if (global_oscport != 0) {
         oscserver->stop();
@@ -573,7 +640,6 @@ void perform::add_sequence( sequence *a_seq, int a_perf )
             a_perf >= 0 ){
 
         m_seqs[a_perf] = a_seq;
-        set_active(a_perf, true);
         //a_seq->set_tag( a_perf );
 
     } else {
@@ -583,7 +649,6 @@ void perform::add_sequence( sequence *a_seq, int a_perf )
             if ( is_active(i) == false ){
 
                 m_seqs[i] = a_seq;
-                set_active(i,true);
 
                 //a_seq->set_tag( i  );
                 break;
@@ -592,80 +657,13 @@ void perform::add_sequence( sequence *a_seq, int a_perf )
     }
 }
 
-
-void perform::set_active( int a_sequence, bool a_active )
-{
-    if ( a_sequence < 0 || a_sequence >= c_max_sequence )
-        return;
-
-    //printf ("set_active %d\n", a_active );
-
-    if ( m_seqs_active[ a_sequence ] == true && a_active == false )
-    {
-        set_was_active(a_sequence);
-    }
-
-    m_seqs_active[ a_sequence ] = a_active;
-}
-
-
-void perform::set_was_active( int a_sequence )
-{
-    if ( a_sequence < 0 || a_sequence >= c_max_sequence )
-        return;
-
-    //printf( "was_active true\n" );
-
-    m_was_active_main[ a_sequence ] = true;
-    m_was_active_edit[ a_sequence ] = true;
-    m_was_active_perf[ a_sequence ] = true;
-    m_was_active_names[ a_sequence ] = true;
-}
-
-
-
 bool perform::is_active( int a_sequence )
 {
     if ( a_sequence < 0 || a_sequence >= c_max_sequence )
         return false;
 
-    return m_seqs_active[ a_sequence ];
+    return m_seqs[ a_sequence ] != NULL;
 }
-
-
-bool perform::is_dirty_main (int a_sequence)
-{
-    if ( a_sequence < 0 || a_sequence >= c_max_sequence )
-        return false;
-
-    if ( is_active(a_sequence) )
-    {
-        return m_seqs[a_sequence]->is_dirty_main();
-    }
-
-    bool was_active = m_was_active_main[ a_sequence ];
-    m_was_active_main[ a_sequence ] = false;
-
-    return was_active;
-}
-
-
-bool perform::is_dirty_edit (int a_sequence)
-{
-    if ( a_sequence < 0 || a_sequence >= c_max_sequence )
-        return false;
-
-    if ( is_active(a_sequence) )
-    {
-        return m_seqs[a_sequence]->is_dirty_edit();
-    }
-
-    bool was_active = m_was_active_edit[ a_sequence ];
-    m_was_active_edit[ a_sequence ] = false;
-
-    return was_active;
-}
-
 
 sequence* perform::get_sequence( int a_sequence )
 {
@@ -709,13 +707,16 @@ double  perform::get_bpm( )
 
 void perform::delete_sequence( int a_num )
 {
-    set_active(a_num, false);
 
     if ( m_seqs[a_num] != NULL ){
+        undoable_lock(true);
 
         m_seqs[a_num]->set_playing( false );
         delete m_seqs[a_num];
+        m_seqs[a_num] = NULL;
         global_is_modified = true;
+
+        undoable_unlock();
     }
 }
 
@@ -730,34 +731,51 @@ void perform::copy_sequence( int a_num )
 void perform::cut_sequence( int a_num )
 {
     if (is_active(a_num)) {
+        undoable_lock(true);
+
         m_clipboard = *get_sequence(a_num);
         delete_sequence(a_num);
+
+        undoable_unlock();
     }
 }
 
 void perform::paste_sequence( int a_num )
 {
     if (!is_active(a_num)) {
+        undoable_lock(true);
+
         new_sequence(a_num);
         *get_sequence(a_num) = m_clipboard;
+
+        undoable_unlock();
     }
 }
 
 void perform::move_sequence( int a_from, int a_to )
 {
     if (is_active(a_from) && !is_active(a_to)) {
+        undoable_lock(true);
+
         new_sequence(a_to);
         *get_sequence(a_to) = *get_sequence(a_from);
         delete_sequence(a_from);
+
+        undoable_unlock();
     }
 }
 
 void perform::new_sequence( int a_sequence )
 {
-    m_seqs[ a_sequence ] = new sequence();
-    m_seqs[ a_sequence ]->set_master_midi_bus( &m_master_bus );
-    set_active(a_sequence, true);
-    global_is_modified = true;
+    if (!is_active(a_sequence)) {
+        undoable_lock(true);
+
+        m_seqs[ a_sequence ] = new sequence();
+        m_seqs[ a_sequence ]->set_master_midi_bus( &m_master_bus );
+        global_is_modified = true;
+
+        undoable_unlock();
+    }
 }
 
 
@@ -775,8 +793,13 @@ void perform::print()
 
 void perform::set_screen_set_notepad( int a_screen_set, string *a_notepad )
 {
-    if ( a_screen_set < c_max_sets )
+    if ( a_screen_set < c_max_sets ) {
+        undoable_lock(true);
+
         m_screen_set_notepad[a_screen_set] = *a_notepad;
+
+        undoable_unlock();
+    }
 }
 
 
@@ -804,29 +827,66 @@ int perform::get_screenset()
     return m_screen_set;
 }
 
+void perform::set_reference_sequence( int a_seqnum )
+{
+    if (a_seqnum == m_reference_sequence) return;
+
+    if (is_active(m_reference_sequence))
+    {
+        get_sequence(m_reference_sequence)->set_sync_reference(false);
+    }
+
+    m_reference_sequence = a_seqnum;
+
+    if (is_active(m_reference_sequence))
+    {
+        get_sequence(m_reference_sequence)->set_sync_reference(true);
+    }
+}
+
+sequence * perform::get_reference_sequence()
+{
+    if (is_active(m_reference_sequence))
+    {
+        return get_sequence(m_reference_sequence);
+    }
+    else
+    {
+        m_reference_sequence = -1;
+        return NULL;
+    }
+}
+
+
+
 
 void perform::play( long a_tick )
 {
 
     if (a_tick <= m_tick) return;
 
-    m_tick = a_tick;
     for (int i=0; i< c_max_sequence; i++ ){
 
         if ( is_active(i) ){
             assert( m_seqs[i] );
 
 
-            if ( m_seqs[i]->get_queued() &&
-                    m_seqs[i]->get_queued_tick() <= a_tick ){
+            if ( m_seqs[i]->is_queued() && m_seqs[i]->get_queued_tick() <= a_tick) {
 
-                m_seqs[i]->play( m_seqs[i]->get_queued_tick() - 1 );
-                m_seqs[i]->toggle_playing();
+
+                // m_seqs[i]->play( m_seqs[i]->get_queued_tick() - 1 );
+                if (get_reference_sequence() != NULL && get_reference_sequence() != m_seqs[i]) {
+                    m_seqs[i]->set_orig_tick( m_tick );
+                    m_seqs[i]->set_sync_offset(m_tick % m_seqs[i]->get_length());
+                }
+
+                m_seqs[i]->set_playing(m_seqs[i]->get_queued() == QUEUED_ON);
             }
 
-            m_seqs[i]->play( a_tick );
+            m_seqs[i]->play( a_tick, m_swing_ratio, m_swing_reference );
         }
     }
+    m_tick = a_tick;
 
     /* flush the bus */
     m_master_bus.flush();
@@ -845,6 +905,7 @@ void perform::set_orig_ticks( long a_tick  )
 }
 
 
+#ifdef USE_JACK
 void perform::start_jack(  )
 {
     //printf( "perform::start_jack()\n" );
@@ -869,13 +930,15 @@ void perform::position_jack()
         jack_transport_locate( m_jack_client, 0 );
     }
 }
-
+#endif
 
 void perform::start()
 {
+    #ifdef USE_JACK
     if (m_jack_running) {
         return;
     }
+    #endif
 
     inner_start();
 }
@@ -953,8 +1016,9 @@ void perform::reset_sequences()
             bool state = m_seqs[i]->get_playing();
 
             m_seqs[i]->off_playing_notes();
+            m_seqs[i]->set_sync_offset(0);
             m_seqs[i]->set_playing(false);
-            m_seqs[i]->zero_markers();
+            m_seqs[i]->set_orig_tick(m_tick_offset);
             m_seqs[i]->set_playing(state);
         }
     }
@@ -1001,7 +1065,7 @@ void* output_thread_func(void *a_pef )
 }
 
 
-
+#ifdef USE_JACK
 int jack_process_callback(jack_nframes_t nframes, void* arg)
 {
     perform *m_mainperf = (perform *) arg;
@@ -1023,7 +1087,7 @@ int jack_process_callback(jack_nframes_t nframes, void* arg)
 
     return 0;
 }
-
+#endif
 
 
 void perform::output_func()
@@ -1091,7 +1155,7 @@ void perform::output_func()
             playing_time = now_time;
 
             // play sequences at current tick
-            play(current_tick);
+            play(current_tick + m_tick_offset);
 
             m_stopping_lock.lock();
             if (m_stopping) break;
@@ -1204,10 +1268,193 @@ void perform::restore_playing_state()
     }
 }
 
-void jack_shutdown(void *arg)
-{
-    perform *p = (perform *) arg;
-    p->m_jack_running = false;
 
-    printf("JACK shut down.\nJACK sync Disabled.\n");
+void perform::file_new()
+{
+    clear_all();
+    global_filename = "";
+    global_is_modified = false;
+}
+
+bool perform::file_open(std::string filename)
+{
+    clear_all();
+    midifile f(filename);
+    bool result = f.parse(this, 0);
+    global_is_modified = !result;
+    if (result) global_filename = filename;
+    return result;
+}
+
+bool perform::file_import(std::string filename)
+{
+    midifile f(filename);
+    bool result = f.parse(this, get_screenset());
+    global_is_modified = !result;
+    return result;
+}
+
+bool perform::file_save()
+{
+    midifile f(global_filename);
+    bool result = f.write(this, -1, -1);
+    if (result) global_is_modified = false;
+    return result;
+}
+
+bool perform::file_saveas(std::string filename)
+{
+    midifile f(filename);
+    bool result = f.write(this, -1, -1);
+    if (result) {
+        global_filename = filename;
+        global_is_modified = false;
+    }
+    return result;
+
+}
+
+bool perform::file_export(std::string filename)
+{
+    midifile f(filename);
+    bool result = f.write(this, -1, -1);
+    return result;
+}
+
+bool perform::file_export_screenset(std::string filename)
+{
+    midifile f(filename);
+    bool result = f.write(this, get_screenset(), -1);
+    return result;
+}
+
+bool perform::file_export_sequence(std::string filename, int seqnum)
+{
+    midifile f(filename);
+    bool result = f.write(this, get_screenset(), seqnum);
+    return result;
+}
+
+state * perform::get_state()
+{
+    state * s = new state();
+    for (int i = 0; i < c_max_sequence; i++) {
+        if (is_active(i)) {
+            s->sequence_map[i] = *get_sequence(i);
+        }
+    }
+    for (int i = 0; i < c_max_sets; i++) {
+        s->notepad[i] = m_screen_set_notepad[i];
+    }
+    return s;
+}
+
+void perform::set_state(state * s)
+{
+    undoable_lock(false);
+
+    save_playing_state();
+
+    for (int i = 0; i < c_max_sequence; i++) {
+        if (is_active(i)) delete_sequence(i);
+        if (s->sequence_map.find(i) != s->sequence_map.end()) {
+            new_sequence(i);
+            *m_seqs[i] = s->sequence_map.find(i)->second;
+        }
+    }
+
+    for (int i = 0; i < c_max_sets; i++) {
+        set_screen_set_notepad(i, &s->notepad[i]);
+    }
+
+    restore_playing_state();
+
+    global_is_modified = true;
+
+    undoable_unlock();
+}
+
+void perform::push_undo()
+{
+    m_list_undo.push_back(get_state());
+
+    if (can_redo()) {
+        for (long unsigned int i = 0; i < m_list_redo.size(); i++) {
+            m_list_redo[i]->sequence_map.clear();
+        }
+        m_list_redo.clear();
+        m_list_redo.shrink_to_fit();
+    }
+
+    if (m_list_undo.size() > c_max_undo_history) {
+        m_list_undo.front()->sequence_map.clear();
+        m_list_undo.pop_front();
+        m_list_undo.shrink_to_fit();
+    }
+}
+
+void perform::pop_undo()
+{
+    if (can_undo())
+    {
+        m_list_redo.push_back(get_state());
+        set_state(m_list_undo.back());
+        m_list_undo.back()->sequence_map.clear();
+        m_list_undo.pop_back();
+        m_list_undo.shrink_to_fit();
+    }
+}
+
+void perform::pop_redo()
+{
+    if (can_redo())
+    {
+        m_list_undo.push_back(get_state());
+        set_state(m_list_redo.back());
+        m_list_redo.back()->sequence_map.clear();
+        m_list_redo.pop_back();
+        m_list_redo.shrink_to_fit();
+    }
+}
+
+bool perform::can_undo()
+{
+    return m_list_undo.size() > 0;
+}
+
+bool perform::can_redo()
+{
+    return m_list_redo.size() > 0;
+}
+
+
+void perform::undoable_lock(bool a_push_undo)
+{
+    if (m_undo_lock == 0 && a_push_undo) push_undo();
+    m_undo_lock++;
+}
+
+void perform::undoable_unlock()
+{
+    m_undo_lock--;
+}
+
+void perform::set_swing(double swing)
+{
+    // define swing strengh
+    // 0 = no swing
+    // > 0 = swing
+    // < 0 = anti-swing
+    if (swing > 4.99) swing = 4.99;
+    else if (swing < -4.99) swing = -4.99;
+    m_swing_ratio = swing;
+}
+
+void perform::set_swing_reference(double swing_reference)
+{
+    // define which beat unit should be the swing reference
+    // 8 = 8th will swing
+    // 16 = 16th will swing
+    if (swing_reference <= 0) swing_reference = 1;
+    m_swing_reference = 2 * (4 * c_ppqn) / swing_reference;
 }

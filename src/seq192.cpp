@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <sys/stat.h>
 
 #include "package.h"
 
@@ -27,8 +28,10 @@
 #include "core/cachefile.h"
 #include "core/perform.h"
 
+#ifdef USE_GTK
 #include "gui/mainwindow.h"
 #include <gtkmm.h>
+#endif
 
 /* struct for command parsing */
 static struct
@@ -49,7 +52,12 @@ string config_filename = "";
 string global_filename = "";
 string last_used_dir = getenv("HOME");
 
+#ifndef USE_GTK
+bool global_no_gui = true;
+#else
 bool global_no_gui = false;
+#endif
+
 bool global_with_jack_transport = false;
 
 bool global_is_running = true;
@@ -62,25 +70,33 @@ user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];
 user_instrument_definition global_user_instrument_definitions[c_max_instruments];
 user_keymap_definition     global_user_keymap_definitions[c_max_instruments];
 
+#ifdef USE_GTK
+color global_user_instrument_colors[c_max_instruments];
 Glib::RefPtr<Gtk::Application> application;
+#endif
 
 // nsm
 bool global_nsm_gui = false;
-bool nsm_opional_gui_support = true;
+bool nsm_optional_gui_support = true;
 nsm_client_t *nsm = 0;
 bool nsm_wait = true;
 string nsm_folder = "";
 int
 nsm_save_cb(char **,  void *userdata)
 {
-    MainWindow *w = (MainWindow *) userdata;
-    w->nsm_save();
-    return ERR_OK;
+    perform *p = (perform *) userdata;
+    if (p->file_save()) {
+        return ERR_OK;
+    } else {
+        return ERR_GENERAL;
+    }
 }
 void
 nsm_hide_cb(void *userdata)
 {
+    #ifdef USE_GTK
     application->hold();
+    #endif
     global_nsm_gui = false;
 }
 void
@@ -95,7 +111,7 @@ nsm_open_cb(const char *name, const char *display_name, const char *client_id, c
     nsm_folder = name;
     global_client_name = client_id;
     // NSM API 1.1.0: check if server supports optional-gui
-    nsm_opional_gui_support = strstr(nsm_get_session_manager_features(nsm), "optional-gui");
+    nsm_optional_gui_support = strstr(nsm_get_session_manager_features(nsm), "optional-gui");
     mkdir(nsm_folder.c_str(), 0777);
     // make sure nsm server doesn't override cached visibility state
     nsm_send_is_shown(nsm);
@@ -146,15 +162,28 @@ main (int argc, char *argv[])
             case 'h':
 
                 printf("\n");
-                printf("seq192 - live MIDI sequencer\n\n");
-                printf("Usage: seq192 [options]\n\n");
+                printf("%s - live MIDI sequencer (version %s)", PACKAGE, VERSION);
+
+                #if !defined USE_JACK && !defined USE_GTK
+                printf("(compiled without jack support and gtk support)");
+                #elif !defined USE_JACK
+                printf("(compiled without jack support)");
+                #elif !defined USE_GTK
+                printf("(compiled without gtk support)");
+                #endif
+
+                printf("\n\nUsage: %s [options]\n\n", PACKAGE);
                 printf("Options:\n");
                 printf("  -h, --help              show available options\n");
                 printf("  -f, --file <filename>   load midi file on startup\n");
                 printf("  -c, --config <filename> load config file on startup\n");
                 printf("  -p, --osc-port <port>   osc input port (udp port number or unix socket path)\n");
+                #ifdef USE_JACK
                 printf("  -j, --jack-transport    sync to jack transport\n");
+                #endif
+                #ifdef USE_GTK
                 printf("  -n, --no-gui            enable headless mode\n");
+                #endif
                 printf("  -v, --version           show version and exit\n");
                 printf("\n");
 
@@ -198,7 +227,8 @@ main (int argc, char *argv[])
         nsm = nsm_new();
         nsm_set_open_callback(nsm, nsm_open_cb, 0);
         if (nsm_init(nsm, nsm_url) == 0) {
-            nsm_send_announce(nsm, PACKAGE, ":optional-gui:dirty:", argv[0]);
+            if (!global_no_gui) nsm_send_announce(nsm, PACKAGE, ":optional-gui:dirty:", argv[0]);
+            else nsm_send_announce(nsm, PACKAGE, ":dirty:", argv[0]);
         }
         int timeout = 0;
         while (nsm_wait) {
@@ -247,7 +277,10 @@ main (int argc, char *argv[])
 
     p->launch_input_thread();
     p->launch_output_thread();
+
+    #ifdef USE_JACK
     p->init_jack();
+    #endif
 
     if (nsm) {
         global_filename = nsm_folder + "/session.midi";
@@ -257,6 +290,7 @@ main (int argc, char *argv[])
             midifile f(global_filename);
             f.write(p, -1, -1);
         }
+        nsm_set_save_callback(nsm, nsm_save_cb, (void*) p);
     }
 
     if (global_filename != "") {
@@ -273,17 +307,17 @@ main (int argc, char *argv[])
     int status = 0;
     if (global_no_gui) {
         while (global_is_running) {
-            usleep(1000);
+            if (nsm) nsm_check_nowait(nsm);
+            usleep(10000);
         }
     } else {
+        #ifdef USE_GTK
         application = Gtk::Application::create();
         MainWindow window(p, application);
 
         if (nsm) {
-            // register callbacks
-            nsm_set_save_callback(nsm, nsm_save_cb, (void*) &window);
             // setup optional-gui
-            if (nsm_opional_gui_support) {
+            if (nsm_optional_gui_support) {
                 nsm_set_show_callback(nsm, nsm_show_cb, 0);
                 nsm_set_hide_callback(nsm, nsm_hide_cb, 0);
                 if (!global_nsm_gui) nsm_hide_cb(0);
@@ -292,7 +326,7 @@ main (int argc, char *argv[])
                 global_nsm_gui = true;
             }
             // enable nsm in window
-            window.nsm_set_client(nsm, nsm_opional_gui_support);
+            window.nsm_set_client(nsm, nsm_optional_gui_support);
             // bind quit signal
             signal(SIGTERM, [](int param){
                 global_is_running = false;
@@ -308,6 +342,7 @@ main (int argc, char *argv[])
 
 
         status = application->run(window);
+        #endif
     }
 
     // write cache file

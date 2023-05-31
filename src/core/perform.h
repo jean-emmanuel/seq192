@@ -27,10 +27,19 @@ class perform;
 #include "osc.h"
 #include <unistd.h>
 #include <pthread.h>
+#include <map>
 
+#ifdef USE_JACK
 #include <jack/jack.h>
 #include <jack/transport.h>
+#endif
 
+
+typedef std::map<int, sequence> SequenceMap;
+struct state {
+    string notepad[c_max_sets];
+    SequenceMap sequence_map;
+};
 
 /* class contains sequences that make up a live set */
 class perform
@@ -40,13 +49,6 @@ class perform
     /* vector of sequences */
     sequence *m_seqs[c_max_sequence];
     sequence m_clipboard;
-
-    bool m_seqs_active[ c_max_sequence ];
-
-    bool m_was_active_main[ c_max_sequence ];
-    bool m_was_active_edit[ c_max_sequence ];
-    bool m_was_active_perf[ c_max_sequence ];
-    bool m_was_active_names[ c_max_sequence ];
 
     bool m_sequence_state[  c_max_sequence ];
 
@@ -68,55 +70,42 @@ class perform
     bool m_transport_stopping;
 
     long m_tick;
+    long m_tick_offset;
+
+    double m_swing_ratio;
+    double m_swing_reference;
 
     void set_running( bool a_running );
 
     string m_screen_set_notepad[c_max_sets];
 
     int m_offset;
-    int m_control_status;
     int m_screen_set;
+    int m_reference_sequence;
 
     condition_var m_running_lock;
     condition_var m_stopping_lock;
 
-    // do not access these directly, use set/lookup below
-    std::map<unsigned int,long> key_events;
-    std::map<unsigned int,long> key_groups;
-    std::map<long,unsigned int> key_events_rev; // reverse lookup, keep this in sync!!
-    std::map<long,unsigned int> key_groups_rev; // reverse lookup, keep this in sync!!
-
-
+    #ifdef USE_JACK
     jack_client_t *m_jack_client;
     bool m_jack_running;
+    #endif
 
     void inner_start();
     void inner_stop();
 
+    deque < state* >m_list_undo;
+    deque < state* >m_list_redo;
+    int m_undo_lock = 0;
+    void undoable_lock(bool a_push_undo);
+    void undoable_unlock();
+    void push_undo();
+    state * get_state();
+    void set_state(state * s);
+
+
  public:
     bool is_running();
-
-    unsigned int m_key_bpm_up;
-    unsigned int m_key_bpm_dn;
-
-    unsigned int m_key_replace;
-    unsigned int m_key_queue;
-    unsigned int m_key_keep_queue;
-    unsigned int m_key_snapshot_1;
-    unsigned int m_key_snapshot_2;
-
-    unsigned int m_key_screenset_up;
-    unsigned int m_key_screenset_dn;
-    unsigned int m_key_set_playing_screenset;
-
-    unsigned int m_key_group_on;
-    unsigned int m_key_group_off;
-    unsigned int m_key_group_learn;
-
-    unsigned int m_key_screenset[c_max_sets];
-
-    unsigned int m_key_start;
-    unsigned int m_key_stop;
 
     perform();
     ~perform();
@@ -131,8 +120,6 @@ class perform
 
     void launch_input_thread();
     void launch_output_thread();
-    void init_jack();
-    void deinit_jack();
 
     void add_sequence( sequence *a_seq, int a_perf );
     void delete_sequence( int a_num );
@@ -151,21 +138,24 @@ class perform
     void set_screenset( int a_ss );
     int get_screenset();
 
+    void set_reference_sequence( int a_seqnum );
+    sequence * get_reference_sequence();
+
     void start();
     void stop();
 
+    #ifdef USE_JACK
+    void init_jack();
+    void deinit_jack();
     void start_jack();
     void stop_jack();
     void position_jack();
+    #endif
 
     void off_sequences();
     void all_notes_off();
 
-    void set_active(int a_sequence, bool a_active);
-    void set_was_active( int a_sequence );
     bool is_active(int a_sequence);
-    bool is_dirty_main (int a_sequence);
-    bool is_dirty_edit (int a_sequence);
 
     void new_sequence( int a_sequence );
 
@@ -180,6 +170,10 @@ class perform
     void set_bpm(double a_bpm);
     double  get_bpm( );
 
+    double get_swing();
+    void set_swing(double swing);
+    void set_swing_reference(double swing_reference);
+
     mastermidibus* get_master_midi_bus( );
 
     void output_func();
@@ -187,6 +181,20 @@ class perform
 
     void save_playing_state();
     void restore_playing_state();
+
+    void file_new();
+    bool file_open(std::string filename);
+    bool file_import(std::string filename);
+    bool file_save();
+    bool file_saveas(std::string filename);
+    bool file_export(std::string filename);
+    bool file_export_screenset(std::string filename);
+    bool file_export_sequence(std::string filename, int seqnum);
+
+    void pop_undo();
+    void pop_redo();
+    bool can_undo();
+    bool can_redo();
 
     OSCServer *oscserver;
     static int osc_callback(const char *path, const char *types, lo_arg ** argv,
@@ -199,6 +207,9 @@ class perform
         SEQ_PLAY,
         SEQ_STOP,
         SEQ_BPM,
+        SEQ_SWING,
+        SEQ_SWING_REFERENCE,
+        SEQ_CURSOR,
         SEQ_SSET,
         SEQ_PANIC,
         SEQ_SSEQ,
@@ -215,6 +226,7 @@ class perform
         SEQ_MODE_RECORD,
         SEQ_MODE_RECORD_ON,
         SEQ_MODE_RECORD_OFF,
+        SEQ_MODE_SYNC,
         SEQ_MODE_COPY,
         SEQ_MODE_CUT,
         SEQ_MODE_PASTE,
@@ -232,6 +244,9 @@ class perform
         {"/play",               SEQ_PLAY},
         {"/stop",               SEQ_STOP},
         {"/bpm",                SEQ_BPM},
+        {"/swing",              SEQ_SWING},
+        {"/swing/reference",    SEQ_SWING_REFERENCE},
+        {"/cursor",             SEQ_CURSOR},
         {"/screenset",          SEQ_SSET},
         {"/panic",              SEQ_PANIC},
         {"/sequence",           SEQ_SSEQ},
@@ -250,6 +265,7 @@ class perform
         {"record",              SEQ_MODE_RECORD},
         {"record_on",           SEQ_MODE_RECORD_ON},
         {"record_off",          SEQ_MODE_RECORD_OFF},
+        {"sync",                SEQ_MODE_SYNC},
         {"copy",                SEQ_MODE_COPY},
         {"cut",                 SEQ_MODE_CUT},
         {"paste",               SEQ_MODE_PASTE},
@@ -269,8 +285,10 @@ class perform
     friend class optionsfile;
     friend class options;
 
+    #ifdef USE_JACK
     friend int jack_process_callback(jack_nframes_t nframes, void* arg);
     friend void jack_shutdown(void *arg);
+    #endif
 };
 
 /* located in perform.C */
@@ -278,7 +296,9 @@ extern void *output_thread_func(void *a_p);
 extern void *input_thread_func(void *a_p);
 
 
+#ifdef USE_JACK
 int jack_process_callback(jack_nframes_t nframes, void* arg);
 void jack_shutdown(void *arg);
+#endif
 
 #endif

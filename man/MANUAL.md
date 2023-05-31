@@ -49,7 +49,7 @@ The main window consist in a toolbar and a sequence grid.
     *Screenset name entry*: set name of current screenset<br/>
     *Screenset number entry*: select current screenset<br/>
 
-* The **sequence grid** is empty by default. Right-clicking in the grid allows creating a new sequence or editing an existing one. Sequences can be rearranged in the grid by dragging them. Left-clicking on a sequence toggles its playing state.
+* The **sequence grid** is empty by default. Right-clicking in the grid allows creating a new sequence or editing an existing one. Sequences can be rearranged in the grid by dragging them. Left-clicking on a sequence toggles its playing state. Middle-clicking on a sequence opens its edit window. Shift+click defines the sequence as the synchronization reference for queued sequences. Ctrl+click toggles the sequence's queued state. The keyboard's arrow keys can be used to navigate accross sequences.
 
 **Edit window**
 
@@ -76,7 +76,10 @@ The edit window consist in a menu, a toolbar, a pianoroll and an event editor.
 
 **Important note**
 
-Undo/redo only works in the edit window, and with some limitations: only MIDI events are journalized, other changes (sequence name, sequence length, etc) can't be undone. Reducing the length of a sequence may result in a loss of data.
+Each window has its own undo/redo history:
+
+    - main window: screnset name and sequences (position and content)
+    - edit window: MIDI events, sequence name, number of measures and time signature
 
 
 ## JACK TRANSPORT
@@ -96,8 +99,9 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
 
     - MIDI bus names
     - MIDI channel names per bus
-    - Note names in the piano roll (per channel)
-    - Control names in the event dropdown (per channel)
+    - Sequence colors as css color strings (per bus or per channel )
+    - Note names in the piano roll (per bus or per channel)
+    - Control names in the event dropdown (per bus or per channel )
 
 **Example**
 
@@ -109,6 +113,7 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
             "channels": {
                 "0": {
                     "name": "Drums",
+                    "color": "orange",
                     "notes": {
                         "64": "Kick",
                         "65": "Snare",
@@ -143,6 +148,15 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
 * `/bpm` <float_or_int: bpm>:
     Set bpm
 
+* `/swing` <float_or_int: position>:
+    Set swing strength (0: no swing, >0: swing, <0: anti-swing)
+
+* `/swing/reference` <float_or_int: position>:
+    Set swing reference (8: 8ths will swing, 16: 16th will swing, etc)
+
+* `/cursor` <float_or_int: position>:
+    Set playhead position (affects all sequences). Position is >= 0 and expressed in quarter notes (0 = first beat)
+
 * `/screenset` <int: screen>:
     Change active screen set
 
@@ -151,7 +165,7 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
 
 * `/sequence` <string: mode> <int: column> <int: row>:
     Set sequence(s) state<br/>
-    _mode_: "solo", "on", "off", "toggle", "record", "record_on", "record_off", "clear", "copy", "cut", "paste", "delete"; only one sequence can be recording at a time; "record_off" mode doesn't require any argument<br/>
+    _mode_: "solo", "on", "off", "toggle", "record", "record_on", "record_off", "sync", "clear", "copy", "cut", "paste", "delete"; only one sequence can be recording at a time; "record_off" mode doesn't require any argument<br/>
     _column_: column number on screen set (zero indexed)<br/>
     _row_: row number; if omitted, all rows are affected; multiple rows can be specified
 
@@ -239,7 +253,7 @@ seq192 is written by Jean-Emmanuel Doucet and based on
 
 ## COPYRIGHT
 
-Copyright © 2021 Jean-Emmanuel Doucet <jean-emmanuel@ammd.net>
+Copyright © 2021-2023 Jean-Emmanuel Doucet <jean-emmanuel@ammd.net>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -304,8 +304,10 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
                                     else if (proprietary == c_timesig)
                                     {
-                                        seq->set_bpm (m_d[m_pos++]);
-                                        seq->set_bw (m_d[m_pos++]);
+                                        seq->undoable_lock(false);
+                                        seq->set_bpm (m_d[m_pos++], false);
+                                        seq->set_bw (m_d[m_pos++], false);
+                                        seq->undoable_unlock();
                                         len -= 2;
                                     }
 
@@ -321,13 +323,18 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                         len--;
                                     }
 
+                                    else if (proprietary == c_chase)
+                                    {
+                                        seq->set_chase (m_d[m_pos++]);
+                                        len--;
+                                    }
                                     /* eat the rest */
                                     m_pos += len;
                                     break;
 
                                     /* Trk Done */
                                 case 0x2f:
-
+                                {
                                     // If delta is 0, then another event happened at the same time
                                     // as the track end.  the sequence class will discard the last
                                     // note.  This is a fix for that.   Native Seq24 file will always
@@ -336,11 +343,16 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                         CurrentTime += 1;
                                     }
 
-                                    seq->set_length (CurrentTime);
+                                    seq->undoable_lock(false);
+                                    long units = ((seq->get_bpm() * (c_ppqn * 4)) /  seq->get_bw() );
+                                    long measures = CurrentTime / units;
+                                    if (CurrentTime % units != 0) measures++;
+                                    seq->set_measures(measures);
+                                    seq->undoable_unlock();
                                     seq->zero_markers ();
                                     done = true;
                                     break;
-
+                                }
                                     /* Track name */
                                 case 0x03:
                                     for (i = 0; i < len; i++)
@@ -405,7 +417,9 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
             /* the sequence has been filled, add it  */
             //printf ( "add_sequence( %d )\n", perf + (a_screen_set * c_seqs_in_set));
+            a_perf->undoable_lock(false);
             a_perf->add_sequence (seq, perf + (a_screen_set * c_seqs_in_set));
+            a_perf->undoable_unlock();
         }
 
         /* dont know what kind of chunk */
@@ -439,7 +453,9 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
                 notes[len] = '\0';
                 string notess (notes);
+                a_perf->undoable_lock(false);
                 a_perf->set_screen_set_notepad (x + a_screen_set, &notess);
+                a_perf->undoable_unlock();
                 delete[]notes;
             }
         }

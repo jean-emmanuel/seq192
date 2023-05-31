@@ -72,6 +72,7 @@ const unsigned long c_midictrl =   0x24240010;
 const unsigned long c_mutegroups = 0x24240009; // not sure why we went to 10 above, this might need a different value
 const unsigned long c_resume = 0x24240011;
 const unsigned long c_alt_cc = 0x24240012;
+const unsigned long c_chase = 0x24240013;
 
 extern string global_client_name;
 
@@ -87,6 +88,8 @@ extern bool is_pattern_playing;
 
 const int c_max_instruments = 256;
 
+const int c_max_undo_history = 30;
+
 struct user_midi_bus_definition
 {
     std::string alias;
@@ -97,6 +100,7 @@ struct user_midi_bus_definition
 struct user_instrument_definition
 {
     string instrument;
+    string color;
     bool controllers_active[128];
     string controllers[128];
 };

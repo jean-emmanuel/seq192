@@ -36,6 +36,21 @@ enum draw_type
     DRAW_NOTE_OFF
 };
 
+enum queued_mode
+{
+   QUEUED_NOT,
+   QUEUED_OFF,
+   QUEUED_ON
+};
+
+struct seqstate {
+    string name;
+    long measures;
+    long beats;
+    long beat_width;
+    list <event> events;
+};
+
 class sequence
 {
 
@@ -46,10 +61,8 @@ class sequence
     list < event > m_list_event_draw;
     static list < event > m_list_clipboard;
 
-    list < event > m_list_undo_hold; // seqdata
-
-    stack < list < event > >m_list_undo;
-    stack < list < event > >m_list_redo;
+    deque <seqstate*> m_list_undo;
+    deque <seqstate*> m_list_redo;
 
     /* markers */
     list < event >::iterator m_iterator_play;
@@ -66,13 +79,17 @@ class sequence
        messages */
     int m_playing_notes[c_midi_notes];
 
+    bool m_chase;
+    int m_chase_pitchbend;
+    int m_chase_controls[128];
+
     /* states */
     bool m_was_playing;
     bool m_playing;
     bool m_recording;
     bool m_quanized_rec;
     bool m_thru;
-    bool m_queued;
+    queued_mode m_queued;
     bool m_resume;
     bool m_resume_next;
 
@@ -93,6 +110,9 @@ class sequence
 
     long m_starting_tick;
 
+    long m_sync_offset;
+    bool m_sync_reference;
+
     /* length of sequence in pulses
        should be powers of two in bars */
     long m_length;
@@ -100,7 +120,7 @@ class sequence
 
     /* these are just for the editor to mark things
        in correct time */
-    //long m_length_measures;
+    long m_time_measures;
     long m_time_beats_per_measure;
     long m_time_beat_width;
 
@@ -133,16 +153,16 @@ class sequence
     sequence ();
     ~sequence ();
 
-    /* seqdata hold for undo */
-    void set_hold_undo (bool a_hold);
-    int get_hold_undo ();
-
     bool m_have_undo;
     bool m_have_redo;
-
-    void push_undo (bool a_hold = false);
+    int m_undo_lock = 0;
+    void push_undo ();
     void pop_undo ();
     void pop_redo ();
+    void set_state(seqstate * s);
+    seqstate * get_state();
+    void undoable_lock(bool a_push_undo);
+    void undoable_unlock();
 
     //
     //  Gets and Sets
@@ -158,16 +178,17 @@ class sequence
     void set_measures (long a_length_measures);
     long get_measures();
 
-    void set_bpm (long a_beats_per_measure);
+    void set_bpm (long a_beats_per_measure, bool update = true);
     long get_bpm();
 
-    void set_bw (long a_beat_width);
+    void set_bw (long a_beat_width, bool update = true);
     long get_bw();
 
     /* returns string of name */
     const char *get_name();
 
     /* length in ticks */
+    void update_length();
     void set_length (long a_len);
     long get_length ();
 
@@ -182,13 +203,23 @@ class sequence
     bool get_playing ();
     void toggle_playing ();
 
-    void toggle_queued();
+    void toggle_queued(sequence * reference);
+    void set_on_queued(sequence * reference);
+    void set_off_queued(sequence * reference);
     void off_queued();
-    bool get_queued();
+    queued_mode get_queued();
+    bool is_queued();
     long get_queued_tick();
     long get_times_played();
     void set_resume(bool a_resume);
     bool get_resume();
+
+    void set_chase(bool a_chase);
+    bool get_chase();
+
+    void set_sync_offset(long offset);
+    void set_sync_reference(bool state);
+    bool is_sync_reference();
 
     void set_recording (bool);
     bool get_recording ();
@@ -220,7 +251,7 @@ class sequence
 
     /* dumps notes from tick and prebuffers to
        ahead.  Called by sequencer thread - performance */
-    void play (long a_tick);
+    void play (long a_tick, double swing_ratio, int swing_reference );
     void set_orig_tick (long a_tick);
 
     //
@@ -365,6 +396,8 @@ class sequence
 
     int get_lowest_note_event ();
     int get_highest_note_event ();
+    int get_lowest_selected_note_event ();
+    int get_highest_selected_note_event ();
 
     bool get_next_event (unsigned char a_status,
                          unsigned char a_cc,

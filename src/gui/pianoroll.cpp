@@ -120,6 +120,7 @@ PianoRoll::draw_background()
     for (int i=start_tick; i<=end_tick; i += ticks_per_step)
     {
         int base_line = (i - m_hscroll) / m_zoom;
+        bool draw = true;
 
         if ( i % ticks_per_m_line == 0 )
         {
@@ -129,22 +130,20 @@ PianoRoll::draw_background()
         {
             cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_beat);
         }
-        else
+        else if (i % m_snap <= last_snap)
         {
-            if (i % m_snap <= last_snap) {
-                cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_snap);
-                base_line -= (i - m_snap * (i / m_snap)) / m_zoom;
-            } else {
-                cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, 0);
-
-            }
+            cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_snap);
+            base_line -= (i - m_snap * (i / m_snap)) / m_zoom;
         }
+        else draw = false;
 
         last_snap = i % m_snap;
 
-        cr->move_to(base_line + 0.5, 0);
-        cr->line_to(base_line + 0.5, height);
-        cr->stroke();
+        if (draw) {
+            cr->move_to(base_line + 0.5, 0);
+            cr->line_to(base_line + 0.5, height);
+            cr->stroke();
+        }
     }
 
 
@@ -386,7 +385,6 @@ void
 PianoRoll::set_adding(bool adding)
 {
     m_adding = adding;
-    get_window()->set_cursor(Gdk::Cursor::create(get_window()->get_display(), adding ? "pencil" : "normal"));
 }
 
 void
@@ -518,6 +516,7 @@ PianoRoll::start_paste()
 bool
 PianoRoll::on_leave_notify_event(GdkEventCrossing* event)
 {
+    signal_hover.emit((string)"");
     m_pianokeys->on_leave_notify_event(event);
     return true;
 }
@@ -525,6 +524,7 @@ PianoRoll::on_leave_notify_event(GdkEventCrossing* event)
 bool
 PianoRoll::on_enter_notify_event(GdkEventCrossing* event)
 {
+    signal_hover.emit((string)"pianoroll");
     return true;
 }
 
@@ -536,8 +536,7 @@ PianoRoll::on_expose_event(GdkEventExpose* event)
 bool
 PianoRoll::on_button_press_event(GdkEventButton* event)
 {
-
-    signal_focus.emit((string)"pianoroll");
+    signal_click.emit((string)"pianoroll");
 
     int numsel;
     long tick_s;
@@ -555,7 +554,7 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
     m_current_y = m_drop_y = snapped_y;
 
     if (event->button == 3) {
-        set_adding(true);
+        signal_adding.emit(true);
     }
 
     if (m_paste)
@@ -576,6 +575,7 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
         {
             /* start the paint job */
             m_painting = true;
+            m_sequence->undoable_lock(false);
 
             /* adding, snapped x */
             m_current_x = m_drop_x = snapped_x;
@@ -595,7 +595,7 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
 
             if (!m_sequence->select_note_events(tick_s, note_h, tick_s, note_h, sequence::e_is_selected))
             {
-                if (!(event->state & GDK_CONTROL_MASK))
+                if (!(event->state & GDK_CONTROL_MASK) && !(event->state & GDK_SHIFT_MASK))
                 {
                     m_sequence->unselect();
                 }
@@ -610,6 +610,7 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
                     m_selecting = true;
                 }
             }
+
             if (m_sequence->select_note_events(tick_s, note_h, tick_s, note_h, sequence::e_is_selected))
             {
                 // moving - left click only
@@ -620,6 +621,9 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
                     /* get the box that selected elements are in */
                     m_sequence->get_selected_box(&tick_s, &note_h, &tick_f, &note_l);
 
+                    if (event->state & GDK_SHIFT_MASK) {
+                        m_sequence->select_note_events(tick_s, note_h, tick_f, note_l, sequence::e_select);
+                    }
                     convert_tn_box_to_coords(tick_s, tick_f, note_h, note_l, &m_selection.x1, &m_selection.y1, &m_selection.x2, &m_selection.y2);
                     convert_tn_box_to_coords(tick_s, tick_f, note_h, note_l, &m_edition.x1, &m_edition.y1, &m_edition.x2, &m_edition.y2);
                 }
@@ -678,7 +682,11 @@ PianoRoll::on_motion_notify_event(GdkEventMotion* event)
         snap_x(&m_current_x);
         convert_xy(m_current_x, m_current_y, &tick, &note);
 
-        m_sequence->add_note(tick, m_note_length - c_note_off_margin, note, true);
+        // prevent adding overlapping note
+        if (!m_sequence->select_note_events(tick, note, tick + m_note_length - c_note_off_margin, note, sequence::e_would_select))
+        {
+            m_sequence->add_note(tick, m_note_length - c_note_off_margin, note, true);
+        }
         return true;
     }
 
@@ -695,7 +703,7 @@ bool
 PianoRoll::on_button_release_event(GdkEventButton* event)
 {
     if (event->button == 3) {
-        set_adding(false);
+        signal_adding.emit(false);
     }
 
     long tick_s;
@@ -764,6 +772,10 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
                 m_sequence->grow_selected(delta_tick);
             }
         }
+    }
+
+    if (m_painting) {
+        m_sequence->undoable_unlock();
     }
 
     m_selecting = false;

@@ -102,12 +102,28 @@ void
 event::increment_data2()
 {
 	m_data[1] = (m_data[1]+1) & 0x7F;
+
+    if (m_status == EVENT_PITCH_WHEEL) {
+        // pitchbend lsb is not supported
+        // set to 127 when msb is 127
+        // so that we can reach the maximum value
+        // (yes, it skips a step)
+        m_data[0] = (int)m_data[1] == 127 ? 127 : 0;
+    }
 }
 
 void
 event::decrement_data2()
 {
 	m_data[1] = (m_data[1]-1) & 0x7F;
+
+    if (m_status == EVENT_PITCH_WHEEL) {
+        // pitchbend lsb is not supported
+        // set to 127 when msb is 127
+        // so that we can reach the maximum value
+        // (yes, it skips a step)
+        m_data[0] = (int)m_data[1] == 127 ? 127 : 0;
+    }
 }
 
 
