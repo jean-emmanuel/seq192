@@ -290,7 +290,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
 
     m_menu_record_through.set_label("Pass events to ouput");
     m_menu_record_through.set_active(m_sequence->get_thru());
-    m_menu_record_recording.add_accelerator("activate", m_accelgroup, 'q', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_record_through.add_accelerator("activate", m_accelgroup, 'q', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_record_through.signal_toggled().connect([&]{menu_callback(EDIT_MENU_RECORD_THRU);});
     m_submenu_record.append(m_menu_record_through);
 
