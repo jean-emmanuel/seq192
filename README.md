@@ -1,5 +1,14 @@
 # seq192
 
+## Changes by Zig:
+- [X] Shortcut for record midi through
+- [ ] one single button to start recording and activate record through
+- [ ] theme with light colors
+- [ ] ask for naming the sequence as soon as it is created
+- [ ] additional OSC controls?
+
+## Upstream info:
+
 MIDI sequencer based on seq24 with less features and more swag.
 
 Read the [Changelog](CHANGELOG.md) for more details.
