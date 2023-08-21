@@ -183,9 +183,9 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
 * `/sequence/edit` <string: edit_mode> <int: column> <int: row> <args>:
     _mode_:<br/>
         "beats" needs arguments <int: beats per measure> <int: beat unit> <int: number of measures><br/>
-        "bus_chan" needs arguments <int: bus> <int: channel>
+        "bus_chan" needs arguments <int: bus> <int: channel> (zero indexed)
 
-* `/sequence/edit` <string: edit_mode> <string: name> 
+* `/sequence/edit` <string: edit_mode> <string: name>  <args>:
     _mode_: "beats", "bus_chan" (see arguments above)
 
 * `/status` <string: address>:
