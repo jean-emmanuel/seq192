@@ -236,6 +236,7 @@ class perform
         SEQ_MODE_CLEAR,
 
         SEQ_EDIT_MODE_BEATS,
+        SEQ_EDIT_MODE_BUS_CHAN,
     };
 
     std::map<std::string, int> osc_commands = {
