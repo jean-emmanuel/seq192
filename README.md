@@ -1,11 +1,19 @@
 # seq192
 
 ## Changes by Zig:
-- [X] Shortcut for record midi through
-- [ ] one single button to start recording and activate record through
-- [ ] theme with light colors
+### OSC API:
+- [X] midi through
+- [ ] Create new clip?
+- [ ] Increase or decrease the clip's length, see https://github.com/jean-emmanuel/seq192/pull/16/commits/3aed2b02ffa898f5d8ed2ed29dd6a17ccd06c80e
+- [ ] Change the bus and channel
+
+### 3rd-party app to connect my MIDI controller to Seq192:
+Written probably first in Pd, then eventually in Python or mididings:
+- [ ] Create new clip, or copy an existing empty clip and past it where I select
+- [ ] one single button to create a new clip and activate record through
 - [ ] ask for naming the sequence as soon as it is created
-- [ ] additional OSC controls?
+- [ ] MIDI leds out to controller
+
 
 ## Upstream info:
 
