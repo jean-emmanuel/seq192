@@ -180,10 +180,13 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
 * `/sequence/trig` <string: mode> <int: column> <int: row>:
     Same as /sequence and (re)start playback
 
-* `/sequence/edit` <string: edit_mode> <int: column> <int: row> <int: beats per measure> <int: beat unit> <int: number of measures>:
-    _mode_: "beats" only for now
+* `/sequence/edit` <string: edit_mode> <int: column> <int: row> <args>:
+    _mode_:<br/>
+        "beats" needs arguments <int: beats per measure> <int: beat unit> <int: number of measures><br/>
+        "bus_chan" needs arguments <int: bus> <int: channel>
 
-* `/sequence/edit` <string: edit_mode> <string: name> <int: beats per measure> <int: beat unit> <int: number of measures>:
+* `/sequence/edit` <string: edit_mode> <string: name> 
+    _mode_: "beats", "bus_chan" (see arguments above)
 
 * `/status` <string: address>:
     Send sequencer's status as json, without sequences informations<br/>

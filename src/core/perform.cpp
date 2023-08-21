@@ -238,14 +238,18 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                     self->m_seqs[t_seq]->set_dirty();
                     break;
                 }
-                //case SEQ_EDIT_MODE_BUS_CHAN:
-                //{   
+                case SEQ_EDIT_MODE_BUS_CHAN:
+                {   
                     if (mode_argc != 3 || types[next] != 'i' || types[next+1] != 'i') return 1;
+                    int m_bus = argv[next]->i;
+                    int m_midi_channel = argv[next+1]->i;
+                    self->m_seqs[t_seq]->set_midi_bus(m_bus);
+                    self->m_seqs[t_seq]->set_midi_channel(m_midi_channel);
                     // printf("Adding note: tick=%d, length=%d, pitch=%d\n", at, len, note);
                 //    self->m_seqs[t_seq]->add_note(at, len, note, true);
                 //    self->m_seqs[t_seq]->set_dirty();
-                //    break;
-                //}
+                    break;
+                }
             }
             break;
         }
