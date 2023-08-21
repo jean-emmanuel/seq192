@@ -217,6 +217,7 @@ class perform
         SEQ_SSEQ_QUEUED,
         SEQ_STATUS,
         SEQ_STATUS_EXT,
+        SEQ_SEQ_EDIT,
 
         SEQ_MODE_SOLO,
         SEQ_MODE_ON,
@@ -234,6 +235,7 @@ class perform
         SEQ_MODE_DELETE,
         SEQ_MODE_CLEAR,
 
+        SEQ_EDIT_MODE_BEATS,
     };
 
     std::map<std::string, int> osc_commands = {
@@ -248,6 +250,7 @@ class perform
         {"/sequence",           SEQ_SSEQ},
         {"/sequence/trig",      SEQ_SSEQ_AND_PLAY},
         {"/sequence/queue",     SEQ_SSEQ_QUEUED},
+        {"/sequence/edit",      SEQ_SEQ_EDIT},
         {"/status",             SEQ_STATUS},
         {"/status/extended",    SEQ_STATUS_EXT}
     };
@@ -268,6 +271,11 @@ class perform
         {"paste",               SEQ_MODE_PASTE},
         {"delete",              SEQ_MODE_DELETE},
         {"clear",               SEQ_MODE_CLEAR}
+    };
+
+    std::map<std::string, int> osc_seq_edit_modes = {
+        {"beats",               SEQ_EDIT_MODE_BEATS},
+        {"bus_chan",            SEQ_EDIT_MODE_BUS_CHAN}
     };
 
 

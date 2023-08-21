@@ -180,6 +180,7 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
 * `/sequence/trig` <string: mode> <int: column> <int: row>:
     Same as /sequence and (re)start playback
 
+* `/sequence/edit` <string: edit_mode> <string: name> <int: beats per measure> <int: beat unit> <int: number of measures>:
 
 * `/status` <string: address>:
     Send sequencer's status as json, without sequences informations<br/>
