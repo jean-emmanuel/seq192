@@ -226,7 +226,7 @@ class perform
         SEQ_MODE_RECORD,
         SEQ_MODE_RECORD_ON,
         SEQ_MODE_RECORD_OFF,
-        SEQ_MODE_NEW,   // added by Zig but doesn't work
+        SEQ_MODE_NEW,
         SEQ_MODE_RECORD_THROUGH,
         SEQ_MODE_SYNC,
         SEQ_MODE_COPY,
@@ -264,8 +264,8 @@ class perform
         {"record",              SEQ_MODE_RECORD},
         {"record_on",           SEQ_MODE_RECORD_ON},
         {"record_off",          SEQ_MODE_RECORD_OFF},
-        {"new",                 SEQ_MODE_NEW},   // Added by Zig but doesn't work
-        {"through",             SEQ_MODE_RECORD_THROUGH},   // Added by Zig
+        {"new",                 SEQ_MODE_NEW},
+        {"through",             SEQ_MODE_RECORD_THROUGH},
         {"sync",                SEQ_MODE_SYNC},
         {"copy",                SEQ_MODE_COPY},
         {"cut",                 SEQ_MODE_CUT},

@@ -352,11 +352,8 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                                     self->m_seqs[nseq]->toggle_playing();
                                 }
                                 break;
-                            case SEQ_MODE_NEW:  // Added by Zig but doesn't work
-                                self->new_sequence(nseq);
-                                return 0;
-                            case SEQ_MODE_RECORD_THROUGH: // Added by Zig
-                                self->m_seqs[nseq]->set_thru(true);
+                            case SEQ_MODE_RECORD_THROUGH:
+                                self->m_seqs[nseq]->set_thru(self->m_seqs[nseq]->get_thru() ? false : true);
                                 break;
                             case SEQ_MODE_RECORD:
                                 self->get_master_midi_bus()->set_sequence_input(self->m_seqs[nseq]->get_recording() ? NULL : self->m_seqs[nseq]);
@@ -394,6 +391,9 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                         switch (mode) {
                             case SEQ_MODE_PASTE:
                                 self->paste_sequence(nseq);
+                                return 0;
+                            case SEQ_MODE_NEW:
+                                self->new_sequence(nseq);
                                 return 0;
                         }
 
