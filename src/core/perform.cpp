@@ -457,7 +457,10 @@ void perform::osc_status( char* address, const char* path)
                     json += "\"queued\":" + std::to_string(m_seqs[nseq]->is_queued()) + ",";
                     json += "\"playing\":" + std::to_string(m_seqs[nseq]->get_playing()) + ",";
                     json += "\"timesPlayed\":" + std::to_string(m_seqs[nseq]->get_times_played()) + ",";
-                    json += "\"recording\":" + std::to_string(m_seqs[nseq]->get_recording());
+                    json += "\"recording\":" + std::to_string(m_seqs[nseq]->get_recording()) + ",";
+                    json += "\"through\":" + std::to_string(m_seqs[nseq]->get_thru()) + ",";
+                    json += "\"bus\":" + std::to_string(m_seqs[nseq]->get_midi_bus()) + ",";
+                    json += "\"channel\":" + std::to_string(m_seqs[nseq]->get_midi_channel());
                     json += "},";
                 }
             }
