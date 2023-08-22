@@ -352,12 +352,8 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                                     self->m_seqs[nseq]->toggle_playing();
                                 }
                                 break;
-                            case SEQ_MODE_RECORD_THROUGH:
-                                //self->m_seqs[nseq]->set_thru(self->m_seqs[nseq]->get_thru() ? false : true);
-                                //break;
-                                self->get_master_midi_bus()->set_sequence_thru_input(self->m_seqs[nseq]->get_thru() ? NULL : self->m_seqs[nseq]); //works to enable/disable thru via mastermidibus::set_sequence_thru_input
-                                //self->get_master_midi_bus()->set_sequence_input(self->m_seqs[nseq]);
-                                //self->m_seqs[nseq]->set_thru(self->m_seqs[nseq]->get_thru() ? false : true);
+                            case SEQ_MODE_RECORD_THRU:
+                                self->get_master_midi_bus()->set_sequence_thru_input(self->m_seqs[nseq]->get_thru() ? NULL : self->m_seqs[nseq]);
                                 return 0;
                             case SEQ_MODE_RECORD:
                                 self->get_master_midi_bus()->set_sequence_input(self->m_seqs[nseq]->get_recording() ? NULL : self->m_seqs[nseq]);
@@ -1195,28 +1191,19 @@ void perform::input_func()
 {
     event ev;
 
-    printf( "Event input"); // nothing arrives here unless recording
-    fflush(stdout);
-
     while (m_inputing) {
 
         if (m_master_bus.poll_for_midi() > 0) {
-            printf("2");
-            fflush(stdout);
             do {
                 
                 if (m_master_bus.get_midi_event(&ev)) {
-                    printf("3");
-                    fflush(stdout);
+
                     /* filter system wide messages */
                     if (ev.get_status() <= EVENT_SYSEX) {
-                        printf("4");
-                        fflush(stdout);
-                        m_master_bus.get_sequence();
+
                         /* is there a sequence set? */
                         if (m_master_bus.is_dumping() && m_tick >= 0) {
-                            printf("5");
-                            fflush(stdout);
+
                             ev.set_timestamp(m_tick);
 
                             /* dump to it */
