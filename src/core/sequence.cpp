@@ -2730,8 +2730,6 @@ sequence::set_recording( bool a_r )
     // called by master_midi_bus
     lock();
     m_recording = a_r;
-    printf("Recording sequence %s: %b\n",get_name(),a_r);
-    fflush(stdout);
     set_dirty_main();
     unlock();
 }
@@ -2772,8 +2770,6 @@ sequence::set_thru( bool a_t )
 {
     lock();
     m_thru = a_t;
-    printf("Now sequence %s has thru %b\n",get_name() ,a_t);
-    fflush( stdout );
     unlock();
 }
 

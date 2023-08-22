@@ -837,22 +837,11 @@ void
 mastermidibus::set_sequence_input( sequence *a_seq )
 {
     lock();
-    printf("Before:\n");
-
-    (a_seq != NULL) ? printf("a_seq is %s and recording %b\n",a_seq->get_name(),a_seq->get_recording()) : printf("a_seq is null\n");
-
-    (m_seq != NULL) ? printf("m_seq is %s and recording %b\n",m_seq->get_name(),m_seq->get_recording()) : printf("m_seq is null\n");
-
+    
 	if (m_seq != NULL) m_seq->set_recording(false);
 	if (a_seq != NULL) a_seq->set_recording(true);
 
     if (a_seq != NULL) m_seq = a_seq;
-
-    printf("After:\n");
-    (a_seq != NULL) ? printf("a_seq is %s and recording %b\n",a_seq->get_name(),a_seq->get_recording()) : printf("a_seq is null\n");
-
-    (m_seq != NULL) ? printf("m_seq is %s and recording %b\n",m_seq->get_name(),m_seq->get_recording()) : printf("m_seq is null\n");
-    fflush (stdout);
 
     unlock();
 }
@@ -861,22 +850,12 @@ void
 mastermidibus::set_sequence_thru_input( sequence *a_seq )
 {
     lock();
-    printf("Before:\n");
-    
-    (a_seq != NULL) ? printf("a_seq is %s and thru %b\n",a_seq->get_name(),a_seq->get_thru()) : printf("a_seq is null\n");
-    (m_seq != NULL) ? printf("m_seq is %s and tru %b\n",m_seq->get_name(),m_seq->get_thru()) : printf("m_seq is null\n");
-    
 
 	if (m_seq != NULL) m_seq->set_thru(false);
 	if (a_seq != NULL) a_seq->set_thru(true);
 
     if (a_seq != NULL) m_seq = a_seq;
     
-    
     unlock();
-    printf("After:\n");
-    (a_seq != NULL) ? printf("a_seq is %s and thru %b\n",a_seq->get_name(),a_seq->get_thru()) : printf("a_seq is null\n");
-    (m_seq != NULL) ? printf("m_seq is %s and tru %b\n",m_seq->get_name(),m_seq->get_thru()) : printf("m_seq is null\n");
-    fflush (stdout);
 
 }

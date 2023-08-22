@@ -796,19 +796,18 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
 
         case EDIT_MENU_RECORD:
             // m_menu_record_state = !m_menu_record_state;
-            printf("rec for %s, get_recording=%b\n",m_sequence->get_name(),m_sequence->get_recording());
-            fflush(stdout);
-            m_perform->get_master_midi_bus()->set_sequence_input(m_sequence->get_recording() ? NULL : m_sequence);
-            
+            //             m_perform->get_master_midi_bus()->set_sequence_input(m_menu_record_state ? NULL : m_sequence);
+
+            //m_perform->get_master_midi_bus()->set_sequence_input(m_sequence->get_recording() ? NULL : m_sequence);
+            m_perform->get_master_midi_bus()->set_sequence_input(m_menu_record_state ? NULL : m_sequence);
             break;
         case EDIT_MENU_RECORD_QUANTIZED:
             m_sequence->get_quantized_rec(m_menu_record_quantized.get_active());
             break;
         case EDIT_MENU_RECORD_THRU:
-            printf("through for %s, get_thru=%b\n",m_sequence->get_name(),m_sequence->get_thru());
-            fflush(stdout);
-            m_perform->get_master_midi_bus()->set_sequence_thru_input(m_sequence->get_thru() ? NULL : m_sequence);
-            
+        //m_sequence->set_thru(m_menu_record_through.get_active());
+            //m_perform->get_master_midi_bus()->set_sequence_thru_input(m_sequence->get_thru() ? NULL : m_sequence);
+            m_perform->get_master_midi_bus()->set_sequence_thru_input(m_menu_record_through_state ? NULL : m_sequence);
             break;
 
         case EDIT_MENU_PLAY:

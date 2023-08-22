@@ -215,7 +215,10 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
             "queued": <int>,
             "playing": <int>,
             "timesPlayed": <int>,
-            "recording": <int>
+            "recording": <int>,
+            "through": <int>,
+            "bus": <int>,
+            "channel": <int>
         },
         ...
     ]
@@ -243,6 +246,9 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
     playing: sequence's playing state
     timesPlayed: number of times the sequence played since last enabled
     recording: sequence's recording state
+    through: sequence's through state
+    bus: sequence's output MIDI bus
+    channel: sequence's output MIDI channel
 
 
 ## AUTHORS
