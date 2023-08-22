@@ -2113,6 +2113,12 @@ sequence::stream_event(  event *a_ev  )
     // adjust tick
     a_ev->mod_timestamp( m_length );
 
+    // nothing arrives here if recording is not on
+    unsigned char d0,d1;
+    a_ev->get_data( &d0, &d1 );
+    printf( "Event in stream_event: %d, %d\n",d0,d1);
+    fflush(stdout);
+
     if ( m_recording && a_ev->get_status() < EVENT_SYSEX ){
 
         // fine quantization and overwrite for events other than notes
@@ -2145,6 +2151,8 @@ sequence::stream_event(  event *a_ev  )
 
             unsigned char d0,d1;
             a_ev->get_data( &d0, &d1 );
+            printf( "Event data recorded: %d, %d\n",d0,d1);
+            fflush( stdout );
             select_events(a_ev->get_timestamp(),a_ev->get_timestamp(), 3, a_ev->get_status(), d0, e_remove_one);
         }
 
@@ -2153,6 +2161,14 @@ sequence::stream_event(  event *a_ev  )
 
     if ( m_thru )
     {
+        // this already passes the piano roll presses to the output,
+        // just not MIDI input
+        printf("This is going through\n");
+        fflush(stdout);
+        unsigned char d0,d1;
+        a_ev->get_data( &d0, &d1 );
+        printf( "Event data going through: %d, %d\n",d0,d1);
+        fflush( stdout );
         put_event_on_bus( a_ev );
     }
 
@@ -2770,6 +2786,7 @@ sequence::set_thru( bool a_r )
 {
     lock();
     m_thru = a_r;
+    //set_dirty_main(); // still don't know what this is for
     unlock();
 }
 
