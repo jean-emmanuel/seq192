@@ -240,8 +240,8 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                     if (mode_argc != 2 || types[next] != 'i' || types[next+1] != 'i') return 1;
                     int m_bus = argv[next]->i;
                     int m_midi_channel = argv[next+1]->i;
-                    self->m_seqs[t_seq]->set_midi_bus(m_bus);
-                    self->m_seqs[t_seq]->set_midi_channel(m_midi_channel);
+                    self->m_seqs[t_seq]->set_midi_bus(m_bus <= 0 ? 0 : m_bus >= 15 ? 15 : m_bus);
+                    self->m_seqs[t_seq]->set_midi_channel(m_midi_channel <= 0 ? 0 : m_midi_channel >= 15 ? 15 : m_midi_channel);
                     // printf("Changing bus=%d and channel=%d\n", m_bus, m_midi_channel);
                     break;
                 }
