@@ -407,8 +407,6 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
                             case SEQ_MODE_DELETE:
                                 self->delete_sequence(nseq);
                                 break;
-                            case SEQ_MODE_TICKS:
-                                printf("Selected has name: %s\n", self->m_seqs[nseq]->get_name());
                         }
                     } else if (nseq < c_max_sequence && !self->is_active(nseq)) {
                         switch (mode) {
