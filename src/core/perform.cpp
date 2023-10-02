@@ -475,7 +475,8 @@ void perform::osc_status( char* address, const char* path)
                     json += "\"queued\":" + std::to_string(m_seqs[nseq]->is_queued()) + ",";
                     json += "\"playing\":" + std::to_string(m_seqs[nseq]->get_playing()) + ",";
                     json += "\"timesPlayed\":" + std::to_string(m_seqs[nseq]->get_times_played()) + ",";
-                    json += "\"recording\":" + std::to_string(m_seqs[nseq]->get_recording());
+                    json += "\"recording\":" + std::to_string(m_seqs[nseq]->get_recording()) + ",";
+                    json += "\"events\":" + m_seqs[nseq]->to_json();
                     json += "},";
                 }
             }
