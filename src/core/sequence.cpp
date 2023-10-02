@@ -17,6 +17,7 @@
 #include "sequence.h"
 #include <stdlib.h>
 #include <math.h>
+#include <iomanip>
 
 list < event > sequence::m_list_clipboard;
 
@@ -2826,6 +2827,53 @@ sequence::print()
 
 }
 
+std::string
+sequence::to_json()
+{   
+    std::stringstream j;
+    j << "[";
+
+    for( list<event>::iterator i = m_list_event.begin(); i != m_list_event.end(); i++ ){
+        if ((*i).is_note_on()){
+            event *end = (*i).get_linked();
+            j << "[";
+            j << (*i).get_timestamp();
+            j << ",";
+            j << end->get_timestamp();
+            j << ",";
+            j << "\"0x" << std::hex << (int)std::uint8_t((*i).get_status()) << std::dec << "\"";
+            j << ",";
+            unsigned char D0;
+            unsigned char D1;
+            (*i).get_data(&D0, &D1);
+            j << std::to_string(D0);
+            j << ",";
+            j << std::to_string(D1);
+            j << "],";
+        }
+        if (((*i).get_status() == EVENT_CONTROL_CHANGE) || ((*i).get_status() == EVENT_PROGRAM_CHANGE) ||
+            ((*i).get_status() == EVENT_CHANNEL_PRESSURE) || ((*i).get_status() == EVENT_PITCH_WHEEL)) {
+            j << "[";
+            j << (*i).get_timestamp();
+            j << ",";
+            j << "\"0x" << std::hex << (int)std::uint8_t((*i).get_status()) << std::dec << "\"";
+            j << ",";
+            unsigned char D0;
+            unsigned char D1;
+            (*i).get_data(&D0, &D1);
+            j << std::to_string(D0);
+            j << ",";
+            j << std::to_string(D1);
+            j << "],";
+        }
+    }
+    
+    std::string jstr( j.str() );
+    if (jstr.length() > 1)
+        jstr = jstr.erase(jstr.length()-1, 1); // Strip final ,
+    jstr += "]";
+    return jstr;
+}
 
 void
 sequence::put_event_on_bus( event *a_e )
