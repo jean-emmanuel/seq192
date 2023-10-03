@@ -201,6 +201,7 @@ class perform
                     int argc, void *data, void *user_data);
 
     int osc_selected_seqs[c_mainwnd_rows * c_mainwnd_cols];
+    bool osc_select_seqs(const char *types, lo_arg ** argv, int argc, int offset);
     void osc_status( char* address, const char* path );
     enum OSC_COMMANDS {
         OSC_ZERO = 0,
@@ -215,6 +216,7 @@ class perform
         SEQ_SSEQ,
         SEQ_SSEQ_AND_PLAY,
         SEQ_SSEQ_QUEUED,
+        SEQ_SSEQ_STATUS,
         SEQ_STATUS,
         SEQ_STATUS_EXT,
 
@@ -246,6 +248,7 @@ class perform
         {"/sequence",           SEQ_SSEQ},
         {"/sequence/trig",      SEQ_SSEQ_AND_PLAY},
         {"/sequence/queue",     SEQ_SSEQ_QUEUED},
+        {"/sequence/status",    SEQ_SSEQ_STATUS},
         {"/status",             SEQ_STATUS},
         {"/status/extended",    SEQ_STATUS_EXT}
     };

@@ -193,57 +193,12 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
             int mode = self->osc_seq_modes[(std::string) &argv[0]->s];
             if (!mode) return 1;
 
-            for (int i = 0; i < c_mainwnd_rows * c_mainwnd_cols; i++) {
-                self->osc_selected_seqs[i] = 0;
-            }
-
             if (mode == SEQ_MODE_RECORD_OFF) {
                 self->get_master_midi_bus()->set_sequence_input(NULL);
                 return 0;
             }
 
-            if (argc < 2) return 0;
-
-            // sequence selection
-            if (types[1] == 'i') {
-                // arg 1: column number
-
-                int col = argv[1]->i;
-                if (col < 0 || col > c_mainwnd_cols) return 0;
-
-                if (argc == 2) {
-                    // select all rows in column
-                    for (int i = 0; i < c_mainwnd_rows; i++) {
-                        self->osc_selected_seqs[i + col * c_mainwnd_rows] = 1;
-                    }
-                } else {
-                    // select some rows in column
-                    for (int i = 2; i < argc; i++) {
-                        if (types[i] == 'i') {
-                            int row = argv[i]->i;
-                            if (row < c_mainwnd_rows) {
-                                self->osc_selected_seqs[row + col * c_mainwnd_rows] = 1;
-                            }
-                        }
-                    }
-                }
-
-            } else if (types[1] == 's') {
-                // arg 1...n: sequences names / osc pattern
-
-                for (int i = 0; i < c_mainwnd_cols * c_mainwnd_rows; i++) {
-                    int nseq = i + self->m_screen_set * c_mainwnd_cols * c_mainwnd_rows;
-                    if (self->is_active(nseq)) {
-                        for (int j = 1; j < argc; j++) {
-                            if (types[j] == 's' && lo_pattern_match(self->m_seqs[nseq]->get_name(), &argv[j]->s)) {
-                                self->osc_selected_seqs[i] = 1;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-            }
+            if (!self->osc_select_seqs(types, argv, argc, 1)) return 0;
 
             if (mode == SEQ_MODE_SOLO) {
                 for (int i = 0; i < c_max_sequence; i++) {
@@ -336,6 +291,20 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
 
             break;
         }
+        case SEQ_SSEQ_STATUS:
+        {
+            if (!self->osc_select_seqs(types, argv, argc, 1)) return 0;
+            char *address = lo_address_get_url(lo_message_get_source(data));
+            for (int i = 0; i < c_mainwnd_rows * c_mainwnd_cols; i++) {
+                if (self->osc_selected_seqs[i] == 1) {
+                    int nseq = i + self->m_screen_set * c_mainwnd_cols * c_mainwnd_rows;
+                    if (nseq < c_max_sequence && self->is_active(nseq)) {
+                        // self->oscserver->send_json(address, path, self->m_seqs[nseq]->to_json());
+                    }
+                }
+            }
+            break;
+        }
         case SEQ_STATUS:
         case SEQ_STATUS_EXT:
             char *address;
@@ -351,6 +320,65 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
 
 
     return 0;
+}
+
+
+bool perform::osc_select_seqs(const char *types, lo_arg ** argv, int argc, int offset)
+{
+
+    bool any_selected = false;
+
+    for (int i = 0; i < c_mainwnd_rows * c_mainwnd_cols; i++) {
+        osc_selected_seqs[i] = 0;
+    }
+
+    if (argc - offset < 1) return false;
+
+    // sequence selection
+    if (types[offset] == 'i') {
+        // arg 1: column number
+
+        int col = argv[offset]->i;
+        if (col < 0 || col > c_mainwnd_cols) return false;
+
+        if (offset == argc - 1) {
+            // column is last arg : select all rows in column
+            for (int i = 0; i < c_mainwnd_rows; i++) {
+                osc_selected_seqs[i + col * c_mainwnd_rows] = 1;
+                any_selected = true;
+            }
+        } else {
+            // select some rows in column
+            for (int i = offset + 1; i < argc; i++) {
+                if (types[i] == 'i') {
+                    int row = argv[i]->i;
+                    if (row < c_mainwnd_rows) {
+                        osc_selected_seqs[row + col * c_mainwnd_rows] = 1;
+                        any_selected = true;
+                    }
+                }
+            }
+        }
+
+    } else if (types[offset] == 's') {
+        // arg 1...n: sequences names / osc pattern
+
+        for (int i = 0; i < c_mainwnd_cols * c_mainwnd_rows; i++) {
+            int nseq = i + m_screen_set * c_mainwnd_cols * c_mainwnd_rows;
+            if (is_active(nseq)) {
+                for (int j = offset; j < argc; j++) {
+                    if (types[j] == 's' && lo_pattern_match(m_seqs[nseq]->get_name(), &argv[j]->s)) {
+                        osc_selected_seqs[i] = 1;
+                        any_selected = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+    }
+
+    return any_selected;
 }
 
 
