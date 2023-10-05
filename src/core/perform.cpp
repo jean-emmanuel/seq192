@@ -293,8 +293,20 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
         }
         case SEQ_SSEQ_STATUS:
         {
-            if (!self->osc_select_seqs(types, argv, argc, 1)) return 0;
-            char *address = lo_address_get_url(lo_message_get_source(data));
+            if (argc < 1) return 0;
+
+            char *address;
+            int offset = 0;
+
+            if (types[0] == 's' && strstr(&argv[0]->s, "://") != NULL) {
+                offset = 1;
+                address = &argv[0]->s;
+            } else {
+                address = lo_address_get_url(lo_message_get_source(data));
+            }
+
+            if (!self->osc_select_seqs(types, argv, argc, offset)) return 0;
+
             for (int i = 0; i < c_mainwnd_rows * c_mainwnd_cols; i++) {
                 if (self->osc_selected_seqs[i] == 1) {
                     int nseq = i + self->m_screen_set * c_mainwnd_cols * c_mainwnd_rows;
