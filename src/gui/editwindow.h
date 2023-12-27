@@ -165,6 +165,7 @@ class EditWindow : public Window {
         CheckMenuItem       m_menu_record_quantized;
         CheckMenuItem       m_menu_record_through;
         bool                m_menu_record_state;
+        bool                m_menu_record_through_state;
 
         SeparatorMenuItem   m_menu_separator0;
         SeparatorMenuItem   m_menu_separator1;
