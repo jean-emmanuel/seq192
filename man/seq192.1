@@ -1,6 +1,6 @@
 .\" generated with Ronn-NG/v0.9.1
 .\" http://github.com/apjanke/ronn-ng/tree/0.9.1
-.TH "SEQ192" "1" "May 2023" "" "User manual"
+.TH "SEQ192" "1" "December 2023" "" "User manual - Zig's fork"
 .SH "NAME"
 \fBseq192\fR \- live MIDI sequencer
 .SH "SYNOPSIS"
@@ -170,7 +170,7 @@ Stop playback
 Set bpm
 .TP
 \fB/swing\fR <float_or_int: position>
-Set swing strength (0: no swing, >0: swing, <0: anti\-swing)
+Set swing strength (0: no swing, >0: swing,
 .TP
 \fB/swing/reference\fR <float_or_int: position>
 Set swing reference (8: 8ths will swing, 16: 16th will swing, etc)
@@ -187,7 +187,7 @@ Disable all sequences and cancel queued sequences
 \fB/sequence\fR <string: mode> <int: column> <int: row>
 Set sequence(s) state
 .br
-\fImode\fR: "solo", "on", "off", "toggle", "record", "record_on", "record_off", "sync", "clear", "copy", "cut", "paste", "delete"; only one sequence can be recording at a time; "record_off" mode doesn't require any argument
+\fImode\fR: "new", "solo", "on", "off", "toggle", "record", "record_on", "record_off", "through", "sync", "clear", "copy", "cut", "paste", "delete"; only one sequence can be recording at a time; "record_off" mode doesn't require any argument
 .br
 \fIcolumn\fR: column number on screen set (zero indexed)
 .br
@@ -203,6 +203,16 @@ Same as /sequence but affected sequences will change state only on next cycle
 .TP
 \fB/sequence/trig\fR <string: mode> <int: column> <int: row>
 Same as /sequence and (re)start playback
+.TP
+\fB/sequence/edit\fR <string: edit_mode> <int: column> <int: row> \fIargs\fR
+\fImode\fR:
+.br
+"beats" needs arguments <int: beats per measure> <int: beat unit> <int: number of measures>
+.br
+"bus_chan" needs arguments
+.TP
+\fB/sequence/edit\fR <string: edit_mode> <string: name> \fIargs\fR
+\fImode\fR: "beats", "bus_chan" (see arguments above)
 .TP
 \fB/status\fR <string: address>
 Send sequencer's status as json, without sequences informations
@@ -232,7 +242,10 @@ Send sequencer's status as json, including sequences informations
             "queued": \fIint\fR,
             "playing": \fIint\fR,
             "timesPlayed": \fIint\fR,
-            "recording": \fIint\fR
+            "recording": \fIint\fR,
+            "through": \fIint\fR,
+            "bus": \fIint\fR,
+            "channel": \fIint\fR
         },
         \|\.\|\.\|\.
     ]
@@ -263,6 +276,9 @@ queued: sequence's queued state
 playing: sequence's playing state
 timesPlayed: number of times the sequence played since last enabled
 recording: sequence's recording state
+through: sequence's through state
+bus: sequence's output MIDI bus
+channel: sequence's output MIDI channel
 .fi
 .IP "" 0
 .SH "AUTHORS"
