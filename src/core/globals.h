@@ -73,6 +73,12 @@ const unsigned long c_mutegroups = 0x24240009; // not sure why we went to 10 abo
 const unsigned long c_resume = 0x24240011;
 const unsigned long c_alt_cc = 0x24240012;
 const unsigned long c_chase = 0x24240013;
+const unsigned long c_snap_tick = 0x24240014;
+const unsigned long c_note_tick = 0x24240015;
+
+const int c_default_snap_tick = c_ppqn / 4;
+const int c_default_note_tick = c_ppqn / 4;
+
 
 extern string global_client_name;
 

@@ -51,7 +51,8 @@ sequence::sequence( )
     m_name          = c_dummy;
     m_bus           = 0;
     m_length        = 4 * c_ppqn;
-    m_snap_tick     = c_ppqn / 4;
+    m_snap_tick     = c_default_snap_tick;
+    m_note_tick     = c_default_note_tick;
     m_midi_channel  = 0;
 
     m_alt_cc = -1;
@@ -2749,6 +2750,25 @@ sequence::set_snap_tick( int a_st )
     unlock();
 }
 
+int
+sequence::get_snap_tick()
+{
+    return m_snap_tick;
+}
+
+void
+sequence::set_note_tick(int a_nt)
+{
+    m_note_tick = a_nt;
+}
+
+int
+sequence::get_note_tick()
+{
+    return m_note_tick;
+}
+
+
 void
 sequence::get_quantized_rec( bool a_qr )
 {
@@ -3498,6 +3518,22 @@ sequence::fill_list( list<char> *a_list, int a_pos )
     a_list->push_front( 0x05 );
     addLongList( a_list, c_chase );
     a_list->push_front( m_chase );
+
+    /* grid div */
+    addListVar( a_list, 0 );
+    a_list->push_front( 0xFF );
+    a_list->push_front( 0x7F );
+    a_list->push_front( 0x05 );
+    addLongList( a_list, c_snap_tick );
+    a_list->push_front( m_snap_tick );
+
+    /* note div */
+    addListVar( a_list, 0 );
+    a_list->push_front( 0xFF );
+    a_list->push_front( 0x7F );
+    a_list->push_front( 0x05 );
+    addLongList( a_list, c_note_tick );
+    a_list->push_front( m_note_tick );
 
     delta_time = m_length - prev_timestamp;
 

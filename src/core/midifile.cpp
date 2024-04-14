@@ -328,6 +328,16 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                         seq->set_chase (m_d[m_pos++]);
                                         len--;
                                     }
+                                    else if (proprietary == c_snap_tick)
+                                    {
+                                        seq->set_snap_tick (m_d[m_pos++]);
+                                        len--;
+                                    }
+                                    else if (proprietary == c_note_tick)
+                                    {
+                                        seq->set_note_tick (m_d[m_pos++]);
+                                        len--;
+                                    }
                                     /* eat the rest */
                                     m_pos += len;
                                     break;

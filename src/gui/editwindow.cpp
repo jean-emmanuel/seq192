@@ -451,9 +451,10 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_toolbar_length.signal_changed().connect([&]{
         int ticks = divs_to_ticks[m_toolbar_length.get_active_text()];
         m_pianoroll.set_note_length(ticks);
+        m_sequence->set_note_tick(ticks);
     });
-    m_toolbar_snap.set_active(ticks_to_divs[m_pianoroll.get_snap()]);
-    m_toolbar_length.set_active(ticks_to_divs[m_pianoroll.get_note_length()]);
+    m_toolbar_snap.set_active(ticks_to_divs[m_sequence->get_snap_tick()]);
+    m_toolbar_length.set_active(ticks_to_divs[m_sequence->get_note_tick()]);
     m_toolbar_snap.set_focus_on_click(false);
     m_toolbar_length.set_focus_on_click(false);
 

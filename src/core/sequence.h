@@ -116,7 +116,9 @@ class sequence
     /* length of sequence in pulses
        should be powers of two in bars */
     long m_length;
-    long m_snap_tick;
+
+    int m_snap_tick;
+    int m_note_tick;
 
     /* these are just for the editor to mark things
        in correct time */
@@ -223,7 +225,12 @@ class sequence
 
     void set_recording (bool);
     bool get_recording ();
+
     void set_snap_tick( int a_st );
+    int get_snap_tick();
+    void set_note_tick(int a_ns);
+    int get_note_tick();
+
     void get_quantized_rec( bool a_qr );
     bool get_quantized_rec( );
 

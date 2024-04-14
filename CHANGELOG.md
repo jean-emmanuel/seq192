@@ -1,5 +1,10 @@
 # Changelog
 
+## next
+
+- edit window
+    - save and restore grid unit / note length per sequence
+
 ## 1.5.1
 
 - nsm
