@@ -1,5 +1,22 @@
 # seq192
 
+## Changes by Zig:
+### OSC API:
+- [X] midi through as a toggle
+- [X] Create new clip?
+- [X] Increase or decrease the clip's length, see https://github.com/jean-emmanuel/seq192/pull/16/commits/3aed2b02ffa898f5d8ed2ed29dd6a17ccd06c80e
+- [X] Change the bus and channel
+
+### 3rd-party app to connect my MIDI controller to Seq192:
+Written probably first in Pd, then eventually in Python or mididings:
+- [ ] Create new clip, or copy an existing empty clip and past it where I select
+- [ ] one single button to create a new clip and activate record through
+- [ ] ask for naming the sequence as soon as it is created
+- [ ] MIDI leds out to controller
+
+
+## Upstream info:
+
 MIDI sequencer based on seq24 with less features and more swag.
 
 Read the [Changelog](CHANGELOG.md) for more details.
