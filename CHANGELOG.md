@@ -1,9 +1,12 @@
 # Changelog
 
-## next
+## 1.6.0
 
 - edit window
     - save and restore grid unit / note length per sequence
+
+- misc
+    - now requires liblo 0.32
 
 ## 1.5.1
 

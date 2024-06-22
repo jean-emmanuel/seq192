@@ -198,7 +198,7 @@ class perform
 
     OSCServer *oscserver;
     static int osc_callback(const char *path, const char *types, lo_arg ** argv,
-                    int argc, void *data, void *user_data);
+                    int argc, lo_message data, void *user_data);
 
     int osc_selected_seqs[c_mainwnd_rows * c_mainwnd_cols];
     void osc_status( char* address, const char* path );

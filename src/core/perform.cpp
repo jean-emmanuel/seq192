@@ -110,7 +110,7 @@ void perform::init()
 }
 
 int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
-                int argc, void *data, void *user_data)
+                int argc, lo_message data, void *user_data)
 {
 
     perform *self = (perform *)user_data;
