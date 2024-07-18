@@ -2,3 +2,4 @@ src/seq192
 **/*.o
 **/*.d
 man/MANUAL.1*
+.vscode/*

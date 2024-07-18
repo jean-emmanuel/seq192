@@ -289,8 +289,10 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_submenu_record.append(m_menu_record_quantized);
 
     m_menu_record_through.set_label("Pass events to ouput");
-    m_menu_record_through.set_active(m_sequence->get_thru());
+    //m_menu_record_through.set_active(m_sequence->get_thru());
+    m_menu_record_through.add_accelerator("activate", m_accelgroup, 'q', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_record_through.signal_toggled().connect([&]{menu_callback(EDIT_MENU_RECORD_THRU);});
+    m_menu_record_through_state = false;
     m_submenu_record.append(m_menu_record_through);
 
     m_menu_playback.set_label("_Playback");
@@ -795,13 +797,18 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
 
         case EDIT_MENU_RECORD:
             // m_menu_record_state = !m_menu_record_state;
+            //             m_perform->get_master_midi_bus()->set_sequence_input(m_menu_record_state ? NULL : m_sequence);
+
+            //m_perform->get_master_midi_bus()->set_sequence_input(m_sequence->get_recording() ? NULL : m_sequence);
             m_perform->get_master_midi_bus()->set_sequence_input(m_menu_record_state ? NULL : m_sequence);
             break;
         case EDIT_MENU_RECORD_QUANTIZED:
             m_sequence->get_quantized_rec(m_menu_record_quantized.get_active());
             break;
         case EDIT_MENU_RECORD_THRU:
-            m_sequence->set_thru(m_menu_record_through.get_active());
+        //m_sequence->set_thru(m_menu_record_through.get_active());
+            //m_perform->get_master_midi_bus()->set_sequence_thru_input(m_sequence->get_thru() ? NULL : m_sequence);
+            m_perform->get_master_midi_bus()->set_sequence_thru_input(m_menu_record_through_state ? NULL : m_sequence);
             break;
 
         case EDIT_MENU_PLAY:
@@ -838,6 +845,11 @@ EditWindow::timer_callback()
         } else {
             m_menu_record.get_style_context()->remove_class("recording");
         }
+    }
+
+    bool thru = m_sequence->get_thru();
+    if (m_menu_record_through_state != thru) {
+        m_menu_record_through_state = thru;
     }
 
     bool playing = m_sequence->get_playing();

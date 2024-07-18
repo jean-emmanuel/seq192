@@ -2786,10 +2786,10 @@ sequence::get_quantized_rec( )
 
 
 void
-sequence::set_thru( bool a_r )
+sequence::set_thru( bool a_t )
 {
     lock();
-    m_thru = a_r;
+    m_thru = a_t;
     unlock();
 }
 
