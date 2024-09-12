@@ -183,6 +183,95 @@ int perform::osc_callback(const char *path, const char *types, lo_arg ** argv,
         case SEQ_PANIC:
             self->panic();
             break;
+        case SEQ_SEQ_EDIT:
+        {
+            if (argc < 1 || types[0] != 's') return 0;
+
+            // arg 0: mode
+            int mode = self->osc_seq_edit_modes[(std::string) &argv[0]->s];
+            if (!mode) return 1;
+
+            int t_seq = -1; // target seq
+            int next = -1;
+            // sequence selection
+            if (types[1] == 'i') {
+                // arg 1: column number
+                int col = argv[1]->i;
+                if (col < 0 || col > c_mainwnd_cols) return 1;
+                // arg 2: row number
+                if (types[2] == 'i') {
+                    int row = argv[2]->i;
+                    if (row < c_mainwnd_rows) {
+                        t_seq = (row + col * c_mainwnd_rows) + self->m_screen_set * c_mainwnd_cols * c_mainwnd_rows;
+                        if (self->is_active(t_seq))
+                            next = 3; // command mode arguments start at index 3
+                    }
+                } else return 1;
+            } else if (types[1] == 's') {
+                // arg 1: sequence name / osc pattern
+                for (int i = 0; i < c_mainwnd_cols * c_mainwnd_rows; i++) {
+                    int nseq = i + self->m_screen_set * c_mainwnd_cols * c_mainwnd_rows;
+                    if (self->is_active(nseq)) {
+                        if (lo_pattern_match(self->m_seqs[nseq]->get_name(), &argv[1]->s)) {
+                            t_seq = nseq;
+                            next = 2; // command mode arguments start at index 2
+                            break;
+                        }
+                    }
+                }
+            }
+            if (next < 0 || t_seq < 0) return 1;
+            int mode_argc = argc - next;
+            switch (mode) {
+                case SEQ_MODE_TICKS:
+                    if (mode_argc != 1 && types[next] != 'i') return 1;
+                    // printf("Sequence: %s Set length: %d\n", self->m_seqs[t_seq]->get_name(), argv[next]->i);
+                    self->m_seqs[t_seq]->set_length(argv[next]->i);
+                    self->m_seqs[t_seq]->set_dirty();
+                    break;
+                case SEQ_MODE_BEATS:
+                {
+                    if (mode_argc != 3 || types[next] != 'i' || types[next+1] != 'i'|| types[next+2] != 'i') return 1;
+                    int bpm = argv[next]->i;
+                    int bw = argv[next+1]->i;
+                    int measures = argv[next+2]->i;
+                    self->m_seqs[t_seq]->set_bpm(bpm);
+                    self->m_seqs[t_seq]->set_bw(bw);
+                    self->m_seqs[t_seq]->set_length(measures * bpm * ((c_ppqn * 4) / bw));
+                    // printf("Set length, bpm, bw %ld %ld\n", self->m_seqs[t_seq]->get_bpm(), self->m_seqs[t_seq]->get_bw());
+                    self->m_seqs[t_seq]->set_dirty();
+                    break;
+                }
+                case SEQ_MODE_ADD_NOTE:
+                {   
+                    constexpr int snap = c_ppqn / 16;
+                    if (mode_argc != 3 || types[next] != 'i' || types[next+1] != 'i'|| types[next+2] != 'i') return 1;
+                    int at = argv[next]->i;
+                    int len = argv[next+1]->i;
+                    int note = argv[next+2]->i;
+                    if (at < 0 || len < 0 || note < 0) return 1;
+                    at *= snap;
+                    len *= snap;
+                    if (note > 127) note = 127;
+                    // printf("Adding note: tick=%d, length=%d, pitch=%d\n", at, len, note);
+                    self->m_seqs[t_seq]->add_note(at, len, note, true);
+                    self->m_seqs[t_seq]->set_dirty();
+                    break;
+                }
+                case SEQ_MODE_DELETE_NOTE:
+                {
+                    constexpr int snap = c_ppqn / 16;
+                    if (mode_argc != 2 || types[next] != 'i' || types[next+1] != 'i') return 1;
+                    int at = argv[next]->i;
+                    int note = argv[next+1]->i;
+                    at *= snap;
+                    int ret = self->m_seqs[t_seq]->select_note_events(at, note, at, note, sequence::e_remove_one);
+                    if (!ret) return 1;
+                    break;
+                }
+            }
+            break;
+        }
         case SEQ_SSEQ:
         case SEQ_SSEQ_AND_PLAY:
         case SEQ_SSEQ_QUEUED:
@@ -386,7 +475,8 @@ void perform::osc_status( char* address, const char* path)
                     json += "\"queued\":" + std::to_string(m_seqs[nseq]->is_queued()) + ",";
                     json += "\"playing\":" + std::to_string(m_seqs[nseq]->get_playing()) + ",";
                     json += "\"timesPlayed\":" + std::to_string(m_seqs[nseq]->get_times_played()) + ",";
-                    json += "\"recording\":" + std::to_string(m_seqs[nseq]->get_recording());
+                    json += "\"recording\":" + std::to_string(m_seqs[nseq]->get_recording()) + ",";
+                    json += "\"events\":" + m_seqs[nseq]->to_json();
                     json += "},";
                 }
             }
