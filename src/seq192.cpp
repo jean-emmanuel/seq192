@@ -320,7 +320,10 @@ main (int argc, char *argv[])
             if (nsm_optional_gui_support) {
                 nsm_set_show_callback(nsm, nsm_show_cb, 0);
                 nsm_set_hide_callback(nsm, nsm_hide_cb, 0);
-                if (!global_nsm_gui) nsm_hide_cb(0);
+                if (!global_nsm_gui) {
+                  window.hide();
+                  nsm_send_is_hidden(nsm);
+                }
                 else nsm_send_is_shown(nsm);
             } else {
                 global_nsm_gui = true;
