@@ -165,7 +165,7 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
 
 * `/sequence` <string: mode> <int: column> <int: row>:
     Set sequence(s) state<br/>
-    _mode_: "solo", "on", "off", "toggle", "record", "record_on", "record_off", "sync", "clear", "copy", "cut", "paste", "delete"; only one sequence can be recording at a time; "record_off" mode doesn't require any argument<br/>
+    _mode_: "new", "solo", "on", "off", "toggle", "record", "record_on", "record_off", "through", "sync", "clear", "copy", "cut", "paste", "delete"; only one sequence can be recording at a time; "record_off" mode doesn't require any argument<br/>
     _column_: column number on screen set (zero indexed)<br/>
     _row_: row number; if omitted, all rows are affected; multiple rows can be specified
 
@@ -180,6 +180,13 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
 * `/sequence/trig` <string: mode> <int: column> <int: row>:
     Same as /sequence and (re)start playback
 
+* `/sequence/edit` <string: edit_mode> <int: column> <int: row> <args>:
+    _mode_:<br/>
+        "beats" needs arguments <int: beats per measure> <int: beat unit> <int: number of measures><br/>
+        "bus_chan" needs arguments <int: bus> <int: channel> (zero indexed)
+
+* `/sequence/edit` <string: edit_mode> <string: name>  <args>:
+    _mode_: "beats", "bus_chan" (see arguments above)
 
 * `/status` <string: address>:
     Send sequencer's status as json, without sequences informations<br/>
@@ -208,7 +215,10 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
             "queued": <int>,
             "playing": <int>,
             "timesPlayed": <int>,
-            "recording": <int>
+            "recording": <int>,
+            "through": <int>,
+            "bus": <int>,
+            "channel": <int>
         },
         ...
     ]
@@ -236,6 +246,9 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
     playing: sequence's playing state
     timesPlayed: number of times the sequence played since last enabled
     recording: sequence's recording state
+    through: sequence's through state
+    bus: sequence's output MIDI bus
+    channel: sequence's output MIDI channel
 
 
 ## AUTHORS
