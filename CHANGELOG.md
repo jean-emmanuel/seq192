@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.1
+
+- bug fixes
+    - pitch wheel chasing not working when value LSB is 0 (always the case when set from pianoroll ui)
+
 ## 1.6.0
 
 - edit window

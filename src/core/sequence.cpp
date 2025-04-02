@@ -2872,8 +2872,8 @@ sequence::put_event_on_bus( event *a_e )
     if ( a_e->m_status == EVENT_PITCH_WHEEL) {
         unsigned char d0, d1;
         a_e->get_data(&d0, &d1);
-        if (d0 != 0 && d1 != 64) m_chase_pitchbend = 1;
-        else m_chase_pitchbend = 0;
+        if (d0 == 0 && d1 == 64) m_chase_pitchbend = 0;
+        else m_chase_pitchbend = 1;
     }
 
     if ( a_e->m_status == EVENT_CONTROL_CHANGE) {
