@@ -1663,6 +1663,7 @@ sequence::increment_selected( unsigned char a_status, unsigned char a_control )
 void
 sequence::decrement_selected(unsigned char a_status, unsigned char a_control )
 {
+    undoable_lock(true);
     lock();
 
     list<event>::iterator i;
@@ -1688,6 +1689,7 @@ sequence::decrement_selected(unsigned char a_status, unsigned char a_control )
     }
 
     unlock();
+    undoable_unlock();
 }
 
 void
