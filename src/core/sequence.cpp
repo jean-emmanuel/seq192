@@ -663,6 +663,8 @@ sequence::verify_and_link()
         }
     }
 
+    remove_marked( );
+
     /* pair slide notes on with base notes */
     slide = m_list_event.begin();
     while ( slide != m_list_event.end() ){
@@ -691,7 +693,6 @@ sequence::verify_and_link()
     }
 
 
-    remove_marked( );
     unlock();
 }
 
