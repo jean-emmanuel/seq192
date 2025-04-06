@@ -141,7 +141,7 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
 
 ## SLIDE NOTES
 
-Slide notes are an attempt to imitate a well-known sequencer's feature. A slide note bends it base note (the tonally closest note that intersects the slide note's beginning) and stops when the base note ends. The duration of the slide note only defines how long it takes to reach the slide note.
+Slide notes are an attempt to imitate a well-known sequencer's feature. A slide note bends it base note (the highest note that intersects the slide note's beginning) and stops when the base note ends. The duration of the slide note only defines how long it takes to reach the slide note.
 
 In the PianoRoll, notes can be toggled from/to slide mode using the "S" key or from the "Edit" menu.
 
