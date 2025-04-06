@@ -2969,7 +2969,7 @@ sequence::put_event_on_bus( event *a_e )
             if (a_e->get_linked()->get_active_slide() != NULL) {
                 // output note off of unterminated slide
                 play_note_off(a_e->get_linked()->get_active_slide()->get_note());
-        }
+            }
 
             a_e->get_linked()->set_active_slide(NULL);
 
