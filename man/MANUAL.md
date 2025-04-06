@@ -141,22 +141,22 @@ The configration file is located in `$XDG_CONFIG_HOME/seq192/config.json` (`~/.c
 
 ## SLIDE NOTES
 
-Slide notes are an attempt to imitate a well-known sequencer's feature. A slide note bends it base note (the highest note that intersects the slide note's beginning) and stops when the base note ends. The duration of the slide note only defines how long it takes to reach the slide note.
+Slide notes are an attempt to imitate a well-known sequencer's feature. A slide note bends its base note (the highest note that intersects the slide note's beginning) and stops when the base note ends. The duration of the slide note only defines how long it takes to reach the slide note.
 
 In the PianoRoll, notes can be toggled from/to slide mode using the "S" key or from the "Edit" menu.
 
 Slide notes rely on CC5 (Portamento MSB) and CC37 (Portamento LSB) to tell controlled synths their slide duration, this has the following implications
 - the synth must have portamento enabled
-- the synth should most likely be monophonic
-- the synth must bind at least CC5 to its portamento setting (ideally CC5 and CC37 should be combined to obtain a 14-bit control)
+- the synth should most likely be monophonic although it may work in some polyphonic scenarios
+- the synth must bind at least CC5 to its portamento time setting (ideally CC5 and CC37 should be combined to obtain a 14-bit control)
 - seq192 must be aware of the synth's maximum portamento time in order to compute correct portamento values
 
-Setting the maximum portamento time in seq192 is done using seq192 config file. Each output bus has a "portamento_max_time" setting (integer, millisecond, defaults to `16383`) and a "portamento_log_scale" (boolean, defaults to `false`).
+Setting the maximum portamento time in seq192 is done using seq192's config file. Each output bus has a "portamento_max_time" setting (integer, millisecond, defaults to `16383`) and a "portamento_log_scale" (boolean, defaults to `false`).
 
 **Examples**
 
-- `Fluidsynth`: the default portamento settings match Fluidsynth's portamento implementation. One should add a CC65 with value 127 (enable Portamento) and a CC67 with value 127 (enable Legato to make it monophonic)
-- `Surge XT`: one should set "portamento_max_time" to `4000` and "portamento_log_scale" to `true` to desired bus in the config file, bind CC5 to Portamento time and choose a monophonc mode in Surge
+- `Fluidsynth`: the default portamento settings matches Fluidsynth's portamento implementation. One should add a CC65 with value 127 (enable Portamento) and a CC67 with value 127 (enable Legato to make it monophonic)
+- `Surge XT`: one should set "portamento_max_time" to `4000` and "portamento_log_scale" to `true` to desired bus in the config file, bind CC5 to Portamento time and choose a monophonic mode in Surge
 
 ## OSC CONTROLS
 
