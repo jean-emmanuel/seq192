@@ -215,6 +215,7 @@ SequenceButton::draw_background()
         int note;
         bool selected;
         int velocity;
+        bool slide;
         draw_type dt;
         int length = seq->get_length( );
         int lowest_note = seq->get_lowest_note_event( );
@@ -223,7 +224,7 @@ SequenceButton::draw_background()
         interval_height += 2;
 
         seq->reset_draw_list();
-        while ( (dt = seq->get_next_note_event( &tick_s, &tick_f, &note, &selected, &velocity )) != DRAW_FIN ) {
+        while ( (dt = seq->get_next_note_event( &tick_s, &tick_f, &note, &selected, &velocity , &slide)) != DRAW_FIN ) {
 
             int note_y = rect_h - (note + 1 - lowest_note) / interval_height * (rect_h - 4);
             int tick_s_x = tick_s * (rect_w - 3) / length + 2;

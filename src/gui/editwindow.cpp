@@ -210,6 +210,17 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_edit_reverse.signal_activate().connect([&]{menu_callback(EDIT_MENU_REVERSE);});
     m_submenu_pattern.append(m_menu_edit_reverse);
 
+
+    m_menu_edit_note.set_label("_Note");
+    m_menu_edit_note.set_use_underline(true);
+    m_submenu_edit.append(m_menu_edit_note);
+    m_menu_edit_note.set_submenu(m_submenu_note);
+
+    m_menu_edit_slide.set_label("Toggle slide");
+    m_menu_edit_slide.add_accelerator("activate", m_accelgroup, 's', (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_slide.signal_activate().connect([&]{menu_callback(EDIT_MENU_SLIDE_NOTE);});
+    m_submenu_note.append(m_menu_edit_slide);
+
     m_submenu_edit.append(m_menu_separator2);
 
     m_menu_edit_close.set_label("_Close");
@@ -787,6 +798,9 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             break;
         case EDIT_MENU_REVERSE:
             m_sequence->reverse_pattern();
+            break;
+        case EDIT_MENU_SLIDE_NOTE:
+            m_sequence->toggle_selected_slide_note();
             break;
         case EDIT_MENU_CLOSE:
             clear_focus();

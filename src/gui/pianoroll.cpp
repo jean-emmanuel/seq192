@@ -155,6 +155,7 @@ PianoRoll::draw_background()
     int note;
     bool selected;
     int velocity;
+    bool slide;
     int note_x;
     int note_width;
     int note_y;
@@ -179,18 +180,18 @@ PianoRoll::draw_background()
 
         seq->reset_draw_list();
 
-        while ((dt = seq->get_next_note_event( &tick_s, &tick_f, &note, &selected, &velocity )) != DRAW_FIN)
+        while ((dt = seq->get_next_note_event( &tick_s, &tick_f, &note, &selected, &velocity, &slide)) != DRAW_FIN)
         {
             if ((tick_s >= start_tick && tick_s <= end_tick) || ((dt == DRAW_NORMAL_LINKED) && (tick_f >= start_tick && tick_f <= end_tick)))
             {
 
                 if (selected)
                 {
-                    cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_event);
+                    cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g + (slide ? 0.25 : 0), c_color_event_selected.b, c_alpha_event);
                 }
                 else
                 {
-                    cr->set_source_rgba(color_event.r, color_event.g, color_event.b, alpha_event);
+                    cr->set_source_rgba(color_event.r, color_event.g  + (slide ? 0.25 : 0), color_event.b, alpha_event);
                 }
 
                 note_x = tick_s / m_zoom;
