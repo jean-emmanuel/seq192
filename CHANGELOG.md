@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.7.0
+
+- sequence
+    - add (FL-ish) slide notes
+
+- config file
+    - per bus "portamento_max_time" and "portamento_log_scale" settings for slide notes
+
 ## 1.6.1
 
 - bug fixes
