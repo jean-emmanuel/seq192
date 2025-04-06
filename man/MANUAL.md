@@ -146,8 +146,8 @@ Slide notes are an attempt to imitate a well-known sequencer's feature. A slide 
 In the PianoRoll, notes can be toggled from/to slide mode using the "S" key or from the "Edit" menu.
 
 Slide notes rely on CC5 (Portamento MSB) and CC37 (Portamento LSB) to tell controlled synths their slide duration, this has the following implications
-- the synth must be monophonic
 - the synth must have portamento enabled
+- the synth should most likely be monophonic
 - the synth must bind at least CC5 to its portamento setting (ideally CC5 and CC37 should be combined to obtain a 14-bit control)
 - seq192 must be aware of the synth's maximum portamento time in order to compute correct portamento values
 
