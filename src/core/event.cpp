@@ -284,7 +284,12 @@ event::get_rank() const
         case EVENT_NOTE_OFF:
             return 0x100;
         case EVENT_NOTE_ON:
-            return 0x090;
+            if ((m_status & EVENT_CHANNEL_MASK) == EVENT_SLIDE_NOTE_CHANNEL) {
+                // slide note after base
+                return 0x091;
+            } else {
+                return 0x090;
+            }
         case EVENT_AFTERTOUCH:
         case EVENT_CHANNEL_PRESSURE:
         case EVENT_PITCH_WHEEL:
