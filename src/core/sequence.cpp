@@ -778,9 +778,9 @@ sequence::remove(list<event>::iterator i)
        playing, send a note off */
     if ( (*i).is_note_off() )
     {
-        if ((*i).get_linked()->has_linked_slide()) {
-            m_masterbus->play( m_bus, &(*i), m_midi_channel );
-            m_playing_notes[(*i).get_note()]--;
+        if ((*i).is_slide_note() && m_playing_notes[(*i).get_note()] > 0) {
+            // brutal fix for dangling slide notes
+            play_note_off((*i).get_note());
         } else {
             put_event_on_bus(&(*i));
         }
@@ -1756,7 +1756,11 @@ sequence::toggle_selected_slide_note()
                 if (!(*i).get_linked()->is_selected()) {
                     (*i).get_linked()->set_status((*i).get_status() | EVENT_SLIDE_NOTE_CHANNEL);
                 }
-
+                if (m_playing_notes[(*i).get_note()] > 0) {
+                    // Turning a regular note into a slide note while it's beeing played
+                    // will skip its note off, force it off
+                    play_note_off((*i).get_note());
+                }
             }
         }
 
