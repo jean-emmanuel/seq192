@@ -789,7 +789,7 @@ mastermidibus::get_midi_event( event *a_in )
     }
 
     a_in->set_timestamp( ev->time.tick );
-    a_in->set_status_midibus( buffer[0] );     // keep channel bit
+    a_in->set_status( buffer[0] );
     a_in->set_size( bytes );
 
     /* we will only get EVENT_SYSEX on the first

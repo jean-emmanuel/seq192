@@ -39,6 +39,10 @@ const unsigned char  EVENT_MIDI_STOP        = 0xFC;
 const unsigned char  EVENT_SYSEX            = 0xF0;
 const unsigned char  EVENT_SYSEX_END        = 0xF7;
 
+const unsigned char  EVENT_CHANNEL_MASK       = 0x0F;
+const unsigned char  EVENT_SLIDE_NOTE_CHANNEL = 0x0F;
+
+
 const int ALL_EVENTS                        = -1;
 const int UNSELECTED_EVENTS                 = 0;
 
@@ -67,6 +71,11 @@ class event
     event *m_linked;
     bool m_has_link;
 
+    event *m_slide_base;
+    bool m_has_linked_slide;
+
+    event *m_active_slide;
+
     /* is this event selected in editing */
     bool m_selected;
 
@@ -92,7 +101,6 @@ class event
     void mod_timestamp( unsigned long a_mod );
 
     void set_status( const char status  );
-    void set_status_midibus( const char status  );
     unsigned char get_status( );
     void set_data( const char D1 );
     void set_data( const char D1, const char D2 );
@@ -114,6 +122,13 @@ class event
     void link( event *event );
     event *get_linked( );
     bool is_linked( );
+
+    void link_slide_base( event *event );
+    event *get_slide_base( );
+    bool has_linked_slide( );
+    void set_active_slide( event *event );
+    event *get_active_slide( );
+
     void clear_link( );
 
     void paint( );
@@ -140,6 +155,7 @@ class event
     /* returns true if status is set */
     bool is_note_on();
     bool is_note_off();
+    bool is_slide_note();
 
     void print();
 

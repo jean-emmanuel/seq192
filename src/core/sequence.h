@@ -129,6 +129,9 @@ class sequence
     /* locking */
     smutex m_mutex;
 
+
+    int m_portamento_max_time;
+    bool m_portamento_log_scale;
     /* used to idenfity which events are ours in the out queue */
     //unsigned char m_tag;
 
@@ -353,6 +356,10 @@ class sequence
     void increment_selected (unsigned char a_status, unsigned char a_control);
     void decrement_selected (unsigned char a_status, unsigned char a_control);
 
+    void toggle_selected_slide_note ();
+    void set_bus_portamento();
+    void output_slide_portamento (int ticks_duration);
+
     void randomize_selected( unsigned char a_status, unsigned char a_control, int a_plus_minus );
 
     void adjust_data_handle( unsigned char a_status, int a_data );
@@ -399,7 +406,7 @@ class sequence
     draw_type get_next_note_event (long *a_tick_s,
 				   long *a_tick_f,
 				   int *a_note,
-				   bool * a_selected, int *a_velocity);
+				   bool * a_selected, int *a_velocity, bool *a_slide);
 
     int get_lowest_note_event ();
     int get_highest_note_event ();

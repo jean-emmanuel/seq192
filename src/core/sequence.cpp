@@ -78,6 +78,8 @@ sequence::sequence( )
 
     m_have_undo = false;
     m_have_redo = false;
+
+    set_bus_portamento();
 }
 
 seqstate*
@@ -570,12 +572,14 @@ sequence::verify_and_link()
     list<event>::iterator i;
     list<event>::iterator on;
     list<event>::iterator off;
+    list<event>::iterator slide;
+    list<event>::iterator base;
     bool end_found = false;
 
     lock();
 
     for ( i = m_list_event.begin(); i != m_list_event.end(); i++ ){
-    (*i).clear_link();
+        (*i).clear_link();
         (*i).unmark();
     }
 
@@ -584,76 +588,104 @@ sequence::verify_and_link()
     /* pair ons and offs */
     while ( on != m_list_event.end() ){
 
-    /* check for a note on, then look for its
-       note off */
-    if ( (*on).is_note_on() ){
+        /* check for a note on, then look for its
+           note off */
+        if ( (*on).is_note_on() ){
 
-        /* get next possible off node */
-        off = on; off++;
-        end_found = false;
+            /* get next possible off node */
+            off = on; off++;
+            end_found = false;
 
-        while ( off != m_list_event.end() ){
+            while ( off != m_list_event.end() ){
 
-        /* is a off event, == notes, and isnt
-           markeded  */
-        if ( (*off).is_note_off()                  &&
-             (*off).get_note() == (*on).get_note() &&
-             ! (*off).is_marked()                  ){
+                /* is a off event, == notes, and isnt
+                   markeded  */
+                if ( (*off).is_note_off()                  &&
+                     (*off).get_note() == (*on).get_note() &&
+                     ! (*off).is_marked()                  ){
 
-            /* link + mark */
-            (*on).link( &(*off) );
-            (*off).link( &(*on) );
-            (*on).mark(  );
-            (*off).mark( );
-            end_found = true;
+                    /* link + mark */
+                    (*on).link( &(*off) );
+                    (*off).link( &(*on) );
+                    (*on).mark(  );
+                    (*off).mark( );
+                    end_found = true;
 
-            break;
-        }
-        off++;
-        }
-        if (!end_found) {
-        off = m_list_event.begin();
-        while ( off != on){
-            if ( (*off).is_note_off()                  &&
-                 (*off).get_note() == (*on).get_note() &&
-                 ! (*off).is_marked()                  ){
-
-                /* link + mark */
-                (*on).link( &(*off) );
-                (*off).link( &(*on) );
-                (*on).mark(  );
-                (*off).mark( );
-                end_found = true;
-
-                break;
+                    break;
+                }
+                off++;
             }
-              off++;
+            if (!end_found) {
+                off = m_list_event.begin();
+                while ( off != on){
+                    if ( (*off).is_note_off()                  &&
+                         (*off).get_note() == (*on).get_note() &&
+                         ! (*off).is_marked()                  ){
 
+                        /* link + mark */
+                        (*on).link( &(*off) );
+                        (*off).link( &(*on) );
+                        (*on).mark(  );
+                        (*off).mark( );
+                        end_found = true;
+
+                        break;
+                    }
+                      off++;
+
+                }
+            }
         }
-        }
-    }
-    on++;
+        on++;
     }
 
     /* unmark all */
     for ( i = m_list_event.begin(); i != m_list_event.end(); i++ ){
-    (*i).unmark();
+        (*i).unmark();
     }
 
     /* kill those not in range */
     for ( i = m_list_event.begin(); i != m_list_event.end(); i++ ){
 
-    /* if our current time stamp is greater then the length */
+        /* if our current time stamp is greater then the length */
 
-    if ( (*i).get_timestamp() >= m_length ||
-         (*i).get_timestamp() < 0            ){
+        if ( (*i).get_timestamp() >= m_length ||
+             (*i).get_timestamp() < 0            ){
 
-        /* we have to prune it */
-        (*i).mark();
-        if ( (*i).is_linked() )
-        (*i).get_linked()->mark();
+            /* we have to prune it */
+            (*i).mark();
+            if ( (*i).is_linked() )
+            (*i).get_linked()->mark();
+        }
     }
+
+    /* pair slide notes on with base notes */
+    slide = m_list_event.begin();
+    while ( slide != m_list_event.end() ){
+        if ( (*slide).is_note_on() && (*slide).is_slide_note() && (*slide).is_linked() ){
+            base = m_list_event.begin();
+            int delta = 128;
+            while ( base != m_list_event.end() ){
+                if (
+                    (*base).is_note_on() &&
+                    (*base).is_linked() &&
+                    !(*base).is_slide_note() &&
+                    abs((*slide).get_note() - (*base).get_note()) < delta &&
+                    (*base).get_timestamp() <= (*slide).get_timestamp() &&
+                    (
+                        (*base).get_linked()->get_timestamp() > (*slide).get_timestamp() ||
+                        (*base).get_linked()->get_timestamp() < (*base).get_timestamp()
+                    )
+                ) {
+                    delta = abs((*slide).get_note() - (*base).get_note());
+                    (*slide).link_slide_base(&(*base));
+                }
+                base++;
+            }
+        }
+        slide++;
     }
+
 
     remove_marked( );
     unlock();
@@ -739,11 +771,14 @@ sequence::remove(list<event>::iterator i)
 {
     /* if its a note off, and that note is currently
        playing, send a note off */
-    if ( (*i).is_note_off()  &&
-     m_playing_notes[ (*i).get_note()] > 0 ){
-
-        m_masterbus->play( m_bus, &(*i), m_midi_channel );
-        m_playing_notes[(*i).get_note()]--;
+    if ( (*i).is_note_off() )
+    {
+        if ((*i).get_linked()->has_linked_slide()) {
+            m_masterbus->play( m_bus, &(*i), m_midi_channel );
+            m_playing_notes[(*i).get_note()]--;
+        } else {
+            put_event_on_bus(&(*i));
+        }
     }
     m_list_event.erase(i);
 }
@@ -1692,6 +1727,43 @@ sequence::decrement_selected(unsigned char a_status, unsigned char a_control )
     undoable_unlock();
 }
 
+
+void
+sequence::toggle_selected_slide_note()
+{
+    undoable_lock(true);
+    lock();
+
+    list<event>::iterator i;
+
+    for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
+    {
+        if ( (*i).is_selected() && (*i).is_note_on() && (*i).is_linked())
+        {
+            if ((*i).is_slide_note()) {
+                (*i).set_status((*i).get_status() & EVENT_CLEAR_CHAN_MASK);
+                if (!(*i).get_linked()->is_selected()) {
+                    (*i).get_linked()->set_status((*i).get_status() & EVENT_CLEAR_CHAN_MASK);
+                }
+
+            } else {
+                (*i).set_status((*i).get_status() | EVENT_SLIDE_NOTE_CHANNEL);
+                if (!(*i).get_linked()->is_selected()) {
+                    (*i).get_linked()->set_status((*i).get_status() | EVENT_SLIDE_NOTE_CHANNEL);
+                }
+
+            }
+        }
+
+    }
+
+    set_dirty();
+    verify_and_link();
+
+    unlock();
+    undoable_unlock();
+}
+
 void
 sequence::randomize_selected( unsigned char a_status, unsigned char a_control, int a_plus_minus )
 {
@@ -2111,7 +2183,7 @@ sequence::stream_event(  event *a_ev  )
     lock();
 
     // remove channel bit
-    a_ev->set_status(a_ev->m_status);
+    // a_ev->set_status(a_ev->m_status);
 
     // adjust tick
     a_ev->mod_timestamp( m_length );
@@ -2222,7 +2294,6 @@ sequence::is_dirty_edit( )
 }
 
 
-/* plays a note from the paino roll */
 void
 sequence::play_note_on( int a_note )
 {
@@ -2240,7 +2311,6 @@ sequence::play_note_on( int a_note )
 }
 
 
-/* plays a note from the paino roll */
 void
 sequence::play_note_off( int a_note )
 {
@@ -2419,7 +2489,8 @@ sequence::get_next_note_event( long *a_tick_s,
 			       long *a_tick_f,
 			       int  *a_note,
 			       bool *a_selected,
-			       int  *a_velocity  )
+			       int  *a_velocity,
+                   bool *a_slide)
 {
 
     draw_type ret = DRAW_FIN;
@@ -2430,7 +2501,8 @@ sequence::get_next_note_event( long *a_tick_s,
 	*a_tick_s   = (*m_iterator_draw).get_timestamp();
 	*a_note     = (*m_iterator_draw).get_note();
 	*a_selected = (*m_iterator_draw).is_selected();
-	*a_velocity = (*m_iterator_draw).get_note_velocity();
+    *a_velocity = (*m_iterator_draw).get_note_velocity();
+	*a_slide    = (*m_iterator_draw).is_slide_note();
 
 	/* note on, so its linked */
 	if( (*m_iterator_draw).is_note_on() &&
@@ -2633,6 +2705,9 @@ sequence::set_midi_bus( char  a_mb )
     off_playing_notes( );
 
     this->m_bus = a_mb;
+
+    set_bus_portamento();
+
     set_dirty();
 
     unlock();
@@ -2859,26 +2934,78 @@ sequence::put_event_on_bus( event *a_e )
 
     if ( a_e->is_note_on() ){
 
-        m_playing_notes[note]++;
+        if ( a_e->is_slide_note()){
+
+            if (a_e->has_linked_slide()) {
+                // output new portamento value based of slide note length
+                output_slide_portamento(a_e->get_linked()->get_timestamp() - a_e->get_timestamp());
+
+                // output note off previous slide
+                if (a_e->get_slide_base()->get_active_slide() != NULL) {
+                    play_note_off(a_e->get_slide_base()->get_active_slide()->get_note());
+                }
+
+                // link active slide to base note
+                a_e->get_slide_base()->set_active_slide(&(*a_e));
+
+            } else {
+
+                skip = true;
+            }
+
+        }
+
+        if (!skip) {
+            m_playing_notes[note]++;
+        }
+
     }
     if ( a_e->is_note_off() ){
 
-        if (  m_playing_notes[note] <= 0 ){
+        if (!(a_e->get_linked()->is_slide_note())){
+
+            // if end of base note
+
+            if (a_e->get_linked()->get_active_slide() != NULL) {
+                // output note off of unterminated slide
+                play_note_off(a_e->get_linked()->get_active_slide()->get_note());
+        }
+
+            a_e->get_linked()->set_active_slide(NULL);
+
+        } else {
+
+            // if end of slide note
+
+            if (a_e->get_linked()->has_linked_slide() &&
+                a_e->get_linked()->get_slide_base()->get_active_slide() == a_e->get_linked()
+            ) {
+                // reset portamento if no other slide took oveer
+                output_slide_portamento(0);
+            }
+
             skip = true;
         }
-        else {
+
+
+        if ( m_playing_notes[note] <= 0 ){
+            skip = true;
+        }
+
+
+        if (!skip) {
             m_playing_notes[note]--;
         }
     }
 
-    if ( a_e->m_status == EVENT_PITCH_WHEEL) {
+    if ( a_e->get_status() == EVENT_PITCH_WHEEL) {
         unsigned char d0, d1;
         a_e->get_data(&d0, &d1);
         if (d0 == 0 && d1 == 64) m_chase_pitchbend = 0;
         else m_chase_pitchbend = 1;
     }
 
-    if ( a_e->m_status == EVENT_CONTROL_CHANGE) {
+    if ( a_e->get_status() == EVENT_CONTROL_CHANGE) {
         unsigned char d0, d1;
         a_e->get_data(&d0, &d1);
         if (d1 != 0) m_chase_controls[d0] = 1;
@@ -2894,6 +3021,46 @@ sequence::put_event_on_bus( event *a_e )
     unlock();
 }
 
+void
+sequence::output_slide_portamento(int ticks_duration)
+{
+
+    // compute slide duration in ms
+    float duration = ticks_duration * 60000 / (m_masterbus->get_bpm() * m_masterbus->get_ppqn());
+
+    // normalize duration
+    duration /= m_portamento_max_time;
+
+    if (m_portamento_log_scale) {
+        // works for Surge XT, should write something generic
+        duration = (log2(duration * 4) + 8 ) / 10;
+    }
+
+    if (duration < 0) duration = 0;
+
+    // create cc events
+    event e;
+    int nrpn_value = (int) (16383 * duration);
+
+    // CC 5 : Portamento MSB
+    e.set_status( EVENT_CONTROL_CHANGE );
+    e.set_data( 5, nrpn_value >> 7 );
+    put_event_on_bus( &e );
+
+    // CC 37 : Portamento LSB
+    e.set_status( EVENT_CONTROL_CHANGE );
+    e.set_data( 37, nrpn_value & 127 );
+    put_event_on_bus( &e );
+}
+
+void
+sequence::set_bus_portamento()
+{
+
+    m_portamento_max_time = global_user_midi_bus_definitions[(int)m_bus].portamento_max_time;
+    m_portamento_log_scale = global_user_midi_bus_definitions[(int)m_bus].portamento_log_scale;
+
+}
 
 void
 sequence::off_playing_notes()

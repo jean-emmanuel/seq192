@@ -129,6 +129,9 @@ main (int argc, char *argv[])
             global_user_midi_bus_definitions[i].instrument[j] = -1;
             global_user_midi_bus_definitions[i].keymap[j] = -1;
         }
+        global_user_midi_bus_definitions[i].portamento_max_time = 16383;
+        global_user_midi_bus_definitions[i].portamento_log_scale = false;
+
     }
 
     for (int i=0; i<c_max_instruments; i++)

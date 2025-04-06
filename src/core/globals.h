@@ -101,6 +101,8 @@ struct user_midi_bus_definition
     std::string alias;
     int instrument[16];
     int keymap[16];
+    int portamento_max_time;
+    bool portamento_log_scale;
 };
 
 struct user_instrument_definition

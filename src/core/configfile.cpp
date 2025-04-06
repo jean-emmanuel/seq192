@@ -70,6 +70,16 @@ ConfigFile::parse()
                 global_user_midi_bus_definitions[bus_number].alias = bus_name;
             }
 
+            auto bus_portamento = bus_data["portamento_max_time"];
+            if (bus_portamento.is_number_integer()) {
+                global_user_midi_bus_definitions[bus_number].portamento_max_time = bus_portamento;
+            }
+
+            auto bus_portamento_log = bus_data["portamento_log_scale"];
+            if (bus_portamento_log.is_boolean()) {
+                global_user_midi_bus_definitions[bus_number].portamento_log_scale = bus_portamento_log;
+            }
+
             auto bus_color = bus_data["color"];
             if (bus_color.is_string()){
                 for (int channel_number=0; channel_number<16; channel_number++) {

@@ -27,9 +27,13 @@ event::event()
     m_sysex = NULL;
 
     m_linked = NULL;
+    m_active_slide = NULL;
+    m_slide_base = NULL;
+
     m_selected = false;
     m_marked = false;
     m_has_link = false;
+    m_has_linked_slide = false;
     m_painted = false;
 }
 
@@ -62,20 +66,6 @@ event::mod_timestamp( unsigned long a_mod )
 void
 event::set_status( const char a_status  )
 {
-   /* bitwise AND to clear the channel portion of the status */
-    if ( (unsigned char) a_status >= 0xF0 ){
-      m_status = (char) a_status;
-    }
-    else
-    {
-      m_status = (char) (a_status & EVENT_CLEAR_CHAN_MASK);
-    }
-}
-
-void
-event::set_status_midibus( const char a_status  )
-{
-    /* keep the channel portion of the status */
     m_status = (char) a_status;
 }
 
@@ -103,7 +93,7 @@ event::increment_data2()
 {
 	m_data[1] = (m_data[1]+1) & 0x7F;
 
-    if (m_status == EVENT_PITCH_WHEEL) {
+    if (get_status() == EVENT_PITCH_WHEEL) {
         // pitchbend lsb is not supported
         // set to 127 when msb is 127
         // so that we can reach the maximum value
@@ -117,7 +107,7 @@ event::decrement_data2()
 {
 	m_data[1] = (m_data[1]-1) & 0x7F;
 
-    if (m_status == EVENT_PITCH_WHEEL) {
+    if (get_status() == EVENT_PITCH_WHEEL) {
         // pitchbend lsb is not supported
         // set to 127 when msb is 127
         // so that we can reach the maximum value
@@ -151,7 +141,7 @@ event::get_data( unsigned char *D0, unsigned char *D1 )
 unsigned char
 event::get_status( )
 {
-    return m_status;
+    return  (char) (m_status & EVENT_CLEAR_CHAN_MASK);
 }
 
 
@@ -222,14 +212,21 @@ event::set_note_velocity( int a_vel )
 bool
 event::is_note_on()
 {
-    return (m_status == EVENT_NOTE_ON);
+    return get_status() == EVENT_NOTE_ON;
 }
 
 bool
 event::is_note_off()
 {
-    return (m_status == EVENT_NOTE_OFF);
+    return get_status() == EVENT_NOTE_OFF;
 }
+
+bool
+event::is_slide_note()
+{
+    return ((m_status & EVENT_CHANNEL_MASK) == EVENT_SLIDE_NOTE_CHANNEL);
+}
+
 
 unsigned char
 event::get_note()
@@ -282,13 +279,12 @@ event::print()
 int
 event::get_rank() const
 {
-    switch ( m_status )
+    switch ( m_status & EVENT_CLEAR_CHAN_MASK )
     {
         case EVENT_NOTE_OFF:
             return 0x100;
         case EVENT_NOTE_ON:
             return 0x090;
-
         case EVENT_AFTERTOUCH:
         case EVENT_CHANNEL_PRESSURE:
         case EVENT_PITCH_WHEEL:
@@ -363,10 +359,42 @@ event::is_linked( )
     return m_has_link;
 }
 
+bool
+event::has_linked_slide( )
+{
+    return m_has_linked_slide;
+}
+
+void
+event::link_slide_base( event *a_event )
+{
+    m_has_linked_slide = true;
+    m_slide_base = a_event;
+}
+
+event*
+event::get_slide_base( )
+{
+    return m_slide_base;
+}
+
+void
+event::set_active_slide( event *a_event )
+{
+    m_active_slide = a_event;
+}
+
+event*
+event::get_active_slide( )
+{
+    return m_active_slide;
+}
+
 void
 event::clear_link( )
 {
     m_has_link = false;
+    m_has_linked_slide = false;
 }
 
 void
