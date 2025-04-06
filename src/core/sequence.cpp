@@ -664,20 +664,20 @@ sequence::verify_and_link()
     while ( slide != m_list_event.end() ){
         if ( (*slide).is_note_on() && (*slide).is_slide_note() && (*slide).is_linked() ){
             base = m_list_event.begin();
-            int delta = 128;
+            int base_note = -1;
             while ( base != m_list_event.end() ){
                 if (
                     (*base).is_note_on() &&
                     (*base).is_linked() &&
                     !(*base).is_slide_note() &&
-                    abs((*slide).get_note() - (*base).get_note()) < delta &&
+                    (*base).get_note() > base_note &&
                     (*base).get_timestamp() <= (*slide).get_timestamp() &&
                     (
                         (*base).get_linked()->get_timestamp() > (*slide).get_timestamp() ||
                         (*base).get_linked()->get_timestamp() < (*base).get_timestamp()
                     )
                 ) {
-                    delta = abs((*slide).get_note() - (*base).get_note());
+                    base_note = (*base).get_note();
                     (*slide).link_slide_base(&(*base));
                 }
                 base++;
