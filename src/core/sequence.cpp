@@ -503,11 +503,15 @@ sequence::play( long a_tick, double swing_ratio, int swing_reference )
                 t += beat_timing * swing_reference;
             }
 
-            if ( m_resume_next &&
-                 (*e).is_note_on() &&
-                 ((*e).get_timestamp() + offset_base ) < (start_tick_offset) &&
-                 ((*(e->get_linked())).get_timestamp() + offset_base ) > (end_tick_offset) )
-            {
+            if (
+                m_resume_next &&
+                (t + offset_base ) < start_tick_offset &&
+                (*e).is_note_on() &&
+                (*e).is_linked() &&
+                ((*(e->get_linked())).get_timestamp() + offset_base ) > (end_tick_offset) // NOTE swing ignored here, probably not an issue
+            ) {
+                // Resume mode:
+                // When the sequence is activated, if the cursor is in the middle of a note, play that note
                 put_event_on_bus( &(*e) );
             }
 
