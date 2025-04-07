@@ -900,7 +900,11 @@ sequence::get_selected_box( long *a_tick_s, int *a_note_h,
 
         if( (*i).is_selected() ){
 
-            time = (*i).get_timestamp();
+            if ((*i).is_note_off() && (*i).is_linked() && (*i).get_timestamp() < (*i).get_linked()->get_timestamp()) {
+                time = (*i).get_timestamp() + m_length;
+            } else {
+                time = (*i).get_timestamp();
+            }
 
             // can't check on/off here. screws up seqevent
             // selection which has no "off"
@@ -1623,8 +1627,14 @@ sequence::grow_selected( long a_delta_tick )
                 a_delta_tick;
 
             // prevent excessive shrinking
-            if (a_delta_tick < 0 && length - on->get_timestamp() < c_min_note_length) {
+            long current_length = off->get_timestamp() - on->get_timestamp();
+            if (current_length < 0) current_length += m_length;
+            if (a_delta_tick < 0 && current_length + a_delta_tick < c_min_note_length) {
                 length = on->get_timestamp() + c_min_note_length;
+            }
+            // prevent excessive growing
+            if (a_delta_tick > 0 && current_length + a_delta_tick >= m_length) {
+                length =  on->get_timestamp() + m_length - 1;
             }
 
             /*
