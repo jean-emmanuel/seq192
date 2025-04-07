@@ -3611,7 +3611,7 @@ sequence::fill_list( list<char> *a_list, int a_pos )
 	/* now that the timestamp is encoded, do the status and
 	   data */
 
-	a_list->push_front( e.m_status | m_midi_channel );
+	a_list->push_front( e.m_status );
 
 	switch( e.m_status & 0xF0 ){
 
