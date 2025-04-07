@@ -180,6 +180,7 @@ entry {
 }
 
 entry:focus {
+    border-color: mix(@color_primary, @color_bg, 0.4);
     background: mix(@color_fg, @color_bg, 0.4);
 }
 
