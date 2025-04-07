@@ -509,6 +509,7 @@ SequenceButton::menu_callback(context_menu_action action, int data1, int data2)
                 entry.set_activates_default(true);
                 entry.grab_focus();
                 entry.show();
+                dialog.get_content_area()->set_spacing(2);
                 dialog.get_content_area()->pack_start(entry, true, true);
                 dialog.add_button("_Ok", Gtk::RESPONSE_OK);
                 dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
