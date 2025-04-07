@@ -40,7 +40,7 @@ const unsigned char  EVENT_SYSEX            = 0xF0;
 const unsigned char  EVENT_SYSEX_END        = 0xF7;
 
 const unsigned char  EVENT_CHANNEL_MASK       = 0x0F;
-const unsigned char  EVENT_SLIDE_NOTE_CHANNEL = 0x0F;
+const unsigned char  EVENT_SLIDE_NOTE_CHANNEL = 0x08;
 
 
 const int ALL_EVENTS                        = -1;
