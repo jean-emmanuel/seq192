@@ -2,6 +2,12 @@
 
 ## 1.7.0
 
+- main window
+    - append "*" to window title when there are unsaved changes
+
+- edit window
+    - add `ctrl+s` shortcut to save the session from this window
+
 - sequence
     - add (FL-ish) slide notes
 
