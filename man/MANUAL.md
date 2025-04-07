@@ -155,7 +155,7 @@ Setting the maximum portamento time in seq192 is done using seq192's config file
 
 **Examples**
 
-- `Fluidsynth`: the default portamento setting matches Fluidsynth's portamento implementation. One should add a CC65 with value 127 (enable Portamento) and a CC67 with value 127 (enable Legato to make it monophonic)
+- `Fluidsynth`: the default portamento setting matches Fluidsynth's portamento implementation. One should add a CC65 with value 127 (enable Portamento) and a CC67 with value 127 (enable Legato to make it monophonic) at the beginning of the sequence unless these options are already set
 - `Surge XT`: one should set "portamento_max_time" to `4000` and "portamento_log_scale" to `true` to desired bus in the config file, bind CC5 to Portamento time and choose a monophonic mode in Surge
 
 ## OSC CONTROLS
