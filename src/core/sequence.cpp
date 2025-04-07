@@ -2247,6 +2247,20 @@ sequence::stream_event(  event *a_ev  )
     unlock();
 }
 
+void
+sequence::prune_event_channels()
+{
+    list<event>::iterator i;
+
+    lock();
+
+    i = m_list_event.begin();
+    while( i != m_list_event.end() ){
+        (*i).set_status((*i).get_status());
+        i++;
+    }
+    unlock();
+}
 
 void
 sequence::set_dirty_main()

@@ -340,6 +340,8 @@ class sequence
 
     void stream_event (event * a_ev);
 
+    void prune_event_channels ();
+
     /* changes velocities in a ramping way from vel_s to vel_f  */
     void change_event_data_range (long a_tick_s, long a_tick_f,
 				  unsigned char a_status,

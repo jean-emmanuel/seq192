@@ -163,6 +163,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
         unsigned char status = 0, type, data[2], laststatus;
         long len;
         unsigned long proprietary = 0;
+        bool has_channel = false;
 
         /* Get ID + Length */
         ID = read_long ();
@@ -247,9 +248,6 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                         e.set_data (data[0], data[1]);
                         seq->add_event (&e);
 
-                        /* set midi channel */
-                        seq->set_midi_channel (status & 0x0F);
-//                        fprintf(stderr,"Midi Channel : %d | 0x0F %d\n",status & 0x0F, 0x0F);
                         break;
 
                         /* one data item */
@@ -263,8 +261,6 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                         e.set_data (data[0]);
                         seq->add_event (&e);
 
-                        /* set midi channel */
-                        seq->set_midi_channel (status & 0x0F);
                         break;
 
                         /* meta midi events ---  this should be FF !!!!!  */
@@ -299,6 +295,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                     else if (proprietary == c_midich)
                                     {
                                         seq->set_midi_channel (m_d[m_pos++]);
+                                        has_channel = true;
                                         len--;
                                     }
 
@@ -424,6 +421,12 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                 }
 
             }			/* while ( !done loading Trk chunk */
+
+            if (!has_channel) {
+                // if proprietary channel is not found, we're importing some generic midi
+                // in which case note channel should not be kept to prevent conflict with note modes (slide, etc)
+                seq->prune_event_channels();
+            }
 
             /* the sequence has been filled, add it  */
             //printf ( "add_sequence( %d )\n", perf + (a_screen_set * c_seqs_in_set));
