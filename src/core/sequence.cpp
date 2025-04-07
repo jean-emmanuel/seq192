@@ -2186,7 +2186,7 @@ sequence::stream_event(  event *a_ev  )
     lock();
 
     // remove channel bit
-    // a_ev->set_status(a_ev->m_status);
+    a_ev->set_status(a_ev->get_status());
 
     // adjust tick
     a_ev->mod_timestamp( m_length );
