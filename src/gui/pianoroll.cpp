@@ -216,7 +216,18 @@ PianoRoll::draw_background()
 
                 note_x -= m_hscroll / m_zoom;
 
-                cr->rectangle(note_x + 2, note_y, note_width - 2, note_height + (note == 0 ? 1 : 0));
+
+                if (slide) {
+                    int cs = min(note_width - 2, 4);
+                    cr->move_to(note_x + 2 + cs, note_y);
+                    cr->line_to(note_x + note_width, note_y);
+                    cr->line_to(note_x + note_width, note_y + note_height + (note == 0 ? 1 : 0));
+                    cr->line_to(note_x + 2, note_y + note_height + (note == 0 ? 1 : 0));
+                    cr->line_to(note_x + 2, note_y + cs);
+                } else {
+                    cr->rectangle(note_x + 2, note_y, note_width - 2, note_height + (note == 0 ? 1 : 0));
+                }
+
 
                 if (tick_f < tick_s)
                 {
