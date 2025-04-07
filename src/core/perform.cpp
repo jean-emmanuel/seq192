@@ -1198,7 +1198,9 @@ bool perform::file_open(std::string filename)
 bool perform::file_import(std::string filename)
 {
     midifile f(filename);
+    undoable_lock(true);
     bool result = f.parse(this, get_screenset());
+    undoable_unlock();
     global_is_modified = !result;
     return result;
 }
