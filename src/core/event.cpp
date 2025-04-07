@@ -224,7 +224,8 @@ event::is_note_off()
 bool
 event::is_slide_note()
 {
-    return ((m_status & EVENT_CHANNEL_MASK) == EVENT_SLIDE_NOTE_CHANNEL);
+    return (m_status & EVENT_CHANNEL_MASK) == EVENT_SLIDE_NOTE_CHANNEL ||
+            (is_note_off() && is_linked() && get_linked()->is_slide_note());
 }
 
 

@@ -1747,15 +1747,9 @@ sequence::toggle_selected_slide_note()
         {
             if ((*i).is_slide_note()) {
                 (*i).set_status((*i).get_status() & EVENT_CLEAR_CHAN_MASK);
-                if (!(*i).get_linked()->is_selected()) {
-                    (*i).get_linked()->set_status((*i).get_status() & EVENT_CLEAR_CHAN_MASK);
-                }
 
             } else {
                 (*i).set_status((*i).get_status() | EVENT_SLIDE_NOTE_CHANNEL);
-                if (!(*i).get_linked()->is_selected()) {
-                    (*i).get_linked()->set_status((*i).get_status() | EVENT_SLIDE_NOTE_CHANNEL);
-                }
                 if (m_playing_notes[(*i).get_note()] > 0) {
                     // Turning a regular note into a slide note while it's beeing played
                     // will skip its note off, force it off
