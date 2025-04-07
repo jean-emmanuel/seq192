@@ -95,13 +95,34 @@ PianoRoll::draw_background()
 
     // Horizontal lines
 
-    cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_key);
     cr->set_line_width(1.0);
-    int i;
+
+    double key_y;
+    int i, key;
+
     for (i = 0; i < c_num_keys; i++) {
-        cr->move_to(0, i * c_key_height - 0.5);
-        cr->line_to(width, i * c_key_height - 0.5);
-        cr->stroke();
+        key = i % 12;
+        key_y = height - c_key_height * (i + 1);
+        if (key == 0 || key == 5) {
+            cr->set_source_rgba(c_key_black.r, c_key_black.g, c_key_black.b, 1);
+            cr->move_to(0, key_y + c_key_height - 0.5);
+            cr->line_to(width, key_y + c_key_height - 0.5);
+            cr->stroke();
+        }
+        if (
+            key == 0 ||
+            key == 2 ||
+            key == 4 ||
+            key == 5 ||
+            key == 7 ||
+            key == 9 ||
+            key == 11
+        ) {
+            cr->set_source_rgba(c_key_white.r, c_key_white.g, c_key_white.b, 0.03);
+            cr->rectangle(0, key_y, width, c_key_height - 1);
+            cr->fill();
+        }
+
     }
 
     // Vertical lines
@@ -217,21 +238,36 @@ PianoRoll::draw_background()
                 note_x -= m_hscroll / m_zoom;
 
 
-                if (slide) {
-                    int cs = min(note_width - 2, 4);
-                    cr->move_to(note_x + 2 + cs, note_y);
-                    cr->line_to(note_x + note_width, note_y);
-                    cr->line_to(note_x + note_width, note_y + note_height + (note == 0 ? 1 : 0));
-                    cr->line_to(note_x + 2, note_y + note_height + (note == 0 ? 1 : 0));
-                    cr->line_to(note_x + 2, note_y + cs);
-                } else {
-                    cr->rectangle(note_x + 2, note_y, note_width - 2, note_height + (note == 0 ? 1 : 0));
-                }
+                // fake corner radius
+                int cs = 1;
+
+                // note overlapping end line, add 1px
+                if (tick_f < tick_s) note_width += 1;
+
+                // top left corner cut for slide notes
+                int cs1 = slide ?  min(note_width - 3, 4) : cs;
+
+                cr->move_to(note_x + 2 + cs1, note_y);
+                cr->line_to(note_x + note_width - cs, note_y);
+                cr->line_to(note_x + note_width, note_y + cs);
+                cr->line_to(note_x + note_width, note_y + note_height - cs + (note == 0 ? 1 : 0));
+                cr->line_to(note_x + note_width - cs, note_y + note_height + (note == 0 ? 1 : 0));
+                cr->line_to(note_x + 2 + cs, note_y + note_height + (note == 0 ? 1 : 0));
+                cr->line_to(note_x + 2, note_y + note_height - cs);
+                cr->line_to(note_x + 2, note_y + cs1);
 
 
                 if (tick_f < tick_s)
                 {
-                    cr->rectangle(0 - m_hscroll / m_zoom, note_y, tick_f / m_zoom - 2, note_height + (note == 0 ? 1 : 0));
+                    // extra note end
+                    note_x = 0 - m_hscroll / m_zoom;
+                    note_width = tick_f / m_zoom - 2;
+                    cr->move_to(note_x, note_y);
+                    cr->line_to(note_x + note_width - cs, note_y);
+                    cr->line_to(note_x + note_width, note_y + cs);
+                    cr->line_to(note_x + note_width, note_y + note_height - cs + (note == 0 ? 1 : 0));
+                    cr->line_to(note_x + note_width - cs, note_y + note_height + (note == 0 ? 1 : 0));
+                    cr->line_to(note_x, note_y + note_height + (note == 0 ? 1 : 0));
                 }
 
                 cr->fill();
