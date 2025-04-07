@@ -354,17 +354,16 @@ class sequence
                                double a_speed, double a_phase, int a_wave,
                                unsigned char a_status, unsigned char a_cc);
 
-    /* moves note off event */
+    /* increment control values */
     void increment_selected (unsigned char a_status, unsigned char a_control);
     void decrement_selected (unsigned char a_status, unsigned char a_control);
+    void randomize_selected( unsigned char a_status, unsigned char a_control, int a_plus_minus );
+    void adjust_data_handle( unsigned char a_status, int a_data );
 
+    /* slide notes */
     void toggle_selected_slide_note ();
     void set_bus_portamento();
     void output_slide_portamento (int ticks_duration);
-
-    void randomize_selected( unsigned char a_status, unsigned char a_control, int a_plus_minus );
-
-    void adjust_data_handle( unsigned char a_status, int a_data );
 
     /* moves note off event */
     void grow_selected (long a_delta_tick);
