@@ -2963,21 +2963,10 @@ sequence::put_event_on_bus( event *a_e )
         }
 
     }
+
     if ( a_e->is_note_off() ){
 
-        if (!(a_e->get_linked()->is_slide_note())){
-
-            // if end of base note
-
-            if (a_e->get_linked()->get_active_slide() != NULL) {
-                // output note off of unterminated slide
-                play_note_off(a_e->get_linked()->get_active_slide()->get_note());
-            }
-
-            a_e->get_linked()->set_active_slide(NULL);
-
-        } else {
-
+        if (a_e->is_slide_note()) {
             // if end of slide note
 
             if (a_e->get_linked()->has_linked_slide() &&
@@ -3017,9 +3006,20 @@ sequence::put_event_on_bus( event *a_e )
 
     if ( !skip ){
         m_masterbus->play( m_bus, a_e,  m_midi_channel );
+        m_masterbus->flush();
     }
 
-    m_masterbus->flush();
+    if (a_e->is_note_off() && !a_e->is_slide_note()) {
+        // if end of base note
+
+        if (a_e->get_linked()->get_active_slide() != NULL) {
+            // output note off of unterminated slide
+            // sent after base note off to avoid glitch (in fluidsynth at leat))
+            play_note_off( a_e->get_linked()->get_active_slide()->get_note());
+        }
+
+        a_e->get_linked()->set_active_slide(NULL);
+    }
 
     unlock();
 }
