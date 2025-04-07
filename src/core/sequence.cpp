@@ -3042,6 +3042,8 @@ void
 sequence::output_slide_portamento(int ticks_duration)
 {
 
+    if (ticks_duration < 0) ticks_duration += m_length;
+
     // compute slide duration in ms
     float duration = ticks_duration * 60000 / (m_masterbus->get_bpm() * m_masterbus->get_ppqn());
 
