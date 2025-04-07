@@ -247,14 +247,21 @@ PianoRoll::draw_background()
                 // top left corner cut for slide notes
                 int cs1 = slide ?  min(note_width - 3, 4) : cs;
 
-                cr->move_to(note_x + 2 + cs1, note_y);
+                cr->move_to(note_x + 2, note_y + cs1);
+                cr->line_to(note_x + 2 + cs1, note_y);
                 cr->line_to(note_x + note_width - cs, note_y);
                 cr->line_to(note_x + note_width, note_y + cs);
                 cr->line_to(note_x + note_width, note_y + note_height - cs + (note == 0 ? 1 : 0));
                 cr->line_to(note_x + note_width - cs, note_y + note_height + (note == 0 ? 1 : 0));
                 cr->line_to(note_x + 2 + cs, note_y + note_height + (note == 0 ? 1 : 0));
                 cr->line_to(note_x + 2, note_y + note_height - cs);
-                cr->line_to(note_x + 2, note_y + cs1);
+                cr->fill();
+
+                cr->move_to(note_x + 2 + 0.5, note_y + cs1 + 0.5);
+                cr->line_to(note_x + 2 + 0.5 + cs1, note_y + 0.5);
+                cr->line_to(note_x + note_width - cs - 0.5, note_y + 0.5);
+                cr->line_to(note_x + note_width - 0.5, note_y + cs + 0.5);
+                cr->stroke();
 
 
                 if (tick_f < tick_s)
@@ -268,9 +275,15 @@ PianoRoll::draw_background()
                     cr->line_to(note_x + note_width, note_y + note_height - cs + (note == 0 ? 1 : 0));
                     cr->line_to(note_x + note_width - cs, note_y + note_height + (note == 0 ? 1 : 0));
                     cr->line_to(note_x, note_y + note_height + (note == 0 ? 1 : 0));
+                    cr->fill();
+
+                    cr->move_to(note_x, note_y + 0.5);
+                    cr->line_to(note_x + note_width - cs - 0.5, note_y  + 0.5);
+                    cr->line_to(note_x + note_width - 0.5, note_y + cs  + 0.5);
+                    cr->stroke();
+
                 }
 
-                cr->fill();
             }
         }
 
