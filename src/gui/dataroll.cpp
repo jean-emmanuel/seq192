@@ -177,6 +177,7 @@ DataRoll::draw_background()
 
                 auto t = create_pango_layout(to_string(event_height));
                 t->set_font_description(font);
+                t->set_line_spacing(0.9);
                 t->set_justify(Pango::ALIGN_CENTER);
                 t->set_width(0);
                 t->set_wrap(Pango::WRAP_CHAR);
