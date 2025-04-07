@@ -652,6 +652,14 @@ EditWindow::on_key_press(GdkEventKey* event)
         case GDK_KEY_d:
             m_toolbar_pen_active.set_active(!m_adding);
             return true;
+        case GDK_KEY_s:
+        case GDK_KEY_S:
+            if (event->state & GDK_CONTROL_MASK) {
+                m_mainwindow->menu_callback(MAIN_MENU_SAVE, 0, 0);
+                return true;
+            } else {
+                return false;
+            }
         default:
             return false;
     }
