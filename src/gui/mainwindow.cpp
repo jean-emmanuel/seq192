@@ -587,6 +587,11 @@ MainWindow::timer_callback()
         }
     }
 
+    if (m_dirty != global_is_modified) {
+        m_dirty = global_is_modified;
+        update_window_title();
+    }
+
     return true;
 }
 
@@ -680,6 +685,7 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
         case MAIN_MENU_SAVE:
             if (global_filename == "") {
                 menu_callback(MAIN_MENU_SAVEAS, -1, -1);
+                update_window_title();
             } else {
                 bool result = m_perform->file_save();
                 if (!result) {
@@ -744,6 +750,7 @@ MainWindow::menu_callback(main_menu_action action, int data1, int data2)
                             result = m_perform->file_export(fn);
                         } else {
                             result = m_perform->file_saveas(fn);
+                            update_window_title();
                         }
                     } else if (action == MAIN_MENU_EXPORT_SCREENSET) {
                         result = m_perform->file_export_screenset(fn);
@@ -776,6 +783,10 @@ MainWindow::update_window_title()
         title = string(PACKAGE) + " - Untitled";
     else
         title = string(PACKAGE) + " - " + global_filename;
+
+    if (global_is_modified) {
+        title += "*";
+    }
 
     set_title(title.c_str());
 }

@@ -166,6 +166,9 @@ class MainWindow : public Window {
         bool m_nsm_dirty;
         nsm_client_t *m_nsm;
 
+        bool m_dirty;
+
+
     friend class SequenceButton;
     friend class EditWindow;
 };
