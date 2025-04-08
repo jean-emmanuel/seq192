@@ -257,6 +257,7 @@ check:checked:hover, .checked check:hover {
     padding-right: 4px;
     min-height: 0;
     border:0;
+    margin-right: 1px;
 }
 
 /* dialogs */

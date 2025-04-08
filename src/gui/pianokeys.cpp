@@ -55,7 +55,7 @@ PianoKeys::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
 
     double key_y;
-    int i, key;
+    int i, key, key_width;
     int octave;
     Pango::FontDescription font;
     int text_width;
@@ -65,35 +65,53 @@ PianoKeys::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     font.set_size(c_key_fontsize * Pango::SCALE);
     font.set_weight(Pango::WEIGHT_BOLD);
 
+    cr->set_line_width(1.0);
+
+    cr->set_source_rgba(c_key_white.r, c_key_white.g, c_key_white.b, 0.9);
+    cr->rectangle(0, 0, width, height);
+    cr->fill();
+
     for (i = 0; i < c_num_keys; i++) {
         key = i % 12;
         key_y = height - c_key_height * (i + 1);
+
+        if (
+            key == 1 ||
+            key == 3 ||
+            key == 6 ||
+            key == 8 ||
+            key == 10
+        ) {
+            cr->set_source_rgb(c_key_black.r, c_key_black.g, c_key_black.b);
+            key_width = 0.7 * width;
+        }
+        else {
+            cr->set_source_rgb(c_key_white.r, c_key_white.g, c_key_white.b);
+            key_width = width;
+        }
 
         if ( i == m_hint_key )
         {
             cr->set_source_rgba(c_color_primary.get_red(), c_color_primary.get_green(), c_color_primary.get_blue(), 0.75);
         }
-        else if (key == 1 ||
-                 key == 3 ||
-                 key == 6 ||
-                 key == 8 ||
-                 key == 10)
-        {
-            cr->set_source_rgb(c_key_black.r, c_key_black.g, c_key_black.b);
-        }
-        else
-        {
-            cr->set_source_rgb(c_key_white.r, c_key_white.g, c_key_white.b);
+
+        if (i == m_hint_key || key_width < width) {
+            cr->rectangle(0, key_y, key_width, c_key_height);
+            cr->fill();
         }
 
-        cr->rectangle(0, key_y, width, c_key_height);
-        cr->fill();
+        if (key_width < width) {
+            // black keys faintest bevel
+            cr->set_source_rgba(c_key_white.r, c_key_white.g, c_key_white.b, 0.35);
+            cr->move_to(0, key_y + 1.5);
+            cr->line_to(key_width - 1.5, key_y + 1.5);
+            cr->line_to(key_width - 1.5, key_y + c_key_height + 1.5);
+            cr->stroke();
+        }
 
-        cr->set_source_rgb(c_key_black.r, c_key_black.g, c_key_black.b);
-
-        if (i != 0)
-        {
-            cr->set_line_width(1.0);
+        if (key == 0 || key == 5) {
+            // separate consecutive white keys
+            cr->set_source_rgba(c_key_black.r, c_key_black.g, c_key_black.b, key == 0 ? 0.4 : 0.2);
             cr->move_to(0, key_y + c_key_height - 0.5);
             cr->line_to(width-1, key_y + c_key_height - 0.5);
             cr->stroke();
@@ -121,7 +139,7 @@ PianoKeys::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             }
             auto name = create_pango_layout(key_name);
             name->set_font_description(font);
-            name->set_width((width - 2 * c_key_padding) * Pango::SCALE);
+            name->set_width((key_width - 2 * c_key_padding) * Pango::SCALE);
             name->set_ellipsize(Pango::ELLIPSIZE_END);
             name->get_pixel_size(text_width, text_height);
             cr->move_to(c_key_padding, key_y + c_key_height / 2 - text_height / 2);
@@ -133,7 +151,7 @@ PianoKeys::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                 auto name = create_pango_layout(key_name);
                 name->set_font_description(font);
                 name->get_pixel_size(text_width, text_height);
-                cr->move_to(width - text_width - c_key_padding, key_y + c_key_height / 2 - text_height / 2);
+                cr->move_to(key_width - text_width - c_key_padding, key_y + c_key_height / 2 - text_height / 2);
                 name->show_in_cairo_context(cr);
             }
         }
