@@ -82,17 +82,21 @@ PianoKeys::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             key == 8 ||
             key == 10
         ) {
-            cr->set_source_rgb(c_key_black.r, c_key_black.g, c_key_black.b);
+            if ( i == m_hint_key ) {
+                cr->set_source_rgba(c_key_black.r, c_key_black.r, c_key_black.r, 0.7);
+            } else {
+                cr->set_source_rgb(c_key_black.r, c_key_black.g, c_key_black.b);
+            }
+
             key_width = 0.7 * width;
         }
         else {
-            cr->set_source_rgb(c_key_white.r, c_key_white.g, c_key_white.b);
+            if ( i == m_hint_key ) {
+                cr->set_source_rgba(c_key_black.r, c_key_black.r, c_key_black.r, 0.15);
+            } else {
+                cr->set_source_rgb(c_key_white.r, c_key_white.g, c_key_white.b);
+            }
             key_width = width;
-        }
-
-        if ( i == m_hint_key )
-        {
-            cr->set_source_rgba(c_color_primary.get_red(), c_color_primary.get_green(), c_color_primary.get_blue(), 0.75);
         }
 
         if (i == m_hint_key || key_width < width) {
