@@ -274,7 +274,7 @@ seq192 is written by Jean-Emmanuel Doucet and based on
 
 ## COPYRIGHT
 
-Copyright © 2021-2023 Jean-Emmanuel Doucet <jean-emmanuel@ammd.net>
+Copyright © 2021-2025 Jean-Emmanuel Doucet <jean-emmanuel@ammd.net>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
