@@ -3537,7 +3537,7 @@ sequence::calulate_reverse(event &a_e)
     if ( a_e.get_status() ==  EVENT_NOTE_OFF)
     {
         timestamp += c_note_off_margin;     // add back the trim ending if it was a note OFF
-        a_e.set_status( EVENT_NOTE_ON);     // change it to a note ON
+        a_e.set_status( a_e.get_linked()->m_status);     // change it to a note ON
     }
     else
         a_e.set_status( EVENT_NOTE_OFF);    // change note ONs to OFFs
