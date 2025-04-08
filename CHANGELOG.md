@@ -7,7 +7,7 @@
 
 - edit window
     - add `ctrl+s` shortcut to save the session from this window
-    - fix shrinking notes that span accross the sequence's end line
+    - fix shrinking / moving / pasting accross the sequence's end line
 
 - sequence
     - add (FL-ish) slide notes

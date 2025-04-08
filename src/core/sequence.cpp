@@ -1926,7 +1926,7 @@ sequence::paste_selected( long a_tick, int a_note )
     list<event> clipboard = m_list_clipboard;
 
     for ( i = clipboard.begin(); i != clipboard.end(); i++ ){
-	(*i).set_timestamp((*i).get_timestamp() + a_tick );
+	       (*i).set_timestamp(((*i).get_timestamp() + a_tick) % m_length );
     }
 
     if ((*clipboard.begin()).is_note_on() ||
