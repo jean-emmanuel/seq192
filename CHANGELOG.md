@@ -8,6 +8,7 @@
 - edit window
     - add `ctrl+s` shortcut to save the session from this window
     - fix shrinking / moving / pasting accross the sequence's end line
+    - pianoroll visual tweaks
 
 - sequence
     - add (FL-ish) slide notes
