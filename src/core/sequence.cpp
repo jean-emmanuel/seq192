@@ -1487,12 +1487,12 @@ sequence::move_selected_notes( long a_delta_tick, int a_delta_note )
                     If timestamp < 0 then adjust to the end.
                 */
 
-                if (timestamp >= m_length)  // wrap to beginning or set to 0
+                while (timestamp >= m_length)  // wrap to beginning or set to 0
                 {
                     timestamp = timestamp - m_length;
                 }
 
-                if (timestamp < 0)          // adjust to the end
+                while (timestamp < 0)          // adjust to the end
                 {
                     timestamp = m_length + timestamp;
                 }
