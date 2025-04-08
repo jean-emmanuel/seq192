@@ -254,7 +254,7 @@ check:checked:hover, .checked check:hover {
     font-size: 8pt;
     font-weight: bold;
     box-shadow: none;
-    padding-right: 4px;
+    padding-right: 3px;
     min-height: 0;
     border:0;
     margin-right: 1px;
