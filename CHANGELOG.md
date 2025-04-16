@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.1
+
+- edit window
+    - smooth horizontal scrolling & zooming
+
 ## 1.7.0
 
 - main window
