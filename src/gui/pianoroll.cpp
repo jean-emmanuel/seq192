@@ -128,27 +128,26 @@ PianoRoll::draw_background()
 
     // Vertical lines
 
-    int measures_per_line = 1;
-
     int ticks_per_measure =  m_sequence->get_bpm() * (4 * c_ppqn) / m_sequence->get_bw();
     int ticks_per_beat =  (4 * c_ppqn) / m_sequence->get_bw();
     int ticks_per_step = 3 * m_zoom;
-    int ticks_per_m_line =  ticks_per_measure * measures_per_line;
     int start_tick = m_hscroll - (m_hscroll % ticks_per_step);
     int end_tick = start_tick + width * m_zoom;
     if (m_sequence->get_length() < end_tick) end_tick = m_sequence->get_length();
     int last_snap = 0;
+    int last_beat = 0;
+    int last_measure = 0;
 
-    for (int i=start_tick; i<=end_tick; i += ticks_per_step)
+    for (int i=start_tick; i<=end_tick+ticks_per_step; i += ticks_per_step)
     {
         int base_line = (i - m_hscroll) / m_zoom;
         bool draw = true;
 
-        if ( i % ticks_per_m_line == 0 )
+        if ( i % ticks_per_measure <= last_measure )
         {
             cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_measure);
         }
-        else if (i % ticks_per_beat == 0 )
+        else if (i % ticks_per_beat <= last_beat )
         {
             cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_beat);
         }
@@ -160,6 +159,8 @@ PianoRoll::draw_background()
         else draw = false;
 
         last_snap = i % m_snap;
+        last_beat = i % ticks_per_beat;
+        last_measure = i % ticks_per_measure;
 
         if (draw) {
             cr->move_to(base_line + 0.5, 0);
@@ -320,7 +321,7 @@ PianoRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     // mouse edition
     if (m_selecting || m_moving || m_paste || m_growing)
     {
-        int x,y,w,h;
+        double x,y,w,h;
         cr->set_source_rgba(c_color_event_selected.r, c_color_event_selected.g, c_color_event_selected.b, c_alpha_lasso_stroke);
         if (m_selecting)
         {
@@ -450,14 +451,14 @@ PianoRoll::set_adding(bool adding)
 }
 
 void
-PianoRoll::convert_xy(int x, int y, long *tick, int *note)
+PianoRoll::convert_xy(double x, double y, long *tick, int *note)
 {
-    *tick = x * m_zoom;
+    *tick = round(x * m_zoom);
     *note = (c_keys_height - y - 2) / c_key_height;
 }
 
 void
-PianoRoll::convert_tn( long ticks, int note, int *x, int *y)
+PianoRoll::convert_tn( long ticks, int note, double *x, double *y)
 {
     *x = ticks /  m_zoom;
     *y = c_keys_height - ((note + 1) * c_key_height) - 1;
@@ -467,7 +468,7 @@ PianoRoll::convert_tn( long ticks, int note, int *x, int *y)
 /* checks mins / maxes..  the fills in x,y
    and width and height */
 void
-PianoRoll::xy_to_rect(int x1,  int y1, int x2,  int y2,  int *x,  int *y,  int *w,  int *h)
+PianoRoll::xy_to_rect(double x1,  double y1, double x2,  double y2,  double *x,  double *y,  double *w,  double *h)
 {
     if (x1 < x2){
     	*x = x1;
@@ -488,7 +489,7 @@ PianoRoll::xy_to_rect(int x1,  int y1, int x2,  int y2,  int *x,  int *y,  int *
 
 
 void
-PianoRoll::convert_tn_box_to_coords(long tick_s, long tick_f, int note_h, int note_l, int *x1, int *y1,  int *x2, int *y2 )
+PianoRoll::convert_tn_box_to_coords(long tick_s, long tick_f, int note_h, int note_l, double *x1, double *y1,  double *x2, double *y2 )
 {
     /* convert box to X,Y values */
     convert_tn(tick_s, note_h, x1, y1);
@@ -497,9 +498,9 @@ PianoRoll::convert_tn_box_to_coords(long tick_s, long tick_f, int note_h, int no
 
 
 void
-PianoRoll::convert_tn_box_to_rect(long tick_s, long tick_f, int note_h, int note_l, int *x, int *y,  int *w, int *h )
+PianoRoll::convert_tn_box_to_rect(long tick_s, long tick_f, int note_h, int note_l, double *x, double *y,  double *w, double *h )
 {
-    int x1, y1, x2, y2;
+    double x1, y1, x2, y2;
 
     /* convert box to X,Y values */
     convert_tn(tick_s, note_h, &x1, &y1);
@@ -512,22 +513,22 @@ PianoRoll::convert_tn_box_to_rect(long tick_s, long tick_f, int note_h, int note
 
 /* performs a 'snap' on y */
 void
-PianoRoll::snap_y(int *y)
+PianoRoll::snap_y(double *y)
 {
-    *y = *y - (*y % c_key_height) - 1;
+    *y = *y - fmod(*y, c_key_height) - 1;
 }
 
 /* performs a 'snap' on x */
 void
-PianoRoll::snap_x(int *x, bool grow=false)
+PianoRoll::snap_x(double *x, bool grow=false)
 {
     //snap = number pulses to snap to
     //m_zoom = number of pulses per pixel
     //so snap / m_zoom  = number pixels to snap to
     int snap = m_snap_active && !m_snap_bypass ? m_snap : c_disabled_snap;
-    int mod = (snap / m_zoom);
+    double mod = (snap / m_zoom);
     if (mod <= 0) mod = 1;
-    int offset = *x % mod;
+    double offset = fmod(*x, mod);
     if (grow) {
         if (offset > (mod / 2)) *x = *x + mod - offset;
         else *x = *x - offset;
@@ -605,7 +606,7 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
     long tick_f;
     int note_h;
     int note_l;
-    int norm_x, norm_y, snapped_x, snapped_y;
+    double norm_x, norm_y, snapped_x, snapped_y;
 
     snapped_x = norm_x = (int) (event->x + m_hscroll / m_zoom) - 1;
     snapped_y = norm_y = (int) event->y;
@@ -714,7 +715,7 @@ bool
 PianoRoll::on_motion_notify_event(GdkEventMotion* event)
 {
 
-    m_current_x = m_last_x = (int) (event->x + m_hscroll / m_zoom) - 1;
+    m_current_x = m_last_x = event->x + m_hscroll / m_zoom - 1;
     m_current_y = (int) event->y;
 
     int note;
@@ -772,9 +773,9 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
     long tick_f;
     int note_h;
     int note_l;
-    int x,y,w,h;
+    double x,y,w,h;
 
-    m_current_x = (int) (event->x + m_hscroll / m_zoom) - 1;
+    m_current_x = event->x + m_hscroll / m_zoom - 1;
     m_current_y = (int) event->y;
 
     snap_y (&m_current_y);
@@ -801,7 +802,7 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
 
         if (m_moving)
         {
-            int delta_x = m_edition.x1 - m_selection.x1;
+            double delta_x = m_edition.x1 - m_selection.x1;
 
             /* convert deltas into screen corridinates */
             convert_xy(delta_x, delta_y, &delta_tick, &delta_note);

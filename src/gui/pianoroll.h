@@ -27,13 +27,13 @@ using namespace Gtk;
 class rect
 {
  public:
-    int x, y, height, width;
+    double x, y, height, width;
 };
 
 class coords
 {
  public:
-    int x1, y1, x2, y2;
+    double x1, y1, x2, y2;
 };
 
 class PianoRoll : public DrawingArea {
@@ -100,12 +100,12 @@ class PianoRoll : public DrawingArea {
         coords       m_edition;
 
         // where the dragging started
-        int m_drop_x;
+        double m_drop_x;
         int m_drop_y;
         int m_move_delta_x;
         int m_move_delta_y;
-        int m_current_x;
-        int m_current_y;
+        double m_current_x;
+        double m_current_y;
         int m_last_x;
 
         int m_last_marker_pos;
@@ -124,19 +124,19 @@ class PianoRoll : public DrawingArea {
         void update_selection();
 
         // coords to notes & ticks
-        void convert_xy( int a_x, int a_y, long *ticks, int *note);
+        void convert_xy( double a_x, double a_y, long *ticks, int *note);
         // notes & ticks to coords
-        void convert_tn( long a_ticks, int a_note, int *x, int *y);
+        void convert_tn( long a_ticks, int a_note, double *x, double *y);
 
         // apply y snap
-        void snap_y(int *y);
+        void snap_y(double *y);
         // apply x snap
-        void snap_x(int *x, bool grow);
+        void snap_x(double *x, bool grow);
 
-        void xy_to_rect(int x1,  int y1, int x2,  int y2, int *x,  int *y, int *w,  int *h );
+        void xy_to_rect(double x1,  double y1, double x2,  double y2, double *x,  double *y, double *w,  double *h );
 
-        void convert_tn_box_to_rect(long tick_s, long tick_f, int note_h, int note_l, int *x, int *y, int *w, int *h );
-        void convert_tn_box_to_coords(long tick_s, long tick_f, int note_h, int note_l, int *x1, int *y1,  int *x2, int *y2 );
+        void convert_tn_box_to_rect(long tick_s, long tick_f, int note_h, int note_l, double *x, double *y, double *w, double *h );
+        void convert_tn_box_to_coords(long tick_s, long tick_f, int note_h, int note_l, double *x1, double *y1,  double *x2, double *y2 );
 
         bool on_motion_notify_event(GdkEventMotion* event);
         bool on_leave_notify_event(GdkEventCrossing* event);

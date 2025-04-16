@@ -62,20 +62,19 @@ TimeRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     font.set_size(c_key_fontsize * Pango::SCALE);
     font.set_weight(Pango::WEIGHT_BOLD);
 
-    int measures_per_line = 1;
-
     int ticks_per_measure =  m_sequence->get_bpm() * (4 * c_ppqn) / m_sequence->get_bw();
-    int ticks_per_m_line =  ticks_per_measure * measures_per_line;
+    int ticks_per_step = 3 * m_zoom;
     int start_tick = max(int(m_hscroll - c_keys_width * m_zoom), 0);
     int end_tick = start_tick + width * m_zoom;
     if (m_sequence->get_length() < end_tick) end_tick = m_sequence->get_length();
     int m = ceil(1.0 * start_tick / ticks_per_measure);
+    int last_measure = 0;
 
-    for (int i=start_tick; i<=end_tick; i++)
+    for (int i=start_tick; i<=end_tick+ticks_per_step; i+=ticks_per_step)
     {
         int base_line = (i - m_hscroll) / m_zoom + c_keys_width;
 
-        if ( i % ticks_per_m_line == 0 )
+        if ( i % ticks_per_measure <= last_measure )
         {
             cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_measure);
             cr->move_to(base_line + 0.5, 0);
@@ -83,13 +82,15 @@ TimeRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             cr->stroke();
 
             m++;
-            string measure = i == end_tick ? (string) "END" : to_string(m);
+            string measure = i >= end_tick ? (string) "END" : to_string(m);
             auto t = create_pango_layout(measure);
             t->set_font_description(font);
             t->get_pixel_size(text_width, text_height);
             cr->move_to(base_line + 4, height / 2 - text_height / 2);
             t->show_in_cairo_context(cr);
         }
+
+        last_measure = i % ticks_per_measure;
 
     }
 

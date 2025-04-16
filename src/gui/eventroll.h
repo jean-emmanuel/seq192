@@ -88,12 +88,12 @@ class EventRoll : public DrawingArea {
         rect         m_selected;
 
         // where the dragging started
-        int m_drop_x;
+        double m_drop_x;
         int m_drop_y;
         int m_move_delta_x;
         int m_move_delta_y;
-        int m_current_x;
-        int m_current_y;
+        double m_current_x;
+        double m_current_y;
         int m_last_x;
 
         void set_zoom(double zoom);
@@ -104,11 +104,11 @@ class EventRoll : public DrawingArea {
         void set_adding(bool adding);
 
 
-        void convert_x( int a_x, long *a_ticks );
-        void convert_t( long a_ticks, int *a_x );
+        void convert_x( double a_x, long *a_ticks );
+        void convert_t( long a_ticks, double *a_x );
 
-        void snap_y( int *a_y );
-        void snap_x( int *a_x );
+        void snap_y( double *a_y );
+        void snap_x( double *a_x );
 
         void x_to_w( int a_x1, int a_x2, int *a_x, int *a_w  );
 

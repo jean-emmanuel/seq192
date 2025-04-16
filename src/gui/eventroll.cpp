@@ -103,37 +103,39 @@ EventRoll::draw_background()
 
     // Vertical lines
 
-    int measures_per_line = 1;
-
     int ticks_per_measure =  m_sequence->get_bpm() * (4 * c_ppqn) / m_sequence->get_bw();
     int ticks_per_beat =  (4 * c_ppqn) / m_sequence->get_bw();
     int ticks_per_step = 3 * m_zoom;
-    int ticks_per_m_line =  ticks_per_measure * measures_per_line;
     int start_tick = m_hscroll - (m_hscroll % ticks_per_step);
     int end_tick = start_tick + width * m_zoom;
     if (m_sequence->get_length() < end_tick) end_tick = m_sequence->get_length();
     int last_snap = 0;
+    int last_beat = 0;
+    int last_measure = 0;
 
-    for (int i=start_tick; i<=end_tick; i += ticks_per_step)
+    for (int i=start_tick; i<=end_tick+ticks_per_step; i += ticks_per_step)
     {
         int base_line = (i - m_hscroll) / m_zoom;
         bool draw = true;
 
-        if (i % ticks_per_m_line == 0)
+        if ( i % ticks_per_measure <= last_measure )
         {
             cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_measure);
         }
-        else if (i % ticks_per_beat == 0)
+        else if (i % ticks_per_beat <= last_beat )
         {
             cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_beat);
         }
-        else if (i % m_snap <= last_snap) {
+        else if (i % m_snap <= last_snap)
+        {
             cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_snap);
             base_line -= (i - m_snap * (i / m_snap)) / m_zoom;
         }
         else draw = false;
 
         last_snap = i % m_snap;
+        last_beat = i % ticks_per_beat;
+        last_measure = i % ticks_per_measure;
 
         if (draw) {
             cr->move_to(base_line + 0.5, 0);
@@ -277,37 +279,37 @@ EventRoll::set_adding(bool adding)
 
 /* takes screen corrdinates, give us notes and ticks */
 void
-EventRoll::convert_x(int a_x, long *a_tick)
+EventRoll::convert_x(double a_x, long *a_tick)
 {
-    *a_tick = a_x * m_zoom;
+    *a_tick = round(a_x * m_zoom);
 }
 
 
 /* notes and ticks to screen corridinates */
 void
-EventRoll::convert_t(long a_ticks, int *a_x)
+EventRoll::convert_t(long a_ticks, double *a_x)
 {
     *a_x = a_ticks / m_zoom;
 }
 
 /* performs a 'snap' on y */
 void
-EventRoll::snap_y(int *a_y)
+EventRoll::snap_y(double *a_y)
 {
-    *a_y = *a_y - (*a_y % c_key_height);
+    *a_y = *a_y - fmod(*a_y, c_key_height);
 }
 
 /* performs a 'snap' on x */
 void
-EventRoll::snap_x(int *a_x)
+EventRoll::snap_x(double *a_x)
 {
     //snap = number pulses to snap to
     //m_zoom = number of pulses per pixel
     //so snap / m_zoom  = number pixels to snap to
     int snap = m_snap_active && !m_snap_bypass ? m_snap : c_disabled_snap;
-    int mod = (snap / m_zoom);
+    double mod = (snap / m_zoom);
     if (mod <= 0) mod = 1;
-    *a_x = *a_x - (*a_x % mod);
+    *a_x = *a_x - fmod(*a_x, mod);
 }
 
 /* checks mins / maxes..  the fills in x,y
@@ -347,7 +349,7 @@ EventRoll::start_paste()
      long tick_f;
      int note_h;
      int note_l;
-     int x, w;
+     double x, w;
 
      snap_x(&m_current_x);
      snap_y(&m_current_x);
@@ -399,7 +401,8 @@ EventRoll::on_button_press_event(GdkEventButton* event)
 {
     signal_click.emit((string)"eventroll");
 
-    int x,w,numsel;
+    double x,w;
+    int numsel;
 
     long tick_s;
     long tick_w;
@@ -500,7 +503,7 @@ EventRoll::on_button_press_event(GdkEventButton* event)
                     m_selected.width = w;
 
                     /* save offset that we get from the snap above */
-                    int adjusted_selected_x = m_selected.x;
+                    double adjusted_selected_x = m_selected.x;
                     snap_x(&adjusted_selected_x);
                     m_move_snap_offset_x = (m_selected.x - adjusted_selected_x);
 
@@ -531,7 +534,7 @@ EventRoll::on_motion_notify_event(GdkEventMotion* event)
 
     long tick = 0;
 
-    m_current_x = m_last_x = (int) event->x  + m_hscroll / m_zoom - 1;
+    m_current_x = m_last_x = event->x  + m_hscroll / m_zoom - 1;
 
     if (m_moving_init)
     {
@@ -577,7 +580,7 @@ EventRoll::on_button_release_event(GdkEventButton* event)
 
     int x,w;
 
-    m_current_x = (int) event->x + m_hscroll / m_zoom - 1;
+    m_current_x = event->x + m_hscroll / m_zoom - 1;
 
     if (m_moving) snap_x(&m_current_x);
 
