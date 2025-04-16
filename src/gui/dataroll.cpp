@@ -47,7 +47,8 @@ DataRoll::DataRoll(perform * p, sequence * seq)
     add_events(Gdk::BUTTON_PRESS_MASK |
 		       Gdk::BUTTON_RELEASE_MASK |
 		       Gdk::POINTER_MOTION_MASK |
-               Gdk::SCROLL_MASK
+               Gdk::SCROLL_MASK |
+               Gdk::SMOOTH_SCROLL_MASK
     );
 
 }

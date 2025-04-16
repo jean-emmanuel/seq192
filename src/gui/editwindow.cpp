@@ -919,39 +919,35 @@ EditWindow::scroll_callback(GdkEventScroll* event)
     if ((event->state & modifiers) == GDK_CONTROL_MASK)
     {
         double zoom = m_pianoroll.get_zoom();
-        if (event->direction == GDK_SCROLL_DOWN)
-        {
-            m_timeroll.set_zoom(zoom * 2);
-            m_eventroll.set_zoom(zoom * 2);
-            m_pianoroll.set_zoom(zoom * 2);
-            m_dataroll.set_zoom(zoom * 2);
+        if (event->direction == GDK_SCROLL_SMOOTH) {
+            zoom += event->delta_y / 2;
         }
-        else if (event->direction == GDK_SCROLL_UP)
-        {
-            m_timeroll.set_zoom(zoom / 2);
-            m_eventroll.set_zoom(zoom / 2);
-            m_pianoroll.set_zoom(zoom / 2);
-            m_dataroll.set_zoom(zoom / 2);
-
+        else if (event->direction == GDK_SCROLL_UP || event->direction == GDK_SCROLL_DOWN) {
+            zoom *= event->direction == GDK_SCROLL_UP ? 0.5 : 2;
         }
+        m_timeroll.set_zoom(zoom);
+        m_eventroll.set_zoom(zoom);
+        m_pianoroll.set_zoom(zoom);
+        m_dataroll.set_zoom(zoom);
         update_hscrollbar_visibility();
         return true;
     }
     else if ((event->state & modifiers) == GDK_SHIFT_MASK)
     {
         auto adj = m_hscrollbar.get_adjustment();
-        if (event->direction == GDK_SCROLL_DOWN)
-        {
-            adj->set_value(adj->get_value() + adj->get_step_increment());
+        double incr = 0;
+        if (event->direction == GDK_SCROLL_SMOOTH) {
+            incr = event->delta_y;
         }
-        else if (event->direction == GDK_SCROLL_UP)
-        {
-            adj->set_value(adj->get_value() - adj->get_step_increment());
+        else if (event->direction == GDK_SCROLL_UP || event->direction == GDK_SCROLL_DOWN) {
+            incr = event->direction == GDK_SCROLL_UP ? -1 : 1;
         }
+        adj->set_value(adj->get_value() + incr * adj->get_step_increment());
         m_pianoroll.queue_draw_background();
         m_eventroll.queue_draw_background();
         m_dataroll.queue_draw_background();
         m_timeroll.queue_draw();
+        return true;
     }
 
     return false;

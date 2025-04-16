@@ -59,8 +59,9 @@ EventRoll::EventRoll(perform * p, sequence * seq)
                 Gdk::POINTER_MOTION_MASK |
                 Gdk::ENTER_NOTIFY_MASK |
                 Gdk::LEAVE_NOTIFY_MASK |
-                Gdk::SCROLL_MASK
- );
+                Gdk::SCROLL_MASK |
+                Gdk::SMOOTH_SCROLL_MASK
+    );
 }
 
 EventRoll::~EventRoll()

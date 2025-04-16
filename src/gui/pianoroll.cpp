@@ -62,7 +62,8 @@ PianoRoll::PianoRoll(perform * p, sequence * seq, PianoKeys * pianokeys)
                 Gdk::POINTER_MOTION_MASK |
                 Gdk::ENTER_NOTIFY_MASK |
                 Gdk::LEAVE_NOTIFY_MASK |
-                Gdk::SCROLL_MASK
+                Gdk::SCROLL_MASK |
+                Gdk::SMOOTH_SCROLL_MASK
     );
 
 }
