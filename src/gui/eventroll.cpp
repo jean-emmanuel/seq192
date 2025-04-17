@@ -306,10 +306,10 @@ EventRoll::snap_x(double *a_x)
     //snap = number pulses to snap to
     //m_zoom = number of pulses per pixel
     //so snap / m_zoom  = number pixels to snap to
-    int snap = m_snap_active && !m_snap_bypass ? m_snap : c_disabled_snap;
-    double mod = (snap / m_zoom);
-    if (mod <= 0) mod = 1;
-    *a_x = *a_x - fmod(*a_x, mod);
+    double snap = (m_snap_active && !m_snap_bypass ? m_snap : c_disabled_snap);
+    double grid = snap / m_zoom;
+
+    *a_x = grid * floor((*a_x + 0.25 * grid) / grid);
 }
 
 /* checks mins / maxes..  the fills in x,y

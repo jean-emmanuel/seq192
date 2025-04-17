@@ -525,16 +525,12 @@ PianoRoll::snap_x(double *x, bool grow=false)
     //snap = number pulses to snap to
     //m_zoom = number of pulses per pixel
     //so snap / m_zoom  = number pixels to snap to
-    int snap = m_snap_active && !m_snap_bypass ? m_snap : c_disabled_snap;
-    double mod = (snap / m_zoom);
-    if (mod <= 0) mod = 1;
-    double offset = fmod(*x, mod);
-    if (grow) {
-        if (offset > (mod / 2)) *x = *x + mod - offset;
-        else *x = *x - offset;
-    } else {
-        *x = *x - offset;
-    }
+    double snap = (m_snap_active && !m_snap_bypass ? m_snap : c_disabled_snap);
+    double grid = snap / m_zoom;
+
+    *x = grid * floor((*x + 0.25 * grid)/ grid);
+
+    if (grow) *x -= 1;
 }
 
 
