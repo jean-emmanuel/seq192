@@ -166,6 +166,7 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_edit_move.set_submenu(m_submenu_move);
 
     m_menu_edit_quantize.set_label("Quantize");
+    m_menu_edit_quantize.add_accelerator("activate", m_accelgroup, 'q', (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
     m_menu_edit_quantize.signal_activate().connect([&]{menu_callback(EDIT_MENU_QUANTIZE);});
     m_submenu_move.append(m_menu_edit_quantize);
 

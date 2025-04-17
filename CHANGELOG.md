@@ -5,6 +5,7 @@
 - edit window
     - smooth horizontal scrolling & zooming
     - support trackpad horizontal scrolling
+    - add `q` shortcut to quantize selection
 
 ## 1.7.0
 
