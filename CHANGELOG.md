@@ -4,6 +4,7 @@
 
 - edit window
     - smooth horizontal scrolling & zooming
+    - support trackpad horizontal scrolling
 
 ## 1.7.0
 

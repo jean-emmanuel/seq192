@@ -915,6 +915,7 @@ bool
 EditWindow::scroll_callback(GdkEventScroll* event)
 {
     guint modifiers = gtk_accelerator_get_default_mod_mask ();
+    bool ret = false;
 
     if ((event->state & modifiers) == GDK_CONTROL_MASK)
     {
@@ -930,27 +931,41 @@ EditWindow::scroll_callback(GdkEventScroll* event)
         m_pianoroll.set_zoom(zoom);
         m_dataroll.set_zoom(zoom);
         update_hscrollbar_visibility();
-        return true;
+        ret = true;
     }
-    else if ((event->state & modifiers) == GDK_SHIFT_MASK)
+    else
     {
         auto adj = m_hscrollbar.get_adjustment();
         double incr = 0;
-        if (event->direction == GDK_SCROLL_SMOOTH) {
-            incr = event->delta_y;
+
+        if ((event->state & modifiers) == GDK_SHIFT_MASK) {
+            if (event->direction == GDK_SCROLL_SMOOTH) {
+                incr = event->delta_y;
+            }
+            else if (event->direction == GDK_SCROLL_UP || event->direction == GDK_SCROLL_DOWN) {
+                incr = event->direction == GDK_SCROLL_UP ? -1 : 1;
+            }
+            ret = true;
+        } else {
+            if (event->direction == GDK_SCROLL_SMOOTH) {
+                incr = event->delta_x;
+            }
+            else if (event->direction == GDK_SCROLL_LEFT || event->direction == GDK_SCROLL_RIGHT) {
+                incr = event->direction == GDK_SCROLL_LEFT ? -1 : 1;
+            }
         }
-        else if (event->direction == GDK_SCROLL_UP || event->direction == GDK_SCROLL_DOWN) {
-            incr = event->direction == GDK_SCROLL_UP ? -1 : 1;
+
+        if (incr != 0)  {
+            adj->set_value(adj->get_value() + incr * adj->get_step_increment());
+            m_pianoroll.queue_draw_background();
+            m_eventroll.queue_draw_background();
+            m_dataroll.queue_draw_background();
+            m_timeroll.queue_draw();
         }
-        adj->set_value(adj->get_value() + incr * adj->get_step_increment());
-        m_pianoroll.queue_draw_background();
-        m_eventroll.queue_draw_background();
-        m_dataroll.queue_draw_background();
-        m_timeroll.queue_draw();
-        return true;
+
     }
 
-    return false;
+    return ret;
 }
 
 void
