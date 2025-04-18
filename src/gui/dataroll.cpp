@@ -473,11 +473,11 @@ DataRoll::on_scroll_event(GdkEventScroll* event)
 
     if (signal_scroll.emit(event)) return true;
 
-    if (event->direction == GDK_SCROLL_UP) {
+    if (event->direction == GDK_SCROLL_UP || (event->direction == GDK_SCROLL_SMOOTH && event->delta_y < 0)) {
         m_sequence->increment_selected(get_status(), get_cc());
         queue_draw_background();
     }
-    if (event->direction == GDK_SCROLL_DOWN) {
+    if (event->direction == GDK_SCROLL_DOWN || (event->direction == GDK_SCROLL_SMOOTH && event->delta_y > 0)) {
         m_sequence->decrement_selected(get_status(), get_cc());
         queue_draw_background();
     }
