@@ -64,22 +64,33 @@ TimeRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
     int ticks_per_measure =  m_sequence->get_bpm() * (4 * c_ppqn) / m_sequence->get_bw();
     int ticks_per_step = 3 * m_zoom;
-    int start_tick = max(int(m_hscroll - c_keys_width * m_zoom), 0);
+    int start_tick = m_hscroll - (m_hscroll % ticks_per_step);
     int end_tick = start_tick + width * m_zoom;
     if (m_sequence->get_length() < end_tick) end_tick = m_sequence->get_length();
     int m = ceil(1.0 * start_tick / ticks_per_measure);
     int last_measure = 0;
+    bool first = m_hscroll > 0;
 
     for (int i=start_tick; i<=end_tick+ticks_per_step; i+=ticks_per_step)
     {
         int base_line = (i - m_hscroll) / m_zoom + c_keys_width;
 
-        if ( i % ticks_per_measure <= last_measure )
+        if ( i % ticks_per_measure <= last_measure  || first)
         {
-            cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_measure);
-            cr->move_to(base_line + 0.5, 0);
-            cr->line_to(base_line + 0.5, height);
-            cr->stroke();
+
+
+            if (first) {
+                first = false;
+                m -= 2;
+                base_line = c_keys_width;
+                cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_beat);
+            } else {
+                cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_measure);
+                cr->move_to(base_line + 0.5, 0);
+                cr->line_to(base_line + 0.5, height);
+                cr->stroke();
+            }
+
 
             m++;
             string measure = i >= end_tick ? (string) "END" : to_string(m);
