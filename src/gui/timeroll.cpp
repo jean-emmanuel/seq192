@@ -69,27 +69,27 @@ TimeRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     if (m_sequence->get_length() < end_tick) end_tick = m_sequence->get_length();
     int m = ceil(1.0 * start_tick / ticks_per_measure);
     int last_measure = 0;
-    bool first = m_hscroll > 0;
+    bool preroll = m_hscroll > 0;
 
     for (int i=start_tick; i<=end_tick+ticks_per_step; i+=ticks_per_step)
     {
         int base_line = (i - m_hscroll) / m_zoom + c_keys_width;
 
-        if ( i % ticks_per_measure <= last_measure  || first)
+        if ( i % ticks_per_measure <= last_measure  || preroll)
         {
+            if ( i % ticks_per_measure == last_measure) preroll = false;
 
-
-            if (first) {
-                first = false;
-                m -= 2;
-                base_line = c_keys_width;
+            if (preroll) {
+                m -= 1;
+                base_line = max((int)((ticks_per_measure * m - m_hscroll) / m_zoom  + c_keys_width), -1);
                 cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_beat);
             } else {
                 cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_measure);
-                cr->move_to(base_line + 0.5, 0);
-                cr->line_to(base_line + 0.5, height);
-                cr->stroke();
             }
+
+            cr->move_to(base_line + 0.5, 0);
+            cr->line_to(base_line + 0.5, height);
+            cr->stroke();
 
 
             m++;
@@ -101,6 +101,7 @@ TimeRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             t->show_in_cairo_context(cr);
         }
 
+        preroll = false;
         last_measure = i % ticks_per_measure;
 
     }
