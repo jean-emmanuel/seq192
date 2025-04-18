@@ -862,6 +862,26 @@ sequence::mark_selected()
 }
 
 void
+sequence::unmark_all()
+{
+    list<event>::iterator i;
+
+    lock();
+
+    i = m_list_event.begin();
+    while( i != m_list_event.end() )
+    {
+        if ((*i).is_marked())
+        {
+            (*i).unmark();
+        }
+        ++i;
+    }
+
+    unlock();
+}
+
+void
 sequence::unpaint_all( )
 {
     list<event>::iterator i;
@@ -1887,6 +1907,52 @@ sequence::adjust_data_handle( unsigned char a_status, int a_data )
     unlock();
 }
 
+unsigned char
+sequence::get_selected_status()
+{
+    list<event>::iterator i;
+    for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
+    {
+        if ((*i).is_selected()) {
+            return (*i).get_status();
+        }
+    }
+
+    return EVENT_NOTE_ON;
+}
+
+unsigned char
+sequence::get_selected_value()
+{
+    list<event>::iterator i;
+    unsigned char data[2];
+    unsigned char status;
+
+    for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
+    {
+        if ((*i).is_selected()) {
+            (*i).get_data( data, data+1 );
+            status = (*i).get_status();
+            if ( status == EVENT_NOTE_ON ||
+                    status == EVENT_NOTE_OFF ||
+                    status == EVENT_AFTERTOUCH ||
+                    status == EVENT_CONTROL_CHANGE ||
+                    status == EVENT_PITCH_WHEEL )
+            {
+                return data[1];
+            }
+
+            if ( status == EVENT_PROGRAM_CHANGE ||
+                 status == EVENT_CHANNEL_PRESSURE ||
+                 status == EVENT_PITCH_WHEEL )
+            {
+                return data[0];
+            }
+        }
+    }
+
+    return 0;
+}
 
 void
 sequence::copy_selected()

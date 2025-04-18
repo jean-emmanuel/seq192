@@ -811,6 +811,34 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
         case EDIT_MENU_SLIDE_NOTE:
             m_sequence->toggle_selected_slide_note();
             break;
+        case EDIT_MENU_SET_VALUE:
+            {
+                if (m_sequence->mark_selected()) {
+                    Dialog dialog("Set event value");
+                    Entry entry;
+                    entry.set_text(to_string(m_sequence->get_selected_value())  );
+                    entry.set_editable(true);
+                    entry.set_activates_default(true);
+                    entry.grab_focus();
+                    entry.show();
+                    dialog.get_content_area()->set_spacing(2);
+                    dialog.get_content_area()->pack_start(entry, true, true);
+                    dialog.add_button("_Ok", Gtk::RESPONSE_OK);
+                    dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+                    dialog.set_default_response(Gtk::RESPONSE_OK);
+                    if (dialog.run() == Gtk::RESPONSE_OK)
+                    {
+                        string s = entry.get_text();
+                        int val = atof(s.c_str());
+                            m_sequence->push_undo();
+                            m_sequence->adjust_data_handle(m_sequence->get_selected_status(), val);
+                            m_sequence->unmark_all();
+                            m_dataroll.queue_draw_background();
+                    }
+                }
+
+                break;
+            }
         case EDIT_MENU_CLOSE:
             clear_focus();
             close();
@@ -1155,6 +1183,13 @@ EditWindow::create_event_menu()
     });
     m_menu_item_toggle_alt_control.add_accelerator("activate", m_accelgroup, 't', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
     m_menu_item_toggle_alt_control.set_sensitive(false);
+
+
+    m_menu_edit_setvalue.set_label("Enter event value");
+    m_menu_edit_setvalue.add_accelerator("activate", m_accelgroup, 'v', (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_setvalue.signal_activate().connect([&]{menu_callback(EDIT_MENU_SET_VALUE);});
+    m_event_menu.append(m_menu_edit_setvalue);
+
 
     m_event_menu.show_all();
     m_event_dropdown.set_popup(m_event_menu);

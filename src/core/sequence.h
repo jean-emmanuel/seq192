@@ -359,6 +359,9 @@ class sequence
     void decrement_selected (unsigned char a_status, unsigned char a_control);
     void randomize_selected( unsigned char a_status, unsigned char a_control, int a_plus_minus );
     void adjust_data_handle( unsigned char a_status, int a_data );
+    unsigned char get_selected_status();
+    unsigned char get_selected_value();
+
 
     /* slide notes */
     void toggle_selected_slide_note ();
@@ -372,6 +375,7 @@ class sequence
     /* deletes events */
     void remove_marked();
     bool mark_selected();
+    void unmark_all();
     void unpaint_all();
 
     /* unselects every event */

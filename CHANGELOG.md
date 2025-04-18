@@ -6,6 +6,7 @@
     - smooth horizontal scrolling & zooming
     - support trackpad horizontal scrolling
     - add `q` shortcut to quantize selection
+    - allow setting selected event's value by typing a number
 
 ## 1.7.0
 
