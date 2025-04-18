@@ -832,9 +832,9 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
                         int val = atof(s.c_str());
                             m_sequence->push_undo();
                             m_sequence->adjust_data_handle(m_sequence->get_selected_status(), val);
-                            m_sequence->unmark_all();
                             m_dataroll.queue_draw_background();
                     }
+                    m_sequence->unmark_all();
                 }
 
                 break;
