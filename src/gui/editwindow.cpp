@@ -950,7 +950,7 @@ EditWindow::scroll_callback(GdkEventScroll* event)
     {
         double zoom = m_pianoroll.get_zoom();
         if (event->direction == GDK_SCROLL_SMOOTH) {
-            zoom += event->delta_y / 2;
+            zoom *= 1 + event->delta_y / 4;
         }
         else if (event->direction == GDK_SCROLL_UP || event->direction == GDK_SCROLL_DOWN) {
             zoom *= event->direction == GDK_SCROLL_UP ? 0.5 : 2;
