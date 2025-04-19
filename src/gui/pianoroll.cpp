@@ -688,7 +688,7 @@ PianoRoll::on_button_press_event(GdkEventButton* event)
                 else if (event->button == 2 || (event->button == 1 && (event->state & GDK_CONTROL_MASK)))
                 {
 
-                    m_growing = true;
+                    m_growing_init = true;
 
                     // get the box that selected elements are in
                     m_sequence->get_selected_box(&tick_s, &note_h, &tick_f, &note_l);
@@ -720,6 +720,11 @@ PianoRoll::on_motion_notify_event(GdkEventMotion* event)
         m_moving = true;
     }
 
+
+    if (m_growing_init){
+        m_growing_init = false;
+        m_growing = true;
+    }
 
     // snap_y(&m_current_y);
     convert_xy(0, m_current_y, &tick, &note);
@@ -840,6 +845,7 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
     m_growing = false;
     m_paste = false;
     m_moving_init = false;
+    m_growing_init = false;
     m_painting = false;
 
     m_sequence->unpaint_all();

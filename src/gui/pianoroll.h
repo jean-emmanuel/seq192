@@ -87,6 +87,7 @@ class PianoRoll : public DrawingArea {
         bool m_selecting;
         bool m_moving;
         bool m_moving_init;
+        bool m_growing_init;
         bool m_growing;
         bool m_painting;
         bool m_paste;
