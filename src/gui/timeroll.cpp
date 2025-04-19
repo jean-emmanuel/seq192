@@ -82,7 +82,7 @@ TimeRoll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             if (preroll) {
                 m -= 1;
                 base_line = max((int)((ticks_per_measure * m - m_hscroll) / m_zoom  + c_keys_width), -1);
-                cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_beat);
+                cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_measure * 0.75);
             } else {
                 cr->set_source_rgba(c_color_grid.r, c_color_grid.g, c_color_grid.b, c_alpha_grid_measure);
             }
