@@ -520,7 +520,7 @@ PianoRoll::snap_y(double *y)
 
 /* performs a 'snap' on x */
 void
-PianoRoll::snap_x(double *x, bool grow=false)
+PianoRoll::snap_x(double *x)
 {
     //snap = number pulses to snap to
     //m_zoom = number of pulses per pixel
@@ -529,8 +529,6 @@ PianoRoll::snap_x(double *x, bool grow=false)
     double grid = snap / m_zoom;
 
     *x = grid * floor((*x + 0.25 * grid)/ grid);
-
-    if (grow) *x -= 1;
 }
 
 
@@ -817,7 +815,7 @@ PianoRoll::on_button_release_event(GdkEventButton* event)
 
         if (m_growing){
 
-            int delta_x = m_edition.x2 - m_selection.x2;
+            double delta_x = m_edition.x2 - m_selection.x2;
 
             /* convert deltas into screen corridinates */
             convert_xy(delta_x, delta_y, &delta_tick, &delta_note);
@@ -857,8 +855,8 @@ PianoRoll::update_selection()
     if (m_moving || m_paste){
         snap_x(&m_current_x);
         snap_x(&m_drop_x);
-        int delta_x = m_current_x - m_drop_x;
-        int delta_y = m_current_y - m_drop_y;
+        double delta_x = m_current_x - m_drop_x;
+        double delta_y = m_current_y - m_drop_y;
         m_edition.x1 = m_selection.x1 + delta_x;
         m_edition.y1 = m_selection.y1 + delta_y;
         snap_x(&m_edition.x1);
@@ -866,11 +864,11 @@ PianoRoll::update_selection()
     }
 
     if (m_growing) {
-        int delta_x = m_current_x - m_drop_x;
-        int x2 = m_edition.x2;
+        double delta_x = m_current_x - m_drop_x;
+        double x2 = m_edition.x2;
         m_edition.x2 = m_selection.x2 + delta_x;
-        snap_x(&m_edition.x2, true);
-        m_edition.x2 = m_edition.x2 -1;
+        snap_x(&m_edition.x2);
+        m_edition.x2 = m_edition.x2 - 1 / m_zoom; // remove 1 tick to prevent overlap
         if (m_edition.x2 <= m_selection.x1 && m_snap_active && !m_snap_bypass) m_edition.x2 = x2;
     }
 

@@ -131,7 +131,7 @@ class PianoRoll : public DrawingArea {
         // apply y snap
         void snap_y(double *y);
         // apply x snap
-        void snap_x(double *x, bool grow);
+        void snap_x(double *x);
 
         void xy_to_rect(double x1,  double y1, double x2,  double y2, double *x,  double *y, double *w,  double *h );
 
