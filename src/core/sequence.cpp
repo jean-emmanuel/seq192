@@ -1698,6 +1698,119 @@ sequence::grow_selected( long a_delta_tick )
 }
 
 
+
+/* cut notes to grid (add note off + note on at every grid intersection) */
+void
+sequence::cut_to_grid_selected( long a_grid )
+{
+    if(!mark_selected())
+        return;
+
+    undoable_lock(true);
+
+    event *on, *off, e;
+
+    lock();
+
+    list<event>::iterator i;
+
+    for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
+    {
+        if ( (*i).is_marked() &&
+                (*i).is_note_on() &&
+                (*i).is_linked() )
+        {
+            on = &(*i);
+            off = (*i).get_linked();
+
+            long off_tick = off->get_timestamp();
+            if (off_tick < on->get_timestamp()) off_tick += m_length;
+
+            for (long tick = on->get_timestamp() - 1 - on->get_timestamp() % a_grid; tick < off_tick; tick += a_grid) {
+
+                if (tick < on->get_timestamp()) continue;
+                if (tick >= off_tick) break;
+
+                e  = *off;
+                e.set_timestamp(tick % m_length);
+                add_event( &e );
+
+                e  = *on;
+                e.unmark();
+                e.set_timestamp((tick + 1) % m_length);
+                add_event( &e );
+
+            }
+        }
+    }
+
+    verify_and_link();
+
+    unlock();
+    undoable_unlock();
+}
+
+
+/* join notes (remove notes between first and last selected events) */
+void
+sequence::join_selected()
+{
+    if(!mark_selected())
+        return;
+
+    undoable_lock(true);
+
+    event *on, *off;
+
+    lock();
+
+    list<event>::iterator i;
+    list<event>::iterator j;
+
+
+    for (int note = 0; note < c_midi_notes; note ++) {
+        for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
+        {
+            if ( (*i).is_marked() &&
+                    (*i).is_note_on() &&
+                    (*i).is_linked() &&
+                    (*i).get_note() == note
+                )
+            {
+                on = &(*i);
+                bool off_found = false;
+
+                for ( j = m_list_event.begin(); j != m_list_event.end(); j++ )
+                {
+                    if ( (*j).is_marked() &&
+                            (*j).is_note_on() &&
+                            on->get_note() == (*j).get_note()
+                        )
+                    {
+                        off = (*j).get_linked();
+                        off_found = true;
+                    }
+                }
+
+                on->unmark();
+                if (off_found) {
+                    off->unmark();
+                }
+                break;
+            }
+        }
+    }
+
+    remove_marked();
+    verify_and_link();
+
+    unlock();
+    undoable_unlock();
+}
+
+
+
+
 void
 sequence::increment_selected( unsigned char a_status, unsigned char a_control )
 {

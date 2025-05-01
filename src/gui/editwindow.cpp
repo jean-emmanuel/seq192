@@ -222,6 +222,16 @@ EditWindow::EditWindow(perform * p, MainWindow * m, int seqnum, sequence * seq) 
     m_menu_edit_slide.signal_activate().connect([&]{menu_callback(EDIT_MENU_SLIDE_NOTE);});
     m_submenu_note.append(m_menu_edit_slide);
 
+    m_menu_edit_cut_to_grid.set_label("Cut to grid");
+    m_menu_edit_cut_to_grid.add_accelerator("activate", m_accelgroup, 'u', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_cut_to_grid.signal_activate().connect([&]{menu_callback(EDIT_MENU_CUT_TO_GRID);});
+    m_submenu_note.append(m_menu_edit_cut_to_grid);
+
+    m_menu_edit_join_notes.set_label("Join");
+    m_menu_edit_join_notes.add_accelerator("activate", m_accelgroup, 'j', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_menu_edit_join_notes.signal_activate().connect([&]{menu_callback(EDIT_MENU_JOIN_NOTES);});
+    m_submenu_note.append(m_menu_edit_join_notes);
+
     m_submenu_edit.append(m_menu_separator2);
 
     m_menu_edit_close.set_label("_Close");
@@ -810,6 +820,12 @@ EditWindow::menu_callback(edit_menu_action action, double data1)
             break;
         case EDIT_MENU_SLIDE_NOTE:
             m_sequence->toggle_selected_slide_note();
+            break;
+        case EDIT_MENU_CUT_TO_GRID:
+            m_sequence->cut_to_grid_selected(m_pianoroll.get_snap());
+            break;
+        case EDIT_MENU_JOIN_NOTES:
+            m_sequence->join_selected();
             break;
         case EDIT_MENU_SET_VALUE:
             {

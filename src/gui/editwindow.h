@@ -50,6 +50,8 @@ enum edit_menu_action
     EDIT_MENU_MULTIPLY,
     EDIT_MENU_REVERSE,
     EDIT_MENU_SLIDE_NOTE,
+    EDIT_MENU_CUT_TO_GRID,
+    EDIT_MENU_JOIN_NOTES,
     EDIT_MENU_SET_VALUE,
     EDIT_MENU_CLOSE,
 
@@ -147,6 +149,8 @@ class EditWindow : public Window {
         MenuItem            m_menu_edit_note;
         Menu                m_submenu_note;
         MenuItem            m_menu_edit_slide;
+        MenuItem            m_menu_edit_cut_to_grid;
+        MenuItem            m_menu_edit_join_notes;
 
         MenuItem            m_menu_edit_move;
         Menu                m_submenu_move;

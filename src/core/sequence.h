@@ -372,6 +372,10 @@ class sequence
     void grow_selected (long a_delta_tick);
     void stretch_selected(long a_delta_tick);
 
+    /* Note manipulation */
+    void cut_to_grid_selected(long a_grid);
+    void join_selected();
+
     /* deletes events */
     void remove_marked();
     bool mark_selected();

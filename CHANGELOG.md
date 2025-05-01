@@ -7,7 +7,8 @@
     - support trackpad horizontal scrolling
     - add `q` shortcut to quantize selection
     - allow setting selected event's value by typing a number
-
+    - add cut to grid (ctrl+u) and join (ctrl+j) note actions
+    
 ## 1.7.0
 
 - main window
