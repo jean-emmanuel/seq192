@@ -2,3 +2,9 @@ src/seq192
 **/*.o
 **/*.d
 man/MANUAL.1*
+
+debian/*
+!debian/control
+!debian/copyright
+!debian/rules
+!debian/changelog

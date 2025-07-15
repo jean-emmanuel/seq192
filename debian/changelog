@@ -1,0 +1,529 @@
+seq192 (1.7.1) unstable; urgency=medium
+
+  [ jean-emmanuel ]
+  * fix window size
+  * sequence: prevent name entry from grabbing focus
+  * osc: use is_active() to check whether a sequence exists or not (!=NULL is true if there has been a sequence there at some point)
+  * osc: add screenset to status message
+  * osc: missing doc & tweak queued mode
+  * osc: add /panic command
+  * osc: simple and extended status, add some more data
+  * osc doc
+  * sequence: import a lot of cool stuff from seq32 @ stazed
+  * sequence: import pitch/time menu actions from seq32
+  * sequence: prevent focus on non editable fields; don't grab keyboard on init
+  * sequence: fix start/stop keyboard shortcuts
+  * log: update
+  * readme: wip
+  * misc: drop lash support
+  * sequence: clear redo stack when a new undoable event is pushed
+  * misc: extreme cleaning
+  * osc: support unix socket port
+  * osc: unbind port when quitting
+  * misc: fix initial is_modified
+  * mainwnd: validate screen name on enter + some improvements from seq32
+  * misc: remove unnused xpm
+  * engine: begin timebase changes
+  * engine: reduce process loop to the minimum, no need for complex jack transport sync, just follow play/stops and don't shift
+  * perf: (seq32/seq64) store bpm as double instead of int
+  * misc: prevent all buttons from grabbing focus
+  * build: require jack
+  * main: rm unnused arguments, clean
+  * misc: clean (rm unnused seq dirty flags)
+  * misc: rm unnused xpm
+  * sequence: compute how many times a sequence played since enabled osc: api update
+  * sequence: (seq32) lfo editor
+  * seqedit: rm unused rec volume
+  * lfo: missing files
+  * osc: rename file and add license header
+  * log: update
+  * mainwnd: bpm/ss entry leave focus on enter
+  * misc: don't deinit jack if jack-transport is not set
+  * misc: rm unused xpm
+  * main: (seq32) export single sequence main: export single screenset
+  * sequence: add "resume" mode (resumes note when enabling sequence)
+  * lfo: window title
+  * gtk3: mainwindow (wip)
+  * mainwindow: define colors/styles in header file
+  * mainwindow: continue !
+  * mainwindow: context menu
+  * sequencemenu: ok except edit and export
+  * mainwindow: main menu ok
+  * sequencebutton: export menu action & tweaks
+  * mainwindow: sequence drag and drop
+  * midifile: dont toggle global_is_modified when applying file's bpm
+  * mainwindow: looks good to me
+  * mainwindow: fix sequence bg update when changing sset
+  * mainwindow: play state & tweaks
+  * mainmindow: update seq after cut
+  * mainwindow: entry tweak editwindow: begin
+  * clean
+  * editwindow: getting started
+  * pianoroll: keys, grid & note paint
+  * pianoroll: mouse interaction ok
+  * pianoroll: snap -> grid opacity
+  * editwindow: edit menu
+  * editwindow: eventroll ok
+  * editwindow: menu actions and transport kb control
+  * editwindow: dynamic undo/redo buttons sensitivity
+  * pianoroll: selection square fill
+  * perform: relax main loop
+  * perform: some stats code if needed
+  * editwindow: getting better
+  * editwindow: snap, note length, output menus
+  * editwindow: record menu, rm xpms
+  * editwindow: timeroll
+  * editwindow: init rec options
+  * rebrandin'
+  * update license
+  * editwindow: small tweaks and fixes
+  * editwindow: playing btn
+  * editwindow: no focus on playing btn
+  * editwindow: fix conflicts between entries and accels
+  * transport menu
+  * edit window: playing button style
+  * editwindow: dataroll ok
+  * editwindow: tweak layout and draw first measure vert line
+  * editwindow: event button & pixel tweaks
+  * pianoroll: px perfect click
+  * eventroll: px perfect click
+  * eventroll: 3px wide events; pianoroll: create longer notes by 1 tick
+  * pianoroll/eventroll: bypass snap when alt is pressed
+  * pianoroll: note grow snap
+  * eventroll: snap issue
+  * misc: indent
+  * pianoroll: some undo fixes
+  * dataroll: stacked sliders fix
+  * editwindow: evevnt selection menu
+  * editwindow: event vs note edit actions
+  * misc: resize win
+  * editwindow: dynamic event menu tooltip
+  * pianokeys: play notes on click
+  * editwindow: prevent offscreen draw
+  * misc: scoped style
+  * editwindow: mouse interaction issue when pressing alt while editing
+  * cli: short options
+  * build: get rid of automake, clean repo
+  * readme: build instructions
+  * readme: missing dependency
+  * main: rm rc/usr file log messages
+  * make: format
+  * misc: comment
+  * main: headless mode misc: rm some unused code
+  * sequence: push undo before reverse misc: more unused globals
+  * sequence: don't push events when timestamp == 0
+  * Revert "editwindow: mouse interaction issue when pressing alt while editing"
+  * editwindow: alt key to bypass snapping
+  * pianoroll: better snap
+  * pianoroll: paste snap
+  * sequence: update mainwindow on undo/redo
+  * pianoroll: update rect on alt key
+  * pianoroll: only draw grid & notes when needed
+  * midibus: prevent segfault at startup
+  * sequencebutton: fix uninitialized variable
+  * main: missing rc/usr file parse
+  * editwindow: full width hscrollbar
+  * pianoroll: redraw grad on snap change
+  * osc: use slash instead of underscores in paths doc: put osc doc in readme
+  * editwindow: adjust hscroll when zooming out
+  * editwindow: show/hide hscrollbar
+  * dataroll: only draw when dirty
+  * eventroll: only draw when dirty
+  * editwindow: queue background drawing
+  * sequencebutton: rm useless signal
+  * main/editwindow: add some tooltips editwindow: force release snap bypass on focus out
+  * readme: jack transport
+  * readme: phrasing
+  * editwindow: default snap 16th
+  * eventroll: missing bg draw
+  * build: rebuild when headers are modified repo: update gitignore
+  * mainwindow: optimize grid drawing
+  * perform: relax main loop
+  * perform: misc change in main loop
+  * editwindow: uninitialized variables
+  * sequencebutton: missing draw
+  * sequencebutton: active marker color
+  * userfile: basic keymap support
+  * eventroll: rm right border
+  * keymap: fix init
+  * config file: touch if not found
+  * option file: app name
+  * sequencebutton: neutral marker color
+  * dataroll: missing draw update
+  * cli: add `--config`
+  * editwindow/sequencebutton: output name format
+  * core/globals: no gtkmm needed here
+  * build: no need to pkg-config nlohmann-json
+  * style: scope that 1px style fix
+  * readme: short description
+  * build: install/uninstall rules package: make it -alpha until it's not
+  * changelog: compact
+  * package: arch PKGBUILD, icon file & desktop file
+  * readme/help: misc changes
+  * ui: apply style to dialogs
+  * misc: human-readable css
+  * ui: dialog tweak
+  * ui: prevent theme from changing button size
+  * mainwindow: change icons for screen set spinbutton
+  * ui: messagedialog button size fix
+  * ui: dialog border tweaks
+  * ui: combobox menu arrow bgcolor
+  * man: now there's one
+  * man: prepare for html version
+  * man: typo
+  * menubar: tiny style fix
+  * osc: add /bpm command
+  * editwindow: disable accelerators when editing seqname to allow default text editing shortcuts
+  * import: assign screen set name to correct set
+  * perform: don't use jack time, it gets all schwifty with our jack transport implementation, system clock is good enough.
+  * editwindow: keep ctrl+w combo in entry
+  * perform: fix transport restart with jack
+  * jack transport fix
+  * more transport tweaks
+  * clean & handle sigint quit
+  * proper stop when quitting
+  * editwindow: reduce drawing cost
+  * init (clean repo)
+  * add seq24rc
+  * seqedit: dont apply measure length and beat per measure settings while typing (wait for ENTER or focus-out)
+  * perform: reduce trigger sleep time to match 5ms latency
+  * perform: revert sleep fix and try reducing trigger width constant
+  * mainwnd: use perf start/stop methods
+  * perf: get rid of usleep when trig/starting
+  * perf: don't retreive jack_pos.frame again when playing to avoid missing the first note of a pattern -> jack_pos is retreived in jack_sync_callback -> only retreive beat information to follow measures and bpm changes -> set inner bpm when jack bol changes
+  * perf: add trig/start usleep for alsa mode only
+  * perf: allow inner bpm change when running (jack)
+  * perform: turn notes off when trig/starting (use usleep in jack & alsa mode to ensure the current loop iteration finishes)
+  * osc control
+  * doc
+  * osc: tweaks and fix
+  * osc: better seq selection, add selection by name/pattern
+  * osc doc
+  * osc: status formatting
+  * osc: fix sequence name matching
+  * scrollable main window
+  * disable song editor
+  * disable song editor; disable keyboard shortcuts except for play/stop
+  * bigger piano keys; increase small font size
+  * clean
+  * clean song mode removal
+  * mainwid: fix midi bus number offset on seq thumbnails
+  * build: fix gcc warnings, hide deprecation warnings, error on warning
+  * seqedit: update name only on focus out / enter & clean
+  * misc: remove old gtk tooltip code
+  * build: drop windows support
+  * misc: remove void in parenthesis
+  * build: fix build without win32 files
+  * engine: remove jack master mode
+  * misc: clean
+  * main: remove option panel
+  * misc: clean old sebkha-chott mods
+  * misc: remove --priority
+  * misc:clean
+  * midi: remove midi controls, midi clock and sysex passing
+  * - misc: remove non alsa midi port code - userfile: apply user bus/channel/control definitions - sequence: display user channel definition
+  * seqedit: better menu full icon
+  * config files: clean
+  * seqedit: make buttons give back focus to allow ctrl+z right after a button action seqedit: remove some unnused code
+  * seqedit: seqdata undo fix + some clean
+  * editwindow: snap to grid toggle; smart snap grid draw (+triplets compatibility)
+  * readme: restore truth
+  * automake hint & rm generic install
+  * make: let warnings pass
+  * reasme: transport
+  * sequencebutton: display queued state
+  * perform: ensure panic unqueue sequences
+  * editwindow: resume menu option
+  * config/cache: refactor, use json, xdg folders
+  * build: add json dep
+  * midibus: remove id prefix in port name
+  * perform: steady clock
+  * mainwindow: force redraw on panic when not playing
+  * pianoroll: unsnap selection box starting point
+  * readme: osc status can reply on unix socket
+  * main: graceful sigint (liblo doesn't free osc.unix socket otherwise)
+  * package: put package name and version in a separate header
+  * main: only bind sigint if needed
+  * main: better osc unix socket port detection
+  * mainwindow: more robust draw update for sequence buttons
+  * main/editwindow: title update
+  * editwindow: playback menu
+  * editwindow: delete when closing
+  * perform: reliable playback restart without jack transport
+  * build: missing DESTDIR
+  * repo: rm arch file, already maintained at AUR
+  * readme: doc link
+  * man: typo
+  * sequence: don't disable recording when closing the edit window sequencebutton: show recording state
+  * osc: control sequence record state
+  * sequence: don't record sysex events
+  * sequence: remove channel bit when recording (issue #3)
+  * sequence osc clear: fix code style and let command affect multiple sequences
+  * sequence osc clear: update man
+  * sequence record: apply edit window's grid to quantiezd record mode
+  * sequence record: fine quantization and overwrite for events other than notes
+  * editwindow: allow zooming up to 0.5 tick per pixel
+  * editwindow: draw events from a copied list to prevent threading issue when recording
+  * sequence: clean thread safe drawing patch
+  * editwindow: event menu arrow bg color
+  * manual: typo
+  * manual: typo
+  * menu: arrow style fix
+  * osc: add sequence recording status
+  * osc: add record toggle control mode
+  * readme: add screenshots
+  * man: attempt to document ui
+  * man: formatting
+  * man: add src link
+  * readme: link to web ui
+  * man: update
+  * man: link
+  * man: typos
+  * clean
+  * nsm: add support for nsm protocol with optional-gui and dirty capabilities
+  * nsm: missing visibilit announce init
+  * nsm: avoid edge case segfault
+  * nsm: prevent server from overriding cached visibility state
+  * nsm: update desktop file
+  * nsm: client should start hidden by default
+  * nsm: support API version 1.1.0
+  * nsm: use client_id as alsa client name
+  * nsm: make sure alsa seq client uses nsm client_id
+  * missing xpm header
+  * sequence btn: reduce repaint
+  * fix using jack transport bpm
+  * dataroll: alt control view
+  * sequence: save alt cc in sequence/file
+  * alt control view: use tertiary color and display legend
+  * editwindow: add background sequence view
+  * background sequence: work in screenset > 0
+  * misc: remove all gtkmm deprecated symbols
+  * editwindow: clear focus before close
+  * sequence: typo breaking  file export
+  * midi file: don't write sequence alt_cc if not set (-1 is invalid and corrupts the file)
+  * midi file: always write alt cc but with an offset
+  * perform: guess who learned condition variables (thread safe transport restart)g
+  * sequence button: reasonnable drawing perfs
+  * jack transport: ignore invalid bpm
+  * perform: fix drifting clock and tighten the loop
+  * perform: main loop tweaked and slightly relaxed
+  * perform: store partial ticks in ticks instead of time
+  * sequencebutton: dirty check conflict
+  * clean
+  * osc: expose seq cut/copy/paste/delete actions
+  * mainwindow: detect sequence deletion without ui action
+  * seq button: add delete action
+  * editwindow: menu label align issue
+  * man update
+  * misc: reset file permissions
+  * timeroll: scroll glitch
+  * timeroll: scroll glitch
+  * build: make jack and gtk optional
+  * nsm: fix broken save
+  * tag 1.0.0
+  * sequence button: clean middle click code & prevent crash if sequence doesn't exist
+  * man: update
+  * package: bump dev
+  * edit window: fix upper bound of pitch wheel events: skip step 8064 to reach 8192 when displayed value is 127; change pitch wheel event slider's origin
+  * clean up pitchbend fix and keep recording incoming pitchbend with full precision
+  * instrument color: more consistent implementation grid: display user bus/channel names
+  * remove disposable file and add some missing strings
+  * sequencebutton: display 1-indexed bus/channel number
+  * sequencebutton: draw time signature again
+  * sequence: better queuing and misc changes - add the possibility to chose a sequence as sync reference for queued sequences - add ctrl+click for queuing, shift+click for chosing sync reference - change queue hint position
+  * sequence: fix queue offset
+  * doc: update
+  * log:update
+  * sequence: add cc & pitchbend chase
+  * sequence: missing session_modified flag changes
+  * edit window: fix aftertouch editing
+  * edit window: wrong is_modifed flag set
+  * edit window:  fix initial scroll and follow transpose
+  * log: update
+  * make: adjust flags
+  * edit window: update event selection dropdown label for aftertouch
+  * misc: avoid some warning
+  * edit window: draw horizontal line at pitchwheel = 0
+  * edit window: consistent busname display
+  * package: next is 1.1.0
+  * misc: handcrafted tiny icons
+  * misc: various tweaks, nice "+" icon
+  * mainwindow: smaller play icon
+  * mainwindow: the rocket must be pointy
+  * misc: play icon more pointy
+  * history: restore seq24 name in history
+  * misc: rotate bus icon
+  * v1.1.0
+  * log: headless build
+  * misc: centering panic icon
+  * log: middle click to open edit window
+  * config: allow setting colors, controls and note names per bus, not only per channel
+  * misc: gtk tweaks
+  * gui: missing files
+  * bump dev version
+  * misc: style regression in dialogs
+  * misc: faster compile after css changes
+  * edit window:display user-defined bus/channel color under the output menu button
+  * misc: fix custombox color init
+  * css: get rid of gtk highlight on icons
+  * release 1.2.0
+  * config file: prevent some errors
+  * log: new shots
+  * sequencebutton: legibility improvements
+  * sequencegrid: prevent blink on sequence drop
+  * readme: fedora dev packagesg
+  * edit window: when no event is selected, hitting Del or Backspace removes the event under the pointer
+  * misc:  add `ctrl+space` shortcut to stop playback
+  * perform: add osc method for changing cursor position
+  * man: /cursor
+  * editwindow: prevent crash when opening event menu with a config file loaded
+  * typo breaking user-defined bus names in sequence bus menu
+  * sequence button: add rename menu action
+  * clean
+  * memory: manage some unmanaged widgets
+  * mainwindow: add kbd shortcuts for sequence menu actions
+  * sequencebutton: missing null check
+  * mainwindow: use arrow keys to navigate in grid
+  * mainwindow: tweak kbd navigation
+  * log: kbd navigation
+  * package: not yet
+  * editwindow: update name when sequence is renamed from main window
+  * mainwindow: add f2 to rename as well
+  * sequencebutton: consistent instrument menu
+  * 1.3.0
+  * man update
+  * perform/mainwindow: add global undo/redo
+  * misc: clean undo implementation
+  * editwindow: add a toggle button and a keyboard shortcut for switching between draw and select modes
+  * xpm: now that's a pencil
+  * xpm: smaller pencil for consistency
+  * perform: prevent creating a new sequence on an existing one
+  * perf/seq: dead simple swing (osc only)
+  * perf: positive swing reference
+  * swing: better swing curve and cheaper pow()
+  * nsm: return correct error code when failing to save
+  * editwindow: fix regression with pianoroll/eventroll focus handling
+  * update man
+  * editwindow: bypass all keybindings while typing
+  * editwindow: rm unnecessary draw instructions
+  * pianoroll: prevent adding overlapping notes when drawing multiple notes in a drag of mouse
+  * log: update
+  * eventroll: prevent overlapping draw
+  * editwindow: tweak note overlap prevention
+  * editwindow:   add shift + click range selection
+  * sequence: include sequence name changes in undo/redo history
+  * main/perf: preserve playing sequences when undo/redo
+  * 1.4.0
+  * sequence: add measure & time sig to undo history edit window: fix some undo/redo issues
+  * mainwindow: add ctrl+shift+z for redo
+  * man: update
+  * sequence: fix loading anything after 1st bar
+  * sequence: copy history on assignment (preserve history after copy/move)
+  * misc: remove some unused variables
+  * swing: allow decimal swing reference value (for fun) and limit reference to sequence length
+  * swing: consistent negative swing vs positive swing; use pow() (approximation doesn't work here)
+  * misc: misplaced comment
+  * swing: use linear functions instead of pow to reduce cpu usage
+  * log: swing
+  * bump version
+  * misc: typo in variable name
+  * nsm: nsm server messages not processed in headless mode
+  * nsm: don't announce optional gui capability in headless mode
+  * main: loosen headless main loop
+  * package: 1.5.1
+  * man: update copyleft year
+  * readme: mark osc ui as proof-of-concept
+  * edit window / seq: save and restore grid unit / note length per sequence
+  * osc: build with liblo 0.32
+  * package: 1.6.0
+  * nsm: prevent window flickering when starting hidden
+  * sequence: fix pitchwheel chasing
+  * package: 1.6.1
+  * sequence: missing undo lock
+  * sequence: add slide notes backend event: keep channel stored now, for storing special event modes configfile: add per bus portamento settings
+  * gui: add side notes
+  * log/docs: slide notes
+  * doc: slide may work with poly
+  * sequence: use highest intersecting note as base for slide note
+  * doc: update
+  * event: tweack slide note rank
+  * misc: indent
+  * man: update
+  * docs: update
+  * sequence: prevent segfault with resume mode + unpaired note on
+  * sequence: verify_and_link routine order tweak
+  * sequence: fix some case of stuck slide notes fix during editing
+  * event: always refer to note on to check for slide note
+  * sequence: send slide note off after base note off (prevent glitch in fluidsynth)
+  * docs: typo
+  * docs: dets
+  * docs: dets
+  * sequence: change slide note channel to allow later use of other bitmask features stored in channel bits
+  * sequence: rm recorded event channel
+  * pianoroll: crop topleft corner on slide notes
+  * sequence: don't overwrite per-event channel in midi file
+  * editwindow: ctrl+s saves the session here too
+  * mainwindow: hint unsaved changes in window title
+  * log: latest changes
+  * style: better entry focus hint
+  * style: tweak seq rename dialog layout
+  * sequence: ignore event channel when importing midi that's not from seq192
+  * misc: method order
+  * perf: undoable import
+  * dataroll: fix vertical spacing of data numbers under event sliders
+  * sequence: fix portamento time for slide notes spanning over the end line
+  * pianoroll: replace horizontal lines with transparent key color reminder; add tiny corner radius on notes
+  * sequence: fix shrinking note spanning accross the end line & proper prevention of excessive grow/shrink
+  * pianoroll: a tiny bit more eye candy
+  * pianoroll: never lose a note dragged out of bar
+  * pianoroll: fix pasting accross the end line
+  * pianoroll: preserve slide notes when reversing pattern
+  * pianoroll: a bit more visually pleasant piano
+  * log: latest change
+  * css: 1px error
+  * pianokeys: less distracting hovered note hint
+  * man: update
+  * package: 1.7
+  * editwindow: smooth scrolling (breaks snapping & grid because of int coords)
+  * editwindow: smooth zoom & working grid/snap at any zoom
+  * log: smooth zoom
+  * editwindow: simpler snap
+  * editwindow: support horizontal scrolling with trackpad
+  * editwindow: add `q` shortcut to quantize selection
+  * dataroll: fix wheel data incr broken by smooth scrolling
+  * editwindow/sequence: add a way to type selected event's value
+  * editwindow: unmark events when cancelling data value dialog
+  * editwindow: linear smooth zoom
+  * timeroll: hint current scrolled-to measure
+  * timeroll: better measure hint
+  * timeroll adjust measure hint opacity
+  * pianoroll: pixel perfect note growth
+  * pianoroll: don't show growing rect until cursor moves
+  * sequence/editwindow: add cut to grid (ctrl+u) and join (ctrl+j) note actions
+  * package: bump
+
+  [ redtide ]
+  * Fixed makefile install
+
+  [ CarloCattano ]
+  *  Trying to map Clear & Undo to osc params , and attempt to stop being an -create issue kiddy- and write some actual code
+  *  Success adding /sequence clear i :-)
+  * Added backspace to remove notes on editor
+  * Check backspace to avoid breaking text inputs
+  * fixed typo Check backspace to avoid breaking text inputs
+  * removed .vscode and json/, whoops
+
+  [ Plagiat Gang Of Bros ]
+  * fix missing mkdir in makefile
+  * nsm: allow save as (as export)
+  * import: do not update global filename on import
+  * nsm: allow save as (as export)
+  * import: do not update global filename on import
+
+  [ Houston4444 ]
+  * enable middle click on a sequence to open edit window
+  * color sequence button with the color found in config file
+  * color only the header part of the sequence button to ensure sequence state readability
+  * synchronize the sequence when /sequence/queue is received, even if wanted playing state is the same than the current one
+
+ -- jean-emmanuel <jean-emmanuel@ammd.net>  Tue, 15 Jul 2025 10:59:04 +0200

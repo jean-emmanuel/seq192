@@ -65,3 +65,10 @@ uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/share/pixmaps/seq192.xpm
 	rm -f $(DESTDIR)$(PREFIX)/share/applications/seq192.desktop
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/seq192.1
+
+
+deb-changelog:
+	gbp dch
+
+deb:
+	dpkg-buildpackage --build=binary --unsigned-changes

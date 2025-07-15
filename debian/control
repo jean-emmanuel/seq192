@@ -1,0 +1,25 @@
+Source: seq192
+Section: audio
+Priority: optional
+Maintainer: ORL <orl@ammd.net>
+Build-Depends: debhelper-compat (= 13),
+               libjack-jackd2-dev,
+               liblo-dev,
+               libgtkmm-3.0-dev,
+               libasound2-dev,
+               nlohmann-json3-dev,
+Standards-Version: 4.5.0
+Vcs-Browser: https://github.com/jean-emmanuel/seq192
+Vcs-Git: https://github.com/jean-emmanuel/seq192
+Homepage: https://github.com/jean-emmanuel/seq192
+Rules-Requires-Root: no
+
+Package: seq192
+Architecture: all
+Depends: ${misc:Depends},
+         jackd2,
+         liblo7,
+         libgtkmm-3.0-1t64,
+         libasound2,
+Pre-Depends: ${misc:Pre-Depends}
+Description: MIDI and OSC controllable MIDI sequencer
