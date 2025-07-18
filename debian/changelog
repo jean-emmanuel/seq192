@@ -1,4 +1,4 @@
-seq192 (1.7.1) unstable; urgency=medium
+seq192 (1.8.0) unstable; urgency=medium
 
   [ jean-emmanuel ]
   * fix window size

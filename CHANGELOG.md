@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.7.1
+## 1.8.0
 
 - edit window
     - smooth horizontal scrolling & zooming
