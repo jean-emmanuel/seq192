@@ -1904,6 +1904,7 @@ sequence::toggle_selected_slide_note()
     }
 
     set_dirty();
+    m_list_event.sort();
     verify_and_link();
 
     unlock();
