@@ -155,6 +155,10 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
     /* for each Track in the midi file */
     for (int curTrack = 0; curTrack < NumTracks; curTrack++)
     {
+
+        /* empty track guard */
+        if ((file_size - m_pos) <= (int) sizeof (unsigned long)) break;
+
         /* done for each track */
         bool done = false;
         perf = 0;
