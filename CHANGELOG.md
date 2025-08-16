@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.8.1
+
+- bug fixes
+    - memory error when importing midi files from musescore
+
 ## 1.8.0
 
 - edit window
