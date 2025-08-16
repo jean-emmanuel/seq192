@@ -8,7 +8,7 @@ seq192 (1.8.1) unstable; urgency=medium
   * main: allow all midi file formats
   * midifile: check for format > 2 just in case it evolves
 
- -- bordun <jean-emmanuel@ammd.net>  Sat, 16 Aug 2025 17:08:04 +0200
+ -- bordun <jean-emmanuel@ammd.net>  Sat, 16 Aug 2025 17:09:51 +0200
 
 seq192 (1.8.0) unstable; urgency=medium
 
