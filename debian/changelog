@@ -1,3 +1,15 @@
+seq192 (1.8.1) unstable; urgency=medium
+
+  [ jean-emmanuel ]
+  * sequence: sort events after toggling a slide note
+  * midifile prevent memory access error when reading file with a extra empty track (musescore does that apparently)
+  * log: ms fix
+  * main: allow loading midi files format 0
+  * main: allow all midi file formats
+  * midifile: check for format > 2 just in case it evolves
+
+ -- bordun <jean-emmanuel@ammd.net>  Sat, 16 Aug 2025 17:08:04 +0200
+
 seq192 (1.8.0) unstable; urgency=medium
 
   [ jean-emmanuel ]
