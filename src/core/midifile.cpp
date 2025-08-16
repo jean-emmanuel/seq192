@@ -144,6 +144,12 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
         return false;
     }
 
+    if (Format > 2) {
+        fprintf(stderr, "Unsupported MIDI format detected: %d\n", Format);
+        delete[]m_d;
+        return false;
+    }
+
     /* We should be good to load now   */
     /* for each Track in the midi file */
     for (int curTrack = 0; curTrack < NumTracks; curTrack++)
