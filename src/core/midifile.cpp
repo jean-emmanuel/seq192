@@ -144,8 +144,8 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
         return false;
     }
 
-    /* we are only supporting format 1 for now */
-    if (Format != 1) {
+    /* we are only supporting format 0 and 1 for now */
+    if (Format > 1) {
         fprintf(stderr, "Unsupported MIDI format detected: %d\n", Format);
         delete[]m_d;
         return false;

@@ -3,7 +3,10 @@
 ## 1.8.1
 
 - bug fixes
-    - memory error when importing midi files from musescore
+    - memory error when importing midi files from Musescore
+
+- main
+    - allow opening/importing midi file format 0 (such as clips from Ardour)
 
 ## 1.8.0
 
