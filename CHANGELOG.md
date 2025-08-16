@@ -6,7 +6,7 @@
     - memory error when importing midi files from Musescore
 
 - main
-    - allow opening/importing midi file format 0 (such as clips from Ardour)
+    - allow opening/importing midi file formats 0 (e.g clips from Ardour) and 2
 
 ## 1.8.0
 
@@ -16,7 +16,7 @@
     - add `q` shortcut to quantize selection
     - allow setting selected event's value by typing a number
     - add cut to grid (ctrl+u) and join (ctrl+j) note actions
-    
+
 ## 1.7.0
 
 - main window
