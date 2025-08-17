@@ -16,6 +16,7 @@
 
 #include "midifile.h"
 #include <iostream>
+#include <cmath>
 
 midifile::midifile(const string& a_name)
 {
@@ -117,6 +118,10 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
     unsigned short ppqn;
     unsigned short perf;
 
+    unsigned short sig_nomiator;
+    unsigned short sig_denomitor;
+    bool has_timesig = false;
+
     /* track name from file */
     char TrackName[256];
 
@@ -154,9 +159,6 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
     /* for each Track in the midi file */
     for (int curTrack = 0; curTrack < NumTracks; curTrack++)
     {
-
-        /* empty track guard */
-        if ((file_size - m_pos) <= (int) sizeof (unsigned long)) break;
 
         /* done for each track */
         bool done = false;
@@ -338,8 +340,6 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                         seq->set_note_tick (m_d[m_pos++]);
                                         len--;
                                     }
-                                    /* eat the rest */
-                                    m_pos += len;
                                     break;
 
                                     /* Trk Done */
@@ -373,6 +373,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                     TrackName[i] = '\0';
 
                                     //printf("[%s]\n", TrackName );
+                                    len = 0;
                                     seq->set_name (TrackName);
                                     break;
 
@@ -380,11 +381,21 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                 case 0x00:
                                     if (len == 0x00)
                                         perf = 0;
-                                    else
+                                    else {
                                         perf = read_short ();
-
+                                        len -= 2;
+                                    }
                                     //printf ( "perf %d\n", perf );
                                     break;
+
+                                    /* sequence time signature */
+                                case 0x58:
+                                    sig_nomiator = m_d[m_pos++];
+                                    sig_denomitor = pow(2, m_d[m_pos++]);
+                                    has_timesig = true;
+                                    len -= 2;
+                                    break;
+
 
                                 default:
                                     // int c;
@@ -396,6 +407,10 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                     //printf("\n");
                                     break;
                             }
+
+                            /* eat the rest */
+                            m_pos += len;
+
                         }
                         else if(status == 0xF0)
                         {
@@ -434,6 +449,17 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
             /* the sequence has been filled, add it  */
             //printf ( "add_sequence( %d )\n", perf + (a_screen_set * c_seqs_in_set));
             a_perf->undoable_lock(false);
+
+
+            if (has_timesig) {
+                // if a standard midi time signature was found, use it
+                seq->set_bpm (sig_nomiator, false);
+                seq->set_bw (sig_denomitor, false);
+
+                // in fomat 2 all tracks should have their own signature
+                if (Format == 2) has_timesig = false;
+            }
+
             a_perf->add_sequence (seq, perf + (a_screen_set * c_seqs_in_set));
             a_perf->undoable_unlock();
         }
@@ -568,7 +594,13 @@ bool midifile::write (perform * a_perf, int a_screen_set, int a_sequence)
     write_long (0x00000006);
 
     /* format 1, number of tracks, ppqn */
-    write_short (0x0001);
+    if (a_sequence == -1) {
+        // multiple sequences = format 1
+        write_short (0x0001);
+    } else {
+        // sequence export = format 0
+        write_short (0x0000);
+    }
     write_short (numtracks);
     write_short (c_ppqn);
 
