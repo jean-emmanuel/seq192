@@ -1,3 +1,11 @@
+seq192 (1.8.2) unstable; urgency=medium
+
+  [ jean-emmanuel ]
+  * midifile: avoid wrong mem read, export sequences in format 0; use standard midi time sig when found
+  * package 1.8.2
+
+ -- bordun <jean-emmanuel@ammd.net>  Sun, 17 Aug 2025 12:14:41 +0200
+
 seq192 (1.8.1) unstable; urgency=medium
 
   [ jean-emmanuel ]
