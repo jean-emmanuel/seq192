@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.8.2
+
+- bug fixes
+    - more issues when opening midi files from other softwares
+
+- main
+    - exporting sequences now use midi format 0 for better interoperability
+
+
 ## 1.8.1
 
 - bug fixes
