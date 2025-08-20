@@ -3057,7 +3057,7 @@ sequence::get_note_tick()
 
 
 void
-sequence::get_quantized_rec( bool a_qr )
+sequence::set_quantized_rec( bool a_qr )
 {
     lock();
     m_quanized_rec = a_qr;

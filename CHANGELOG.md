@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.8.3
+
+- main window
+    - add record and playback submenu to sequence buttons
+
 ## 1.8.2
 
 - bug fixes

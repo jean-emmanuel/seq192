@@ -234,7 +234,7 @@ class sequence
     void set_note_tick(int a_ns);
     int get_note_tick();
 
-    void get_quantized_rec( bool a_qr );
+    void set_quantized_rec( bool a_qr );
     bool get_quantized_rec( );
 
     void set_thru (bool);

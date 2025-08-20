@@ -443,6 +443,49 @@ SequenceButton::on_button_release_event(GdkEventButton* event)
                 MenuItem * sep2 = manage(new SeparatorMenuItem());
                 menu->append(*sep2);
 
+
+                MenuItem * menu_item_record = manage(new MenuItem("Record"));
+                menu->append(*menu_item_record);
+
+                Menu *menu_record = manage(new Menu());
+                menu_item_record->set_submenu(*menu_record);
+
+                MenuItem * menu_item_togglerecord = manage(new MenuItem("Toggle record"));
+                menu_item_togglerecord->signal_activate().connect([&]{get_sequence()->set_recording(!get_sequence()->get_recording());});
+                menu_record->append(*menu_item_togglerecord);
+
+                CheckMenuItem * menu_item_quantized = manage(new CheckMenuItem("Quantized record"));
+                menu_item_quantized->set_active(seq->get_quantized_rec());
+                menu_item_quantized->signal_activate().connect([&]{get_sequence()->set_quantized_rec(!get_sequence()->get_quantized_rec());});
+                menu_record->append(*menu_item_quantized);
+
+                CheckMenuItem * menu_item_thru = manage(new CheckMenuItem("Pass through"));
+                menu_item_thru->set_active(seq->get_thru());
+                menu_item_thru->signal_activate().connect([&]{get_sequence()->set_thru(!get_sequence()->get_thru());});
+                menu_record->append(*menu_item_thru);
+
+
+                MenuItem * menu_item_playback = manage(new MenuItem("Playback"));
+                menu->append(*menu_item_playback);
+
+                Menu *menu_playback = manage(new Menu());
+                menu_item_playback->set_submenu(*menu_playback);
+
+                // MenuItem * menu_item_toggleplayback = manage(new MenuItem("Toggle playback"));
+                // menu_item_toggleplayback->signal_activate().connect([&]{get_sequence()->set_playing(!get_sequence()->get_playing());});
+                // menu_playback->append(*menu_item_toggleplayback);
+
+                CheckMenuItem * menu_item_resume = manage(new CheckMenuItem("Resume notes"));
+                menu_item_resume->set_active(seq->get_resume());
+                menu_item_resume->signal_activate().connect([&]{get_sequence()->set_resume(!get_sequence()->get_resume());});
+                menu_playback->append(*menu_item_resume);
+
+                CheckMenuItem * menu_item_chase = manage(new CheckMenuItem("Chase controls"));
+                menu_item_chase->set_active(seq->get_chase());
+                menu_item_chase->signal_activate().connect([&]{get_sequence()->set_chase(!get_sequence()->get_chase());});
+                menu_playback->append(*menu_item_chase);
+
+
                 MenuItem * menu_item7 = manage(new MenuItem("Midi Bus"));
                 menu->append(*menu_item7);
 
