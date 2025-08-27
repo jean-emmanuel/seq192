@@ -496,7 +496,7 @@ mastermidibus::mastermidibus()
     m_num_out_buses = 0;
     m_num_in_buses = 0;
 
-    for( int i=0; i<c_maxBuses; ++i ){
+    for( int i=0; i<c_max_busses; ++i ){
         m_buses_in_active[i] = false;
         m_buses_out_active[i] = false;
         m_buses_in_init[i] = false;
@@ -530,7 +530,7 @@ mastermidibus::init( )
     snd_seq_client_info_alloca(&cinfo);
     snd_seq_client_info_set_client(cinfo, -1);
 
-    int num_buses = 16;
+	int num_buses = global_num_busses;
 
     for( int i=0; i<num_buses; ++i )
     {
@@ -641,7 +641,7 @@ void
 mastermidibus::set_input( unsigned char a_bus, bool a_inputing )
 {
     lock();
-    if ( a_bus < c_maxBuses ){
+    if ( a_bus < c_max_busses ){
         m_init_input[a_bus] = a_inputing;
     }
 

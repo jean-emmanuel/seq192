@@ -41,6 +41,7 @@ option long_options[] = {
     {"config", 1,0,'c'},
     {"help",     0, 0, 'h'},
     {"osc-port", 1,0,'p'},
+    {"outputs", 1,0,'o'},
     {"jack-transport",0, 0, 'j'},
     {"no-gui",0, 0, 'n'},
     {"version",0, 0, 'v'},
@@ -63,10 +64,11 @@ bool global_with_jack_transport = false;
 bool global_is_running = true;
 
 char* global_oscport;
+int global_num_busses = 16;
 
 string global_client_name = PACKAGE;
 
-user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];
+user_midi_bus_definition   global_user_midi_bus_definitions[c_max_busses];
 user_instrument_definition global_user_instrument_definitions[c_max_instruments];
 user_keymap_definition     global_user_keymap_definitions[c_max_instruments];
 
@@ -123,29 +125,6 @@ int
 main (int argc, char *argv[])
 {
 
-    for (int i=0; i<c_maxBuses; i++)
-    {
-        for (int j=0; j<16; j++) {
-            global_user_midi_bus_definitions[i].instrument[j] = -1;
-            global_user_midi_bus_definitions[i].keymap[j] = -1;
-        }
-        global_user_midi_bus_definitions[i].portamento_max_time = 16383;
-        global_user_midi_bus_definitions[i].portamento_log_scale = false;
-
-    }
-
-    for (int i=0; i<c_max_instruments; i++)
-    {
-        for (int j=0; j<128; j++)
-            global_user_instrument_definitions[i].controllers_active[j] = false;
-    }
-
-    for (int i=0; i<c_max_instruments; i++)
-    {
-        for (int j=0; j<128; j++)
-            global_user_keymap_definitions[i].keys_active[j] = false;
-    }
-
     /* parse parameters */
     int c;
     while (1) {
@@ -153,7 +132,7 @@ main (int argc, char *argv[])
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "p:f:c:hjnv", long_options, &option_index);
+        c = getopt_long (argc, argv, "p:o:f:c:hjnv", long_options, &option_index);
 
         /* Detect the end of the options. */
         if (c == -1)
@@ -181,6 +160,7 @@ main (int argc, char *argv[])
                 printf("  -f, --file <filename>   load midi file on startup\n");
                 printf("  -c, --config <filename> load config file on startup\n");
                 printf("  -p, --osc-port <port>   osc input port (udp port number or unix socket path)\n");
+                printf("  -o, --outputs <n>       number of midi outputs (16 by default, 32 max)\n");
                 #ifdef USE_JACK
                 printf("  -j, --jack-transport    sync to jack transport\n");
                 #endif
@@ -213,6 +193,10 @@ main (int argc, char *argv[])
                 global_oscport = optarg;
                 break;
 
+            case 'o':
+                global_num_busses = min(atoi(optarg), c_max_busses);
+                break;
+
             case 'v':
                 printf("%s %s\n", PACKAGE, VERSION);
                 return EXIT_SUCCESS;
@@ -222,6 +206,29 @@ main (int argc, char *argv[])
                 break;
         }
 
+    }
+
+    for (int i=0; i<global_num_busses; i++)
+    {
+        for (int j=0; j<16; j++) {
+            global_user_midi_bus_definitions[i].instrument[j] = -1;
+            global_user_midi_bus_definitions[i].keymap[j] = -1;
+        }
+        global_user_midi_bus_definitions[i].portamento_max_time = 16383;
+        global_user_midi_bus_definitions[i].portamento_log_scale = false;
+
+    }
+
+    for (int i=0; i<c_max_instruments; i++)
+    {
+        for (int j=0; j<128; j++)
+            global_user_instrument_definitions[i].controllers_active[j] = false;
+    }
+
+    for (int i=0; i<c_max_instruments; i++)
+    {
+        for (int j=0; j<128; j++)
+            global_user_keymap_definitions[i].keys_active[j] = false;
     }
 
     // nsm

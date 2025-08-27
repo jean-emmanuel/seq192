@@ -133,17 +133,17 @@ class mastermidibus
     int m_num_out_buses;
     int m_num_in_buses;
 
-    midibus *m_buses_out[c_maxBuses];
-    midibus *m_buses_in[c_maxBuses];
+    midibus *m_buses_out[c_max_busses];
+    midibus *m_buses_in[c_max_busses];
     midibus *m_bus_announce;
 
-    bool m_buses_out_active[c_maxBuses];
-    bool m_buses_in_active[c_maxBuses];
+    bool m_buses_out_active[c_max_busses];
+    bool m_buses_in_active[c_max_busses];
 
-    bool m_buses_out_init[c_maxBuses];
-    bool m_buses_in_init[c_maxBuses];
+    bool m_buses_out_init[c_max_busses];
+    bool m_buses_in_init[c_max_busses];
 
-    bool m_init_input[c_maxBuses];
+    bool m_init_input[c_max_busses];
 
     /* id of queue */
     int m_queue;

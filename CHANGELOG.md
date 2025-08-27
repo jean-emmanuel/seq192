@@ -5,6 +5,9 @@
 - main window
     - add record and playback submenu to sequence buttons
 
+- main
+    - add `-o / --ouptuts` cli option to set the number of output busses
+
 ## 1.8.2
 
 - bug fixes

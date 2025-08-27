@@ -2846,6 +2846,9 @@ sequence::operator= (const sequence& a_rhs)
         m_resume        = a_rhs.m_resume;
         m_chase         = a_rhs.m_chase;
 
+        m_thru          = a_rhs.m_thru;
+        m_quanized_rec  = a_rhs.m_quanized_rec;
+
         m_time_measures = a_rhs.m_time_measures;
     	m_time_beats_per_measure = a_rhs.m_time_beats_per_measure;
     	m_time_beat_width = a_rhs.m_time_beat_width;

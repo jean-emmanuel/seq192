@@ -47,8 +47,6 @@ const double c_bpm_scale_factor          = 1000.0;  /* used in midifile for doub
 const double c_bpm_minimum               = 1.0;
 const double c_bpm_maximum               = 600.0;
 
-const int c_maxBuses = 32;
-
 /* sequences */
 const int c_note_off_margin = 1;  // # ticks to shave off end of painted notes
 const int c_num_keys = 128;
@@ -92,7 +90,10 @@ extern string global_filename;
 extern string last_used_dir;
 extern bool is_pattern_playing;
 
-const int c_max_instruments = 256;
+extern int global_num_busses;
+
+const int c_max_busses = 32;
+const int c_max_instruments = c_max_busses * 16;
 
 const int c_max_undo_history = 30;
 
@@ -121,7 +122,7 @@ struct user_keymap_definition
 };
 
 
-extern user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];
+extern user_midi_bus_definition   global_user_midi_bus_definitions[c_max_busses];
 extern user_instrument_definition global_user_instrument_definitions[c_max_instruments];
 extern user_keymap_definition     global_user_keymap_definitions[c_max_instruments];
 
