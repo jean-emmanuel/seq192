@@ -258,6 +258,7 @@ class sequence
 
     /* dumps contents to stdout */
     void print ();
+    std::string to_json();
 
     /* dumps notes from tick and prebuffers to
        ahead.  Called by sequencer thread - performance */
