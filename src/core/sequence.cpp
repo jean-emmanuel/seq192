@@ -3219,7 +3219,7 @@ sequence::put_event_on_bus( event *a_e )
         m_masterbus->flush();
     }
 
-    if (a_e->is_note_off() && !a_e->is_slide_note()) {
+    if (a_e->is_note_off() && !a_e->is_slide_note() && a_e->is_linked()) {
         // if end of base note
 
         if (a_e->get_linked()->get_active_slide() != NULL) {
