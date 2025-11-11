@@ -241,11 +241,6 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
                    //     fprintf(stderr,"data[0] : %d | data[1] %d\n",data[0],data[1]);
 
-                        // some files have vel=0 as note off
-                        if ((status & 0xF0) == EVENT_NOTE_ON && data[1] == 0)
-                        {
-                            e.set_status (EVENT_NOTE_OFF);
-                        }
 
                         //printf( "%02X %02X\n", data[0], data[1] );
 
