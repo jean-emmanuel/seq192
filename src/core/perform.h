@@ -217,6 +217,7 @@ class perform
         SEQ_SSEQ_QUEUED,
         SEQ_STATUS,
         SEQ_STATUS_EXT,
+        SEQ_SEQ_EDIT,
 
         SEQ_MODE_SOLO,
         SEQ_MODE_ON,
@@ -231,6 +232,11 @@ class perform
         SEQ_MODE_PASTE,
         SEQ_MODE_DELETE,
         SEQ_MODE_CLEAR,
+
+        SEQ_MODE_TICKS,
+        SEQ_MODE_BEATS,
+        SEQ_MODE_ADD_NOTE,
+        SEQ_MODE_DELETE_NOTE,
 
     };
 
@@ -247,7 +253,8 @@ class perform
         {"/sequence/trig",      SEQ_SSEQ_AND_PLAY},
         {"/sequence/queue",     SEQ_SSEQ_QUEUED},
         {"/status",             SEQ_STATUS},
-        {"/status/extended",    SEQ_STATUS_EXT}
+        {"/status/extended",    SEQ_STATUS_EXT},
+        {"/sequence/edit",      SEQ_SEQ_EDIT},
     };
 
     std::map<std::string, int> osc_seq_modes = {
@@ -266,6 +273,12 @@ class perform
         {"clear",               SEQ_MODE_CLEAR}
     };
 
+    std::map<std::string, int> osc_seq_edit_modes = {
+        {"ticks",               SEQ_MODE_TICKS},
+        {"beats",               SEQ_MODE_BEATS},
+        {"add_note",            SEQ_MODE_ADD_NOTE},
+        {"delete_note",         SEQ_MODE_DELETE_NOTE},
+    };
 
     friend class mainwid;
     friend class midifile;
